@@ -25,6 +25,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 buildscript {
     repositories {
         jcenter()
+	mavenCentral()
     }
     dependencies {
       classpath "at.bxm.gradleplugins:gradle-svntools-plugin:latest.release"
@@ -32,6 +33,7 @@ buildscript {
 }
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'application'
 apply plugin: 'maven-publish'
 apply plugin: "at.bxm.svntools"
 
@@ -44,6 +46,9 @@ ext.pluginsDir = "${rootDir}/plugins"
 // java settings
 def jvmArguments = ['-Xms128M', '-Xmx1024M']
 ext.ofbizMainClass = 'org.apache.ofbiz.base.start.Start'
+
+mainClassName = 'Start'
+
 javadoc.failOnError = true
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -67,6 +72,7 @@ allprojects {
     repositories{
         jcenter()
         mavenLocal()
+	mavenCentral()
     }
 }
 
@@ -140,6 +146,11 @@ dependencies {
     compile 'org.zapodot:jackson-databind-java-optional:2.4.2'
     compile 'oro:oro:2.0.8'
     compile 'wsdl4j:wsdl4j:1.6.2'
+    compile 'org.springframework:spring-core:3.2.5.RELEASE'
+    compile 'org.springframework:spring-beans:3.2.5.RELEASE'
+    compile 'org.springframework:spring-context:3.2.5.RELEASE'
+    compile 'org.springframework:spring-webmvc:4.1.6.RELEASE'    
+
 
     // ofbiz unit-test compile libs
     testCompile 'org.mockito:mockito-core:1.+'
