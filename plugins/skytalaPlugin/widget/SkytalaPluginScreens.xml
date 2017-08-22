@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screens xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://ofbiz.apache.org/Widget-Screen" xsi:schemaLocation="http://ofbiz.apache.org/Widget-Screen http://ofbiz.apache.org/dtds/widget-screen.xsd">
+
+    <screen name="main">
+        <section>
+            <actions>
+                <set field="headerItem" value="main"/><!-- this highlights the selected menu-item with name "main" -->
+            </actions>
+            <widgets>
+                <decorator-screen name="main-decorator" location="${parameters.mainDecoratorLocation}">
+					<decorator-section name="body">
+						<label text="This is the main page"/>
+						<!-- <screenlet title="Add SkytalaPlugin">
+							<include-form name="AddSkytalaPlugin" location="component://skytalaPlugin/widget/SkytalaPluginForms.xml"/>
+						</screenlet> -->
+					</decorator-section>
+				</decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    
+    <!-- Find and list all ofbizdemos in a tabular format -->
+	<screen name="findProductList">
+		<section>
+		<actions>
+			<set field="headerItem" value="findProductList"/>
+			<set field="titleProperty" value="Product List"/>
+			
+			
+			<set field="skytalaPluginCtx" from-field="parameters"/>
+		</actions>
+		<widgets>
+			<decorator-screen name="main-decorator" location="${parameters.mainDecoratorLocation}">
+				<decorator-section name="body">
+					<section>
+						<condition>
+							<if-has-permission permission="SKYTALAPLUGIN" action="_VIEW"/>
+						</condition>
+					<widgets>
+						<decorator-screen name="FindScreenDecorator" location="component://common/widget/CommonScreens.xml">
+						<decorator-section name="search-options">
+							<include-form name="findProductList" location="component://skytalaPlugin/widget/SkytalaPluginForms.xml"/>
+						</decorator-section>
+						<decorator-section name="search-results">
+							<include-form name="productList" location="component://skytalaPlugin/widget/SkytalaPluginForms.xml"/>
+						</decorator-section>
+						<decorator-section	name="test this thing">
+							<include-form name="test" location="component://skytalaPlugin/widget/SkytalaPluginForms.xml"/>
+						</decorator-section>	
+						</decorator-screen>
+					</widgets>
+					<fail-widgets>
+						<label style="h3">${uiLabelMap.SkytalaPluginViewPermissionError}</label>
+					</fail-widgets>
+					</section>
+				</decorator-section>
+			</decorator-screen>
+		</widgets>
+		</section>
+	</screen>
+
+</screens>

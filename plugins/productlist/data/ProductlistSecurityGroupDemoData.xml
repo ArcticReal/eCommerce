@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-engine-xml>
+    <SecurityGroupPermission groupId="FULLADMIN" permissionId="PRODUCTLIST_ADMIN"/>
+    <SecurityGroupPermission groupId="FLEXADMIN" permissionId="PRODUCTLIST_CREATE"/>
+    <SecurityGroupPermission groupId="FLEXADMIN" permissionId="PRODUCTLIST_DELETE"/>
+    <SecurityGroupPermission groupId="FLEXADMIN" permissionId="PRODUCTLIST_UPDATE"/>
+    <SecurityGroupPermission groupId="FLEXADMIN" permissionId="PRODUCTLIST_VIEW"/>
+    <SecurityGroupPermission groupId="VIEWADMIN" permissionId="PRODUCTLIST_VIEW"/>
+    <SecurityGroupPermission groupId="BIZADMIN" permissionId="PRODUCTLIST_ADMIN"/>
+</entity-engine-xml>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entitymodel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/entitymodel.xsd">
+    <!-- ========================================================= -->
+    <!-- ======================== Defaults ======================= -->
+    <!-- ========================================================= -->
+    <title>Entity of SkytalaPlugin Component</title>
+    <description>None</description>
+    <copyright></copyright>
+    <version>0.1</version>
+    
+    <entity entity-name="SkytalaPluginType" package-name="org.apache.ofbiz.skytalaPlugin" title="SkytalaPlugin Type Entity">
+		<field name="skytalaPluginTypeId" type="id"><description>primary sequenced ID</description></field>
+		<field name="description" type="description"></field>
+		<prim-key field="skytalaPluginTypeId"/>
+	</entity>
+	<entity entity-name="SkytalaPlugin" package-name="org.apache.ofbiz.skytalaPlugin" title="SkytalaPlugin Entity">
+		<field name="skytalaPluginId" type="id"><description>primary sequenced ID</description></field>
+		<field name="skytalaPluginTypeId" type="id"></field>
+		<field name="firstName" type="name"></field>
+		<field name="lastName" type="name"></field>
+		<field name="comments" type="comment"></field>
+		<prim-key field="skytalaPluginId"/>
+		<relation type="one" fk-name="ODEM_OD_TYPE_ID" rel-entity-name="SkytalaPluginType">
+			<key-map field-name="skytalaPluginTypeId"/>
+		</relation>
+	</entity>
+
+</entitymodel>
