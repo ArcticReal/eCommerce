@@ -18,7 +18,7 @@
         <attribute type="String" mode="IN" name="name" optional="true"/>
     </service>
     
-    <service name="getallproducts" default-entity-name="SkytalaPlugin"  engine="java"  location = "com.companyname.skytalaPlugin.services.Products" invoke="search"	auth="true" export="true">
+    <service name="getallproducts" default-entity-name="SkytalaPlugin"  engine="java"  location = "com.companyname.skytalaPlugin.services.Products" invoke="search"	auth="false" export="true">
     	<description>Print out the list of Products</description>
     	<attribute type="String" 	mode="IN"	name="ID"	optional="true"/>
     	<attribute type="String"		mode="IN"	name="Name"	optional="true"/>

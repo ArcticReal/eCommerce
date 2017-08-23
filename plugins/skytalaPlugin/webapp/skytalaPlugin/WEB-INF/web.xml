@@ -42,7 +42,7 @@
             <param-name>allowedPaths</param-name>
             <param-value>/error:/control:/select:/index.html:/index.jsp:/default.html:/default.jsp:/images</param-value>
         </init-param>
-        <init-param><param-name>redirectPath</param-name><param-value>/control/main</param-value></init-param>
+<!--         <init-param><param-name>redirectPath</param-name><param-value>/control/main</param-value></init-param> -->
     </filter>
     <filter>
         <display-name>ContextFilter</display-name>
@@ -57,32 +57,26 @@
     <!-- NOTE: not all app servers support mounting implementations of the HttpSessionActivationListener interface -->
     <!-- <listener><listener-class>org.apache.ofbiz.webapp.control.ControlActivationEventListener</listener-class></listener> -->
 
+ 
     <servlet>
-        <description>SpringServlet</description>
-        <display-name>Spring Servlet</display-name>
-        <servlet-name>Spring Servlet</servlet-name>
-        <servlet-class>com.companyname.skytalaPlugin.services.RestServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    
-    <servlet>
-        <description>ControlServlet</description>
-        <display-name>Control Servlet</display-name>
-        <servlet-name>Control Servlet</servlet-name>
-        <servlet-class>org.apache.ofbiz.webapp.control.ControlServlet</servlet-class>
+        <description>DispatcherServlet</description>
+        <display-name>DispatcherServlet</display-name>
+        <servlet-name>DispatcherServlet</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
     
     
-    <servlet-mapping><servlet-name>Control Servlet</servlet-name><url-pattern>/control/*</url-pattern></servlet-mapping>
-	<servlet-mapping><servlet-name>Spring Servlet</servlet-name><url-pattern>/spring/*</url-pattern></servlet-mapping>
+ 
+    
+	<servlet-mapping><servlet-name>DispatcherServlet</servlet-name><url-pattern>/</url-pattern></servlet-mapping>
 	
 
     <session-config>
         <session-timeout>60</session-timeout><!-- in minutes -->
         <cookie-config>
             <http-only>true</http-only>
-            <secure>true</secure>
+            <secure>false</secure>
         </cookie-config>
         <tracking-mode>COOKIE</tracking-mode>
     </session-config>
