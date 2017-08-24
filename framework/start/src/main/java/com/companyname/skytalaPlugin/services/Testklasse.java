@@ -1,5 +1,7 @@
 package com.companyname.skytalaPlugin.services;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.ofbiz.base.util.Debug;
 import org.apache.ofbiz.entity.Delegator;
 import org.apache.ofbiz.entity.GenericEntityException;
@@ -12,6 +14,7 @@ public class Testklasse {
 	public static final String module = Testklasse.class.getName();
 	
 	
+	@SuppressWarnings("unlikely-arg-type")
 	public static Map<String, Object> testit(DispatchContext dctx, Map<String, Object> context){
 		
 		Map<String,Object> result = ServiceUtil.returnSuccess();

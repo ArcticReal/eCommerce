@@ -16,7 +16,7 @@ public class Simple {
 		
 	//	result=ServiceUtil.returnSuccess();
 		String eing = (""+context.get("eingabe"));
-		String weiter = (""+context.get("weiteresattribut"));
+		//String weiter = (""+context.get("weiteresattribut"));
 		System.out.println(""+context.get("eingabe"));
 		System.out.println(""+context.get("weiteresattribut"));
 		
