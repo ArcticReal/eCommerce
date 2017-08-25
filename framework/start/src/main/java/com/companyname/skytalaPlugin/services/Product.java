@@ -2,34 +2,35 @@ package com.companyname.skytalaPlugin.services;
 
 public class Product {
 
-	private String name;
-	private String id;
+	private String productName;
+	private String productId;
 	
 	Product(String newName, String newId){
-		setName(newName);
-		setId(newId);
+		setProductName(newName);
+		setProductId(newId);
 	}
 
-	
-	
-	public String getName() {
-		return name;
-	}
 
-	public void setName(String name) {
-		this.name = name;
+	public String getProductId() {
+		return productId;
 	}
 
 
 
-	public String getId() {
-		return id;
+	public void setProductId(String productId) {
+		this.productId = productId;
 	}
 
 
 
-	public void setId(String id) {
-		this.id = id;
+	public String getProductName() {
+		return productName;
+	}
+
+
+
+	public void setProductName(String productName) {
+		this.productName = productName;
 	}
 	
 }
