@@ -1,36 +1,43 @@
 package com.companyname.skytalaPlugin.services;
 
-public class Product {
+import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class Product {
+	
+	@JsonProperty("productName")  
 	private String productName;
+	@JsonProperty("productId") 
 	private String productId;
 	
-	Product(String newName, String newId){
-		setProductName(newName);
-		setProductId(newId);
+	public Product(String productName, String productId){
+		setProductName(productName);
+		setProductId(productId);
 	}
+	
 
 
 	public String getProductId() {
 		return productId;
 	}
 
-
-
+	
 	public void setProductId(String productId) {
 		this.productId = productId;
 	}
-
-
 
 	public String getProductName() {
 		return productName;
 	}
 
-
-
+	
 	public void setProductName(String productName) {
 		this.productName = productName;
 	}
 	
+	public Map<String, Object> getAttributeField(){
+
+		return ProductMapper.map(this);
+	}
 }

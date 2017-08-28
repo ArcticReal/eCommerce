@@ -8,6 +8,7 @@ import org.apache.ofbiz.entity.Delegator;
 import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
 import org.apache.ofbiz.entity.GenericValue;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,7 +45,11 @@ public class ProductListController {
 						(buf.get(i).getString("productName").contains(name) && 
 						buf.get(i).getString("productId").contains(id))) {
 					
-					returnval.add(new Product(buf.get(i).getString("productName"), buf.get(i).getString("productId")));
+					Product foundProduct = new Product("","");
+					foundProduct.setProductId(buf.get(i).getString("productId"));
+					foundProduct.setProductName(buf.get(i).getString("productName"));
+					
+					returnval.add(foundProduct);
 				}
 		
 			}
@@ -71,8 +76,11 @@ public class ProductListController {
 			List<GenericValue> buf = delegator.findAll("Product", false);
 			
 			for (int i = 0; i < buf.size(); i++) {
-				returnval.add(new Product(buf.get(i).getString("productName"), buf.get(i).getString("productId")));
+				Product foundProduct = new Product("","");
+				foundProduct.setProductId(buf.get(i).getString("productId"));
+				foundProduct.setProductName(buf.get(i).getString("productName"));
 				
+				returnval.add(foundProduct);				
 			}
 			
 			
@@ -92,15 +100,15 @@ public class ProductListController {
 	 * returns true on success
 	 * 
 	 */
-	@RequestMapping(method=RequestMethod.POST, value = "/createProduct")
-	public boolean createProduct(Product newProduct) {
+	@RequestMapping(method=RequestMethod.POST, value = "/createProduct", consumes = "application/json")
+	public boolean createProduct(@RequestParam String test) {
 				
-			
+		Product newProduct = new Product("","");
 		Delegator delegator = DelegatorFactory.getDelegator("default");
 		boolean returnval = true;
 
 		try {
-			GenericValue newValue = delegator.makeValue("Product", newProduct);
+			GenericValue newValue = delegator.makeValue("Product", newProduct.getAttributeField());
 			delegator.create(newValue);
 			
 		} catch (GenericEntityException e){
@@ -132,7 +140,7 @@ public class ProductListController {
 		try {
 			
 			
-			GenericValue newValue = delegator.makeValue("Product", newProduct);	
+			GenericValue newValue = delegator.makeValue("Product", newProduct.getAttributeField());	
 			returnval = delegator.store(newValue);
 			
 
