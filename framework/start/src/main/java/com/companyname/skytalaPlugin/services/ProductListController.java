@@ -1,18 +1,27 @@
 package com.companyname.skytalaPlugin.services;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.ofbiz.base.util.UtilMisc;
 import org.apache.ofbiz.entity.Delegator;
 import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
 import org.apache.ofbiz.entity.GenericValue;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.google.common.base.Splitter;
+import com.skytala.skytalaPlugin.command.Scheduler;
+import com.skytala.skytalaPlugin.command.Product.AddProduct;
 
 
 @RestController
@@ -100,24 +109,32 @@ public class ProductListController {
 	 * returns true on success
 	 * 
 	 */
-	@RequestMapping(method=RequestMethod.POST, value = "/createProduct", consumes = "application/json")
-	public boolean createProduct(@RequestParam String test) {
+	@RequestMapping(method=RequestMethod.POST, value = "/createProduct", consumes = "application/x-www-form-urlencoded")
+	public GenericValue createProduct(HttpServletRequest request) {
+		
+		String productName = request.getParameter("productName");
+		String productId = request.getParameter("productId");
 				
-		Product newProduct = new Product("","");
-		Delegator delegator = DelegatorFactory.getDelegator("default");
-		boolean returnval = true;
-
+		Product newProduct = new Product(productName, productId);
+		
+		AddProduct command = new AddProduct(newProduct);
+		
+		GenericValue returnVal = null;
+		
+		Scheduler scheduler = Scheduler.instance();
+		scheduler.schedule(command);
+		
 		try {
-			GenericValue newValue = delegator.makeValue("Product", newProduct.getAttributeField());
-			delegator.create(newValue);
-			
-		} catch (GenericEntityException e){
-			returnval = false;
+			scheduler.executeNext();
+			returnVal = command.getCreatedProduct();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
-				
+
+		return returnVal;		
 		
-		return returnval;
 	}
 	
 	/*
@@ -128,9 +145,38 @@ public class ProductListController {
 	 * returns the number of rows updated
 	 * 
 	 */
-	@RequestMapping(method=RequestMethod.PUT, value = "/updateProduct")
-	public int updateProduct(Product newProduct) {
+	@RequestMapping(method=RequestMethod.PUT, value = "/updateProduct", consumes = "application/x-www-form-urlencoded")
+	public int updateProduct(HttpServletRequest request) {
+
+		BufferedReader br;
+		String data = null;
+		Map<String, String> dataMap = null;
+
+		try {
+			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
+			data = br.readLine();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+			
 		
+		dataMap = Splitter.on('&')
+                .trimResults()
+                .withKeyValueSeparator(
+                        Splitter.on('=')
+                        .limit(2)
+                        .trimResults())
+                .split(data);
+		
+		
+		System.out.println(dataMap);
+		
+		String productName = dataMap.get("productName");
+		String productId = dataMap.get("productId");
+		
+		
+		Product newProduct = new Product(productName, productId);
 		
 		Delegator delegator = DelegatorFactory.getDelegator("default");
 		
@@ -139,10 +185,8 @@ public class ProductListController {
 		
 		try {
 			
-			
-			GenericValue newValue = delegator.makeValue("Product", newProduct.getAttributeField());	
+			GenericValue newValue = delegator.makeValue("Product", newProduct.mapAttributeField());	
 			returnval = delegator.store(newValue);
-			
 
 			
 		}catch(GenericEntityException e) {

@@ -36,7 +36,7 @@ public class Product {
 		this.productName = productName;
 	}
 	
-	public Map<String, Object> getAttributeField(){
+	public Map<String, Object> mapAttributeField(){
 
 		return ProductMapper.map(this);
 	}
