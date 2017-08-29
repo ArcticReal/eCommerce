@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ofbiz-component name="productlist"
+<ofbiz-component name="eCommerce"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/ofbiz-component.xsd">
     <!-- define resource loaders; most common is to use the component resource loader -->
@@ -12,10 +12,10 @@
     <!-- entity resources: model(s), eca(s), group, and data definitions -->
     <entity-resource type="model" reader-name="main" loader="main" location="entitydef/entitymodel.xml"/>
     <!-- <entity-resource type="eca" reader-name="main" loader="main" location="entitydef/eecas.xml"/> -->
-    <entity-resource type="data" reader-name="seed" loader="main" location="data/ProductlistTypeData.xml"/>
-    <entity-resource type="data" reader-name="seed" loader="main" location="data/ProductlistSecurityPermissionSeedData.xml"/>
-    <entity-resource type="data" reader-name="demo" loader="main" location="data/ProductlistSecurityGroupDemoData.xml"/>
-    <entity-resource type="data" reader-name="demo" loader="main" location="data/ProductlistDemoData.xml"/>
+    <entity-resource type="data" reader-name="seed" loader="main" location="data/ECommerceTypeData.xml"/>
+    <entity-resource type="data" reader-name="seed" loader="main" location="data/ECommerceSecurityPermissionSeedData.xml"/>
+    <entity-resource type="data" reader-name="demo" loader="main" location="data/ECommerceSecurityGroupDemoData.xml"/>
+    <entity-resource type="data" reader-name="demo" loader="main" location="data/ECommerceDemoData.xml"/>
 
     <!-- service resources: model(s), eca(s) and group definitions -->
     <service-resource type="model" loader="main" location="servicedef/services.xml"/>
@@ -24,13 +24,13 @@
     <service-resource type="group" loader="main" location="servicedef/groups.xml"/>
     -->
 
-    <test-suite loader="main" location="testdef/ProductlistTests.xml"/>
+    <test-suite loader="main" location="testdef/ECommerceTests.xml"/>
 
     <!-- web applications; will be mounted when using the embedded container -->
-    <webapp name="productlist"
-        title="Productlist"
+    <webapp name="eCommerce"
+        title="ECommerce"
         server="default-server"
-        location="webapp/productlist"
-        base-permission="OFBTOOLS,PRODUCTLIST"
-        mount-point="/productlist"/>
+        location="webapp/eCommerce"
+        base-permission="OFBTOOLS,ECOMMERCE"
+        mount-point="/eCommerce"/>
 </ofbiz-component>
