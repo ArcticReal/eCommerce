@@ -1,9 +1,17 @@
 package com.skytala.eCommerce.entity;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.ofbiz.entity.GenericValue;
+
 
 public class ProductMapper {
 
@@ -54,4 +62,33 @@ public class ProductMapper {
 			
 	}
 	
+	public static Product map(HttpServletRequest request) throws Exception {
+		
+		Product returnVal = new Product();
+		
+		Map<String, String[]> paramMap = request.getParameterMap();
+		
+		// Required; that's how it should look with required attributes (i think there wont be any except this one)
+		if(!paramMap.containsKey("productId")) {
+			throw new Exception("Error! Id required");
+		}
+		else {
+			returnVal.setProductId(request.getParameter("productId"));
+		}
+		
+		// every other attribute should be set like this
+		if(paramMap.containsKey("productName")) {			
+			returnVal.setProductName(request.getParameter("productName"));
+		}
+
+		// examples for parsing a string to other data types; getParameter only returns strings
+		String test = request.getParameter("test");
+		Float testInFloat = Float.parseFloat(test);
+
+		String test2 = request.getParameter("some date");
+		DateFormat df = new SimpleDateFormat();//i dont know how the time is formatted in ofbiz server
+		Date test2InDate = df.parse(test2);
+		
+		return returnVal;
+	}
 }
