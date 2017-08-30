@@ -1,5 +1,7 @@
 package com.skytala.eCommerce.entity;
 
+import java.util.Map;
+
 public class Product {
 
 	
@@ -33,4 +35,7 @@ public class Product {
 		this.productId = productId;
 	}
 	
+	public Map<String, Object> mapAttributeField() {
+		return ProductMapper.map(this);
+	}
 }
