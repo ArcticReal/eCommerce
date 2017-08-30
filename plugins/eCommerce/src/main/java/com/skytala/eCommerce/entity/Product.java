@@ -2,7 +2,7 @@ package com.skytala.eCommerce.entity;
 
 import java.util.Map;
 
-public class Product {
+public class Product{
 
 	
 	String productName;

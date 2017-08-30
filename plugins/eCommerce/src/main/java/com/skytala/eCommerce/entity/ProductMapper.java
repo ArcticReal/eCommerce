@@ -37,16 +37,17 @@ public class ProductMapper {
 		return returnVal;
 	}
 	
-	public static Product map(Map<String, Object> fields) {
+	public static Product map(Map<String, String> fields) {
 		
 		Product returnVal = new Product("","");
 		
+		//Just like in the next method you need to parse from string to the other data types
 		if(fields.get("productName") != null) {
-			returnVal.setProductName((String) fields.get("productName"));
+			returnVal.setProductName(fields.get("productName"));
 		}
 
 		if(fields.get("productId") != null) {
-			returnVal.setProductName((String) fields.get("productId"));
+			returnVal.setProductName(fields.get("productId"));
 		}
 		
 		return returnVal;
