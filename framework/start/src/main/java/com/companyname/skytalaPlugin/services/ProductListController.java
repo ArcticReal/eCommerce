@@ -54,7 +54,7 @@ public class ProductListController {
 						(buf.get(i).getString("productName").contains(name) && 
 						buf.get(i).getString("productId").contains(id))) {
 					
-					Product foundProduct = new Product("","");
+					Product foundProduct = new Product();
 					foundProduct.setProductId(buf.get(i).getString("productId"));
 					foundProduct.setProductName(buf.get(i).getString("productName"));
 					
@@ -85,7 +85,7 @@ public class ProductListController {
 			List<GenericValue> buf = delegator.findAll("Product", false);
 			
 			for (int i = 0; i < buf.size(); i++) {
-				Product foundProduct = new Product("","");
+				Product foundProduct = new Product();
 				foundProduct.setProductId(buf.get(i).getString("productId"));
 				foundProduct.setProductName(buf.get(i).getString("productName"));
 				
@@ -115,7 +115,7 @@ public class ProductListController {
 		String productName = request.getParameter("productName");
 		String productId = request.getParameter("productId");
 				
-		Product newProduct = new Product(productName, productId);
+		Product newProduct = new Product();
 		
 		AddProduct command = new AddProduct(newProduct);
 		
@@ -176,7 +176,7 @@ public class ProductListController {
 		String productId = dataMap.get("productId");
 		
 		
-		Product newProduct = new Product(productName, productId);
+		Product newProduct = new Product();
 		
 		Delegator delegator = DelegatorFactory.getDelegator("default");
 		
