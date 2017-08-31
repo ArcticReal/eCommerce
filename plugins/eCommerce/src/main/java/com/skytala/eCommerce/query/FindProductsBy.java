@@ -1,6 +1,7 @@
 package com.skytala.eCommerce.query;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -17,10 +18,10 @@ import com.skytala.eCommerce.event.ProductsFound;
 
 public class FindProductsBy implements Query{
 
-	Map<String, Object> filter;
+	Map<String, String> filter;
 	
-	public FindProductsBy(Map<String, Object> newFilter) {
-		this.filter = newFilter;
+	public FindProductsBy(Map<String, String> filter) {
+		this.filter = filter;
 	}
 	
 	@Override
@@ -51,19 +52,25 @@ public class FindProductsBy implements Query{
 	
 	public boolean applysToFilter(GenericValue val) {
 	
-		String[] keySet = (String[]) filter.keySet().toArray();
-		boolean returnVal = true;
+
+		Iterator<String> iterator = filter.keySet().iterator();
+
 		
-		for(int i = 0; i < filter.size(); i++) {
+		while(iterator.hasNext()) {
 
+			String key = iterator.next();
 
-			if(!filter.get(keySet[i]).equals(val.get(keySet[i]))) {
-				returnVal = false;
-				break;
+			if(val.get(key).getClass().equals(String.class)) {
+				if(!((String) val.get(key)).contains(filter.get(key))) {
+					return false;
+				}
+			}else if(!filter.get(key).equals(val.get(key))){
+				return false;
 			}
+
 		}
 		
-		return returnVal;
+		return true;
 	}
 
 }
