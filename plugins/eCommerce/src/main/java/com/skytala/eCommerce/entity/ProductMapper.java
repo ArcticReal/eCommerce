@@ -1,5 +1,6 @@
 package com.skytala.eCommerce.entity;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -416,11 +417,11 @@ public class ProductMapper {
 		}
 
 		if (fields.get("quantityIncluded") != null) {
-			returnVal.setQuantityIncluded((float) fields.get("quantityIncluded"));
+			returnVal.setQuantityIncluded((BigDecimal) fields.get("quantityIncluded"));
 		}
 
 		if (fields.get("piecesIncluded") != null) {
-			returnVal.setPiecesIncluded((int) fields.get("piecesIncluded"));
+			returnVal.setPiecesIncluded((long) fields.get("piecesIncluded"));
 		}
 
 		if (fields.get("requireAmount") != null) {
@@ -428,7 +429,7 @@ public class ProductMapper {
 		}
 
 		if (fields.get("fixedAmount") != null) {
-			returnVal.setFixedAmount((float) fields.get("fixedAmount"));
+			returnVal.setFixedAmount((BigDecimal) fields.get("fixedAmount"));
 		}
 
 		if (fields.get("amountUomTypeId") != null) {
@@ -440,11 +441,11 @@ public class ProductMapper {
 		}
 
 		if (fields.get("shippingWeight") != null) {
-			returnVal.setShippingWeight((float) fields.get("shippingWeight"));
+			returnVal.setShippingWeight((BigDecimal) fields.get("shippingWeight"));
 		}
 
 		if (fields.get("productWeight") != null) {
-			returnVal.setProductWeight((float) fields.get("productWeight"));
+			returnVal.setProductWeight((BigDecimal) fields.get("productWeight"));
 		}
 
 		if (fields.get("heightUomId") != null) {
@@ -452,11 +453,11 @@ public class ProductMapper {
 		}
 
 		if (fields.get("productHeight") != null) {
-			returnVal.setProductHeight((float) fields.get("productHeight"));
+			returnVal.setProductHeight((BigDecimal) fields.get("productHeight"));
 		}
 
 		if (fields.get("shippingHeight") != null) {
-			returnVal.setShippingHeight((float) fields.get("shippingHeight"));
+			returnVal.setShippingHeight((BigDecimal) fields.get("shippingHeight"));
 		}
 
 		if (fields.get("widthUomId") != null) {
@@ -464,11 +465,11 @@ public class ProductMapper {
 		}
 
 		if (fields.get("productWidth") != null) {
-			returnVal.setProductWidth((float) fields.get("productWidth"));
+			returnVal.setProductWidth((BigDecimal) fields.get("productWidth"));
 		}
 
 		if (fields.get("shippingWidth") != null) {
-			returnVal.setShippingWidth((float) fields.get("shippingWidth"));
+			returnVal.setShippingWidth((BigDecimal) fields.get("shippingWidth"));
 		}
 
 		if (fields.get("depthUomId") != null) {
@@ -476,11 +477,11 @@ public class ProductMapper {
 		}
 
 		if (fields.get("productDepth") != null) {
-			returnVal.setProductDepth((float) fields.get("productDepth"));
+			returnVal.setProductDepth((BigDecimal) fields.get("productDepth"));
 		}
 
 		if (fields.get("shippingDepth") != null) {
-			returnVal.setShippingDepth((float) fields.get("shippingDepth"));
+			returnVal.setShippingDepth((BigDecimal) fields.get("shippingDepth"));
 		}
 
 		if (fields.get("diameterUomId") != null) {
@@ -488,11 +489,11 @@ public class ProductMapper {
 		}
 
 		if (fields.get("productDiameter") != null) {
-			returnVal.setProductDiameter((float) fields.get("productDiameter"));
+			returnVal.setProductDiameter((BigDecimal) fields.get("productDiameter"));
 		}
 
 		if (fields.get("productRating") != null) {
-			returnVal.setProductRating((float) fields.get("productRating"));
+			returnVal.setProductRating((BigDecimal) fields.get("productRating"));
 		}
 
 		if (fields.get("ratingTypeEnum") != null) {
@@ -540,19 +541,19 @@ public class ProductMapper {
 		}
 
 		if (fields.get("billOfMaterialLevel") != null) {
-			returnVal.setBillOfMaterialLevel((int) fields.get("billOfMaterialLevel"));
+			returnVal.setBillOfMaterialLevel((long) fields.get("billOfMaterialLevel"));
 		}
 
 		if (fields.get("reservMaxPersons") != null) {
-			returnVal.setReservMaxPersons((float) fields.get("reservMaxPersons"));
+			returnVal.setReservMaxPersons((BigDecimal) fields.get("reservMaxPersons"));
 		}
 
 		if (fields.get("reserv2ndPPPerc") != null) {
-			returnVal.setReserv2ndPPPerc((float) fields.get("reserv2ndPPPerc"));
+			returnVal.setReserv2ndPPPerc((BigDecimal) fields.get("reserv2ndPPPerc"));
 		}
 
 		if (fields.get("reservNthPPPerc") != null) {
-			returnVal.setReservNthPPPerc((float) fields.get("reservNthPPPerc"));
+			returnVal.setReservNthPPPerc((BigDecimal) fields.get("reservNthPPPerc"));
 		}
 
 		if (fields.get("configId") != null) {
@@ -728,13 +729,14 @@ public class ProductMapper {
 			String buf;
 			buf = fields.get("quantityIncluded");
 			float ibuf = Float.parseFloat(buf);
-			returnVal.setQuantityIncluded(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setQuantityIncluded(bd);
 		}
 
 		if (fields.get("piecesIncluded") != null) {
 			String buf;
 			buf = fields.get("piecesIncluded");
-			int ibuf = Integer.parseInt(buf);
+			long ibuf = Long.parseLong(buf);
 			returnVal.setPiecesIncluded(ibuf);
 		}
 
@@ -749,7 +751,8 @@ public class ProductMapper {
 			String buf;
 			buf = fields.get("fixedAmount");
 			float ibuf = Float.parseFloat(buf);
-			returnVal.setFixedAmount(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setFixedAmount(bd);
 		}
 
 		if (fields.get("amountUomTypeId") != null) {
@@ -764,14 +767,16 @@ public class ProductMapper {
 			String buf;
 			buf = fields.get("shippingWeight");
 			float ibuf = Float.parseFloat(buf);
-			returnVal.setShippingWeight(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setShippingWeight(bd);
 		}
 
 		if (fields.get("productWeight") != null) {
 			String buf;
 			buf = fields.get("productWeight");
 			float ibuf = Float.parseFloat(buf);
-			returnVal.setProductWeight(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setProductWeight(bd);
 		}
 
 		if (fields.get("heightUomId") != null) {
@@ -782,14 +787,16 @@ public class ProductMapper {
 			String buf;
 			buf = fields.get("productHeight");
 			float ibuf = Float.parseFloat(buf);
-			returnVal.setProductHeight(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setProductHeight(bd);
 		}
 
 		if (fields.get("shippingHeight") != null) {
 			String buf;
 			buf = fields.get("shippingHeight");
 			float ibuf = Float.parseFloat(buf);
-			returnVal.setShippingHeight(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setShippingHeight(bd);
 		}
 
 		if (fields.get("widthUomId") != null) {
@@ -800,14 +807,16 @@ public class ProductMapper {
 			String buf;
 			buf = fields.get("productWidth");
 			float ibuf = Float.parseFloat(buf);
-			returnVal.setProductWidth(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setProductWidth(bd);
 		}
 
 		if (fields.get("shippingWidth") != null) {
 			String buf;
 			buf = fields.get("shippingWidth");
 			float ibuf = Float.parseFloat(buf);
-			returnVal.setShippingWidth(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setShippingWidth(bd);
 		}
 
 		if (fields.get("depthUomId") != null) {
@@ -818,14 +827,16 @@ public class ProductMapper {
 			String buf;
 			buf = fields.get("productDepth");
 			float ibuf = Float.parseFloat(buf);
-			returnVal.setProductDepth(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setProductDepth(bd);
 		}
 
 		if (fields.get("shippingDepth") != null) {
 			String buf;
 			buf = fields.get("shippingDepth");
 			float ibuf = Float.parseFloat(buf);
-			returnVal.setShippingDepth(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setShippingDepth(bd);
 		}
 
 		if (fields.get("diameterUomId") != null) {
@@ -836,14 +847,16 @@ public class ProductMapper {
 			String buf;
 			buf = fields.get("productDiameter");
 			float ibuf = Float.parseFloat(buf);
-			returnVal.setProductDiameter(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setProductDiameter(bd);
 		}
 
 		if (fields.get("productRating") != null) {
 			String buf;
 			buf = fields.get("productRating");
 			float ibuf = Float.parseFloat(buf);
-			returnVal.setProductRating(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setProductRating(bd);
 		}
 
 		if (fields.get("ratingTypeEnum") != null) {
@@ -914,7 +927,7 @@ public class ProductMapper {
 		if (fields.get("billOfMaterialLevel") != null) {
 			String buf;
 			buf = fields.get("billOfMaterialLevel");
-			int ibuf = Integer.parseInt(buf);
+			long ibuf = Long.parseLong(buf);
 			returnVal.setBillOfMaterialLevel(ibuf);
 		}
 
@@ -922,21 +935,24 @@ public class ProductMapper {
 			String buf;
 			buf = fields.get("reservMaxPersons");
 			float ibuf = Float.parseFloat(buf);
-			returnVal.setReservMaxPersons(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setReservMaxPersons(bd);
 		}
 
 		if (fields.get("reserv2ndPPPerc") != null) {
 			String buf;
 			buf = fields.get("reserv2ndPPPerc");
 			float ibuf = Float.parseFloat(buf);
-			returnVal.setReserv2ndPPPerc(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setReserv2ndPPPerc(bd);
 		}
 
 		if (fields.get("reservNthPPPerc") != null) {
 			String buf;
 			buf = fields.get("reservNthPPPerc");
 			float ibuf = Float.parseFloat(buf);
-			returnVal.setReservNthPPPerc(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setReservNthPPPerc(bd);
 		}
 
 		if (fields.get("configId") != null) {
@@ -998,10 +1014,10 @@ public class ProductMapper {
 		returnVal.setPrimaryProductCategoryId(val.getString("primaryProductCategoryId"));
 		returnVal.setManufacturerPartyId(val.getString("manufacturerPartyId"));
 		returnVal.setFacilityId(val.getString("facilityId"));
-		returnVal.setIntroductionDate(val.getDate("introductionDate"));
-		returnVal.setReleaseDate(val.getDate("releaseDate"));
-		returnVal.setSupportDiscontinuationDate(val.getDate("supportDiscontinuationDate"));
-		returnVal.setSalesDiscontinuationDate(val.getDate("salesDiscontinuationDate"));
+		returnVal.setIntroductionDate(val.getTimestamp("introductionDate"));
+		returnVal.setReleaseDate(val.getTimestamp("releaseDate"));
+		returnVal.setSupportDiscontinuationDate(val.getTimestamp("supportDiscontinuationDate"));
+		returnVal.setSalesDiscontinuationDate(val.getTimestamp("salesDiscontinuationDate"));
 		returnVal.setSalesDiscWhenNotAvail(val.getBoolean("salesDiscWhenNotAvail"));
 		returnVal.setInternalName(val.getString("internalName"));
 		returnVal.setBrandName(val.getString("brandName"));
@@ -1020,26 +1036,26 @@ public class ProductMapper {
 		returnVal.setInventoryItemTypeId(val.getString("inventoryItemTypeId"));
 		returnVal.setRequireInventory(val.getBoolean("requireInventory"));
 		returnVal.setQuantityUomId(val.getString("quantityUomId"));
-		returnVal.setQuantityIncluded(val.getFloat("quantityIncluded"));
-		returnVal.setPiecesIncluded(val.getInteger("piecesIncluded"));
+		returnVal.setQuantityIncluded(val.getBigDecimal("quantityIncluded"));
+		returnVal.setPiecesIncluded(val.getLong("piecesIncluded"));
 		returnVal.setRequireAmount(val.getBoolean("requireAmount"));
-		returnVal.setFixedAmount(val.getFloat("fixedAmount"));
+		returnVal.setFixedAmount(val.getBigDecimal("fixedAmount"));
 		returnVal.setAmountUomTypeId(val.getString("amountUomTypeId"));
 		returnVal.setWeightUomId(val.getString("weightUomId"));
-		returnVal.setShippingWeight(val.getFloat("shippingWeight"));
-		returnVal.setProductWeight(val.getFloat("productWeight"));
+		returnVal.setShippingWeight(val.getBigDecimal("shippingWeight"));
+		returnVal.setProductWeight(val.getBigDecimal("productWeight"));
 		returnVal.setHeightUomId(val.getString("heightUomId"));
-		returnVal.setProductHeight(val.getFloat("productHeight"));
-		returnVal.setShippingHeight(val.getFloat("shippingHeight"));
+		returnVal.setProductHeight(val.getBigDecimal("productHeight"));
+		returnVal.setShippingHeight(val.getBigDecimal("shippingHeight"));
 		returnVal.setWidthUomId(val.getString("widthUomId"));
-		returnVal.setProductWidth(val.getFloat("productWidth"));
-		returnVal.setShippingWidth(val.getFloat("shippingWidth"));
+		returnVal.setProductWidth(val.getBigDecimal("productWidth"));
+		returnVal.setShippingWidth(val.getBigDecimal("shippingWidth"));
 		returnVal.setDepthUomId(val.getString("depthUomId"));
-		returnVal.setProductDepth(val.getFloat("productDepth"));
-		returnVal.setShippingDepth(val.getFloat("shippingDepth"));
+		returnVal.setProductDepth(val.getBigDecimal("productDepth"));
+		returnVal.setShippingDepth(val.getBigDecimal("shippingDepth"));
 		returnVal.setDiameterUomId(val.getString("diameterUomId"));
-		returnVal.setProductDiameter(val.getFloat("productDiameter"));
-		returnVal.setProductRating(val.getFloat("productRating"));
+		returnVal.setProductDiameter(val.getBigDecimal("productDiameter"));
+		returnVal.setProductRating(val.getBigDecimal("productRating"));
 		returnVal.setRatingTypeEnum(val.getString("ratingTypeEnum"));
 		returnVal.setReturnable(val.getBoolean("returnable"));
 		returnVal.setTaxable(val.getBoolean("taxable"));
@@ -1051,14 +1067,14 @@ public class ProductMapper {
 		returnVal.setVirtualVariantMethodEnum(val.getString("virtualVariantMethodEnum"));
 		returnVal.setOriginGeoId(val.getString("originGeoId"));
 		returnVal.setRequirementMethodEnumId(val.getString("requirementMethodEnumId"));
-		returnVal.setBillOfMaterialLevel(val.getInteger("billOfMaterialLevel"));
-		returnVal.setReservMaxPersons(val.getFloat("reservMaxPersons"));
-		returnVal.setReserv2ndPPPerc(val.getFloat("reserv2ndPPPerc"));
-		returnVal.setReservNthPPPerc(val.getFloat("reservNthPPPerc"));
+		returnVal.setBillOfMaterialLevel(val.getLong("billOfMaterialLevel"));
+		returnVal.setReservMaxPersons(val.getBigDecimal("reservMaxPersons"));
+		returnVal.setReserv2ndPPPerc(val.getBigDecimal("reserv2ndPPPerc"));
+		returnVal.setReservNthPPPerc(val.getBigDecimal("reservNthPPPerc"));
 		returnVal.setConfigId(val.getString("configId"));
-		returnVal.setCreatedDate(val.getDate("createdDate"));
+		returnVal.setCreatedDate(val.getTimestamp("createdDate"));
 		returnVal.setCreatedByUserLogin(val.getString("createdByUserLogin"));
-		returnVal.setLastModifiedDate(val.getDate("lastModifiedDate"));
+		returnVal.setLastModifiedDate(val.getTimestamp("lastModifiedDate"));
 		returnVal.setLastModifiedByUserLogin(val.getString("lastModifiedByUserLogin"));
 		returnVal.setInShippingBox(val.getBoolean("inShippingBox"));
 		returnVal.setDefaultShipmentBoxTypeId(val.getString("defaultShipmentBoxTypeId"));
@@ -1178,11 +1194,12 @@ public class ProductMapper {
 		if (paramMap.containsKey("quantityIncluded")) {
 			String buf = request.getParameter("quantityIncluded");
 			Float ibuf = Float.parseFloat(buf);
-			returnVal.setQuantityIncluded(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setQuantityIncluded(bd);
 		}
 		if (paramMap.containsKey("piecesIncluded")) {
 			String buf = request.getParameter("piecesIncluded");
-			int ibuf = Integer.parseInt(buf);
+			Long ibuf = Long.parseLong(buf);
 			returnVal.setPiecesIncluded(ibuf);
 		}
 		if (paramMap.containsKey("requireAmount")) {
@@ -1193,7 +1210,8 @@ public class ProductMapper {
 		if (paramMap.containsKey("fixedAmount")) {
 			String buf = request.getParameter("fixedAmount");
 			Float ibuf = Float.parseFloat(buf);
-			returnVal.setFixedAmount(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setFixedAmount(bd);
 		}
 		if (paramMap.containsKey("amountUomTypeId")) {
 			returnVal.setAmountUomTypeId(request.getParameter("amountUomTypeId"));
@@ -1204,12 +1222,14 @@ public class ProductMapper {
 		if (paramMap.containsKey("shippingWeight")) {
 			String buf = request.getParameter("shippingWeight");
 			Float ibuf = Float.parseFloat(buf);
-			returnVal.setShippingWeight(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setShippingWeight(bd);
 		}
 		if (paramMap.containsKey("productWeight")) {
 			String buf = request.getParameter("productWeight");
 			Float ibuf = Float.parseFloat(buf);
-			returnVal.setProductWeight(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setProductWeight(bd);
 		}
 		if (paramMap.containsKey("heightUomId")) {
 			returnVal.setHeightUomId(request.getParameter("heightUomId"));
@@ -1217,12 +1237,14 @@ public class ProductMapper {
 		if (paramMap.containsKey("productHeight")) {
 			String buf = request.getParameter("productHeight");
 			Float ibuf = Float.parseFloat(buf);
-			returnVal.setProductHeight(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setProductHeight(bd);
 		}
 		if (paramMap.containsKey("shippingHeight")) {
 			String buf = request.getParameter("shippingHeight");
 			Float ibuf = Float.parseFloat(buf);
-			returnVal.setShippingHeight(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setShippingHeight(bd);
 		}
 		if (paramMap.containsKey("widthUomId")) {
 			returnVal.setWidthUomId(request.getParameter("widthUomId"));
@@ -1230,12 +1252,14 @@ public class ProductMapper {
 		if (paramMap.containsKey("productWidth")) {
 			String buf = request.getParameter("productWidth");
 			Float ibuf = Float.parseFloat(buf);
-			returnVal.setProductWidth(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setProductWidth(bd);
 		}
 		if (paramMap.containsKey("shippingWidth")) {
 			String buf = request.getParameter("shippingWidth");
 			Float ibuf = Float.parseFloat(buf);
-			returnVal.setShippingWidth(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setShippingWidth(bd);
 		}
 		if (paramMap.containsKey("depthUomId")) {
 			returnVal.setDepthUomId(request.getParameter("depthUomId"));
@@ -1243,12 +1267,14 @@ public class ProductMapper {
 		if (paramMap.containsKey("productDepth")) {
 			String buf = request.getParameter("productDepth");
 			Float ibuf = Float.parseFloat(buf);
-			returnVal.setProductDepth(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setProductDepth(bd);
 		}
 		if (paramMap.containsKey("shippingDepth")) {
 			String buf = request.getParameter("shippingDepth");
 			Float ibuf = Float.parseFloat(buf);
-			returnVal.setShippingDepth(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setShippingDepth(bd);
 		}
 		if (paramMap.containsKey("diameterUomId")) {
 			returnVal.setDiameterUomId(request.getParameter("diameterUomId"));
@@ -1256,12 +1282,14 @@ public class ProductMapper {
 		if (paramMap.containsKey("productDiameter")) {
 			String buf = request.getParameter("productDiameter");
 			Float ibuf = Float.parseFloat(buf);
-			returnVal.setProductDiameter(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setProductDiameter(bd);
 		}
 		if (paramMap.containsKey("productRating")) {
 			String buf = request.getParameter("productRating");
 			Float ibuf = Float.parseFloat(buf);
-			returnVal.setProductRating(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setProductRating(bd);
 		}
 		if (paramMap.containsKey("ratingTypeEnum")) {
 			returnVal.setRatingTypeEnum(request.getParameter("ratingTypeEnum"));
@@ -1312,23 +1340,26 @@ public class ProductMapper {
 		}
 		if (paramMap.containsKey("billOfMaterialLevel")) {
 			String buf = request.getParameter("billOfMaterialLevel");
-			int ibuf = Integer.parseInt(buf);
+			Long ibuf = Long.parseLong(buf);
 			returnVal.setBillOfMaterialLevel(ibuf);
 		}
 		if (paramMap.containsKey("reservMaxPersons")) {
 			String buf = request.getParameter("reservMaxPersons");
 			Float ibuf = Float.parseFloat(buf);
-			returnVal.setReservMaxPersons(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setReservMaxPersons(bd);
 		}
 		if (paramMap.containsKey("reserv2ndPPPerc")) {
 			String buf = request.getParameter("reserv2ndPPPerc");
 			Float ibuf = Float.parseFloat(buf);
-			returnVal.setReserv2ndPPPerc(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setReserv2ndPPPerc(bd);
 		}
 		if (paramMap.containsKey("reservNthPPPerc")) {
 			String buf = request.getParameter("reservNthPPPerc");
 			Float ibuf = Float.parseFloat(buf);
-			returnVal.setReservNthPPPerc(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setReservNthPPPerc(bd);
 		}
 		if (paramMap.containsKey("configId")) {
 			returnVal.setConfigId(request.getParameter("configId"));
