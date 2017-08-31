@@ -184,9 +184,15 @@ public class ProductController {
                 .split(data);
 
 		
-		Product productToBeUpdated = ProductMapper.map(dataMap);
-		
+		Product productToBeUpdated = new Product();
+		try {
+			productToBeUpdated = ProductMapper.mapstrstr(dataMap);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+			return false;
+		}
 		UpdateProduct com = new UpdateProduct(productToBeUpdated);
+		
 		int usedTicketId;
 		
 		synchronized(ProductController.class) {			

@@ -23,7 +23,7 @@ public class ProductMapper {
 	
 	public static Product map(Map<String, Object> fields) {
 		
-		Product returnVal = new Product("","");
+		Product returnVal = new Product();
 		
 		if(fields.get("productName") != null) {
 			returnVal.setProductName((String) fields.get("productName"));
