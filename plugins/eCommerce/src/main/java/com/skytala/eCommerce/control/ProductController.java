@@ -274,5 +274,12 @@ public class ProductController {
 	public void sendProductChangedMessage(boolean success, int id) {
 		commandReturnVal.put(id, success);
 	}
+	
+	@RequestMapping(value = (" * "))
+	public String returnErrorPage() {
+
+		
+		return "Error 404: Page not found! Check your spelling and/or your request method.";
+	}
 
 }
