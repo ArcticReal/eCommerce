@@ -1083,12 +1083,10 @@ public class ProductMapper {
 
 		Map<String, String[]> paramMap = request.getParameterMap();
 
-		if (!paramMap.containsKey("productId")) {
-			throw new Exception("Error! Id required");
-		} else {
+		//productId will be automatically generated whille adding product
+		if (paramMap.containsKey("productId")) {
 			returnVal.setProductId(request.getParameter("productId"));
 		}
-
 		if (paramMap.containsKey("productTypeId")) {
 			returnVal.setProductTypeId(request.getParameter("productTypeId"));
 		}

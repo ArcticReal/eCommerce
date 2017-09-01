@@ -3,6 +3,7 @@ package com.skytala.eCommerce.command;
 import org.apache.ofbiz.entity.Delegator;
 import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
+import org.apache.ofbiz.entity.GenericValue;
 
 import com.skytala.eCommerce.control.Broker;
 import com.skytala.eCommerce.control.Command;
@@ -14,7 +15,7 @@ public class AddProduct implements Command{
 	private Product productToBeAdded;
 	
 	public AddProduct(Product productToBeAdded) {
-		productToBeAdded = this.productToBeAdded;
+		this.productToBeAdded = productToBeAdded;
 	}
 	
 	@Override
@@ -24,7 +25,10 @@ public class AddProduct implements Command{
 
 		boolean success;
 		try {
-			delegator.create("Product", productToBeAdded);
+			productToBeAdded.setProductId(delegator.getNextSeqId("Product"));
+			productToBeAdded.setAutoCreateKeywords(false);
+			GenericValue newValue = delegator.makeValue("Product", productToBeAdded.mapAttributeField());
+			delegator.create(newValue);
 			success = true;
 		} catch (GenericEntityException e) {
 			e.printStackTrace();

@@ -101,7 +101,6 @@ public class ProductController {
 	
 	public void sendProductFoundMessage(List<Product> products, int id) {
 		queryReturnVal.put(id, products);
-		
 	}
 	
 	
@@ -120,6 +119,7 @@ public class ProductController {
 		try {
 			productToBeAdded = ProductMapper.map(request);
 		} catch (Exception e) {
+			System.out.println(e.getMessage());
 			e.printStackTrace();
 			return false;
 		}
