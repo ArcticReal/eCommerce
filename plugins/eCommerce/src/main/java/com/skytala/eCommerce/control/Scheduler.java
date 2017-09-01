@@ -2,6 +2,8 @@ package com.skytala.eCommerce.control;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
+import com.skytala.eCommerce.command.Command;
+
 public class Scheduler {
 
 	//Singleton
