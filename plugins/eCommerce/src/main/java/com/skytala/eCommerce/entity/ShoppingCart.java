@@ -25,6 +25,10 @@ public class ShoppingCart {
 	public boolean removePosition(Position position) {
 		return positions.remove(position);
 	}
+	public boolean removebyPosition(int positionInCard){
+		positions.remove(positionInCard);
+		return true;
+	}
 
 	public void changePosition(Position oldPosition, Position newPosition) {
 		positions.remove(oldPosition);
