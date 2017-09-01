@@ -330,20 +330,19 @@ public class ProductMapper {
 		}
 
 		if (fields.get("introductionDate") != null) {
-			//TODO: cast to Timestamp
 			returnVal.setIntroductionDate((Timestamp) fields.get("introductionDate"));
 		}
 
 		if (fields.get("releaseDate") != null) {
-			returnVal.setReleaseDate((Date) fields.get("releaseDate"));
+			returnVal.setReleaseDate((Timestamp) fields.get("releaseDate"));
 		}
 
 		if (fields.get("supportDiscontinuationDate") != null) {
-			returnVal.setSupportDiscontinuationDate((Date) fields.get("supportDiscontinuationDate"));
+			returnVal.setSupportDiscontinuationDate((Timestamp) fields.get("supportDiscontinuationDate"));
 		}
 
 		if (fields.get("salesDiscontinuationDate") != null) {
-			returnVal.setSalesDiscontinuationDate((Date) fields.get("salesDiscontinuationDate"));
+			returnVal.setSalesDiscontinuationDate((Timestamp) fields.get("salesDiscontinuationDate"));
 		}
 
 		if (fields.get("salesDiscWhenNotAvail") != null) {
@@ -563,7 +562,7 @@ public class ProductMapper {
 		}
 
 		if (fields.get("createdDate") != null) {
-			returnVal.setCreatedDate((Date) fields.get("createdDate"));
+			returnVal.setCreatedDate((Timestamp) fields.get("createdDate"));
 		}
 
 		if (fields.get("createdByUserLogin") != null) {
@@ -571,7 +570,7 @@ public class ProductMapper {
 		}
 
 		if (fields.get("lastModifiedDate") != null) {
-			returnVal.setLastModifiedDate((Date) fields.get("lastModifiedDate"));
+			returnVal.setLastModifiedDate((Timestamp) fields.get("lastModifiedDate"));
 		}
 
 		if (fields.get("lastModifiedByUserLogin") != null) {
@@ -621,8 +620,6 @@ public class ProductMapper {
 			returnVal.setFacilityId((String) fields.get("facilityId"));
 		}
 
-		
-		//TODO: this works
 		if (fields.get("introductionDate") != null) {
 			String buf = fields.get("introductionDate");
 			Timestamp ibuf = Timestamp.valueOf(buf);
@@ -631,22 +628,19 @@ public class ProductMapper {
 
 		if (fields.get("releaseDate") != null) {
 			String buf = fields.get("releaseDate");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-			Date ibuf = df.parse(buf);
+			Timestamp ibuf = Timestamp.valueOf(buf);
 			returnVal.setReleaseDate(ibuf);
 		}
 
 		if (fields.get("supportDiscontinuationDate") != null) {
 			String buf = fields.get("supportDiscontinuationDate");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-			Date ibuf = df.parse(buf);
+			Timestamp ibuf = Timestamp.valueOf(buf);
 			returnVal.setSupportDiscontinuationDate(ibuf);
 		}
 
 		if (fields.get("salesDiscontinuationDate") != null) {
 			String buf = fields.get("salesDiscontinuationDate");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-			Date ibuf = df.parse(buf);
+			Timestamp ibuf = Timestamp.valueOf(buf);
 			returnVal.setSalesDiscontinuationDate(ibuf);
 		}
 
@@ -964,8 +958,7 @@ public class ProductMapper {
 
 		if (fields.get("createdDate") != null) {
 			String buf = fields.get("createdDate");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-			Date ibuf = df.parse(buf);
+			Timestamp ibuf = Timestamp.valueOf(buf);
 			returnVal.setCreatedDate(ibuf);
 		}
 
@@ -975,8 +968,7 @@ public class ProductMapper {
 
 		if (fields.get("lastModifiedDate") != null) {
 			String buf = fields.get("lastModifiedDate");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-			Date ibuf = df.parse(buf);
+			Timestamp ibuf = Timestamp.valueOf(buf);
 			returnVal.setLastModifiedDate(ibuf);
 		}
 
@@ -1114,26 +1106,22 @@ public class ProductMapper {
 		}
 		if (paramMap.containsKey("introductionDate")) {
 			String buf = request.getParameter("introductionDate");
-			//TODO: this works too
 			Timestamp ibuf = Timestamp.valueOf(buf);
 			returnVal.setIntroductionDate(ibuf);
 		}
 		if (paramMap.containsKey("releaseDate")) {
 			String buf = request.getParameter("releaseDate");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-			Date ibuf = df.parse(buf);
+			Timestamp ibuf = Timestamp.valueOf(buf);
 			returnVal.setReleaseDate(ibuf);
 		}
 		if (paramMap.containsKey("supportDiscontinuationDate")) {
 			String buf = request.getParameter("supportDiscontinuationDate");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-			Date ibuf = df.parse(buf);
+			Timestamp ibuf = Timestamp.valueOf(buf);
 			returnVal.setSupportDiscontinuationDate(ibuf);
 		}
 		if (paramMap.containsKey("salesDiscontinuationDate")) {
 			String buf = request.getParameter("salesDiscontinuationDate");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-			Date ibuf = df.parse(buf);
+			Timestamp ibuf = Timestamp.valueOf(buf);
 			returnVal.setSalesDiscontinuationDate(ibuf);
 		}
 		if (paramMap.containsKey("salesDiscWhenNotAvail")) {
@@ -1369,8 +1357,7 @@ public class ProductMapper {
 		}
 		if (paramMap.containsKey("createdDate")) {
 			String buf = request.getParameter("createdDate");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-			Date ibuf = df.parse(buf);
+			Timestamp ibuf = Timestamp.valueOf(buf);
 			returnVal.setCreatedDate(ibuf);
 		}
 		if (paramMap.containsKey("createdByUserLogin")) {
@@ -1378,8 +1365,7 @@ public class ProductMapper {
 		}
 		if (paramMap.containsKey("lastModifiedDate")) {
 			String buf = request.getParameter("lastModifiedDate");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-			Date ibuf = df.parse(buf);
+			Timestamp ibuf = Timestamp.valueOf(buf);
 			returnVal.setLastModifiedDate(ibuf);
 		}
 		if (paramMap.containsKey("lastModifiedByUserLogin")) {
