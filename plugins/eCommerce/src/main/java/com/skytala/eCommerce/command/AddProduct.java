@@ -6,7 +6,6 @@ import org.apache.ofbiz.entity.GenericEntityException;
 import org.apache.ofbiz.entity.GenericValue;
 
 import com.skytala.eCommerce.control.Broker;
-import com.skytala.eCommerce.control.Command;
 import com.skytala.eCommerce.entity.Product;
 import com.skytala.eCommerce.event.ProductAdded;
 
