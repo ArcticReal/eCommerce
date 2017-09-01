@@ -60,11 +60,13 @@ public class FindProductsBy implements Query{
 
 			String key = iterator.next();
 
-			if(val.get(key).getClass().equals(String.class)) {
-				if(!((String) val.get(key)).contains(filter.get(key))) {
-					return false;
-				}
-			}else if(!filter.get(key).equals(val.get(key))){
+			if(val.get(key) == null) {
+				return false;
+			}
+			
+			if((val.get(key).toString()).contains(filter.get(key))) {
+//				System.out.println("\nProduct with ID " + val.get("productId") + " contains criteria for key " + key + ": " + filter.get(key) + "\n");
+			}else {
 				return false;
 			}
 
