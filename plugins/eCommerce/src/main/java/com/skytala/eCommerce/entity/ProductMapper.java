@@ -330,6 +330,7 @@ public class ProductMapper {
 		}
 
 		if (fields.get("introductionDate") != null) {
+			//TODO: cast to Timestamp
 			returnVal.setIntroductionDate((Timestamp) fields.get("introductionDate"));
 		}
 
@@ -1113,7 +1114,7 @@ public class ProductMapper {
 		}
 		if (paramMap.containsKey("introductionDate")) {
 			String buf = request.getParameter("introductionDate");
-//			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+			//TODO: this works too
 			Timestamp ibuf = Timestamp.valueOf(buf);
 			returnVal.setIntroductionDate(ibuf);
 		}
