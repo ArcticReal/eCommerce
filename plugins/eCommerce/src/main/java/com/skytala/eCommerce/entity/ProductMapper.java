@@ -1,6 +1,7 @@
 package com.skytala.eCommerce.entity;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -329,7 +330,7 @@ public class ProductMapper {
 		}
 
 		if (fields.get("introductionDate") != null) {
-			returnVal.setIntroductionDate((Date) fields.get("introductionDate"));
+			returnVal.setIntroductionDate((Timestamp) fields.get("introductionDate"));
 		}
 
 		if (fields.get("releaseDate") != null) {
@@ -619,10 +620,11 @@ public class ProductMapper {
 			returnVal.setFacilityId((String) fields.get("facilityId"));
 		}
 
+		
+		//TODO: this works
 		if (fields.get("introductionDate") != null) {
 			String buf = fields.get("introductionDate");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-			Date ibuf = df.parse(buf);
+			Timestamp ibuf = Timestamp.valueOf(buf);
 			returnVal.setIntroductionDate(ibuf);
 		}
 
@@ -1111,8 +1113,8 @@ public class ProductMapper {
 		}
 		if (paramMap.containsKey("introductionDate")) {
 			String buf = request.getParameter("introductionDate");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-			Date ibuf = df.parse(buf);
+//			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+			Timestamp ibuf = Timestamp.valueOf(buf);
 			returnVal.setIntroductionDate(ibuf);
 		}
 		if (paramMap.containsKey("releaseDate")) {

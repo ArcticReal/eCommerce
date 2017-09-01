@@ -159,7 +159,7 @@ public class ProductController {
 	 * returns true on success / false when failed
 	 * 
 	 */
-	@RequestMapping(method=RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@RequestMapping(method=RequestMethod.PUT, value = "/update")
 	public boolean updateProduct(HttpServletRequest request) {
 
 
@@ -169,11 +169,12 @@ public class ProductController {
 
 		try {
 			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			data = br.readLine();
+			data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
 		} catch (IOException e1) {
 			e1.printStackTrace();
 			return false;
 		}
+		
 		
 		dataMap = Splitter.on('&')
                 .trimResults()
