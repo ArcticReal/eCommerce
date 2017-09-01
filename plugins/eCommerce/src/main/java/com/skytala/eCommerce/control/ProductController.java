@@ -27,7 +27,6 @@ import com.skytala.eCommerce.event.ProductsFound;
 import com.skytala.eCommerce.query.FindAllProducts;
 import com.skytala.eCommerce.query.FindProductsBy;
 
-
 @RestController
 @RequestMapping("/api/product")
 public class ProductController {
@@ -35,86 +34,82 @@ public class ProductController {
 	private static int requestTicketId = 0;
 	private static Map<Integer, List<Product>> queryReturnVal = new HashMap<>();
 	private static Map<Integer, Boolean> commandReturnVal = new HashMap<>();
-	
-	
-	/*
-	 * returns a list with all products from ofbiz
+
+	/**
+	 * 
+	 * @return returns a list with all products from ofbiz
 	 * 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/findAll")
+	@RequestMapping(method = RequestMethod.GET, value = {"/findAll", "/find", "/", "list"})
 	public List<Product> findAll() {
 		FindAllProducts query = new FindAllProducts();
 		int usedTicketId;
-		
-		synchronized(ProductController.class) {
-			
+
+		synchronized (ProductController.class) {
+
 			usedTicketId = requestTicketId;
 			requestTicketId++;
 		}
-		Broker.instance().subscribe(ProductsFound.class, 
+		Broker.instance().subscribe(ProductsFound.class,
 				event -> sendProductFoundMessage(((ProductsFound) event).getFoundProducts(), usedTicketId));
 
 		query.execute();
-		
-		while(!queryReturnVal.containsKey(usedTicketId)) {
+
+		while (!queryReturnVal.containsKey(usedTicketId)) {
 		}
 		return queryReturnVal.remove(usedTicketId);
-		
+
 	}
 
-
-	
-	/*
+	/**
 	 * searches for products by:
+	 * 
 	 * 
 	 * @param name: name of the product
 	 * @param id: id of the product
 	 * 
-	 * if no name or id is given, every product will be returned
+	 * @return a list of Products the filter applys to if no name or id is given,
+	 *         every product will be returned
 	 * 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/findBy")
-	public List<Product> findBy(@RequestParam Map<String, String> allRequestParams){
-		
+	public List<Product> findBy(@RequestParam Map<String, String> allRequestParams) {
 
 		FindProductsBy query = new FindProductsBy(allRequestParams);
 		int usedTicketId;
-		
-		synchronized(ProductController.class) {
+
+		synchronized (ProductController.class) {
 			usedTicketId = requestTicketId;
 			requestTicketId++;
 		}
-		Broker.instance().subscribe(ProductsFound.class, 
+		Broker.instance().subscribe(ProductsFound.class,
 				event -> sendProductFoundMessage(((ProductsFound) event).getFoundProducts(), usedTicketId));
-			
-			
-		
 
 		query.execute();
-		
-		while(!queryReturnVal.containsKey(usedTicketId)) {
-			
+
+		while (!queryReturnVal.containsKey(usedTicketId)) {
+
 		}
 		return queryReturnVal.remove(usedTicketId);
-		
+
 	}
-	
+
 	public void sendProductFoundMessage(List<Product> products, int id) {
 		queryReturnVal.put(id, products);
 	}
-	
-	
-	/*
-	 * creates a new Product in the ofbiz database
+
+	/**
+	 * Notice: this method will only be called by Spring, if you want to create a
+	 * Product, please use the other method
 	 * 
-	 * @param newProduct: the product that will be inserted into the DB
+	 * @param request: the servletrequest from spring
 	 * 
-	 * returns true on success
+	 * @return returns true on success
 	 * 
 	 */
-	@RequestMapping(method=RequestMethod.POST, value = "/create", consumes = "application/x-www-form-urlencoded")
+	@RequestMapping(method = RequestMethod.POST, value = {"/create", "/insert"}, consumes = "application/x-www-form-urlencoded")
 	public boolean createProduct(HttpServletRequest request) {
-		
+
 		Product productToBeAdded = new Product();
 		try {
 			productToBeAdded = ProductMapper.map(request);
@@ -123,18 +118,32 @@ public class ProductController {
 			e.printStackTrace();
 			return false;
 		}
-		
+
+		return this.createProduct(productToBeAdded);
+
+	}
+
+	/**
+	 * creates a new Product
+	 * 
+	 * @param productToBeAdded: the product thats to be added
+	 * 
+	 * @return returns true on success and false on fail
+	 * 
+	 */
+	public boolean createProduct(Product productToBeAdded) {
+
 		AddProduct com = new AddProduct(productToBeAdded);
 		int usedTicketId;
-		
-		synchronized(ProductController.class) {			
-			
+
+		synchronized (ProductController.class) {
+
 			usedTicketId = requestTicketId;
 			requestTicketId++;
 		}
-		Broker.instance().subscribe(ProductAdded.class, 
+		Broker.instance().subscribe(ProductAdded.class,
 				event -> sendProductChangedMessage(((ProductAdded) event).isSuccess(), usedTicketId));
-		
+
 		try {
 			Scheduler.instance().schedule(com).executeNext();
 		} catch (Exception e) {
@@ -142,26 +151,23 @@ public class ProductController {
 			e.printStackTrace();
 			return false;
 		}
-		while(!commandReturnVal.containsKey(usedTicketId)) {	
+		while (!commandReturnVal.containsKey(usedTicketId)) {
 		}
-		
-		
+
 		return commandReturnVal.remove(usedTicketId);
 	}
-	
-	/*
-	 * updates a product in the ofbiz database
-	 * will change any other attributes of the product according to the parameters for the product
-	 * with given ID
+
+	/**
+	 * updates a product in the ofbiz database; this method will only be calles by
+	 * the Spring DispatcherServlet
 	 * 
 	 * @param newProduct: The product that will be created
 	 * 
-	 * returns true on success / false when failed
+	 * @return returns true on success / false when failed
 	 * 
 	 */
-	@RequestMapping(method=RequestMethod.PUT, value = "/update")
+	@RequestMapping(method = RequestMethod.PUT, value = "/update")
 	public boolean updateProduct(HttpServletRequest request) {
-
 
 		BufferedReader br;
 		String data = null;
@@ -174,17 +180,10 @@ public class ProductController {
 			e1.printStackTrace();
 			return false;
 		}
-		
-		
-		dataMap = Splitter.on('&')
-                .trimResults()
-                .withKeyValueSeparator(
-                        Splitter.on('=')
-                        .limit(2)
-                        .trimResults())
-                .split(data);
 
-		
+		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
+				.split(data);
+
 		Product productToBeUpdated = new Product();
 		try {
 			productToBeUpdated = ProductMapper.mapstrstr(dataMap);
@@ -192,57 +191,35 @@ public class ProductController {
 			e1.printStackTrace();
 			return false;
 		}
-		UpdateProduct com = new UpdateProduct(productToBeUpdated);
-		
-		int usedTicketId;
-		
-		synchronized(ProductController.class) {			
-			
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(ProductUpdated.class, 
-				event -> sendProductChangedMessage(((ProductUpdated) event).isSuccess(), usedTicketId));
-		
-		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-		while(!commandReturnVal.containsKey(usedTicketId)) {	
-		}
-		
-		
-		return commandReturnVal.remove(usedTicketId);
+
+		return this.updateProducut(productToBeUpdated);
 
 	}
 
-	
-	/*
-	 * removes a product from the database
+	/**
+	 * updates a product in the ofbiz database will change any other attributes of
+	 * the product according to the parameters for the product with given ID
 	 * 
-	 * @param productId: the id of the product thats to be removed
-	 * 
-	 * @return: true on success; false on fail
+	 * @param productToBeUpdated:
+	 *            the product that will be updated
+	 *            
+	 * @return returns true on success / false when failed
 	 * 
 	 */
-	@RequestMapping(method=RequestMethod.DELETE, value = "/removeById")
-	public boolean removeProductById(@RequestParam(value = "id") String productId) {
-		
-		DeleteProduct com = new DeleteProduct(productId);
-		
+	public boolean updateProducut(Product productToBeUpdated) {
+
+		UpdateProduct com = new UpdateProduct(productToBeUpdated);
+
 		int usedTicketId;
-		
-		synchronized(ProductController.class) {			
-			
+
+		synchronized (ProductController.class) {
+
 			usedTicketId = requestTicketId;
 			requestTicketId++;
 		}
-		Broker.instance().subscribe(ProductDeleted.class, 
-				event -> sendProductChangedMessage(((ProductDeleted) event).isSuccess(), usedTicketId));
-		
+		Broker.instance().subscribe(ProductUpdated.class,
+				event -> sendProductChangedMessage(((ProductUpdated) event).isSuccess(), usedTicketId));
+
 		try {
 			Scheduler.instance().schedule(com).executeNext();
 		} catch (Exception e) {
@@ -250,14 +227,50 @@ public class ProductController {
 			e.printStackTrace();
 			return false;
 		}
-		while(!commandReturnVal.containsKey(usedTicketId)) {	
+		while (!commandReturnVal.containsKey(usedTicketId)) {
 		}
-		
-		
+
+		return commandReturnVal.remove(usedTicketId);
+
+	}
+
+	/**
+	 * removes a product from the database
+	 * 
+	 * @param productId:
+	 *            the id of the product thats to be removed
+	 * 
+	 * @return true on success; false on fail
+	 * 
+	 */
+	@RequestMapping(method = RequestMethod.DELETE, value = {"/removeById", "/removeBy"})
+	public boolean removeProductById(@RequestParam(value = "productId") String productId) {
+
+		DeleteProduct com = new DeleteProduct(productId);
+
+		int usedTicketId;
+
+		synchronized (ProductController.class) {
+
+			usedTicketId = requestTicketId;
+			requestTicketId++;
+		}
+		Broker.instance().subscribe(ProductDeleted.class,
+				event -> sendProductChangedMessage(((ProductDeleted) event).isSuccess(), usedTicketId));
+
+		try {
+			Scheduler.instance().schedule(com).executeNext();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
+		while (!commandReturnVal.containsKey(usedTicketId)) {
+		}
+
 		return commandReturnVal.remove(usedTicketId);
 	}
 
-	
 	public void sendProductChangedMessage(boolean success, int id) {
 		commandReturnVal.put(id, success);
 	}
