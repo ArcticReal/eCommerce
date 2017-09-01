@@ -175,7 +175,9 @@ public class ProductController {
 
 		try {
 			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
+			if(br != null) {
+				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");				
+			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
 			return false;
