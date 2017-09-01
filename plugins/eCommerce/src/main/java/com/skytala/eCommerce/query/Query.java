@@ -1,4 +1,4 @@
-package com.skytala.eCommerce.control;
+package com.skytala.eCommerce.query;
 
 public interface Query {
 
