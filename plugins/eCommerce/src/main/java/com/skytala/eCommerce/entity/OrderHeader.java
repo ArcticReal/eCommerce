@@ -2,6 +2,7 @@ package com.skytala.eCommerce.entity;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.List;
 
 public class OrderHeader {
 
@@ -34,6 +35,16 @@ public class OrderHeader {
 	private BigDecimal grandTotal;
 	private Boolean isViewed;
 	private Boolean invoicePerShipment;
+	private List<OrderItem> m_items;
+
+	
+	public List<OrderItem> getM_items() {
+		return m_items;
+	}
+
+	public void setM_items(List<OrderItem> m_items) {
+		this.m_items = m_items;
+	}
 
 	public String getOrderId() {
 		return orderId;

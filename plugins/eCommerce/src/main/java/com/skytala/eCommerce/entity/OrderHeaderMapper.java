@@ -130,7 +130,13 @@ public class OrderHeaderMapper {
 		if (orderheader.getInvoicePerShipment() != null) {
 			returnVal.put("invoicePerShipment", orderheader.getInvoicePerShipment());
 		}
-
+		
+		/*
+		if (orderheader.getM_items() != null) {
+			returnVal.put("m_items", orderheader.getM_items());
+		}
+		*/
+		
 		return returnVal;
 	}
 
