@@ -40,7 +40,7 @@ public class ProductController {
 	 * @return returns a list with all products from ofbiz
 	 * 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = {"/findAll", "/find", "/", "list"})
+	@RequestMapping(method = RequestMethod.GET, value = { "/findAll", "/find", "/", "list" })
 	public List<Product> findAll() {
 		FindAllProducts query = new FindAllProducts();
 		int usedTicketId;
@@ -65,8 +65,10 @@ public class ProductController {
 	 * searches for products by:
 	 * 
 	 * 
-	 * @param name: name of the product
-	 * @param id: id of the product
+	 * @param name:
+	 *            name of the product
+	 * @param id:
+	 *            id of the product
 	 * 
 	 * @return a list of Products the filter applys to if no name or id is given,
 	 *         every product will be returned
@@ -102,12 +104,14 @@ public class ProductController {
 	 * Notice: this method will only be called by Spring, if you want to create a
 	 * Product, please use the other method
 	 * 
-	 * @param request: the servletrequest from spring
+	 * @param request:
+	 *            the servletrequest from spring
 	 * 
 	 * @return returns true on success
 	 * 
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = {"/create", "/insert"}, consumes = "application/x-www-form-urlencoded")
+	@RequestMapping(method = RequestMethod.POST, value = { "/create",
+			"/insert" }, consumes = "application/x-www-form-urlencoded")
 	public boolean createProduct(HttpServletRequest request) {
 
 		Product productToBeAdded = new Product();
@@ -126,7 +130,8 @@ public class ProductController {
 	/**
 	 * creates a new Product
 	 * 
-	 * @param productToBeAdded: the product thats to be added
+	 * @param productToBeAdded:
+	 *            the product thats to be added
 	 * 
 	 * @return returns true on success and false on fail
 	 * 
@@ -161,7 +166,8 @@ public class ProductController {
 	 * updates a product in the ofbiz database; this method will only be calles by
 	 * the Spring DispatcherServlet
 	 * 
-	 * @param newProduct: The product that will be created
+	 * @param newProduct:
+	 *            The product that will be created
 	 * 
 	 * @return returns true on success / false when failed
 	 * 
@@ -175,8 +181,8 @@ public class ProductController {
 
 		try {
 			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if(br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");				
+			if (br != null) {
+				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -204,7 +210,7 @@ public class ProductController {
 	 * 
 	 * @param productToBeUpdated:
 	 *            the product that will be updated
-	 *            
+	 * 
 	 * @return returns true on success / false when failed
 	 * 
 	 */
@@ -245,7 +251,7 @@ public class ProductController {
 	 * @return true on success; false on fail
 	 * 
 	 */
-	@RequestMapping(method = RequestMethod.DELETE, value = {"/removeById", "/removeBy"})
+	@RequestMapping(method = RequestMethod.DELETE, value = { "/removeById", "/removeBy" })
 	public boolean removeProductById(@RequestParam(value = "productId") String productId) {
 
 		DeleteProduct com = new DeleteProduct(productId);
@@ -276,11 +282,10 @@ public class ProductController {
 	public void sendProductChangedMessage(boolean success, int id) {
 		commandReturnVal.put(id, success);
 	}
-	
+
 	@RequestMapping(value = (" * "))
 	public String returnErrorPage() {
 
-		
 		return "Error 404: Page not found! Check your spelling and/or your request method.";
 	}
 
