@@ -1,8 +1,7 @@
 package com.skytala.eCommerce.entity;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,134 +9,134 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.ofbiz.entity.GenericValue;
 
-public class OrderMapper {
+public class OrderHeaderMapper {
 
-	public static Map<String, Object> map(Order order) {
+	public static Map<String, Object> map(OrderHeader orderheader) {
 
 		Map<String, Object> returnVal = new HashMap<String, Object>();
 
-		if (order.getOrderId() != null) {
-			returnVal.put("orderId", order.getOrderId());
+		if (orderheader.getOrderId() != null) {
+			returnVal.put("orderId", orderheader.getOrderId());
 		}
 
-		if (order.getOrderTypeId() != null) {
-			returnVal.put("orderTypeId", order.getOrderTypeId());
+		if (orderheader.getOrderTypeId() != null) {
+			returnVal.put("orderTypeId", orderheader.getOrderTypeId());
 		}
 
-		if (order.getOrderName() != null) {
-			returnVal.put("orderName", order.getOrderName());
+		if (orderheader.getOrderName() != null) {
+			returnVal.put("orderName", orderheader.getOrderName());
 		}
 
-		if (order.getExternalId() != null) {
-			returnVal.put("externalId", order.getExternalId());
+		if (orderheader.getExternalId() != null) {
+			returnVal.put("externalId", orderheader.getExternalId());
 		}
 
-		if (order.getSalesChannelEnumId() != null) {
-			returnVal.put("salesChannelEnumId", order.getSalesChannelEnumId());
+		if (orderheader.getSalesChannelEnumId() != null) {
+			returnVal.put("salesChannelEnumId", orderheader.getSalesChannelEnumId());
 		}
 
-		if (order.getOrderDate() != null) {
-			returnVal.put("orderDate", order.getOrderDate());
+		if (orderheader.getOrderDate() != null) {
+			returnVal.put("orderDate", orderheader.getOrderDate());
 		}
 
-		if (order.getPriority() != null) {
-			returnVal.put("priority", order.getPriority());
+		if (orderheader.getPriority() != null) {
+			returnVal.put("priority", orderheader.getPriority());
 		}
 
-		if (order.getEntryDate() != null) {
-			returnVal.put("entryDate", order.getEntryDate());
+		if (orderheader.getEntryDate() != null) {
+			returnVal.put("entryDate", orderheader.getEntryDate());
 		}
 
-		if (order.getPickSheetPrintedDate() != null) {
-			returnVal.put("pickSheetPrintedDate", order.getPickSheetPrintedDate());
+		if (orderheader.getPickSheetPrintedDate() != null) {
+			returnVal.put("pickSheetPrintedDate", orderheader.getPickSheetPrintedDate());
 		}
 
-		if (order.getVisitId() != null) {
-			returnVal.put("visitId", order.getVisitId());
+		if (orderheader.getVisitId() != null) {
+			returnVal.put("visitId", orderheader.getVisitId());
 		}
 
-		if (order.getStatusId() != null) {
-			returnVal.put("statusId", order.getStatusId());
+		if (orderheader.getStatusId() != null) {
+			returnVal.put("statusId", orderheader.getStatusId());
 		}
 
-		if (order.getCreatedBy() != null) {
-			returnVal.put("createdBy", order.getCreatedBy());
+		if (orderheader.getCreatedBy() != null) {
+			returnVal.put("createdBy", orderheader.getCreatedBy());
 		}
 
-		if (order.getFirstAttemptOrderId() != null) {
-			returnVal.put("firstAttemptOrderId", order.getFirstAttemptOrderId());
+		if (orderheader.getFirstAttemptOrderId() != null) {
+			returnVal.put("firstAttemptOrderId", orderheader.getFirstAttemptOrderId());
 		}
 
-		if (order.getCurrencyUom() != null) {
-			returnVal.put("currencyUom", order.getCurrencyUom());
+		if (orderheader.getCurrencyUom() != null) {
+			returnVal.put("currencyUom", orderheader.getCurrencyUom());
 		}
 
-		if (order.getSyncStatusId() != null) {
-			returnVal.put("syncStatusId", order.getSyncStatusId());
+		if (orderheader.getSyncStatusId() != null) {
+			returnVal.put("syncStatusId", orderheader.getSyncStatusId());
 		}
 
-		if (order.getBillingAccountId() != null) {
-			returnVal.put("billingAccountId", order.getBillingAccountId());
+		if (orderheader.getBillingAccountId() != null) {
+			returnVal.put("billingAccountId", orderheader.getBillingAccountId());
 		}
 
-		if (order.getOriginFacilityId() != null) {
-			returnVal.put("originFacilityId", order.getOriginFacilityId());
+		if (orderheader.getOriginFacilityId() != null) {
+			returnVal.put("originFacilityId", orderheader.getOriginFacilityId());
 		}
 
-		if (order.getWebSiteId() != null) {
-			returnVal.put("webSiteId", order.getWebSiteId());
+		if (orderheader.getWebSiteId() != null) {
+			returnVal.put("webSiteId", orderheader.getWebSiteId());
 		}
 
-		if (order.getProductStoreId() != null) {
-			returnVal.put("productStoreId", order.getProductStoreId());
+		if (orderheader.getProductStoreId() != null) {
+			returnVal.put("productStoreId", orderheader.getProductStoreId());
 		}
 
-		if (order.getTerminalId() != null) {
-			returnVal.put("terminalId", order.getTerminalId());
+		if (orderheader.getTerminalId() != null) {
+			returnVal.put("terminalId", orderheader.getTerminalId());
 		}
 
-		if (order.getTransactionId() != null) {
-			returnVal.put("transactionId", order.getTransactionId());
+		if (orderheader.getTransactionId() != null) {
+			returnVal.put("transactionId", orderheader.getTransactionId());
 		}
 
-		if (order.getAutoOrderShoppingListId() != null) {
-			returnVal.put("autoOrderShoppingListId", order.getAutoOrderShoppingListId());
+		if (orderheader.getAutoOrderShoppingListId() != null) {
+			returnVal.put("autoOrderShoppingListId", orderheader.getAutoOrderShoppingListId());
 		}
 
-		if (order.getNeedsInventoryIssuance() != null) {
-			returnVal.put("needsInventoryIssuance", order.getNeedsInventoryIssuance());
+		if (orderheader.getNeedsInventoryIssuance() != null) {
+			returnVal.put("needsInventoryIssuance", orderheader.getNeedsInventoryIssuance());
 		}
 
-		if (order.getIsRushOrder() != null) {
-			returnVal.put("isRushOrder", order.getIsRushOrder());
+		if (orderheader.getIsRushOrder() != null) {
+			returnVal.put("isRushOrder", orderheader.getIsRushOrder());
 		}
 
-		if (order.getInternalCode() != null) {
-			returnVal.put("internalCode", order.getInternalCode());
+		if (orderheader.getInternalCode() != null) {
+			returnVal.put("internalCode", orderheader.getInternalCode());
 		}
 
-		if (order.getRemainingSubTotal() != null) {
-			returnVal.put("remainingSubTotal", order.getRemainingSubTotal());
+		if (orderheader.getRemainingSubTotal() != null) {
+			returnVal.put("remainingSubTotal", orderheader.getRemainingSubTotal());
 		}
 
-		if (order.getGrandTotal() != null) {
-			returnVal.put("grandTotal", order.getGrandTotal());
+		if (orderheader.getGrandTotal() != null) {
+			returnVal.put("grandTotal", orderheader.getGrandTotal());
 		}
 
-		if (order.getIsViewed() != null) {
-			returnVal.put("isViewed", order.getIsViewed());
+		if (orderheader.getIsViewed() != null) {
+			returnVal.put("isViewed", orderheader.getIsViewed());
 		}
 
-		if (order.getInvoicePerShipment() != null) {
-			returnVal.put("invoicePerShipment", order.getInvoicePerShipment());
+		if (orderheader.getInvoicePerShipment() != null) {
+			returnVal.put("invoicePerShipment", orderheader.getInvoicePerShipment());
 		}
 
 		return returnVal;
 	}
 
-	public static Order map(Map<String, Object> fields) {
+	public static OrderHeader map(Map<String, Object> fields) {
 
-		Order returnVal = new Order();
+		OrderHeader returnVal = new OrderHeader();
 
 		if (fields.get("orderId") != null) {
 			returnVal.setOrderId((String) fields.get("orderId"));
@@ -160,7 +159,7 @@ public class OrderMapper {
 		}
 
 		if (fields.get("orderDate") != null) {
-			returnVal.setOrderDate((Date) fields.get("orderDate"));
+			returnVal.setOrderDate((Timestamp) fields.get("orderDate"));
 		}
 
 		if (fields.get("priority") != null) {
@@ -168,11 +167,11 @@ public class OrderMapper {
 		}
 
 		if (fields.get("entryDate") != null) {
-			returnVal.setEntryDate((Date) fields.get("entryDate"));
+			returnVal.setEntryDate((Timestamp) fields.get("entryDate"));
 		}
 
 		if (fields.get("pickSheetPrintedDate") != null) {
-			returnVal.setPickSheetPrintedDate((Date) fields.get("pickSheetPrintedDate"));
+			returnVal.setPickSheetPrintedDate((Timestamp) fields.get("pickSheetPrintedDate"));
 		}
 
 		if (fields.get("visitId") != null) {
@@ -240,11 +239,11 @@ public class OrderMapper {
 		}
 
 		if (fields.get("remainingSubTotal") != null) {
-			returnVal.setRemainingSubTotal((float) fields.get("remainingSubTotal"));
+			returnVal.setRemainingSubTotal((BigDecimal) fields.get("remainingSubTotal"));
 		}
 
 		if (fields.get("grandTotal") != null) {
-			returnVal.setGrandTotal((float) fields.get("grandTotal"));
+			returnVal.setGrandTotal((BigDecimal) fields.get("grandTotal"));
 		}
 
 		if (fields.get("isViewed") != null) {
@@ -258,9 +257,9 @@ public class OrderMapper {
 		return returnVal;
 	}
 
-	public static Order mapstrstr(Map<String, String> fields) throws Exception {
+	public static OrderHeader mapstrstr(Map<String, String> fields) throws Exception {
 
-		Order returnVal = new Order();
+		OrderHeader returnVal = new OrderHeader();
 
 		if (fields.get("orderId") != null) {
 			returnVal.setOrderId((String) fields.get("orderId"));
@@ -284,8 +283,7 @@ public class OrderMapper {
 
 		if (fields.get("orderDate") != null) {
 			String buf = fields.get("orderDate");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-			Date ibuf = df.parse(buf);
+			Timestamp ibuf = Timestamp.valueOf(buf);
 			returnVal.setOrderDate(ibuf);
 		}
 
@@ -298,15 +296,13 @@ public class OrderMapper {
 
 		if (fields.get("entryDate") != null) {
 			String buf = fields.get("entryDate");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-			Date ibuf = df.parse(buf);
+			Timestamp ibuf = Timestamp.valueOf(buf);
 			returnVal.setEntryDate(ibuf);
 		}
 
 		if (fields.get("pickSheetPrintedDate") != null) {
 			String buf = fields.get("pickSheetPrintedDate");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-			Date ibuf = df.parse(buf);
+			Timestamp ibuf = Timestamp.valueOf(buf);
 			returnVal.setPickSheetPrintedDate(ibuf);
 		}
 
@@ -384,14 +380,16 @@ public class OrderMapper {
 			String buf;
 			buf = fields.get("remainingSubTotal");
 			float ibuf = Float.parseFloat(buf);
-			returnVal.setRemainingSubTotal(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setRemainingSubTotal(bd);
 		}
 
 		if (fields.get("grandTotal") != null) {
 			String buf;
 			buf = fields.get("grandTotal");
 			float ibuf = Float.parseFloat(buf);
-			returnVal.setGrandTotal(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setGrandTotal(bd);
 		}
 
 		if (fields.get("isViewed") != null) {
@@ -411,18 +409,18 @@ public class OrderMapper {
 		return returnVal;
 	}
 
-	public static Order map(GenericValue val) {
+	public static OrderHeader map(GenericValue val) {
 
-		Order returnVal = new Order();
+		OrderHeader returnVal = new OrderHeader();
 		returnVal.setOrderId(val.getString("orderId"));
 		returnVal.setOrderTypeId(val.getString("orderTypeId"));
 		returnVal.setOrderName(val.getString("orderName"));
 		returnVal.setExternalId(val.getString("externalId"));
 		returnVal.setSalesChannelEnumId(val.getString("salesChannelEnumId"));
-		returnVal.setOrderDate(val.getDate("orderDate"));
+		returnVal.setOrderDate(val.getTimestamp("orderDate"));
 		returnVal.setPriority(val.getBoolean("priority"));
-		returnVal.setEntryDate(val.getDate("entryDate"));
-		returnVal.setPickSheetPrintedDate(val.getDate("pickSheetPrintedDate"));
+		returnVal.setEntryDate(val.getTimestamp("entryDate"));
+		returnVal.setPickSheetPrintedDate(val.getTimestamp("pickSheetPrintedDate"));
 		returnVal.setVisitId(val.getString("visitId"));
 		returnVal.setStatusId(val.getString("statusId"));
 		returnVal.setCreatedBy(val.getString("createdBy"));
@@ -439,8 +437,8 @@ public class OrderMapper {
 		returnVal.setNeedsInventoryIssuance(val.getBoolean("needsInventoryIssuance"));
 		returnVal.setIsRushOrder(val.getBoolean("isRushOrder"));
 		returnVal.setInternalCode(val.getString("internalCode"));
-		returnVal.setRemainingSubTotal(val.getFloat("remainingSubTotal"));
-		returnVal.setGrandTotal(val.getFloat("grandTotal"));
+		returnVal.setRemainingSubTotal(val.getBigDecimal("remainingSubTotal"));
+		returnVal.setGrandTotal(val.getBigDecimal("grandTotal"));
 		returnVal.setIsViewed(val.getBoolean("isViewed"));
 		returnVal.setInvoicePerShipment(val.getBoolean("invoicePerShipment"));
 
@@ -448,9 +446,9 @@ public class OrderMapper {
 
 	}
 
-	public static Order map(HttpServletRequest request) throws Exception {
+	public static OrderHeader map(HttpServletRequest request) throws Exception {
 
-		Order returnVal = new Order();
+		OrderHeader returnVal = new OrderHeader();
 
 		Map<String, String[]> paramMap = request.getParameterMap();
 
@@ -474,8 +472,7 @@ public class OrderMapper {
 		}
 		if (paramMap.containsKey("orderDate")) {
 			String buf = request.getParameter("orderDate");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-			Date ibuf = df.parse(buf);
+			Timestamp ibuf = Timestamp.valueOf(buf);
 			returnVal.setOrderDate(ibuf);
 		}
 		if (paramMap.containsKey("priority")) {
@@ -485,14 +482,12 @@ public class OrderMapper {
 		}
 		if (paramMap.containsKey("entryDate")) {
 			String buf = request.getParameter("entryDate");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-			Date ibuf = df.parse(buf);
+			Timestamp ibuf = Timestamp.valueOf(buf);
 			returnVal.setEntryDate(ibuf);
 		}
 		if (paramMap.containsKey("pickSheetPrintedDate")) {
 			String buf = request.getParameter("pickSheetPrintedDate");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-			Date ibuf = df.parse(buf);
+			Timestamp ibuf = Timestamp.valueOf(buf);
 			returnVal.setPickSheetPrintedDate(ibuf);
 		}
 		if (paramMap.containsKey("visitId")) {
@@ -550,12 +545,14 @@ public class OrderMapper {
 		if (paramMap.containsKey("remainingSubTotal")) {
 			String buf = request.getParameter("remainingSubTotal");
 			Float ibuf = Float.parseFloat(buf);
-			returnVal.setRemainingSubTotal(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setRemainingSubTotal(bd);
 		}
 		if (paramMap.containsKey("grandTotal")) {
 			String buf = request.getParameter("grandTotal");
 			Float ibuf = Float.parseFloat(buf);
-			returnVal.setGrandTotal(ibuf);
+			BigDecimal bd = BigDecimal.valueOf(ibuf);
+			returnVal.setGrandTotal(bd);
 		}
 		if (paramMap.containsKey("isViewed")) {
 			String buf = request.getParameter("isViewed");
