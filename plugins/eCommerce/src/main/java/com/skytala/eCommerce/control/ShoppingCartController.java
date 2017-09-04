@@ -21,8 +21,8 @@ public class ShoppingCartController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/show")
 	public LinkedList<Position> show(HttpSession session) {
-		
-		//Debug Message for Windows Forms should be removed later
+
+		// Debug Message for Windows Forms should be removed later
 		System.out.println(session.getCreationTime());
 		System.out.println(session.getId());
 
@@ -34,16 +34,34 @@ public class ShoppingCartController {
 		return null;
 	}
 
+	@RequestMapping(method = RequestMethod.GET, value = "/showId")
+	public LinkedList<String> showId(HttpSession session) {
+		// Debug Message for Windows Forms should be removed later
+		System.out.println(session.getCreationTime());
+		System.out.println(session.getId());
+
+		LinkedList<String> mylist = new LinkedList<String>();
+		if (session.getAttribute("cart") != null) {
+			ShoppingCart sc = new ShoppingCart();
+			sc = (ShoppingCart) session.getAttribute("cart");
+			for (int i = 0; i < sc.getPositions().size(); i++) {
+				mylist.add(sc.getPositions().get(i).getProduct().getProductId());
+			}
+		}
+		return mylist;
+
+	}
+
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = "application/x-www-form-urlencoded")
 	public boolean addToCart(HttpSession session, @RequestParam Map<String, String> allRequestParams) {
 
 		Map<String, String> find = new HashMap<String, String>();
 		ProductController pc = new ProductController();
 
-		//Debug Message for Windows Forms should be removed later
+		// Debug Message for Windows Forms should be removed later
 		System.out.println(session.getCreationTime());
 		System.out.println(session.getId());
-		
+
 		if (session.getAttribute("cart") == null) {
 			ShoppingCart sc = new ShoppingCart();
 			session.setAttribute("cart", sc);
@@ -58,12 +76,17 @@ public class ShoppingCartController {
 			return false;
 		}
 		pro = pc.findBy(find).get(0);
+
+		if (!pro.getProductId().equals(allRequestParams.get("productId"))) {
+			return false;
+		}
+
 		int anz = 1;
 		if (allRequestParams.get("count") != null) {
 			anz = Integer.parseInt(allRequestParams.get("count"));
 			System.out.println(allRequestParams.get("count"));
-		} 
-		
+		}
+
 		for (int i = 0; i < sc.getPositions().size(); i++) {
 			if (pro.getProductId().equals(sc.getPositions().get(i).getProduct().getProductId())) {
 				int ibuf = sc.getPositions().get(i).getNumberProducts();
@@ -84,11 +107,22 @@ public class ShoppingCartController {
 	@RequestMapping(method = RequestMethod.POST, value = "/remove", consumes = "application/x-www-form-urlencoded")
 	public boolean removeFromCart(HttpSession session, @RequestParam Map<String, String> allRequestParams) {
 
-		if (allRequestParams.get("position") != null) {
+		if (allRequestParams.get("productId") != null) {
+			int count = Integer.parseInt(allRequestParams.get("count"));
 			ShoppingCart sc = (ShoppingCart) session.getAttribute("cart");
-			sc.removebyPosition(Integer.parseInt(allRequestParams.get("position")));
-			session.setAttribute("cart", sc);
-			return true;
+
+			for (int i = 0; i < sc.getPositions().size(); i++) {
+				if (sc.getPositions().get(i).getProduct().getProductId().equals(allRequestParams.get("productId"))) {
+					sc.getPositions().get(i).setNumberProducts(sc.getPositions().get(i).getNumberProducts()-count);
+					if (sc.getPositions().get(i).getNumberProducts() <= 0) {
+						sc.removebyPosition(i);
+					}
+					session.setAttribute("cart", sc);
+					return true;
+				}
+			}
+
+			// sc.removebyPosition(Integer.parseInt(allRequestParams.get("position")));
 		}
 
 		return false;
