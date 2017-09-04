@@ -22,6 +22,9 @@ public class NewOrder implements Command{
 	ShoppingCart cart;
 	OrderHeader header;
 	
+	public NewOrder(ShoppingCart cart) {
+		this.cart = cart;
+	}
 	
 	@Override
 	public void execute() {
@@ -53,6 +56,18 @@ public class NewOrder implements Command{
 				item.setProductId(product.getProductId());
 				item.setQuantity(positions.get(i).getNumberProducts());
 				
+				//TODO: pricing
+				
+				item.setStatusId("ITEM_CREATED");
+				
+				try {
+					GenericValue newValue = delegator.makeValue("OrderItem", item);
+					delegator.create(newValue);
+				}catch(GenericEntityException e) {
+					e.printStackTrace();
+					success = false;
+					break;
+				}
 			}
 		}
 		
