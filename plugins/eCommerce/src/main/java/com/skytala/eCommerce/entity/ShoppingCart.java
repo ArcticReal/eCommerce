@@ -1,13 +1,23 @@
 package com.skytala.eCommerce.entity;
 
+import java.math.BigDecimal;
 import java.util.LinkedList;
 
 public class ShoppingCart {
 
 	private LinkedList<Position> positions = new LinkedList<>();
+	private BigDecimal grandTotal;
 
 	public ShoppingCart() {
 
+	}
+
+	public BigDecimal getGrandTotal() {
+		return grandTotal;
+	}
+
+	public void setGrandTotal(BigDecimal grandTotal) {
+		this.grandTotal = grandTotal;
 	}
 
 	public LinkedList<Position> getPositions() {
@@ -25,7 +35,8 @@ public class ShoppingCart {
 	public boolean removePosition(Position position) {
 		return positions.remove(position);
 	}
-	public boolean removebyPosition(int positionInCard){
+
+	public boolean removebyPosition(int positionInCard) {
 		positions.remove(positionInCard);
 		return true;
 	}

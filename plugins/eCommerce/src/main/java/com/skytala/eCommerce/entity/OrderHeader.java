@@ -2,7 +2,6 @@ package com.skytala.eCommerce.entity;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.List;
 
 public class OrderHeader {
 

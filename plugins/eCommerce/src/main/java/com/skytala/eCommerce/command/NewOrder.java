@@ -37,6 +37,7 @@ public class NewOrder implements Command{
 		try {
 			headerId = delegator.getNextSeqId("OrderHeader");
 			header.setOrderId(headerId);
+			header.setGrandTotal(cart.getGrandTotal());
 			GenericValue newValue = delegator.makeValue("OrderHeader", OrderHeaderMapper.map(header));
 			delegator.create(newValue);
 			success = true;
@@ -56,11 +57,10 @@ public class NewOrder implements Command{
 				item.setOrderItemSeqId(Integer.toString(i));
 				item.setOrderItemTypeId("PRODUCT_ORDER_ITEM");
 				item.setProductId(product.getProductId());
-				item.setQuantity(positions.get(i).getNumberProducts());
-				
-				//TODO: pricing
-				
+				item.setQuantity(positions.get(i).getNumberProducts());				
 				item.setStatusId("ITEM_CREATED");
+				
+				
 				
 				try {
 					

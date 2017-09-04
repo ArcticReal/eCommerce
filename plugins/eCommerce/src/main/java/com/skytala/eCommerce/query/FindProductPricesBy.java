@@ -8,6 +8,7 @@ import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
 import org.apache.ofbiz.entity.GenericValue;
 import org.apache.ofbiz.entity.condition.EntityCondition;
+import org.apache.ofbiz.entity.condition.EntityJoinOperator;
 import org.apache.ofbiz.entity.util.EntityListIterator;
 
 import com.skytala.eCommerce.control.Broker;
@@ -17,10 +18,12 @@ import com.skytala.eCommerce.event.ProductPricesFound;
 
 public class FindProductPricesBy implements Query {
 
-	private String productId;
+	String productId;
+	String productPriceTypeId;
 
-	public FindProductPricesBy(String productId) {
-		this.setProductId(productId);
+	public FindProductPricesBy(String productId, String productPriceTypeId) {
+		this.productId = productId;
+		this.productPriceTypeId = productPriceTypeId;
 	}
 
 	public String getProductId() {
@@ -31,29 +34,38 @@ public class FindProductPricesBy implements Query {
 		this.productId = productId;
 	}
 
+	public String getProductPriceTypeId() {
+		return productPriceTypeId;
+	}
+
+	public void setProductPriceTypeId(String productPriceTypeId) {
+		this.productPriceTypeId = productPriceTypeId;
+	}
+
 	@Override
 	public void execute() {
 
 		Delegator delegator = DelegatorFactory.getDelegator("default");
 
 		List<ProductPrice> foundProductPrices = new LinkedList<>();
-		
+
 		try {
-			
+
 			EntityCondition cond = EntityCondition.makeCondition("productId", productId);
-			EntityListIterator iterator = delegator.find("ProductPrice", cond, null, null, null, null);
-			
+			EntityCondition cond2 = EntityCondition.makeCondition("productPriceTypeId", productPriceTypeId);
+			EntityListIterator iterator = delegator.find("ProductPrice", EntityCondition.makeCondition(cond, EntityJoinOperator.AND, cond2), null, null, null, null);
+
 			GenericValue value = new GenericValue();
-			while((value = iterator.next()) != null) {
+			while ((value = iterator.next()) != null) {
 				foundProductPrices.add(ProductPriceMapper.map(value));
 			}
-			
-			
+
 		} catch (GenericEntityException e) {
 			e.printStackTrace();
 		}
 
 		Broker.instance().publish(new ProductPricesFound(foundProductPrices));
+
 	}
 
 }

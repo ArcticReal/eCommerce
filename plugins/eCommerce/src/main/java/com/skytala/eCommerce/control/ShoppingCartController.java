@@ -3,6 +3,7 @@ package com.skytala.eCommerce.control;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.skytala.eCommerce.entity.Position;
 import com.skytala.eCommerce.entity.Product;
+import com.skytala.eCommerce.entity.ProductPrice;
 import com.skytala.eCommerce.entity.ShoppingCart;
 
 @RestController
@@ -53,6 +55,18 @@ public class ShoppingCartController {
 
 	}
 
+	public BigDecimal showGrandTotal(HttpSession session) {
+
+		BigDecimal grandTotal = new BigDecimal(0);
+		if(session.getAttribute("cart") != null) {
+			ShoppingCart sc = new ShoppingCart();
+			sc = (ShoppingCart) session.getAttribute("cart");
+			grandTotal = sc.getGrandTotal();
+		}
+		
+		return grandTotal;
+	}
+
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = "application/x-www-form-urlencoded")
 	public boolean addToCart(HttpSession session, @RequestParam Map<String, String> allRequestParams) {
 
@@ -80,11 +94,9 @@ public class ShoppingCartController {
 
 		BigDecimal anz = new BigDecimal(1);
 
-
 		if (!pro.getProductId().equals(allRequestParams.get("productId"))) {
 			return false;
 		}
-
 
 		if (allRequestParams.get("count") != null) {
 			anz = new BigDecimal(Integer.parseInt(allRequestParams.get("count")));
@@ -95,6 +107,12 @@ public class ShoppingCartController {
 			if (pro.getProductId().equals(sc.getPositions().get(i).getProduct().getProductId())) {
 				BigDecimal ibuf = sc.getPositions().get(i).getNumberProducts();
 				sc.getPositions().get(i).setNumberProducts(ibuf.add(anz));
+				try {
+					sc.setGrandTotal(this.calculateGrandTotal(sc));
+				} catch (Exception e) {
+					System.out.println(e.getMessage());
+					e.printStackTrace();
+				}
 				session.setAttribute("cart", sc);
 				return true;
 
@@ -117,9 +135,16 @@ public class ShoppingCartController {
 
 			for (int i = 0; i < sc.getPositions().size(); i++) {
 				if (sc.getPositions().get(i).getProduct().getProductId().equals(allRequestParams.get("productId"))) {
-					sc.getPositions().get(i).setNumberProducts(sc.getPositions().get(i).getNumberProducts().subtract(new BigDecimal(count)));
+					sc.getPositions().get(i).setNumberProducts(
+							sc.getPositions().get(i).getNumberProducts().subtract(new BigDecimal(count)));
 					if (sc.getPositions().get(i).getNumberProducts().signum() <= 0) {
 						sc.removebyPosition(i);
+					}
+					try {
+						sc.setGrandTotal(this.calculateGrandTotal(sc));
+					} catch (Exception e) {
+						e.printStackTrace();
+						System.out.println(e.getMessage());
 					}
 					session.setAttribute("cart", sc);
 					return true;
@@ -130,5 +155,27 @@ public class ShoppingCartController {
 		}
 
 		return false;
+	}
+
+	public BigDecimal calculateGrandTotal(ShoppingCart sc) throws Exception {
+
+		PricingController pc = new PricingController();
+
+		LinkedList<Position> positions = sc.getPositions();
+		List<ProductPrice> prices;
+		BigDecimal returnVal = new BigDecimal(0);
+
+		for (int i = 0; i < positions.size(); i++) {
+			String productId = positions.get(i).getProduct().getProductId();
+			prices = pc.findProductPricesBy(productId, "DEFAULT_PRICE");
+
+			if (prices.size() == 1) {
+				returnVal = returnVal.add(prices.get(0).getPrice().multiply(positions.get(i).getNumberProducts()));
+			} else {
+				throw new Exception("No default price, or multiple default prices");
+			}
+		}
+
+		return returnVal;
 	}
 }

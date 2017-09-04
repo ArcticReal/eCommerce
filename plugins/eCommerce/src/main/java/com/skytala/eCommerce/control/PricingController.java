@@ -23,6 +23,7 @@ import com.skytala.eCommerce.event.ProductPriceAdded;
 import com.skytala.eCommerce.event.ProductPriceUpdated;
 import com.skytala.eCommerce.event.ProductPricesFound;
 import com.skytala.eCommerce.query.FindProductPricesBy;
+import com.skytala.eCommerce.query.FindProductPricesById;
 
 @RestController
 @RequestMapping("/api/pricing")
@@ -34,15 +35,48 @@ public class PricingController {
 
 	/**
 	 * 
+	 * @param productId
+	 *            the product id of the product the price should be found of
+	 * @param productPriceTypeId
+	 *            the price type id
+	 * @return a List with the ProductPrices
+	 */
+	@RequestMapping(method = RequestMethod.GET, value = { "/findById" })
+	public List<ProductPrice> findProductPricesBy(@RequestParam String productId,
+			@RequestParam String productPriceTypeId) {
+
+		FindProductPricesBy query = new FindProductPricesBy(productId, productPriceTypeId);
+
+		int usedTicketId;
+
+		synchronized (ProductController.class) {
+			usedTicketId = requestTicketId;
+			requestTicketId++;
+		}
+		Broker.instance().subscribe(ProductPricesFound.class,
+				event -> sendProductPricesFoundMessage(((ProductPricesFound) event).getFoundProductPrices(),
+						usedTicketId));
+
+		query.execute();
+
+		while (!queryReturnVal.containsKey(usedTicketId)) {
+
+		}
+		return queryReturnVal.remove(usedTicketId);
+
+	}
+
+	/**
+	 * 
 	 * 
 	 * @param productId
 	 *            Id of the product that you want to know the price of
 	 * @return A list of different prices
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = { "/findById" })
-	public List<ProductPrice> findProductPricesBy(@RequestParam String productId) {
+	@RequestMapping(method = RequestMethod.GET, value = { "/findBy" })
+	public List<ProductPrice> findProductPricesById(@RequestParam String productId) {
 
-		FindProductPricesBy query = new FindProductPricesBy(productId);
+		FindProductPricesById query = new FindProductPricesById(productId);
 
 		int usedTicketId;
 
@@ -163,7 +197,7 @@ public class PricingController {
 	public boolean updateProductPrice(ProductPrice productPriceToBeUpdated) {
 
 		UpdateProductPrice com = new UpdateProductPrice(productPriceToBeUpdated);
-		
+
 		int usedTicketId;
 
 		synchronized (ProductController.class) {
