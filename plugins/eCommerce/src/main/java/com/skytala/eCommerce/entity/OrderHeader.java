@@ -35,11 +35,10 @@ public class OrderHeader {
 	private BigDecimal grandTotal;
 	private Boolean isViewed;
 	private Boolean invoicePerShipment;
-	private List<OrderItem> m_items;
 
 	public OrderHeader() {
 		//when implementing a more complex ecommerce you might want to change following settings
-		this.setOrderTypeId("Sales_ORDER");
+		this.setOrderTypeId("SALES_ORDER");
 		this.setSalesChannelEnumId("WEB_SALES_CHANNEL");
 		Timestamp currentTime = new Timestamp(System.currentTimeMillis());
 		currentTime.setNanos(0);
@@ -50,13 +49,7 @@ public class OrderHeader {
 		this.setProductStoreId("10000");
 	}
 	
-	public List<OrderItem> getM_items() {
-		return m_items;
-	}
 
-	public void setM_items(List<OrderItem> m_items) {
-		this.m_items = m_items;
-	}
 
 	public String getOrderId() {
 		return orderId;

@@ -11,6 +11,7 @@ import com.skytala.eCommerce.control.Broker;
 import com.skytala.eCommerce.entity.OrderHeader;
 import com.skytala.eCommerce.entity.OrderHeaderMapper;
 import com.skytala.eCommerce.entity.OrderItem;
+import com.skytala.eCommerce.entity.OrderItemMapper;
 import com.skytala.eCommerce.entity.Position;
 import com.skytala.eCommerce.entity.Product;
 import com.skytala.eCommerce.entity.ShoppingCart;
@@ -24,6 +25,7 @@ public class NewOrder implements Command{
 	
 	public NewOrder(ShoppingCart cart) {
 		this.cart = cart;
+		header = new OrderHeader();
 	}
 	
 	@Override
@@ -61,7 +63,9 @@ public class NewOrder implements Command{
 				item.setStatusId("ITEM_CREATED");
 				
 				try {
-					GenericValue newValue = delegator.makeValue("OrderItem", item);
+					
+					
+					GenericValue newValue = delegator.makeValue("OrderItem", OrderItemMapper.map(item));
 					delegator.create(newValue);
 				}catch(GenericEntityException e) {
 					e.printStackTrace();
