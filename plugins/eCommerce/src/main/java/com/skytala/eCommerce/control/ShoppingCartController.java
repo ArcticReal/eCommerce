@@ -21,9 +21,13 @@ public class ShoppingCartController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/show")
 	public LinkedList<Position> show(HttpSession session) {
+		
+		//Debug Message for Windows Forms should be removed later
+		System.out.println(session.getCreationTime());
+		System.out.println(session.getId());
 
-		ShoppingCart sc = new ShoppingCart();
 		if (session.getAttribute("cart") != null) {
+			ShoppingCart sc = new ShoppingCart();
 			sc = (ShoppingCart) session.getAttribute("cart");
 			return sc.getPositions();
 		}
@@ -36,6 +40,10 @@ public class ShoppingCartController {
 		Map<String, String> find = new HashMap<String, String>();
 		ProductController pc = new ProductController();
 
+		//Debug Message for Windows Forms should be removed later
+		System.out.println(session.getCreationTime());
+		System.out.println(session.getId());
+		
 		if (session.getAttribute("cart") == null) {
 			ShoppingCart sc = new ShoppingCart();
 			session.setAttribute("cart", sc);
@@ -46,16 +54,28 @@ public class ShoppingCartController {
 		if (allRequestParams.get("productId") != null) {
 			find.put("productId", allRequestParams.get("productId"));
 			System.out.println(allRequestParams.get("productId"));
+		} else {
+			return false;
 		}
 		pro = pc.findBy(find).get(0);
-		int anz = 0;
+		int anz = 1;
 		if (allRequestParams.get("count") != null) {
 			anz = Integer.parseInt(allRequestParams.get("count"));
 			System.out.println(allRequestParams.get("count"));
+		} 
+		
+		for (int i = 0; i < sc.getPositions().size(); i++) {
+			if (pro.getProductId().equals(sc.getPositions().get(i).getProduct().getProductId())) {
+				int ibuf = sc.getPositions().get(i).getNumberProducts();
+				sc.getPositions().get(i).setNumberProducts(ibuf + anz);
+				session.setAttribute("cart", sc);
+				return true;
+
+			}
+
 		}
 
 		Position pos = new Position(pro, anz);
-
 		sc.addPosition(pos);
 		session.setAttribute("cart", sc);
 		return true;
