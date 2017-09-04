@@ -1,11 +1,13 @@
 package com.skytala.eCommerce.entity;
 
+import java.math.BigDecimal;
+
 public class Position {
 
 	Product product = new Product();
-	int productNumber = 0;
+	BigDecimal productNumber = new BigDecimal(0);
 
-	public Position(Product newProduct, int numberProducts) {
+	public Position(Product newProduct, BigDecimal numberProducts) {
 		this.product = newProduct;
 		this.productNumber = numberProducts;
 	}
@@ -18,11 +20,11 @@ public class Position {
 		this.product = product;
 	}
 
-	public int getNumberProducts() {
+	public BigDecimal getNumberProducts() {
 		return productNumber;
 	}
 
-	public void setNumberProducts(int numberProducts) {
+	public void setNumberProducts(BigDecimal numberProducts) {
 		this.productNumber = numberProducts;
 	}
 

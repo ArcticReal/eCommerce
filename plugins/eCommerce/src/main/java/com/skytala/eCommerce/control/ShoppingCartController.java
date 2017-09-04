@@ -1,5 +1,6 @@
 package com.skytala.eCommerce.control;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -58,16 +59,16 @@ public class ShoppingCartController {
 			return false;
 		}
 		pro = pc.findBy(find).get(0);
-		int anz = 1;
+		BigDecimal anz = new BigDecimal(1);
 		if (allRequestParams.get("count") != null) {
-			anz = Integer.parseInt(allRequestParams.get("count"));
+			anz = new BigDecimal(Integer.parseInt(allRequestParams.get("count")));
 			System.out.println(allRequestParams.get("count"));
 		} 
 		
 		for (int i = 0; i < sc.getPositions().size(); i++) {
 			if (pro.getProductId().equals(sc.getPositions().get(i).getProduct().getProductId())) {
-				int ibuf = sc.getPositions().get(i).getNumberProducts();
-				sc.getPositions().get(i).setNumberProducts(ibuf + anz);
+				BigDecimal ibuf = sc.getPositions().get(i).getNumberProducts();
+				sc.getPositions().get(i).setNumberProducts(ibuf.add(anz));
 				session.setAttribute("cart", sc);
 				return true;
 
