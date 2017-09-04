@@ -2,8 +2,6 @@ package com.skytala.eCommerce.entity;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Map;
 
 public class OrderItem {
 

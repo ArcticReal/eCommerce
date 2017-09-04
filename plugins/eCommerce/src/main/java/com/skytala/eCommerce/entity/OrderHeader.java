@@ -37,6 +37,18 @@ public class OrderHeader {
 	private Boolean invoicePerShipment;
 	private List<OrderItem> m_items;
 
+	public OrderHeader() {
+		//when implementing a more complex ecommerce you might want to change following settings
+		this.setOrderTypeId("Sales_ORDER");
+		this.setSalesChannelEnumId("WEB_SALES_CHANNEL");
+		Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+		currentTime.setNanos(0);
+		this.setOrderDate(currentTime);
+		this.setEntryDate(currentTime);
+		this.setStatusId("ORDER_HOLD");
+		this.setCurrencyUom("EUR");
+		this.setProductStoreId("10000");
+	}
 	
 	public List<OrderItem> getM_items() {
 		return m_items;
