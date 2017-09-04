@@ -42,7 +42,8 @@ public class OrderController {
 //			System.out.println("Error keine gueltige Session");
 //		}
 //		
-		NewOrder order = new NewOrder();
+		//TODO: shopping cart from session
+		NewOrder order = new NewOrder(new ShoppingCart());
 		int usedTicketId;
 		
 		synchronized(OrderController.class){

@@ -27,6 +27,15 @@ public class ProductPrice {
 	private Timestamp lastModifiedDate;
 	private String lastModifiedByUserLogin;
 
+	public ProductPrice() {
+		this.setCurrencyUomId("EUR");
+		this.setProductStoreGroupId("10000");
+		Timestamp currentDate = new Timestamp(System.currentTimeMillis());
+		currentDate.setNanos(0);
+		this.setFromDate(currentDate);
+		
+	}
+	
 	public String getProductId() {
 		return productId;
 	}
