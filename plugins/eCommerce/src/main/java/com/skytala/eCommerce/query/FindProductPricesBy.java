@@ -55,8 +55,7 @@ public class FindProductPricesBy implements Query {
 			EntityCondition cond2 = EntityCondition.makeCondition("productPriceTypeId", productPriceTypeId);
 
 			List<String> orderBy = new LinkedList<>();
-			orderBy.add("fromDate");
-			orderBy.add("DESC");
+			orderBy.add("fromDate DESC");
 
 			List<GenericValue> values = delegator.findList("ProductPrice",
 					EntityCondition.makeCondition(cond, EntityJoinOperator.AND, cond2), null, orderBy, null, false);
