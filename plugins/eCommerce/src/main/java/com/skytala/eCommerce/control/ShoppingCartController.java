@@ -22,7 +22,7 @@ import com.skytala.eCommerce.entity.ShoppingCart;
 @RequestMapping("/api/cart")
 public class ShoppingCartController {
 
-	@RequestMapping(method = RequestMethod.GET, value = {"/show", "/"})
+	@RequestMapping(method = RequestMethod.GET, value = { "/show", "/" })
 	public LinkedList<Position> show(HttpSession session) {
 
 		// Debug Message for Windows Forms should be removed later
@@ -84,7 +84,6 @@ public class ShoppingCartController {
 			session.setAttribute("cart", sc);
 		}
 		ShoppingCart sc = (ShoppingCart) session.getAttribute("cart");
-		Product pro = new Product();
 
 		if (allRequestParams.get("productId") != null) {
 			find.put("productId", allRequestParams.get("productId"));
@@ -92,13 +91,24 @@ public class ShoppingCartController {
 		} else {
 			return false;
 		}
-		pro = pc.findBy(find).get(0);
 
-		BigDecimal anz = new BigDecimal(1);
+		List<Product> products = pc.findBy(find);
+		Product pro = new Product();
+		for (int i = 0; i < products.size(); i++) {
+			pro = pc.findBy(find).get(i);
 
-		if (!pro.getProductId().equals(allRequestParams.get("productId"))) {
+			if (pro.getProductId().equals(allRequestParams.get("productId"))) {
+				break;
+			} else {
+				pro = null;
+			}
+		}
+
+		if (pro == null) {
 			return false;
 		}
+
+		BigDecimal anz = new BigDecimal(1);
 
 		if (allRequestParams.get("count") != null) {
 			anz = new BigDecimal(Integer.parseInt(allRequestParams.get("count")));
@@ -124,12 +134,13 @@ public class ShoppingCartController {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
-		
+
 		session.setAttribute("cart", sc);
 		return true;
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = {"/remove", "/delete"}, consumes = "application/x-www-form-urlencoded")
+	@RequestMapping(method = RequestMethod.POST, value = { "/remove",
+			"/delete" }, consumes = "application/x-www-form-urlencoded")
 	public boolean removeFromCart(HttpSession session, @RequestParam Map<String, String> allRequestParams) {
 
 		if (allRequestParams.get("productId") != null) {
