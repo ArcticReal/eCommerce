@@ -45,7 +45,7 @@ public class OrderHeader {
 		this.setEntryDate(currentTime);
 		this.setStatusId("ORDER_HOLD");
 		this.setCurrencyUom("EUR");
-		this.setProductStoreId("10000");
+		this.setProductStoreId("SKYTALA_DIETMANNSR.");
 	}
 	
 

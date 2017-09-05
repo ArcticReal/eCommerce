@@ -42,13 +42,14 @@ public class DatabaseInitializer {
 //			System.out.println(purposes+"\n\n\n\n\n\n\n\n\n");
 			
 			GenericValue storeGroupValue = delegator.makeValue("ProductStoreGroup", mapStoreGroup);
-			delegator.create(storeGroupValue);
+			delegator.createOrStore(storeGroupValue);
 			
 			GenericValue storeValue = delegator.makeValidValue("ProductStore", mapStore);
-			delegator.create(storeValue);
+			delegator.createOrStore(storeValue);
 
 			storeValue = delegator.makeValidValue("ProductStore", mapStore2);
-			delegator.create(storeValue);
+			delegator.createOrStore(storeValue);
+			
 
 		} catch (GenericEntityException e) {
 			e.printStackTrace();
