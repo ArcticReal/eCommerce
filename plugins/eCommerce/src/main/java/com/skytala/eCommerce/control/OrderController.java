@@ -46,7 +46,13 @@ public class OrderController {
 
 		while (!commandReturnVal.containsKey(usedTicketId)) {
 		}
-		return commandReturnVal.remove(usedTicketId);
+		
+		boolean orderSuccess = commandReturnVal.remove(usedTicketId);
+		if (orderSuccess) {
+			session.removeAttribute("cart");
+		}
+		
+		return orderSuccess;
 
 	}
 
