@@ -29,10 +29,11 @@ public class ProductPrice {
 
 	public ProductPrice() {
 		this.setCurrencyUomId("EUR");
-		this.setProductStoreGroupId("10000");
+		this.setProductStoreGroupId("SKYTALA_GROUP");
 		Timestamp currentDate = new Timestamp(System.currentTimeMillis());
 		currentDate.setNanos(0);
 		this.setFromDate(currentDate);
+		this.setProductPricePurposeId("PURCHASE");
 		
 	}
 	
