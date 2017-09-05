@@ -8,7 +8,6 @@ import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
 import org.apache.ofbiz.entity.GenericValue;
 import org.apache.ofbiz.entity.condition.EntityCondition;
-import org.apache.ofbiz.entity.util.EntityListIterator;
 
 import com.skytala.eCommerce.control.Broker;
 import com.skytala.eCommerce.entity.ProductPrice;
@@ -41,11 +40,10 @@ public class FindProductPricesById implements Query {
 		try {
 			
 			EntityCondition cond = EntityCondition.makeCondition("productId", productId);
-			EntityListIterator iterator = delegator.find("ProductPrice", cond, null, null, null, null);
+			List<GenericValue> values = delegator.findList("ProductPrice", cond, null, null, null, false);
 			
-			GenericValue value = new GenericValue();
-			while((value = iterator.next()) != null) {
-				foundProductPrices.add(ProductPriceMapper.map(value));
+			for(int i = 0 ; i < values.size(); i++) {
+				foundProductPrices.add(ProductPriceMapper.map(values.get(i)));
 			}
 			
 			
