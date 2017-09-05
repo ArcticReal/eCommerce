@@ -22,7 +22,7 @@ import com.skytala.eCommerce.entity.ShoppingCart;
 @RequestMapping("/api/cart")
 public class ShoppingCartController {
 
-	@RequestMapping(method = RequestMethod.GET, value = "/show")
+	@RequestMapping(method = RequestMethod.GET, value = {"/show", "/"})
 	public LinkedList<Position> show(HttpSession session) {
 
 		// Debug Message for Windows Forms should be removed later
@@ -55,19 +55,21 @@ public class ShoppingCartController {
 
 	}
 
+	@RequestMapping(method = RequestMethod.GET, value = { "/total", "/grandTotal", "/calc" })
 	public BigDecimal showGrandTotal(HttpSession session) {
 
 		BigDecimal grandTotal = new BigDecimal(0);
-		if(session.getAttribute("cart") != null) {
+		if (session.getAttribute("cart") != null) {
 			ShoppingCart sc = new ShoppingCart();
 			sc = (ShoppingCart) session.getAttribute("cart");
 			grandTotal = sc.getGrandTotal();
 		}
-		
+
 		return grandTotal;
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = "application/x-www-form-urlencoded")
+	@RequestMapping(method = RequestMethod.POST, value = { "/add", "/create",
+			"/new" }, consumes = "application/x-www-form-urlencoded")
 	public boolean addToCart(HttpSession session, @RequestParam Map<String, String> allRequestParams) {
 
 		Map<String, String> find = new HashMap<String, String>();
@@ -107,12 +109,6 @@ public class ShoppingCartController {
 			if (pro.getProductId().equals(sc.getPositions().get(i).getProduct().getProductId())) {
 				BigDecimal ibuf = sc.getPositions().get(i).getNumberProducts();
 				sc.getPositions().get(i).setNumberProducts(ibuf.add(anz));
-				try {
-					sc.setGrandTotal(this.calculateGrandTotal(sc));
-				} catch (Exception e) {
-					System.out.println(e.getMessage());
-					e.printStackTrace();
-				}
 				session.setAttribute("cart", sc);
 				return true;
 
@@ -122,11 +118,18 @@ public class ShoppingCartController {
 
 		Position pos = new Position(pro, anz);
 		sc.addPosition(pos);
+		try {
+			sc.setGrandTotal(this.calculateGrandTotal(sc));
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+		
 		session.setAttribute("cart", sc);
 		return true;
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/remove", consumes = "application/x-www-form-urlencoded")
+	@RequestMapping(method = RequestMethod.POST, value = {"/remove", "/delete"}, consumes = "application/x-www-form-urlencoded")
 	public boolean removeFromCart(HttpSession session, @RequestParam Map<String, String> allRequestParams) {
 
 		if (allRequestParams.get("productId") != null) {

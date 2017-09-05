@@ -1,5 +1,6 @@
 package com.skytala.eCommerce.query;
 
+import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -8,7 +9,6 @@ import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
 import org.apache.ofbiz.entity.GenericValue;
 import org.apache.ofbiz.entity.condition.EntityCondition;
-import org.apache.ofbiz.entity.util.EntityListIterator;
 
 import com.skytala.eCommerce.control.Broker;
 import com.skytala.eCommerce.entity.ProductPrice;
@@ -37,18 +37,31 @@ public class FindProductPricesById implements Query {
 		Delegator delegator = DelegatorFactory.getDelegator("default");
 
 		List<ProductPrice> foundProductPrices = new LinkedList<>();
-		
+
 		try {
-			
+
 			EntityCondition cond = EntityCondition.makeCondition("productId", productId);
-			EntityListIterator iterator = delegator.find("ProductPrice", cond, null, null, null, null);
-			
-			GenericValue value = new GenericValue();
-			while((value = iterator.next()) != null) {
-				foundProductPrices.add(ProductPriceMapper.map(value));
+
+			List<String> orderBy = new LinkedList<>();
+			orderBy.add("fromDate DESC");
+
+			List<GenericValue> values = delegator.findList("ProductPrice", cond, null, orderBy, null, false);
+
+			Timestamp currentDate = new Timestamp(System.currentTimeMillis());
+			currentDate.setNanos(0);
+
+			for (int i = 0; i < values.size(); i++) {
+				ProductPrice price = ProductPriceMapper.map(values.get(i));
+
+				if (price.getThruDate() == null || price.getThruDate().after(currentDate)) {
+
+					if (price.getFromDate().before(currentDate)) {
+						foundProductPrices.add(price);
+					}
+				}
+
 			}
-			
-			
+
 		} catch (GenericEntityException e) {
 			e.printStackTrace();
 		}

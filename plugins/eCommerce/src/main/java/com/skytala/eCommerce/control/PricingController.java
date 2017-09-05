@@ -41,7 +41,7 @@ public class PricingController {
 	 *            the price type id
 	 * @return a List with the ProductPrices
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = { "/findById" })
+	@RequestMapping(method = RequestMethod.GET, value = { "/findBy" })
 	public List<ProductPrice> findProductPricesBy(@RequestParam String productId,
 			@RequestParam String productPriceTypeId) {
 
@@ -73,7 +73,7 @@ public class PricingController {
 	 *            Id of the product that you want to know the price of
 	 * @return A list of different prices
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = { "/findBy" })
+	@RequestMapping(method = RequestMethod.GET, value = { "/findById" })
 	public List<ProductPrice> findProductPricesById(@RequestParam String productId) {
 
 		FindProductPricesById query = new FindProductPricesById(productId);

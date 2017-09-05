@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.skytala.eCommerce.command.NewOrder;
@@ -20,7 +21,7 @@ public class OrderController {
 
 	private static Map<Integer, Boolean> commandReturnVal = new HashMap<>();
 
-	@RequestMapping("/create")
+	@RequestMapping(method = RequestMethod.POST, value = "/create")
 	public boolean createOrder(HttpSession session) {
 
 		ShoppingCart sc = new ShoppingCart();
@@ -45,7 +46,13 @@ public class OrderController {
 
 		while (!commandReturnVal.containsKey(usedTicketId)) {
 		}
-		return commandReturnVal.remove(usedTicketId);
+		
+		boolean orderSuccess = commandReturnVal.remove(usedTicketId);
+		if (orderSuccess) {
+			session.removeAttribute("cart");
+		}
+		
+		return orderSuccess;
 
 	}
 
