@@ -80,9 +80,7 @@ public class PersonController {
 		
 		try {
 			int usedTicketId;
-			for(int i = 0 ; i< 10 ; i++){
-				System.out.println((String) params.get("partyId"));
-				}
+		
 			String partyId = params.get("partyId");
 			
 			user = UserLoginMapper.mapstrstr(params);

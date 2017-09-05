@@ -16,6 +16,7 @@ public class UserLogin {
 	private String lastTimeZone;
 	private Timestamp disabledDateTime;
 	private Long successiveFailedLogins;
+	private String partyId;
 	private String externalAuthId;
 	private String userLdapDn;
 	private String disabledBy;
@@ -114,6 +115,14 @@ public class UserLogin {
 
 	public void setSuccessiveFailedLogins(Long successiveFailedLogins) {
 		this.successiveFailedLogins = successiveFailedLogins;
+	}
+
+	public String getPartyId() {
+		return partyId;
+	}
+
+	public void setPartyId(String partyId) {
+		this.partyId = partyId;
 	}
 
 	public String getExternalAuthId() {
