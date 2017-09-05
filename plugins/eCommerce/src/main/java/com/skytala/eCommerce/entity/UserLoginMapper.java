@@ -62,6 +62,10 @@ public class UserLoginMapper {
 			returnVal.put("successiveFailedLogins", userlogin.getSuccessiveFailedLogins());
 		}
 
+		if (userlogin.getPartyId() != null) {
+			returnVal.put("partyId", userlogin.getPartyId());
+		}
+
 		if (userlogin.getExternalAuthId() != null) {
 			returnVal.put("externalAuthId", userlogin.getExternalAuthId());
 		}
@@ -127,6 +131,10 @@ public class UserLoginMapper {
 
 		if (fields.get("successiveFailedLogins") != null) {
 			returnVal.setSuccessiveFailedLogins((long) fields.get("successiveFailedLogins"));
+		}
+
+		if (fields.get("partyId") != null) {
+			returnVal.setPartyId((String) fields.get("partyId"));
 		}
 
 		if (fields.get("externalAuthId") != null) {
@@ -213,6 +221,10 @@ public class UserLoginMapper {
 			returnVal.setSuccessiveFailedLogins(ibuf);
 		}
 
+		if (fields.get("partyId") != null) {
+			returnVal.setPartyId((String) fields.get("partyId"));
+		}
+
 		if (fields.get("externalAuthId") != null) {
 			returnVal.setExternalAuthId((String) fields.get("externalAuthId"));
 		}
@@ -243,6 +255,7 @@ public class UserLoginMapper {
 		returnVal.setLastTimeZone(val.getString("lastTimeZone"));
 		returnVal.setDisabledDateTime(val.getTimestamp("disabledDateTime"));
 		returnVal.setSuccessiveFailedLogins(val.getLong("successiveFailedLogins"));
+		returnVal.setPartyId(val.getString("partyId"));
 		returnVal.setExternalAuthId(val.getString("externalAuthId"));
 		returnVal.setUserLdapDn(val.getString("userLdapDn"));
 		returnVal.setDisabledBy(val.getString("disabledBy"));
@@ -307,6 +320,9 @@ public class UserLoginMapper {
 			String buf = request.getParameter("successiveFailedLogins");
 			Long ibuf = Long.parseLong(buf);
 			returnVal.setSuccessiveFailedLogins(ibuf);
+		}
+		if (paramMap.containsKey("partyId")) {
+			returnVal.setPartyId(request.getParameter("partyId"));
 		}
 		if (paramMap.containsKey("externalAuthId")) {
 			returnVal.setExternalAuthId(request.getParameter("externalAuthId"));
