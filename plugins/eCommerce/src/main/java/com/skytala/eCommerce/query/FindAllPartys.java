@@ -11,6 +11,7 @@ import org.apache.ofbiz.entity.GenericValue;
 import com.skytala.eCommerce.control.Broker;
 import com.skytala.eCommerce.entity.Party;
 import com.skytala.eCommerce.entity.PartyMapper;
+import com.skytala.eCommerce.event.PartyFound;
 
 public class FindAllPartys implements Query {
 

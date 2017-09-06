@@ -6,6 +6,7 @@ import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
 
 import com.skytala.eCommerce.control.Broker;
+import com.skytala.eCommerce.event.PartyDeleted;
 
 public class DeleteParty implements Command {
 

@@ -7,6 +7,7 @@ import org.apache.ofbiz.entity.GenericValue;
 
 import com.skytala.eCommerce.control.Broker;
 import com.skytala.eCommerce.entity.Party;
+import com.skytala.eCommerce.event.PartyAdded;
 
 public class AddParty implements Command {
 
