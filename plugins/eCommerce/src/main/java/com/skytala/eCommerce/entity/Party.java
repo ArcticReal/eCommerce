@@ -1,6 +1,7 @@
 package com.skytala.eCommerce.entity;
 
 import java.sql.Timestamp;
+import java.util.Map;
 
 public class Party {
 
@@ -111,6 +112,10 @@ public class Party {
 
 	public void setIsUnread(Boolean isUnread) {
 		this.isUnread = isUnread;
+	}
+
+	public Map<String, Object> mapAttributeField() {
+		return PartyMapper.map(this);
 	}
 
 }
