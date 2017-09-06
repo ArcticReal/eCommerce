@@ -49,7 +49,7 @@ public class PricingController {
 
 		int usedTicketId;
 
-		synchronized (ProductController.class) {
+		synchronized (PricingController.class) {
 			usedTicketId = requestTicketId;
 			requestTicketId++;
 		}
@@ -80,7 +80,7 @@ public class PricingController {
 
 		int usedTicketId;
 
-		synchronized (ProductController.class) {
+		synchronized (PricingController.class) {
 			usedTicketId = requestTicketId;
 			requestTicketId++;
 		}
@@ -138,7 +138,7 @@ public class PricingController {
 		AddProductPrice com = new AddProductPrice(productPriceToBeAdded);
 		int usedTicketId;
 
-		synchronized (ProductController.class) {
+		synchronized (PricingController.class) {
 
 			usedTicketId = requestTicketId;
 			requestTicketId++;
@@ -160,6 +160,12 @@ public class PricingController {
 
 	}
 
+	/**
+	 * this method will only be called by Springs DispatcherServlet
+	 * 
+	 * @param request HttpServletRequest object
+	 * @return true on success, false on fail
+	 */
 	@RequestMapping(method = RequestMethod.PUT, value = { "/update",
 			"/change" }, consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductPrice(HttpServletRequest request) {
@@ -194,13 +200,19 @@ public class PricingController {
 
 	}
 
+	/**
+	 * Updates the ProductPrice with the specific Id
+	 * 
+	 * @param productPriceToBeUpdated the ProductPrice thats to be updated
+	 * @return true on success, false on fail
+	 */
 	public boolean updateProductPrice(ProductPrice productPriceToBeUpdated) {
 
 		UpdateProductPrice com = new UpdateProductPrice(productPriceToBeUpdated);
 
 		int usedTicketId;
 
-		synchronized (ProductController.class) {
+		synchronized (PricingController.class) {
 
 			usedTicketId = requestTicketId;
 			requestTicketId++;
