@@ -1,6 +1,7 @@
 package com.skytala.eCommerce.entity;
 
 import java.sql.Timestamp;
+import java.util.Map;
 
 public class UserLogin {
 
@@ -149,4 +150,7 @@ public class UserLogin {
 		this.disabledBy = disabledBy;
 	}
 
+	public Map<String, Object> mapAttributeField() {
+		return UserLoginMapper.map(this);
+	}
 }

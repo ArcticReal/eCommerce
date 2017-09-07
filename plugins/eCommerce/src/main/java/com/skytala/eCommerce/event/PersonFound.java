@@ -2,8 +2,8 @@ package com.skytala.eCommerce.event;
 
 import java.util.List;
 
-import com.skytala.eCommerce.entity.Party;
 import com.skytala.eCommerce.control.Event;
+import com.skytala.eCommerce.entity.Person;
 
 public class PersonFound implements Event{
 

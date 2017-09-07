@@ -2,6 +2,7 @@ package com.skytala.eCommerce.entity;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.Map;
 
 public class Person {
 
@@ -294,4 +295,7 @@ public class Person {
 		this.cardId = cardId;
 	}
 
+	public Map<String, Object> mapAttributeField() {
+		return PersonMapper.map(this);
+	}
 }
