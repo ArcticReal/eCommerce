@@ -4,8 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -33,6 +35,16 @@ public class PartyController {
 	private static int requestTicketId = 0;
 	private static Map<Integer, Boolean> commandReturnVal = new HashMap<>();
 	private static Map<Integer, List<Party>> queryReturnVal = new HashMap<>();
+	private static Map<String, RequestMethod> validRequests = new HashMap<>();
+
+	public PartyController() {
+
+		validRequests.put("find", RequestMethod.GET);
+		validRequests.put("add", RequestMethod.POST);
+		validRequests.put("update", RequestMethod.PUT);
+		validRequests.put("removeById", RequestMethod.DELETE);
+
+	}
 
 	/**
 	 * 
@@ -40,8 +52,8 @@ public class PartyController {
 	 *            all params by which you want to find a Party
 	 * @return a List with the Partys
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = { "/findBy" })
-	public List<Party> findPartysBy(@RequestParam Map<String, String> allRequestParams){
+	@RequestMapping(method = RequestMethod.GET, value = { "/find" })
+	public List<Party> findPartysBy(@RequestParam Map<String, String> allRequestParams) {
 
 		FindPartysBy query = new FindPartysBy(allRequestParams);
 
@@ -75,8 +87,7 @@ public class PartyController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = { "/create",
-			"/insert", "/add" }, consumes = "application/x-www-form-urlencoded")
+	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = "application/x-www-form-urlencoded")
 	public boolean createParty(HttpServletRequest request) {
 
 		Party partyToBeAdded = new Party();
@@ -129,11 +140,11 @@ public class PartyController {
 	/**
 	 * this method will only be called by Springs DispatcherServlet
 	 * 
-	 * @param request HttpServletRequest object
+	 * @param request
+	 *            HttpServletRequest object
 	 * @return true on success, false on fail
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = { "/update",
-			"/change" }, consumes = "application/x-www-form-urlencoded")
+	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateParty(HttpServletRequest request) {
 
 		BufferedReader br;
@@ -169,7 +180,8 @@ public class PartyController {
 	/**
 	 * Updates the Party with the specific Id
 	 * 
-	 * @param partyToBeUpdated the Party thats to be updated
+	 * @param partyToBeUpdated
+	 *            the Party thats to be updated
 	 * @return true on success, false on fail
 	 */
 	public boolean updateParty(Party partyToBeUpdated) {
@@ -208,7 +220,7 @@ public class PartyController {
 	 * @return true on success; false on fail
 	 * 
 	 */
-	@RequestMapping(method = RequestMethod.DELETE, value = { "/removeById", "/removeBy" })
+	@RequestMapping(method = RequestMethod.DELETE, value = "/removeById")
 	public boolean deletepartyById(@RequestParam(value = "partyId") String partyId) {
 
 		DeleteParty com = new DeleteParty(partyId);
@@ -241,8 +253,34 @@ public class PartyController {
 	}
 
 	@RequestMapping(value = (" * "))
-	public String returnErrorPage() {
+	public String returnErrorPage(HttpServletRequest request) {
 
-		return "Error 404: Page not found! Check your spelling and/or your request method.";
+		String usedUri = request.getRequestURI();
+		String[] splittedString = usedUri.split("/");
 
-}}
+		String usedRequest = splittedString[splittedString.length - 1];
+
+		if (validRequests.containsKey(usedRequest)) {
+			return "Error: request method " + request.getMethod() + " not allowed for \"" + usedUri + "\"!\n"
+					+ "Please use " + validRequests.get(usedRequest) + "!";
+
+		}
+
+		String returnVal = "Error 404: Page not found! Valid pages are: \"eCommerce/api/party/\" plus one of the following: "
+				+ "";
+
+		Set<String> keySet = validRequests.keySet();
+		Iterator<String> it = keySet.iterator();
+
+		while (it.hasNext()) {
+			returnVal += "\"" + it.next() + "\"";
+			if (it.hasNext())
+				returnVal += ", ";
+		}
+
+		returnVal += "!";
+
+		return returnVal;
+
+	}
+}
