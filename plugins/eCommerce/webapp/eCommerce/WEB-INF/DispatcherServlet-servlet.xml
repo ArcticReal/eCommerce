@@ -21,21 +21,9 @@
     <mvc:annotation-driven />
 
 	<context:annotation-config />
-
-	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
-	    <property name="messageConverters">
-	        <list>
-	            <ref bean="jsonMessageConverter" />
-	        </list>
-	    </property>
-	
-	</bean>
 	
 	<bean id="databaseInitializer" class="com.skytala.eCommerce.control.DatabaseInitializer">
 	</bean>
 	
-	<bean id="jsonMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" >
-	    <property name="supportedMediaTypes" value="application/json" />
-	</bean>
 
  </beans>
