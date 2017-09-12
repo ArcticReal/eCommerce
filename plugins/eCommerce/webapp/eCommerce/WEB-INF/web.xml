@@ -40,9 +40,8 @@
         <filter-class>org.apache.ofbiz.webapp.control.ControlFilter</filter-class>
         <init-param>
             <param-name>allowedPaths</param-name>
-            <param-value>/api:/error:/control:/select:/index.html:/index.jsp:/default.html:/default.jsp:/images</param-value>
+            <param-value>/swagger-resources:/null:/webjars:/swagger-ui.html:/v2:/api:/error:/control:/select:/index.html:/index.jsp:/default.html:/default.jsp:/images</param-value>
         </init-param>
-        <init-param><param-name>redirectPath</param-name><param-value>/control/main</param-value></init-param>
     </filter>
     <filter>
         <display-name>ContextFilter</display-name>
@@ -67,6 +66,8 @@
     
       
 	<servlet-mapping><servlet-name>DispatcherServlet</servlet-name><url-pattern>/</url-pattern></servlet-mapping>
+
+
 
     <session-config>
         <session-timeout>60</session-timeout><!-- in minutes -->

@@ -21,10 +21,6 @@ package org.apache.ofbiz.base.start;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-
 /**
  * OFBiz startup class.
  *
@@ -42,9 +38,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
  * <tt>getInstance()</tt> static method.
  * </p>
  */
-@Configuration
-@EnableWebMvc
-@ComponentScan
 public final class Start {
 
     private Config config = null;
