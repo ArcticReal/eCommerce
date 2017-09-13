@@ -29,7 +29,7 @@ import com.skytala.eCommerce.event.UserLoginUpdated;
 import com.skytala.eCommerce.query.FindUserLoginsBy;
 
 @RestController
-@RequestMapping("/api/userLogin")
+@RequestMapping("/userLogin")
 public class UserLoginController {
 
 	private static int requestTicketId = 0;

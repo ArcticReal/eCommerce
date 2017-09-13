@@ -64,16 +64,31 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
     
+    <servlet>
+        <description>Main Control Servlet</description>
+        <display-name>ControlServlet</display-name>
+        <servlet-name>ControlServlet</servlet-name>
+        <servlet-class>org.apache.ofbiz.webapp.control.ControlServlet</servlet-class>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+    
       
-	<servlet-mapping><servlet-name>DispatcherServlet</servlet-name><url-pattern>/</url-pattern></servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>DispatcherServlet</servlet-name>
+		<url-pattern>/api/*</url-pattern>
+	</servlet-mapping>
 
+    <servlet-mapping>
+        <servlet-name>ControlServlet</servlet-name>
+        <url-pattern>/control/*</url-pattern>
+    </servlet-mapping>
 
 
     <session-config>
         <session-timeout>60</session-timeout><!-- in minutes -->
         <cookie-config>
             <http-only>true</http-only>
-            <secure>false</secure>
+            <secure>true</secure>
         </cookie-config>
         <tracking-mode>COOKIE</tracking-mode>
     </session-config>

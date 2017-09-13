@@ -19,7 +19,7 @@ import com.skytala.eCommerce.entity.ProductPrice;
 import com.skytala.eCommerce.entity.ShoppingCart;
 
 @RestController
-@RequestMapping("/api/cart")
+@RequestMapping("/cart")
 public class ShoppingCartController {
 
 	@RequestMapping(method = RequestMethod.GET, value = { "/show", "/" })

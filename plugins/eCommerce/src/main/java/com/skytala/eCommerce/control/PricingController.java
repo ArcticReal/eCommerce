@@ -26,7 +26,7 @@ import com.skytala.eCommerce.query.FindProductPricesBy;
 import com.skytala.eCommerce.query.FindProductPricesById;
 
 @RestController
-@RequestMapping("/api/pricing")
+@RequestMapping("/pricing")
 public class PricingController {
 
 	private static int requestTicketId = 0;

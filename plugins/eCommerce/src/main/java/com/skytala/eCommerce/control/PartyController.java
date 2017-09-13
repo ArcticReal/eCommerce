@@ -29,7 +29,7 @@ import com.skytala.eCommerce.event.PartyUpdated;
 import com.skytala.eCommerce.query.FindPartysBy;
 
 @RestController
-@RequestMapping("/api/party")
+@RequestMapping("/party")
 public class PartyController {
 
 	private static int requestTicketId = 0;

@@ -22,7 +22,7 @@ import com.skytala.eCommerce.query.FindAllOrders;
 import com.skytala.eCommerce.query.FindOrderById;
 
 @RestController
-@RequestMapping("/api/order")
+@RequestMapping("/order")
 public class OrderController {
 
 	private static int requestTicketId = 0;

@@ -28,7 +28,7 @@ import com.skytala.eCommerce.query.FindAllProducts;
 import com.skytala.eCommerce.query.FindProductsBy;
 
 @RestController
-@RequestMapping("/api/product")
+@RequestMapping("/product")
 public class ProductController {
 
 	private static int requestTicketId = 0;

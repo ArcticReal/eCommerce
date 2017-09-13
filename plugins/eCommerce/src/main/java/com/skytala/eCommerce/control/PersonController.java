@@ -29,7 +29,7 @@ import com.skytala.eCommerce.event.PersonUpdated;
 import com.skytala.eCommerce.query.FindPersonsBy;
 
 @RestController
-@RequestMapping("/api/person")
+@RequestMapping("/person")
 public class PersonController {
 
 	private static int requestTicketId = 0;
