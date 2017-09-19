@@ -30,13 +30,13 @@ public class SwaggerConfig{
 
 	private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-            .title("Swagger")
-            .description("Swagger 2 api")
-            .version("VERSION")
+            .title("Ofbiz")
+            .description("ofbiz service controlling and CRUD")
+            .version("0.1 pre Alpha")
             .termsOfServiceUrl("http://terms-of-services.url")
             .license("LICENSE")
             .licenseUrl("http://url-to-license.com")
-            .contact(new Contact("CONTACT_NAME", "CONTACT_URL", "CONTACT_MAIL"))
+            .contact(new Contact("Skytala GmbH", "http://www.skytala-gmbh.com/", "info@skytala-gmbh.com"))
             .build();
     }
 	
