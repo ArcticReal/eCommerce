@@ -133,7 +133,7 @@ public class ProductCostingServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCostComponentAttribute")
-	public ResponseEntity<Object> updateCostComponentAttribute(HttpSession session, @RequestParam(value="attrName") String attrName, @RequestParam(value="costComponentId") String costComponentId, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) long attrValue) {
+	public ResponseEntity<Object> updateCostComponentAttribute(HttpSession session, @RequestParam(value="attrName") String attrName, @RequestParam(value="costComponentId") String costComponentId, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("attrName",attrName);
@@ -161,7 +161,7 @@ public class ProductCostingServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductCostComponentCalc")
-	public ResponseEntity<Object> updateProductCostComponentCalc(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="productId") String productId, @RequestParam(value="sequenceNum", required=false) long sequenceNum, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Object> updateProductCostComponentCalc(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="productId") String productId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -272,7 +272,7 @@ public class ProductCostingServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCostComponentType")
-	public ResponseEntity<Object> createCostComponentType(HttpSession session, @RequestParam(value="costComponentTypeId", required=false) String costComponentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> createCostComponentType(HttpSession session, @RequestParam(value="costComponentTypeId", required=false) String costComponentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentTypeId",costComponentTypeId);
@@ -454,7 +454,7 @@ public class ProductCostingServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductCostComponentCalc")
-	public ResponseEntity<Object> createProductCostComponentCalc(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="productId") String productId, @RequestParam(value="sequenceNum", required=false) long sequenceNum, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Object> createProductCostComponentCalc(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="productId") String productId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -484,7 +484,7 @@ public class ProductCostingServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCostComponentAttribute")
-	public ResponseEntity<Object> createCostComponentAttribute(HttpSession session, @RequestParam(value="attrName") String attrName, @RequestParam(value="costComponentId") String costComponentId, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) long attrValue) {
+	public ResponseEntity<Object> createCostComponentAttribute(HttpSession session, @RequestParam(value="attrName") String attrName, @RequestParam(value="costComponentId") String costComponentId, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("attrName",attrName);
@@ -596,7 +596,7 @@ public class ProductCostingServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCostComponentType")
-	public ResponseEntity<Object> updateCostComponentType(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> updateCostComponentType(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentTypeId",costComponentTypeId);

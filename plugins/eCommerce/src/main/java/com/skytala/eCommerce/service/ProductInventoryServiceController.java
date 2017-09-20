@@ -164,7 +164,7 @@ public class ProductInventoryServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createInventoryItemAttribute")
-	public ResponseEntity<Object> createInventoryItemAttribute(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) long attrValue) {
+	public ResponseEntity<Object> createInventoryItemAttribute(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("inventoryItemId",inventoryItemId);
@@ -245,7 +245,7 @@ public class ProductInventoryServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateInventoryItemAttribute")
-	public ResponseEntity<Object> updateInventoryItemAttribute(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) long attrValue) {
+	public ResponseEntity<Object> updateInventoryItemAttribute(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("inventoryItemId",inventoryItemId);

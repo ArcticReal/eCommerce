@@ -5,10 +5,10 @@ dependencies {
     //pluginLibsRuntime 'junit:junit-dep:4.10'
 }
 
-task install << {
+task install  {
     // Install logic for this plugin
 }
 
-task uninstall << {
+task uninstall  {
     // uninstall logic for this plugin
 }

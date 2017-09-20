@@ -25,18 +25,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/service/ProductComponentController4")
 public class ProductComponentServiceController4{
 
-	@RequestMapping(method = RequestMethod.POST, value = "/deleteSubscriptionTypeAttr")
-	public ResponseEntity<Object> deleteSubscriptionTypeAttr(HttpSession session, @RequestParam(value="subscriptionTypeId") String subscriptionTypeId, @RequestParam(value="attrName") String attrName) {
+	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductPromoCode")
+	public ResponseEntity<Object> deleteProductPromoCode(HttpSession session, @RequestParam(value="productPromoCodeId") String productPromoCodeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("subscriptionTypeId",subscriptionTypeId);
-		paramMap.put("attrName",attrName);
+		paramMap.put("productPromoCodeId",productPromoCodeId);
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
 
 		Map<String, Object> result = new HashMap<>();
 		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
 		try {
-			result = dispatcher.runSync("deleteSubscriptionTypeAttr", paramMap);
+			result = dispatcher.runSync("deleteProductPromoCode", paramMap);
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
@@ -51,164 +50,24 @@ public class ProductComponentServiceController4{
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/createSubscriptionResource")
-	public ResponseEntity<Object> createSubscriptionResource(HttpSession session, @RequestParam(value="subscriptionResourceId") String subscriptionResourceId, @RequestParam(value="serviceNameOnExpiry", required=false) String serviceNameOnExpiry, @RequestParam(value="contentId", required=false) String contentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="parentResourceId", required=false) String parentResourceId, @RequestParam(value="webSiteId", required=false) String webSiteId) {
+	@RequestMapping(method = RequestMethod.POST, value = "/updateProductPromoCategory")
+	public ResponseEntity<Object> updateProductPromoCategory(HttpSession session, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="andGroupId") String andGroupId, @RequestParam(value="productPromoActionSeqId") String productPromoActionSeqId, @RequestParam(value="productPromoRuleId") String productPromoRuleId, @RequestParam(value="productPromoId") String productPromoId, @RequestParam(value="productPromoCondSeqId") String productPromoCondSeqId, @RequestParam(value="includeSubCategories", required=false) Boolean includeSubCategories, @RequestParam(value="productPromoApplEnumId", required=false) String productPromoApplEnumId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("subscriptionResourceId",subscriptionResourceId);
-		paramMap.put("serviceNameOnExpiry",serviceNameOnExpiry);
-		paramMap.put("contentId",contentId);
-		paramMap.put("description",description);
-		paramMap.put("parentResourceId",parentResourceId);
-		paramMap.put("webSiteId",webSiteId);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
-
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
-		try {
-			result = dispatcher.runSync("createSubscriptionResource", paramMap);
-		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/updateSubscriptionAttribute")
-	public ResponseEntity<Object> updateSubscriptionAttribute(HttpSession session, @RequestParam(value="subscriptionId") String subscriptionId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrValue", required=false) String attrValue) {
-		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("subscriptionId",subscriptionId);
-		paramMap.put("attrName",attrName);
-		paramMap.put("attrValue",attrValue);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
-
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
-		try {
-			result = dispatcher.runSync("updateSubscriptionAttribute", paramMap);
-		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductSubscriptionResource")
-	public ResponseEntity<Object> deleteProductSubscriptionResource(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="subscriptionResourceId") String subscriptionResourceId) {
-		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("fromDate",fromDate);
-		paramMap.put("productId",productId);
-		paramMap.put("subscriptionResourceId",subscriptionResourceId);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
-
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
-		try {
-			result = dispatcher.runSync("deleteProductSubscriptionResource", paramMap);
-		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/createSubscriptionAttribute")
-	public ResponseEntity<Object> createSubscriptionAttribute(HttpSession session, @RequestParam(value="subscriptionId") String subscriptionId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) long attrValue) {
-		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("subscriptionId",subscriptionId);
-		paramMap.put("attrName",attrName);
-		paramMap.put("attrDescription",attrDescription);
-		paramMap.put("attrValue",attrValue);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
-
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
-		try {
-			result = dispatcher.runSync("createSubscriptionAttribute", paramMap);
-		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/isSubscribed")
-	public ResponseEntity<Object> isSubscribed(HttpSession session, @RequestParam(value="partyId") String partyId, @RequestParam(value="maxLifeTimeUomId", required=false) String maxLifeTimeUomId, @RequestParam(value="useTimeUomId", required=false) String useTimeUomId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="subscriptionResourceId", required=false) String subscriptionResourceId, @RequestParam(value="description", required=false) String description, @RequestParam(value="subscriptionTypeId", required=false) String subscriptionTypeId, @RequestParam(value="canclAutmExtTimeUomId", required=false) String canclAutmExtTimeUomId, @RequestParam(value="contactMechId", required=false) String contactMechId, @RequestParam(value="gracePeriodOnExpiryUomId", required=false) String gracePeriodOnExpiryUomId, @RequestParam(value="availableTime", required=false) long availableTime, @RequestParam(value="productCategoryId", required=false) String productCategoryId, @RequestParam(value="partyNeedId", required=false) String partyNeedId, @RequestParam(value="useTime", required=false) long useTime, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="purchaseFromDate", required=false) Timestamp purchaseFromDate, @RequestParam(value="needTypeId", required=false) String needTypeId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="filterByDate", required=false) String filterByDate, @RequestParam(value="useCountLimit", required=false) long useCountLimit, @RequestParam(value="expirationCompletedDate", required=false) Timestamp expirationCompletedDate, @RequestParam(value="availableTimeUomId", required=false) String availableTimeUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="canclAutmExtTime", required=false) long canclAutmExtTime, @RequestParam(value="originatedFromRoleTypeId", required=false) String originatedFromRoleTypeId, @RequestParam(value="automaticExtend", required=false) boolean automaticExtend, @RequestParam(value="originatedFromPartyId", required=false) String originatedFromPartyId, @RequestParam(value="communicationEventId", required=false) String communicationEventId, @RequestParam(value="maxLifeTime", required=false) long maxLifeTime, @RequestParam(value="purchaseThruDate", required=false) Timestamp purchaseThruDate, @RequestParam(value="externalSubscriptionId", required=false) String externalSubscriptionId, @RequestParam(value="gracePeriodOnExpiry", required=false) long gracePeriodOnExpiry, @RequestParam(value="subscriptionId", required=false) String subscriptionId) {
-		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("partyId",partyId);
-		paramMap.put("maxLifeTimeUomId",maxLifeTimeUomId);
-		paramMap.put("useTimeUomId",useTimeUomId);
-		paramMap.put("orderId",orderId);
-		paramMap.put("subscriptionResourceId",subscriptionResourceId);
-		paramMap.put("description",description);
-		paramMap.put("subscriptionTypeId",subscriptionTypeId);
-		paramMap.put("canclAutmExtTimeUomId",canclAutmExtTimeUomId);
-		paramMap.put("contactMechId",contactMechId);
-		paramMap.put("gracePeriodOnExpiryUomId",gracePeriodOnExpiryUomId);
-		paramMap.put("availableTime",availableTime);
 		paramMap.put("productCategoryId",productCategoryId);
-		paramMap.put("partyNeedId",partyNeedId);
-		paramMap.put("useTime",useTime);
-		paramMap.put("orderItemSeqId",orderItemSeqId);
-		paramMap.put("roleTypeId",roleTypeId);
-		paramMap.put("purchaseFromDate",purchaseFromDate);
-		paramMap.put("needTypeId",needTypeId);
-		paramMap.put("productId",productId);
-		paramMap.put("filterByDate",filterByDate);
-		paramMap.put("useCountLimit",useCountLimit);
-		paramMap.put("expirationCompletedDate",expirationCompletedDate);
-		paramMap.put("availableTimeUomId",availableTimeUomId);
-		paramMap.put("thruDate",thruDate);
-		paramMap.put("inventoryItemId",inventoryItemId);
-		paramMap.put("fromDate",fromDate);
-		paramMap.put("canclAutmExtTime",canclAutmExtTime);
-		paramMap.put("originatedFromRoleTypeId",originatedFromRoleTypeId);
-		paramMap.put("automaticExtend",automaticExtend);
-		paramMap.put("originatedFromPartyId",originatedFromPartyId);
-		paramMap.put("communicationEventId",communicationEventId);
-		paramMap.put("maxLifeTime",maxLifeTime);
-		paramMap.put("purchaseThruDate",purchaseThruDate);
-		paramMap.put("externalSubscriptionId",externalSubscriptionId);
-		paramMap.put("gracePeriodOnExpiry",gracePeriodOnExpiry);
-		paramMap.put("subscriptionId",subscriptionId);
+		paramMap.put("andGroupId",andGroupId);
+		paramMap.put("productPromoActionSeqId",productPromoActionSeqId);
+		paramMap.put("productPromoRuleId",productPromoRuleId);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("productPromoCondSeqId",productPromoCondSeqId);
+		paramMap.put("includeSubCategories",includeSubCategories);
+		paramMap.put("productPromoApplEnumId",productPromoApplEnumId);
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
 
 		Map<String, Object> result = new HashMap<>();
 		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
 		try {
-			result = dispatcher.runSync("isSubscribed", paramMap);
+			result = dispatcher.runSync("updateProductPromoCategory", paramMap);
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
@@ -223,368 +82,21 @@ public class ProductComponentServiceController4{
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/createProductSubscriptionResource")
-	public ResponseEntity<Object> createProductSubscriptionResource(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="subscriptionResourceId") String subscriptionResourceId, @RequestParam(value="purchaseFromDate", required=false) Timestamp purchaseFromDate, @RequestParam(value="maxLifeTimeUomId", required=false) String maxLifeTimeUomId, @RequestParam(value="useTimeUomId", required=false) String useTimeUomId, @RequestParam(value="canclAutmExtTimeUomId", required=false) String canclAutmExtTimeUomId, @RequestParam(value="useCountLimit", required=false) long useCountLimit, @RequestParam(value="availableTimeUomId", required=false) String availableTimeUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="canclAutmExtTime", required=false) long canclAutmExtTime, @RequestParam(value="gracePeriodOnExpiryUomId", required=false) String gracePeriodOnExpiryUomId, @RequestParam(value="availableTime", required=false) long availableTime, @RequestParam(value="automaticExtend", required=false) boolean automaticExtend, @RequestParam(value="useRoleTypeId", required=false) String useRoleTypeId, @RequestParam(value="maxLifeTime", required=false) long maxLifeTime, @RequestParam(value="useTime", required=false) long useTime, @RequestParam(value="purchaseThruDate", required=false) Timestamp purchaseThruDate, @RequestParam(value="gracePeriodOnExpiry", required=false) long gracePeriodOnExpiry) {
+	@RequestMapping(method = RequestMethod.POST, value = "/calculatePurchasePrice")
+	public ResponseEntity<Object> calculatePurchasePrice(HttpSession session, @RequestParam(value="product") org.apache.ofbiz.entity.GenericValue product, @RequestParam(value="currencyUomId") String currencyUomId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("productId",productId);
-		paramMap.put("subscriptionResourceId",subscriptionResourceId);
-		paramMap.put("purchaseFromDate",purchaseFromDate);
-		paramMap.put("maxLifeTimeUomId",maxLifeTimeUomId);
-		paramMap.put("useTimeUomId",useTimeUomId);
-		paramMap.put("canclAutmExtTimeUomId",canclAutmExtTimeUomId);
-		paramMap.put("useCountLimit",useCountLimit);
-		paramMap.put("availableTimeUomId",availableTimeUomId);
-		paramMap.put("thruDate",thruDate);
-		paramMap.put("fromDate",fromDate);
-		paramMap.put("canclAutmExtTime",canclAutmExtTime);
-		paramMap.put("gracePeriodOnExpiryUomId",gracePeriodOnExpiryUomId);
-		paramMap.put("availableTime",availableTime);
-		paramMap.put("automaticExtend",automaticExtend);
-		paramMap.put("useRoleTypeId",useRoleTypeId);
-		paramMap.put("maxLifeTime",maxLifeTime);
-		paramMap.put("useTime",useTime);
-		paramMap.put("purchaseThruDate",purchaseThruDate);
-		paramMap.put("gracePeriodOnExpiry",gracePeriodOnExpiry);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
-
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
-		try {
-			result = dispatcher.runSync("createProductSubscriptionResource", paramMap);
-		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/updateSubscriptionActivity")
-	public ResponseEntity<Object> updateSubscriptionActivity(HttpSession session, @RequestParam(value="subscriptionActivityId") String subscriptionActivityId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="dateSent", required=false) Timestamp dateSent) {
-		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("subscriptionActivityId",subscriptionActivityId);
-		paramMap.put("comments",comments);
-		paramMap.put("dateSent",dateSent);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
-
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
-		try {
-			result = dispatcher.runSync("updateSubscriptionActivity", paramMap);
-		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/runSubscriptionExpired")
-	public ResponseEntity<Object> runSubscriptionExpired(HttpSession session, @RequestParam(value="subscriptionId") String subscriptionId) {
-		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("subscriptionId",subscriptionId);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
-
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
-		try {
-			result = dispatcher.runSync("runSubscriptionExpired", paramMap);
-		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/removeSubscriptionCommEvent")
-	public ResponseEntity<Object> removeSubscriptionCommEvent(HttpSession session, @RequestParam(value="communicationEventId") String communicationEventId, @RequestParam(value="subscriptionId") String subscriptionId) {
-		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("communicationEventId",communicationEventId);
-		paramMap.put("subscriptionId",subscriptionId);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
-
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
-		try {
-			result = dispatcher.runSync("removeSubscriptionCommEvent", paramMap);
-		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/updateSubscriptionType")
-	public ResponseEntity<Object> updateSubscriptionType(HttpSession session, @RequestParam(value="subscriptionTypeId") String subscriptionTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) boolean hasTable, @RequestParam(value="description", required=false) String description) {
-		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("subscriptionTypeId",subscriptionTypeId);
-		paramMap.put("parentTypeId",parentTypeId);
-		paramMap.put("hasTable",hasTable);
-		paramMap.put("description",description);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
-
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
-		try {
-			result = dispatcher.runSync("updateSubscriptionType", paramMap);
-		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/getSubscriptionEnt")
-	public ResponseEntity<Object> getSubscriptionEnt(HttpSession session, @RequestParam(value="subscriptionId") String subscriptionId) {
-		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("subscriptionId",subscriptionId);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
-
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
-		try {
-			result = dispatcher.runSync("getSubscriptionEnt", paramMap);
-		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/deleteSubscriptionAttribute")
-	public ResponseEntity<Object> deleteSubscriptionAttribute(HttpSession session, @RequestParam(value="subscriptionId") String subscriptionId, @RequestParam(value="attrName") String attrName) {
-		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("subscriptionId",subscriptionId);
-		paramMap.put("attrName",attrName);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
-
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
-		try {
-			result = dispatcher.runSync("deleteSubscriptionAttribute", paramMap);
-		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/updateProductSubscriptionResource")
-	public ResponseEntity<Object> updateProductSubscriptionResource(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="subscriptionResourceId") String subscriptionResourceId, @RequestParam(value="purchaseFromDate", required=false) Timestamp purchaseFromDate, @RequestParam(value="maxLifeTimeUomId", required=false) String maxLifeTimeUomId, @RequestParam(value="useTimeUomId", required=false) String useTimeUomId, @RequestParam(value="canclAutmExtTimeUomId", required=false) String canclAutmExtTimeUomId, @RequestParam(value="useCountLimit", required=false) long useCountLimit, @RequestParam(value="availableTimeUomId", required=false) String availableTimeUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="canclAutmExtTime", required=false) long canclAutmExtTime, @RequestParam(value="gracePeriodOnExpiryUomId", required=false) String gracePeriodOnExpiryUomId, @RequestParam(value="availableTime", required=false) long availableTime, @RequestParam(value="automaticExtend", required=false) boolean automaticExtend, @RequestParam(value="useRoleTypeId", required=false) String useRoleTypeId, @RequestParam(value="maxLifeTime", required=false) long maxLifeTime, @RequestParam(value="useTime", required=false) long useTime, @RequestParam(value="purchaseThruDate", required=false) Timestamp purchaseThruDate, @RequestParam(value="gracePeriodOnExpiry", required=false) long gracePeriodOnExpiry) {
-		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("fromDate",fromDate);
-		paramMap.put("productId",productId);
-		paramMap.put("subscriptionResourceId",subscriptionResourceId);
-		paramMap.put("purchaseFromDate",purchaseFromDate);
-		paramMap.put("maxLifeTimeUomId",maxLifeTimeUomId);
-		paramMap.put("useTimeUomId",useTimeUomId);
-		paramMap.put("canclAutmExtTimeUomId",canclAutmExtTimeUomId);
-		paramMap.put("useCountLimit",useCountLimit);
-		paramMap.put("availableTimeUomId",availableTimeUomId);
-		paramMap.put("thruDate",thruDate);
-		paramMap.put("canclAutmExtTime",canclAutmExtTime);
-		paramMap.put("gracePeriodOnExpiryUomId",gracePeriodOnExpiryUomId);
-		paramMap.put("availableTime",availableTime);
-		paramMap.put("automaticExtend",automaticExtend);
-		paramMap.put("useRoleTypeId",useRoleTypeId);
-		paramMap.put("maxLifeTime",maxLifeTime);
-		paramMap.put("useTime",useTime);
-		paramMap.put("purchaseThruDate",purchaseThruDate);
-		paramMap.put("gracePeriodOnExpiry",gracePeriodOnExpiry);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
-
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
-		try {
-			result = dispatcher.runSync("updateProductSubscriptionResource", paramMap);
-		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/deleteSubscriptionActivity")
-	public ResponseEntity<Object> deleteSubscriptionActivity(HttpSession session, @RequestParam(value="subscriptionActivityId") String subscriptionActivityId) {
-		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("subscriptionActivityId",subscriptionActivityId);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
-
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
-		try {
-			result = dispatcher.runSync("deleteSubscriptionActivity", paramMap);
-		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/processExtendSubscriptionByOrder")
-	public ResponseEntity<Object> processExtendSubscriptionByOrder(HttpSession session, @RequestParam(value="orderId") String orderId) {
-		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("orderId",orderId);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
-
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
-		try {
-			result = dispatcher.runSync("processExtendSubscriptionByOrder", paramMap);
-		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/runServiceOnSubscriptionExpiry")
-	public ResponseEntity<Object> runServiceOnSubscriptionExpiry(HttpSession session) {
-		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
-
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
-		try {
-			result = dispatcher.runSync("runServiceOnSubscriptionExpiry", paramMap);
-		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/createSubscription")
-	public ResponseEntity<Object> createSubscription(HttpSession session, @RequestParam(value="maxLifeTimeUomId", required=false) String maxLifeTimeUomId, @RequestParam(value="useTimeUomId", required=false) String useTimeUomId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="subscriptionResourceId", required=false) String subscriptionResourceId, @RequestParam(value="description", required=false) String description, @RequestParam(value="subscriptionTypeId", required=false) String subscriptionTypeId, @RequestParam(value="canclAutmExtTimeUomId", required=false) String canclAutmExtTimeUomId, @RequestParam(value="contactMechId", required=false) String contactMechId, @RequestParam(value="gracePeriodOnExpiryUomId", required=false) String gracePeriodOnExpiryUomId, @RequestParam(value="availableTime", required=false) long availableTime, @RequestParam(value="productCategoryId", required=false) String productCategoryId, @RequestParam(value="partyNeedId", required=false) String partyNeedId, @RequestParam(value="useTime", required=false) long useTime, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="purchaseFromDate", required=false) Timestamp purchaseFromDate, @RequestParam(value="needTypeId", required=false) String needTypeId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="useCountLimit", required=false) long useCountLimit, @RequestParam(value="expirationCompletedDate", required=false) Timestamp expirationCompletedDate, @RequestParam(value="availableTimeUomId", required=false) String availableTimeUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="canclAutmExtTime", required=false) long canclAutmExtTime, @RequestParam(value="originatedFromRoleTypeId", required=false) String originatedFromRoleTypeId, @RequestParam(value="automaticExtend", required=false) boolean automaticExtend, @RequestParam(value="originatedFromPartyId", required=false) String originatedFromPartyId, @RequestParam(value="communicationEventId", required=false) String communicationEventId, @RequestParam(value="maxLifeTime", required=false) long maxLifeTime, @RequestParam(value="purchaseThruDate", required=false) Timestamp purchaseThruDate, @RequestParam(value="externalSubscriptionId", required=false) String externalSubscriptionId, @RequestParam(value="gracePeriodOnExpiry", required=false) long gracePeriodOnExpiry, @RequestParam(value="subscriptionId", required=false) String subscriptionId) {
-		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("maxLifeTimeUomId",maxLifeTimeUomId);
-		paramMap.put("useTimeUomId",useTimeUomId);
-		paramMap.put("orderId",orderId);
-		paramMap.put("subscriptionResourceId",subscriptionResourceId);
-		paramMap.put("description",description);
-		paramMap.put("subscriptionTypeId",subscriptionTypeId);
-		paramMap.put("canclAutmExtTimeUomId",canclAutmExtTimeUomId);
-		paramMap.put("contactMechId",contactMechId);
-		paramMap.put("gracePeriodOnExpiryUomId",gracePeriodOnExpiryUomId);
-		paramMap.put("availableTime",availableTime);
-		paramMap.put("productCategoryId",productCategoryId);
-		paramMap.put("partyNeedId",partyNeedId);
-		paramMap.put("useTime",useTime);
+		paramMap.put("product",product);
+		paramMap.put("currencyUomId",currencyUomId);
+		paramMap.put("amount",amount);
+		paramMap.put("quantity",quantity);
 		paramMap.put("partyId",partyId);
-		paramMap.put("orderItemSeqId",orderItemSeqId);
-		paramMap.put("roleTypeId",roleTypeId);
-		paramMap.put("purchaseFromDate",purchaseFromDate);
-		paramMap.put("needTypeId",needTypeId);
-		paramMap.put("productId",productId);
-		paramMap.put("useCountLimit",useCountLimit);
-		paramMap.put("expirationCompletedDate",expirationCompletedDate);
-		paramMap.put("availableTimeUomId",availableTimeUomId);
-		paramMap.put("thruDate",thruDate);
-		paramMap.put("inventoryItemId",inventoryItemId);
-		paramMap.put("fromDate",fromDate);
-		paramMap.put("canclAutmExtTime",canclAutmExtTime);
-		paramMap.put("originatedFromRoleTypeId",originatedFromRoleTypeId);
-		paramMap.put("automaticExtend",automaticExtend);
-		paramMap.put("originatedFromPartyId",originatedFromPartyId);
-		paramMap.put("communicationEventId",communicationEventId);
-		paramMap.put("maxLifeTime",maxLifeTime);
-		paramMap.put("purchaseThruDate",purchaseThruDate);
-		paramMap.put("externalSubscriptionId",externalSubscriptionId);
-		paramMap.put("gracePeriodOnExpiry",gracePeriodOnExpiry);
-		paramMap.put("subscriptionId",subscriptionId);
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
 
 		Map<String, Object> result = new HashMap<>();
 		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
 		try {
-			result = dispatcher.runSync("createSubscription", paramMap);
+			result = dispatcher.runSync("calculatePurchasePrice", paramMap);
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
@@ -599,51 +111,21 @@ public class ProductComponentServiceController4{
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/updateSubscription")
-	public ResponseEntity<Object> updateSubscription(HttpSession session, @RequestParam(value="subscriptionId") String subscriptionId, @RequestParam(value="maxLifeTimeUomId", required=false) String maxLifeTimeUomId, @RequestParam(value="useTimeUomId", required=false) String useTimeUomId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="subscriptionResourceId", required=false) String subscriptionResourceId, @RequestParam(value="description", required=false) String description, @RequestParam(value="subscriptionTypeId", required=false) String subscriptionTypeId, @RequestParam(value="canclAutmExtTimeUomId", required=false) String canclAutmExtTimeUomId, @RequestParam(value="contactMechId", required=false) String contactMechId, @RequestParam(value="gracePeriodOnExpiryUomId", required=false) String gracePeriodOnExpiryUomId, @RequestParam(value="availableTime", required=false) long availableTime, @RequestParam(value="productCategoryId", required=false) String productCategoryId, @RequestParam(value="partyNeedId", required=false) String partyNeedId, @RequestParam(value="useTime", required=false) long useTime, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="purchaseFromDate", required=false) Timestamp purchaseFromDate, @RequestParam(value="needTypeId", required=false) String needTypeId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="useCountLimit", required=false) long useCountLimit, @RequestParam(value="expirationCompletedDate", required=false) Timestamp expirationCompletedDate, @RequestParam(value="availableTimeUomId", required=false) String availableTimeUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="canclAutmExtTime", required=false) long canclAutmExtTime, @RequestParam(value="originatedFromRoleTypeId", required=false) String originatedFromRoleTypeId, @RequestParam(value="automaticExtend", required=false) boolean automaticExtend, @RequestParam(value="originatedFromPartyId", required=false) String originatedFromPartyId, @RequestParam(value="communicationEventId", required=false) String communicationEventId, @RequestParam(value="maxLifeTime", required=false) long maxLifeTime, @RequestParam(value="purchaseThruDate", required=false) Timestamp purchaseThruDate, @RequestParam(value="externalSubscriptionId", required=false) String externalSubscriptionId, @RequestParam(value="gracePeriodOnExpiry", required=false) long gracePeriodOnExpiry) {
+	@RequestMapping(method = RequestMethod.POST, value = "/updateProductPriceAction")
+	public ResponseEntity<Object> updateProductPriceAction(HttpSession session, @RequestParam(value="productPriceActionSeqId") String productPriceActionSeqId, @RequestParam(value="productPriceRuleId") String productPriceRuleId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="productPriceActionTypeId", required=false) String productPriceActionTypeId, @RequestParam(value="rateCode", required=false) String rateCode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("subscriptionId",subscriptionId);
-		paramMap.put("maxLifeTimeUomId",maxLifeTimeUomId);
-		paramMap.put("useTimeUomId",useTimeUomId);
-		paramMap.put("orderId",orderId);
-		paramMap.put("subscriptionResourceId",subscriptionResourceId);
-		paramMap.put("description",description);
-		paramMap.put("subscriptionTypeId",subscriptionTypeId);
-		paramMap.put("canclAutmExtTimeUomId",canclAutmExtTimeUomId);
-		paramMap.put("contactMechId",contactMechId);
-		paramMap.put("gracePeriodOnExpiryUomId",gracePeriodOnExpiryUomId);
-		paramMap.put("availableTime",availableTime);
-		paramMap.put("productCategoryId",productCategoryId);
-		paramMap.put("partyNeedId",partyNeedId);
-		paramMap.put("useTime",useTime);
-		paramMap.put("partyId",partyId);
-		paramMap.put("orderItemSeqId",orderItemSeqId);
-		paramMap.put("roleTypeId",roleTypeId);
-		paramMap.put("purchaseFromDate",purchaseFromDate);
-		paramMap.put("needTypeId",needTypeId);
-		paramMap.put("productId",productId);
-		paramMap.put("useCountLimit",useCountLimit);
-		paramMap.put("expirationCompletedDate",expirationCompletedDate);
-		paramMap.put("availableTimeUomId",availableTimeUomId);
-		paramMap.put("thruDate",thruDate);
-		paramMap.put("inventoryItemId",inventoryItemId);
-		paramMap.put("fromDate",fromDate);
-		paramMap.put("canclAutmExtTime",canclAutmExtTime);
-		paramMap.put("originatedFromRoleTypeId",originatedFromRoleTypeId);
-		paramMap.put("automaticExtend",automaticExtend);
-		paramMap.put("originatedFromPartyId",originatedFromPartyId);
-		paramMap.put("communicationEventId",communicationEventId);
-		paramMap.put("maxLifeTime",maxLifeTime);
-		paramMap.put("purchaseThruDate",purchaseThruDate);
-		paramMap.put("externalSubscriptionId",externalSubscriptionId);
-		paramMap.put("gracePeriodOnExpiry",gracePeriodOnExpiry);
+		paramMap.put("productPriceActionSeqId",productPriceActionSeqId);
+		paramMap.put("productPriceRuleId",productPriceRuleId);
+		paramMap.put("amount",amount);
+		paramMap.put("productPriceActionTypeId",productPriceActionTypeId);
+		paramMap.put("rateCode",rateCode);
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
 
 		Map<String, Object> result = new HashMap<>();
 		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
 		try {
-			result = dispatcher.runSync("updateSubscription", paramMap);
+			result = dispatcher.runSync("updateProductPriceAction", paramMap);
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
@@ -658,136 +140,30 @@ public class ProductComponentServiceController4{
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/createSubscriptionActivity")
-	public ResponseEntity<Object> createSubscriptionActivity(HttpSession session, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="subscriptionActivityId", required=false) String subscriptionActivityId, @RequestParam(value="dateSent", required=false) Timestamp dateSent) {
-		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("comments",comments);
-		paramMap.put("subscriptionActivityId",subscriptionActivityId);
-		paramMap.put("dateSent",dateSent);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
-
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
-		try {
-			result = dispatcher.runSync("createSubscriptionActivity", paramMap);
-		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/createSubscriptionType")
-	public ResponseEntity<Object> createSubscriptionType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) boolean hasTable, @RequestParam(value="description", required=false) String description, @RequestParam(value="subscriptionTypeId", required=false) String subscriptionTypeId) {
-		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("parentTypeId",parentTypeId);
-		paramMap.put("hasTable",hasTable);
-		paramMap.put("description",description);
-		paramMap.put("subscriptionTypeId",subscriptionTypeId);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
-
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
-		try {
-			result = dispatcher.runSync("createSubscriptionType", paramMap);
-		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/updateSubscriptionResource")
-	public ResponseEntity<Object> updateSubscriptionResource(HttpSession session, @RequestParam(value="subscriptionResourceId") String subscriptionResourceId, @RequestParam(value="serviceNameOnExpiry", required=false) String serviceNameOnExpiry, @RequestParam(value="contentId", required=false) String contentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="parentResourceId", required=false) String parentResourceId, @RequestParam(value="webSiteId", required=false) String webSiteId) {
-		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("subscriptionResourceId",subscriptionResourceId);
-		paramMap.put("serviceNameOnExpiry",serviceNameOnExpiry);
-		paramMap.put("contentId",contentId);
-		paramMap.put("description",description);
-		paramMap.put("parentResourceId",parentResourceId);
-		paramMap.put("webSiteId",webSiteId);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
-
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
-		try {
-			result = dispatcher.runSync("updateSubscriptionResource", paramMap);
-		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/subscriptionPermissionCheck")
-	public ResponseEntity<Object> subscriptionPermissionCheck(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="mainAction", required=false) String mainAction) {
-		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("primaryPermission",primaryPermission);
-		paramMap.put("altPermission",altPermission);
-		paramMap.put("resourceDescription",resourceDescription);
-		paramMap.put("mainAction",mainAction);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
-
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
-		try {
-			result = dispatcher.runSync("subscriptionPermissionCheck", paramMap);
-		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
-		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
-	}
-
-	@RequestMapping(method = RequestMethod.POST, value = "/processExtendSubscriptionByProduct")
-	public ResponseEntity<Object> processExtendSubscriptionByProduct(HttpSession session, @RequestParam(value="quantity") Integer quantity, @RequestParam(value="productId") String productId, @RequestParam(value="partyId") String partyId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="orderCreatedDate", required=false) Timestamp orderCreatedDate) {
+	@RequestMapping(method = RequestMethod.POST, value = "/createProductPromoCodeSet")
+	public ResponseEntity<Object> createProductPromoCodeSet(HttpSession session, @RequestParam(value="quantity") Long quantity, @RequestParam(value="useLimitPerCode", required=false) Long useLimitPerCode, @RequestParam(value="codeLength", required=false) Integer codeLength, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="promoCodeLayout", required=false) String promoCodeLayout, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="useLimitPerCustomer", required=false) Long useLimitPerCustomer, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="userEntered", required=false) Boolean userEntered, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="requireEmailOrParty", required=false) Boolean requireEmailOrParty, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quantity",quantity);
-		paramMap.put("productId",productId);
-		paramMap.put("partyId",partyId);
-		paramMap.put("orderItemSeqId",orderItemSeqId);
-		paramMap.put("inventoryItemId",inventoryItemId);
-		paramMap.put("orderId",orderId);
-		paramMap.put("orderCreatedDate",orderCreatedDate);
+		paramMap.put("useLimitPerCode",useLimitPerCode);
+		paramMap.put("codeLength",codeLength);
+		paramMap.put("lastModifiedDate",lastModifiedDate);
+		paramMap.put("promoCodeLayout",promoCodeLayout);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("useLimitPerCustomer",useLimitPerCustomer);
+		paramMap.put("thruDate",thruDate);
+		paramMap.put("fromDate",fromDate);
+		paramMap.put("userEntered",userEntered);
+		paramMap.put("lastModifiedByUserLogin",lastModifiedByUserLogin);
+		paramMap.put("createdDate",createdDate);
+		paramMap.put("requireEmailOrParty",requireEmailOrParty);
+		paramMap.put("createdByUserLogin",createdByUserLogin);
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
 
 		Map<String, Object> result = new HashMap<>();
 		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
 		try {
-			result = dispatcher.runSync("processExtendSubscriptionByProduct", paramMap);
+			result = dispatcher.runSync("createProductPromoCodeSet", paramMap);
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
@@ -802,19 +178,955 @@ public class ProductComponentServiceController4{
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/updateSubscriptionTypeAttr")
-	public ResponseEntity<Object> updateSubscriptionTypeAttr(HttpSession session, @RequestParam(value="subscriptionTypeId") String subscriptionTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
+	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductPromoRule")
+	public ResponseEntity<Object> deleteProductPromoRule(HttpSession session, @RequestParam(value="productPromoRuleId") String productPromoRuleId, @RequestParam(value="productPromoId") String productPromoId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("subscriptionTypeId",subscriptionTypeId);
-		paramMap.put("attrName",attrName);
+		paramMap.put("productPromoRuleId",productPromoRuleId);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("deleteProductPromoRule", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductPriceAction")
+	public ResponseEntity<Object> deleteProductPriceAction(HttpSession session, @RequestParam(value="productPriceActionSeqId") String productPriceActionSeqId, @RequestParam(value="productPriceRuleId") String productPriceRuleId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPriceActionSeqId",productPriceActionSeqId);
+		paramMap.put("productPriceRuleId",productPriceRuleId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("deleteProductPriceAction", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductPromoCodeEmail")
+	public ResponseEntity<Object> deleteProductPromoCodeEmail(HttpSession session, @RequestParam(value="emailAddress") String emailAddress, @RequestParam(value="productPromoCodeId") String productPromoCodeId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("emailAddress",emailAddress);
+		paramMap.put("productPromoCodeId",productPromoCodeId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("deleteProductPromoCodeEmail", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/updateProductPriceAutoNotice")
+	public ResponseEntity<Object> updateProductPriceAutoNotice(HttpSession session, @RequestParam(value="productPriceNoticeId") String productPriceNoticeId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="runDate", required=false) Timestamp runDate, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPriceNoticeId",productPriceNoticeId);
+		paramMap.put("fromDate",fromDate);
+		paramMap.put("runDate",runDate);
+		paramMap.put("facilityId",facilityId);
+		paramMap.put("thruDate",thruDate);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("updateProductPriceAutoNotice", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductPriceCond")
+	public ResponseEntity<Object> deleteProductPriceCond(HttpSession session, @RequestParam(value="productPriceCondSeqId") String productPriceCondSeqId, @RequestParam(value="productPriceRuleId") String productPriceRuleId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPriceCondSeqId",productPriceCondSeqId);
+		paramMap.put("productPriceRuleId",productPriceRuleId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("deleteProductPriceCond", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductPromoProduct")
+	public ResponseEntity<Object> deleteProductPromoProduct(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productPromoActionSeqId") String productPromoActionSeqId, @RequestParam(value="productPromoRuleId") String productPromoRuleId, @RequestParam(value="productPromoId") String productPromoId, @RequestParam(value="productPromoCondSeqId") String productPromoCondSeqId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productId",productId);
+		paramMap.put("productPromoActionSeqId",productPromoActionSeqId);
+		paramMap.put("productPromoRuleId",productPromoRuleId);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("productPromoCondSeqId",productPromoCondSeqId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("deleteProductPromoProduct", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductPromoCond")
+	public ResponseEntity<Object> deleteProductPromoCond(HttpSession session, @RequestParam(value="productPromoRuleId") String productPromoRuleId, @RequestParam(value="productPromoId") String productPromoId, @RequestParam(value="productPromoCondSeqId") String productPromoCondSeqId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPromoRuleId",productPromoRuleId);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("productPromoCondSeqId",productPromoCondSeqId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("deleteProductPromoCond", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/createProductPromoProduct")
+	public ResponseEntity<Object> createProductPromoProduct(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productPromoActionSeqId") String productPromoActionSeqId, @RequestParam(value="productPromoRuleId") String productPromoRuleId, @RequestParam(value="productPromoId") String productPromoId, @RequestParam(value="productPromoCondSeqId") String productPromoCondSeqId, @RequestParam(value="productPromoApplEnumId", required=false) String productPromoApplEnumId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productId",productId);
+		paramMap.put("productPromoActionSeqId",productPromoActionSeqId);
+		paramMap.put("productPromoRuleId",productPromoRuleId);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("productPromoCondSeqId",productPromoCondSeqId);
+		paramMap.put("productPromoApplEnumId",productPromoApplEnumId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("createProductPromoProduct", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/calculateProductPrice")
+	public ResponseEntity<Object> calculateProductPrice(HttpSession session, @RequestParam(value="product") org.apache.ofbiz.entity.GenericValue product, @RequestParam(value="currencyUomIdTo", required=false) String currencyUomIdTo, @RequestParam(value="autoUserLogin", required=false) org.apache.ofbiz.entity.GenericValue autoUserLogin, @RequestParam(value="optimizeForLargeRuleSet", required=false) String optimizeForLargeRuleSet, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="termUomId", required=false) String termUomId, @RequestParam(value="surveyResponseId", required=false) String surveyResponseId, @RequestParam(value="productStoreGroupId", required=false) String productStoreGroupId, @RequestParam(value="findAllQuantityPrices", required=false) String findAllQuantityPrices, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="agreementId", required=false) String agreementId, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="productPricePurposeId", required=false) String productPricePurposeId, @RequestParam(value="checkIncludeVat", required=false) String checkIncludeVat, @RequestParam(value="prodCatalogId", required=false) String prodCatalogId, @RequestParam(value="webSiteId", required=false) String webSiteId, @RequestParam(value="customAttributes", required=false) Map customAttributes) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("product",product);
+		paramMap.put("currencyUomIdTo",currencyUomIdTo);
+		paramMap.put("autoUserLogin",autoUserLogin);
+		paramMap.put("optimizeForLargeRuleSet",optimizeForLargeRuleSet);
+		paramMap.put("amount",amount);
+		paramMap.put("quantity",quantity);
+		paramMap.put("termUomId",termUomId);
+		paramMap.put("surveyResponseId",surveyResponseId);
+		paramMap.put("productStoreGroupId",productStoreGroupId);
+		paramMap.put("findAllQuantityPrices",findAllQuantityPrices);
+		paramMap.put("currencyUomId",currencyUomId);
+		paramMap.put("agreementId",agreementId);
+		paramMap.put("productStoreId",productStoreId);
+		paramMap.put("partyId",partyId);
+		paramMap.put("productPricePurposeId",productPricePurposeId);
+		paramMap.put("checkIncludeVat",checkIncludeVat);
+		paramMap.put("prodCatalogId",prodCatalogId);
+		paramMap.put("webSiteId",webSiteId);
+		paramMap.put("customAttributes",customAttributes);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("calculateProductPrice", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductPromo")
+	public ResponseEntity<Object> deleteProductPromo(HttpSession session, @RequestParam(value="productPromoId") String productPromoId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("deleteProductPromo", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductPromoAction")
+	public ResponseEntity<Object> deleteProductPromoAction(HttpSession session, @RequestParam(value="productPromoActionSeqId") String productPromoActionSeqId, @RequestParam(value="productPromoRuleId") String productPromoRuleId, @RequestParam(value="productPromoId") String productPromoId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPromoActionSeqId",productPromoActionSeqId);
+		paramMap.put("productPromoRuleId",productPromoRuleId);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("deleteProductPromoAction", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/createProductPromoCodeParty")
+	public ResponseEntity<Object> createProductPromoCodeParty(HttpSession session, @RequestParam(value="productPromoCodeId") String productPromoCodeId, @RequestParam(value="partyId") String partyId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPromoCodeId",productPromoCodeId);
+		paramMap.put("partyId",partyId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("createProductPromoCodeParty", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/getAssociatedPriceRulesConds")
+	public ResponseEntity<Object> getAssociatedPriceRulesConds(HttpSession session, @RequestParam(value="inputParamEnumId") String inputParamEnumId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("inputParamEnumId",inputParamEnumId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("getAssociatedPriceRulesConds", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/createProductPromo")
+	public ResponseEntity<Object> createProductPromo(HttpSession session, @RequestParam(value="promoName") String promoName, @RequestParam(value="productPromoId") String productPromoId, @RequestParam(value="showToCustomer", required=false) Boolean showToCustomer, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="requireCode", required=false) Boolean requireCode, @RequestParam(value="overrideOrgPartyId", required=false) String overrideOrgPartyId, @RequestParam(value="useLimitPerCustomer", required=false) Long useLimitPerCustomer, @RequestParam(value="useLimitPerOrder", required=false) Long useLimitPerOrder, @RequestParam(value="useLimitPerPromotion", required=false) Long useLimitPerPromotion, @RequestParam(value="promoText", required=false) String promoText, @RequestParam(value="userEntered", required=false) Boolean userEntered, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="billbackFactor", required=false) BigDecimal billbackFactor, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("promoName",promoName);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("showToCustomer",showToCustomer);
+		paramMap.put("lastModifiedDate",lastModifiedDate);
+		paramMap.put("requireCode",requireCode);
+		paramMap.put("overrideOrgPartyId",overrideOrgPartyId);
+		paramMap.put("useLimitPerCustomer",useLimitPerCustomer);
+		paramMap.put("useLimitPerOrder",useLimitPerOrder);
+		paramMap.put("useLimitPerPromotion",useLimitPerPromotion);
+		paramMap.put("promoText",promoText);
+		paramMap.put("userEntered",userEntered);
+		paramMap.put("lastModifiedByUserLogin",lastModifiedByUserLogin);
+		paramMap.put("createdDate",createdDate);
+		paramMap.put("billbackFactor",billbackFactor);
+		paramMap.put("createdByUserLogin",createdByUserLogin);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("createProductPromo", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/createProductPromoAction")
+	public ResponseEntity<Object> createProductPromoAction(HttpSession session, @RequestParam(value="productPromoRuleId") String productPromoRuleId, @RequestParam(value="productPromoActionEnumId") String productPromoActionEnumId, @RequestParam(value="productPromoId") String productPromoId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="orderAdjustmentTypeId", required=false) String orderAdjustmentTypeId, @RequestParam(value="useCartQuantity", required=false) Boolean useCartQuantity, @RequestParam(value="serviceName", required=false) String serviceName, @RequestParam(value="partyId", required=false) String partyId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPromoRuleId",productPromoRuleId);
+		paramMap.put("productPromoActionEnumId",productPromoActionEnumId);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("amount",amount);
+		paramMap.put("quantity",quantity);
+		paramMap.put("productId",productId);
+		paramMap.put("orderAdjustmentTypeId",orderAdjustmentTypeId);
+		paramMap.put("useCartQuantity",useCartQuantity);
+		paramMap.put("serviceName",serviceName);
+		paramMap.put("partyId",partyId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("createProductPromoAction", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/updateProductPromoAction")
+	public ResponseEntity<Object> updateProductPromoAction(HttpSession session, @RequestParam(value="productPromoActionSeqId") String productPromoActionSeqId, @RequestParam(value="productPromoRuleId") String productPromoRuleId, @RequestParam(value="productPromoId") String productPromoId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="orderAdjustmentTypeId", required=false) String orderAdjustmentTypeId, @RequestParam(value="useCartQuantity", required=false) Boolean useCartQuantity, @RequestParam(value="productPromoActionEnumId", required=false) String productPromoActionEnumId, @RequestParam(value="serviceName", required=false) String serviceName, @RequestParam(value="partyId", required=false) String partyId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPromoActionSeqId",productPromoActionSeqId);
+		paramMap.put("productPromoRuleId",productPromoRuleId);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("amount",amount);
+		paramMap.put("quantity",quantity);
+		paramMap.put("productId",productId);
+		paramMap.put("orderAdjustmentTypeId",orderAdjustmentTypeId);
+		paramMap.put("useCartQuantity",useCartQuantity);
+		paramMap.put("productPromoActionEnumId",productPromoActionEnumId);
+		paramMap.put("serviceName",serviceName);
+		paramMap.put("partyId",partyId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("updateProductPromoAction", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/updateProductPromoProduct")
+	public ResponseEntity<Object> updateProductPromoProduct(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productPromoActionSeqId") String productPromoActionSeqId, @RequestParam(value="productPromoRuleId") String productPromoRuleId, @RequestParam(value="productPromoId") String productPromoId, @RequestParam(value="productPromoCondSeqId") String productPromoCondSeqId, @RequestParam(value="productPromoApplEnumId", required=false) String productPromoApplEnumId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productId",productId);
+		paramMap.put("productPromoActionSeqId",productPromoActionSeqId);
+		paramMap.put("productPromoRuleId",productPromoRuleId);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("productPromoCondSeqId",productPromoCondSeqId);
+		paramMap.put("productPromoApplEnumId",productPromoApplEnumId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("updateProductPromoProduct", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/updateProductPromoRule")
+	public ResponseEntity<Object> updateProductPromoRule(HttpSession session, @RequestParam(value="productPromoRuleId") String productPromoRuleId, @RequestParam(value="ruleName") String ruleName, @RequestParam(value="productPromoId") String productPromoId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPromoRuleId",productPromoRuleId);
+		paramMap.put("ruleName",ruleName);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("updateProductPromoRule", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductPriceAutoNotice")
+	public ResponseEntity<Object> deleteProductPriceAutoNotice(HttpSession session, @RequestParam(value="productPriceNoticeId") String productPriceNoticeId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPriceNoticeId",productPriceNoticeId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("deleteProductPriceAutoNotice", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/createProductPromoCond")
+	public ResponseEntity<Object> createProductPromoCond(HttpSession session, @RequestParam(value="productPromoRuleId") String productPromoRuleId, @RequestParam(value="productPromoId") String productPromoId, @RequestParam(value="inputParamEnumId", required=false) String inputParamEnumId, @RequestParam(value="condValue", required=false) String condValue, @RequestParam(value="carrierShipmentMethod", required=false) String carrierShipmentMethod, @RequestParam(value="operatorEnumId", required=false) String operatorEnumId, @RequestParam(value="otherValue", required=false) String otherValue) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPromoRuleId",productPromoRuleId);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("inputParamEnumId",inputParamEnumId);
+		paramMap.put("condValue",condValue);
+		paramMap.put("carrierShipmentMethod",carrierShipmentMethod);
+		paramMap.put("operatorEnumId",operatorEnumId);
+		paramMap.put("otherValue",otherValue);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("createProductPromoCond", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/updateProductPromoCode")
+	public ResponseEntity<Object> updateProductPromoCode(HttpSession session, @RequestParam(value="productPromoCodeId") String productPromoCodeId, @RequestParam(value="useLimitPerCode", required=false) Long useLimitPerCode, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="userEntered", required=false) Boolean userEntered, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="requireEmailOrParty", required=false) Boolean requireEmailOrParty, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="useLimitPerCustomer", required=false) Long useLimitPerCustomer, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPromoCodeId",productPromoCodeId);
+		paramMap.put("useLimitPerCode",useLimitPerCode);
+		paramMap.put("fromDate",fromDate);
+		paramMap.put("userEntered",userEntered);
+		paramMap.put("lastModifiedByUserLogin",lastModifiedByUserLogin);
+		paramMap.put("createdDate",createdDate);
+		paramMap.put("lastModifiedDate",lastModifiedDate);
+		paramMap.put("requireEmailOrParty",requireEmailOrParty);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("useLimitPerCustomer",useLimitPerCustomer);
+		paramMap.put("createdByUserLogin",createdByUserLogin);
+		paramMap.put("thruDate",thruDate);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("updateProductPromoCode", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductPriceActionType")
+	public ResponseEntity<Object> deleteProductPriceActionType(HttpSession session, @RequestParam(value="productPriceActionTypeId") String productPriceActionTypeId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPriceActionTypeId",productPriceActionTypeId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("deleteProductPriceActionType", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/createProductPriceAction")
+	public ResponseEntity<Object> createProductPriceAction(HttpSession session, @RequestParam(value="productPriceRuleId") String productPriceRuleId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="productPriceActionTypeId", required=false) String productPriceActionTypeId, @RequestParam(value="rateCode", required=false) String rateCode) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPriceRuleId",productPriceRuleId);
+		paramMap.put("amount",amount);
+		paramMap.put("productPriceActionTypeId",productPriceActionTypeId);
+		paramMap.put("rateCode",rateCode);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("createProductPriceAction", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/createProductPromoCategory")
+	public ResponseEntity<Object> createProductPromoCategory(HttpSession session, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="andGroupId") String andGroupId, @RequestParam(value="productPromoActionSeqId") String productPromoActionSeqId, @RequestParam(value="productPromoRuleId") String productPromoRuleId, @RequestParam(value="productPromoId") String productPromoId, @RequestParam(value="productPromoCondSeqId") String productPromoCondSeqId, @RequestParam(value="includeSubCategories", required=false) Boolean includeSubCategories, @RequestParam(value="productPromoApplEnumId", required=false) String productPromoApplEnumId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productCategoryId",productCategoryId);
+		paramMap.put("andGroupId",andGroupId);
+		paramMap.put("productPromoActionSeqId",productPromoActionSeqId);
+		paramMap.put("productPromoRuleId",productPromoRuleId);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("productPromoCondSeqId",productPromoCondSeqId);
+		paramMap.put("includeSubCategories",includeSubCategories);
+		paramMap.put("productPromoApplEnumId",productPromoApplEnumId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("createProductPromoCategory", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/createBulkProductPromoCodeEmail")
+	public ResponseEntity<Object> createBulkProductPromoCodeEmail(HttpSession session, @RequestParam(value="productPromoCodeId") String productPromoCodeId, @RequestParam(value="_uploadedFile_contentType", required=false) String _uploadedFile_contentType, @RequestParam(value="uploadedFile", required=false) java.nio.ByteBuffer uploadedFile, @RequestParam(value="_uploadedFile_fileName", required=false) String _uploadedFile_fileName) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPromoCodeId",productPromoCodeId);
+		paramMap.put("_uploadedFile_contentType",_uploadedFile_contentType);
+		paramMap.put("uploadedFile",uploadedFile);
+		paramMap.put("_uploadedFile_fileName",_uploadedFile_fileName);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("createBulkProductPromoCodeEmail", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/updateProductPriceRule")
+	public ResponseEntity<Object> updateProductPriceRule(HttpSession session, @RequestParam(value="productPriceRuleId") String productPriceRuleId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="ruleName", required=false) String ruleName, @RequestParam(value="description", required=false) String description, @RequestParam(value="isSale", required=false) Boolean isSale, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPriceRuleId",productPriceRuleId);
+		paramMap.put("fromDate",fromDate);
+		paramMap.put("ruleName",ruleName);
+		paramMap.put("description",description);
+		paramMap.put("isSale",isSale);
+		paramMap.put("thruDate",thruDate);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("updateProductPriceRule", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/createProductPriceCond")
+	public ResponseEntity<Object> createProductPriceCond(HttpSession session, @RequestParam(value="productPriceRuleId") String productPriceRuleId, @RequestParam(value="condValueInput", required=false) String condValueInput, @RequestParam(value="inputParamEnumId", required=false) String inputParamEnumId, @RequestParam(value="condValue", required=false) String condValue, @RequestParam(value="operatorEnumId", required=false) String operatorEnumId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPriceRuleId",productPriceRuleId);
+		paramMap.put("condValueInput",condValueInput);
+		paramMap.put("inputParamEnumId",inputParamEnumId);
+		paramMap.put("condValue",condValue);
+		paramMap.put("operatorEnumId",operatorEnumId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("createProductPriceCond", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/createProductPromoCode")
+	public ResponseEntity<Object> createProductPromoCode(HttpSession session, @RequestParam(value="useLimitPerCode", required=false) Long useLimitPerCode, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="userEntered", required=false) Boolean userEntered, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="productPromoCodeId", required=false) String productPromoCodeId, @RequestParam(value="requireEmailOrParty", required=false) Boolean requireEmailOrParty, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="useLimitPerCustomer", required=false) Long useLimitPerCustomer, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("useLimitPerCode",useLimitPerCode);
+		paramMap.put("fromDate",fromDate);
+		paramMap.put("userEntered",userEntered);
+		paramMap.put("lastModifiedByUserLogin",lastModifiedByUserLogin);
+		paramMap.put("createdDate",createdDate);
+		paramMap.put("lastModifiedDate",lastModifiedDate);
+		paramMap.put("productPromoCodeId",productPromoCodeId);
+		paramMap.put("requireEmailOrParty",requireEmailOrParty);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("useLimitPerCustomer",useLimitPerCustomer);
+		paramMap.put("createdByUserLogin",createdByUserLogin);
+		paramMap.put("thruDate",thruDate);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("createProductPromoCode", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductPromoCodeParty")
+	public ResponseEntity<Object> deleteProductPromoCodeParty(HttpSession session, @RequestParam(value="productPromoCodeId") String productPromoCodeId, @RequestParam(value="partyId") String partyId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPromoCodeId",productPromoCodeId);
+		paramMap.put("partyId",partyId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("deleteProductPromoCodeParty", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/createProductPriceActionType")
+	public ResponseEntity<Object> createProductPriceActionType(HttpSession session, @RequestParam(value="description", required=false) String description, @RequestParam(value="productPriceActionTypeId", required=false) String productPriceActionTypeId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("description",description);
+		paramMap.put("productPriceActionTypeId",productPriceActionTypeId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("createProductPriceActionType", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/createProductPromoRule")
+	public ResponseEntity<Object> createProductPromoRule(HttpSession session, @RequestParam(value="ruleName") String ruleName, @RequestParam(value="productPromoId") String productPromoId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("ruleName",ruleName);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("createProductPromoRule", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/createProductPriceAutoNotice")
+	public ResponseEntity<Object> createProductPriceAutoNotice(HttpSession session, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="runDate", required=false) Timestamp runDate, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="productPriceNoticeId", required=false) String productPriceNoticeId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("fromDate",fromDate);
+		paramMap.put("runDate",runDate);
+		paramMap.put("facilityId",facilityId);
+		paramMap.put("productPriceNoticeId",productPriceNoticeId);
+		paramMap.put("thruDate",thruDate);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("createProductPriceAutoNotice", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/updateProductPriceActionType")
+	public ResponseEntity<Object> updateProductPriceActionType(HttpSession session, @RequestParam(value="productPriceActionTypeId") String productPriceActionTypeId, @RequestParam(value="description", required=false) String description) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPriceActionTypeId",productPriceActionTypeId);
 		paramMap.put("description",description);
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
 
 		Map<String, Object> result = new HashMap<>();
 		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
 		try {
-			result = dispatcher.runSync("updateSubscriptionTypeAttr", paramMap);
+			result = dispatcher.runSync("updateProductPriceActionType", paramMap);
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
@@ -829,17 +1141,30 @@ public class ProductComponentServiceController4{
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/deleteSubscriptionType")
-	public ResponseEntity<Object> deleteSubscriptionType(HttpSession session, @RequestParam(value="subscriptionTypeId") String subscriptionTypeId) {
+	@RequestMapping(method = RequestMethod.POST, value = "/createBulkProductPromoCode")
+	public ResponseEntity<Object> createBulkProductPromoCode(HttpSession session, @RequestParam(value="useLimitPerCode", required=false) Long useLimitPerCode, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="useLimitPerCustomer", required=false) Long useLimitPerCustomer, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="userEntered", required=false) Boolean userEntered, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="_uploadedFile_contentType", required=false) String _uploadedFile_contentType, @RequestParam(value="requireEmailOrParty", required=false) Boolean requireEmailOrParty, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="uploadedFile", required=false) java.nio.ByteBuffer uploadedFile, @RequestParam(value="_uploadedFile_fileName", required=false) String _uploadedFile_fileName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("subscriptionTypeId",subscriptionTypeId);
+		paramMap.put("useLimitPerCode",useLimitPerCode);
+		paramMap.put("lastModifiedDate",lastModifiedDate);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("useLimitPerCustomer",useLimitPerCustomer);
+		paramMap.put("thruDate",thruDate);
+		paramMap.put("fromDate",fromDate);
+		paramMap.put("userEntered",userEntered);
+		paramMap.put("lastModifiedByUserLogin",lastModifiedByUserLogin);
+		paramMap.put("createdDate",createdDate);
+		paramMap.put("_uploadedFile_contentType",_uploadedFile_contentType);
+		paramMap.put("requireEmailOrParty",requireEmailOrParty);
+		paramMap.put("createdByUserLogin",createdByUserLogin);
+		paramMap.put("uploadedFile",uploadedFile);
+		paramMap.put("_uploadedFile_fileName",_uploadedFile_fileName);
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
 
 		Map<String, Object> result = new HashMap<>();
 		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
 		try {
-			result = dispatcher.runSync("deleteSubscriptionType", paramMap);
+			result = dispatcher.runSync("createBulkProductPromoCode", paramMap);
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
@@ -854,19 +1179,61 @@ public class ProductComponentServiceController4{
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/createSubscriptionTypeAttr")
-	public ResponseEntity<Object> createSubscriptionTypeAttr(HttpSession session, @RequestParam(value="subscriptionTypeId") String subscriptionTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
+	@RequestMapping(method = RequestMethod.POST, value = "/updateProductPromo")
+	public ResponseEntity<Object> updateProductPromo(HttpSession session, @RequestParam(value="productPromoId") String productPromoId, @RequestParam(value="showToCustomer", required=false) Boolean showToCustomer, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="requireCode", required=false) Boolean requireCode, @RequestParam(value="overrideOrgPartyId", required=false) String overrideOrgPartyId, @RequestParam(value="useLimitPerCustomer", required=false) Long useLimitPerCustomer, @RequestParam(value="useLimitPerOrder", required=false) Long useLimitPerOrder, @RequestParam(value="useLimitPerPromotion", required=false) Long useLimitPerPromotion, @RequestParam(value="promoName", required=false) String promoName, @RequestParam(value="promoText", required=false) String promoText, @RequestParam(value="userEntered", required=false) Boolean userEntered, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="billbackFactor", required=false) BigDecimal billbackFactor, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("subscriptionTypeId",subscriptionTypeId);
-		paramMap.put("attrName",attrName);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("showToCustomer",showToCustomer);
+		paramMap.put("lastModifiedDate",lastModifiedDate);
+		paramMap.put("requireCode",requireCode);
+		paramMap.put("overrideOrgPartyId",overrideOrgPartyId);
+		paramMap.put("useLimitPerCustomer",useLimitPerCustomer);
+		paramMap.put("useLimitPerOrder",useLimitPerOrder);
+		paramMap.put("useLimitPerPromotion",useLimitPerPromotion);
+		paramMap.put("promoName",promoName);
+		paramMap.put("promoText",promoText);
+		paramMap.put("userEntered",userEntered);
+		paramMap.put("lastModifiedByUserLogin",lastModifiedByUserLogin);
+		paramMap.put("createdDate",createdDate);
+		paramMap.put("billbackFactor",billbackFactor);
+		paramMap.put("createdByUserLogin",createdByUserLogin);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("updateProductPromo", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/createProductPriceRule")
+	public ResponseEntity<Object> createProductPriceRule(HttpSession session, @RequestParam(value="ruleName") String ruleName, @RequestParam(value="productPriceRuleId") String productPriceRuleId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="description", required=false) String description, @RequestParam(value="isSale", required=false) Boolean isSale, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("ruleName",ruleName);
+		paramMap.put("productPriceRuleId",productPriceRuleId);
+		paramMap.put("fromDate",fromDate);
 		paramMap.put("description",description);
+		paramMap.put("isSale",isSale);
+		paramMap.put("thruDate",thruDate);
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
 
 		Map<String, Object> result = new HashMap<>();
 		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
 		try {
-			result = dispatcher.runSync("createSubscriptionTypeAttr", paramMap);
+			result = dispatcher.runSync("createProductPriceRule", paramMap);
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
@@ -881,31 +1248,22 @@ public class ProductComponentServiceController4{
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/processExtendSubscription")
-	public ResponseEntity<Object> processExtendSubscription(HttpSession session, @RequestParam(value="useTimeUomId") String useTimeUomId, @RequestParam(value="subscriptionResourceId") String subscriptionResourceId, @RequestParam(value="useTime") Integer useTime, @RequestParam(value="partyId") String partyId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="canclAutmExtTime", required=false) Integer canclAutmExtTime, @RequestParam(value="gracePeriodOnExpiryUomId", required=false) String gracePeriodOnExpiryUomId, @RequestParam(value="alwaysCreateNewRecord", required=false) String alwaysCreateNewRecord, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="automaticExtend", required=false) String automaticExtend, @RequestParam(value="useRoleTypeId", required=false) String useRoleTypeId, @RequestParam(value="canclAutmExtTimeUomId", required=false) String canclAutmExtTimeUomId, @RequestParam(value="gracePeriodOnExpiry", required=false) Integer gracePeriodOnExpiry) {
+	@RequestMapping(method = RequestMethod.POST, value = "/updateProductPriceCond")
+	public ResponseEntity<Object> updateProductPriceCond(HttpSession session, @RequestParam(value="productPriceCondSeqId") String productPriceCondSeqId, @RequestParam(value="productPriceRuleId") String productPriceRuleId, @RequestParam(value="condValueInput", required=false) String condValueInput, @RequestParam(value="inputParamEnumId", required=false) String inputParamEnumId, @RequestParam(value="condValue", required=false) String condValue, @RequestParam(value="operatorEnumId", required=false) String operatorEnumId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("useTimeUomId",useTimeUomId);
-		paramMap.put("subscriptionResourceId",subscriptionResourceId);
-		paramMap.put("useTime",useTime);
-		paramMap.put("partyId",partyId);
-		paramMap.put("orderItemSeqId",orderItemSeqId);
-		paramMap.put("inventoryItemId",inventoryItemId);
-		paramMap.put("canclAutmExtTime",canclAutmExtTime);
-		paramMap.put("gracePeriodOnExpiryUomId",gracePeriodOnExpiryUomId);
-		paramMap.put("alwaysCreateNewRecord",alwaysCreateNewRecord);
-		paramMap.put("productId",productId);
-		paramMap.put("orderId",orderId);
-		paramMap.put("automaticExtend",automaticExtend);
-		paramMap.put("useRoleTypeId",useRoleTypeId);
-		paramMap.put("canclAutmExtTimeUomId",canclAutmExtTimeUomId);
-		paramMap.put("gracePeriodOnExpiry",gracePeriodOnExpiry);
+		paramMap.put("productPriceCondSeqId",productPriceCondSeqId);
+		paramMap.put("productPriceRuleId",productPriceRuleId);
+		paramMap.put("condValueInput",condValueInput);
+		paramMap.put("inputParamEnumId",inputParamEnumId);
+		paramMap.put("condValue",condValue);
+		paramMap.put("operatorEnumId",operatorEnumId);
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
 
 		Map<String, Object> result = new HashMap<>();
 		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
 		try {
-			result = dispatcher.runSync("processExtendSubscription", paramMap);
+			result = dispatcher.runSync("updateProductPriceCond", paramMap);
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
@@ -920,18 +1278,105 @@ public class ProductComponentServiceController4{
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/createSubscriptionCommEvent")
-	public ResponseEntity<Object> createSubscriptionCommEvent(HttpSession session, @RequestParam(value="communicationEventId") String communicationEventId, @RequestParam(value="subscriptionId") String subscriptionId) {
+	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductPriceRule")
+	public ResponseEntity<Object> deleteProductPriceRule(HttpSession session, @RequestParam(value="productPriceRuleId") String productPriceRuleId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("communicationEventId",communicationEventId);
-		paramMap.put("subscriptionId",subscriptionId);
+		paramMap.put("productPriceRuleId",productPriceRuleId);
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
 
 		Map<String, Object> result = new HashMap<>();
 		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
 		try {
-			result = dispatcher.runSync("createSubscriptionCommEvent", paramMap);
+			result = dispatcher.runSync("deleteProductPriceRule", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductPromoCategory")
+	public ResponseEntity<Object> deleteProductPromoCategory(HttpSession session, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="andGroupId") String andGroupId, @RequestParam(value="productPromoActionSeqId") String productPromoActionSeqId, @RequestParam(value="productPromoRuleId") String productPromoRuleId, @RequestParam(value="productPromoId") String productPromoId, @RequestParam(value="productPromoCondSeqId") String productPromoCondSeqId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productCategoryId",productCategoryId);
+		paramMap.put("andGroupId",andGroupId);
+		paramMap.put("productPromoActionSeqId",productPromoActionSeqId);
+		paramMap.put("productPromoRuleId",productPromoRuleId);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("productPromoCondSeqId",productPromoCondSeqId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("deleteProductPromoCategory", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/createProductPromoCodeEmail")
+	public ResponseEntity<Object> createProductPromoCodeEmail(HttpSession session, @RequestParam(value="emailAddress") String emailAddress, @RequestParam(value="productPromoCodeId") String productPromoCodeId) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("emailAddress",emailAddress);
+		paramMap.put("productPromoCodeId",productPromoCodeId);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("createProductPromoCodeEmail", paramMap);
+		} catch (ServiceAuthException e) {
+
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+		} catch (ServiceValidationException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		} catch (GenericServiceException e) {
+			e.printStackTrace();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+		}
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/updateProductPromoCond")
+	public ResponseEntity<Object> updateProductPromoCond(HttpSession session, @RequestParam(value="productPromoRuleId") String productPromoRuleId, @RequestParam(value="productPromoId") String productPromoId, @RequestParam(value="productPromoCondSeqId") String productPromoCondSeqId, @RequestParam(value="inputParamEnumId", required=false) String inputParamEnumId, @RequestParam(value="condValue", required=false) String condValue, @RequestParam(value="carrierShipmentMethod", required=false) String carrierShipmentMethod, @RequestParam(value="operatorEnumId", required=false) String operatorEnumId, @RequestParam(value="otherValue", required=false) String otherValue) {
+		
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("productPromoRuleId",productPromoRuleId);
+		paramMap.put("productPromoId",productPromoId);
+		paramMap.put("productPromoCondSeqId",productPromoCondSeqId);
+		paramMap.put("inputParamEnumId",inputParamEnumId);
+		paramMap.put("condValue",condValue);
+		paramMap.put("carrierShipmentMethod",carrierShipmentMethod);
+		paramMap.put("operatorEnumId",operatorEnumId);
+		paramMap.put("otherValue",otherValue);
+		paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+		Map<String, Object> result = new HashMap<>();
+		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		try {
+			result = dispatcher.runSync("updateProductPromoCond", paramMap);
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
