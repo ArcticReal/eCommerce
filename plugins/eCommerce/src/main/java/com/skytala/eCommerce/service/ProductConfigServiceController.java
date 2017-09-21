@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductConfigServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProdConfItemContentType")
-	public ResponseEntity<Object> createProdConfItemContentType(HttpSession session, @RequestParam(value="confItemContentTypeId", required=false) String confItemContentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> createProdConfItemContentType(HttpSession session, @RequestParam(value="confItemContentTypeId", required=false) String confItemContentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) boolean hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("confItemContentTypeId",confItemContentTypeId);
@@ -54,7 +54,7 @@ public class ProductConfigServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createConfigOptionProductOption")
-	public ResponseEntity<Object> createConfigOptionProductOption(HttpSession session, @RequestParam(value="configItemId") String configItemId, @RequestParam(value="sequenceNum") Long sequenceNum, @RequestParam(value="productId") String productId, @RequestParam(value="configId") String configId, @RequestParam(value="configOptionId") String configOptionId, @RequestParam(value="productOptionId", required=false) String productOptionId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> createConfigOptionProductOption(HttpSession session, @RequestParam(value="configItemId") String configItemId, @RequestParam(value="sequenceNum") long sequenceNum, @RequestParam(value="productId") String productId, @RequestParam(value="configId") String configId, @RequestParam(value="configOptionId") String configOptionId, @RequestParam(value="productOptionId", required=false) String productOptionId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("configItemId",configItemId);
@@ -85,7 +85,7 @@ public class ProductConfigServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateConfigOptionProductOption")
-	public ResponseEntity<Object> updateConfigOptionProductOption(HttpSession session, @RequestParam(value="configItemId") String configItemId, @RequestParam(value="sequenceNum") Long sequenceNum, @RequestParam(value="productId") String productId, @RequestParam(value="configId") String configId, @RequestParam(value="configOptionId") String configOptionId, @RequestParam(value="productOptionId", required=false) String productOptionId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> updateConfigOptionProductOption(HttpSession session, @RequestParam(value="configItemId") String configItemId, @RequestParam(value="sequenceNum") long sequenceNum, @RequestParam(value="productId") String productId, @RequestParam(value="configId") String configId, @RequestParam(value="configOptionId") String configOptionId, @RequestParam(value="productOptionId", required=false) String productOptionId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("configItemId",configItemId);
@@ -116,7 +116,7 @@ public class ProductConfigServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteConfigOptionProductOption")
-	public ResponseEntity<Object> deleteConfigOptionProductOption(HttpSession session, @RequestParam(value="configItemId") String configItemId, @RequestParam(value="sequenceNum") Long sequenceNum, @RequestParam(value="productId") String productId, @RequestParam(value="configId") String configId, @RequestParam(value="configOptionId") String configOptionId) {
+	public ResponseEntity<Object> deleteConfigOptionProductOption(HttpSession session, @RequestParam(value="configItemId") String configItemId, @RequestParam(value="sequenceNum") long sequenceNum, @RequestParam(value="productId") String productId, @RequestParam(value="configId") String configId, @RequestParam(value="configOptionId") String configOptionId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("configItemId",configItemId);
@@ -170,7 +170,7 @@ public class ProductConfigServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProdConfItemContentType")
-	public ResponseEntity<Object> updateProdConfItemContentType(HttpSession session, @RequestParam(value="confItemContentTypeId") String confItemContentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> updateProdConfItemContentType(HttpSession session, @RequestParam(value="confItemContentTypeId") String confItemContentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) boolean hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("confItemContentTypeId",confItemContentTypeId);
