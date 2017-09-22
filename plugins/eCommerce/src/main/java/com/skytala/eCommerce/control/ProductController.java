@@ -4,11 +4,17 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,96 +28,70 @@ import com.skytala.eCommerce.entity.Product;
 import com.skytala.eCommerce.entity.ProductMapper;
 import com.skytala.eCommerce.event.ProductAdded;
 import com.skytala.eCommerce.event.ProductDeleted;
+import com.skytala.eCommerce.event.ProductFound;
 import com.skytala.eCommerce.event.ProductUpdated;
-import com.skytala.eCommerce.event.ProductsFound;
-import com.skytala.eCommerce.query.FindAllProducts;
 import com.skytala.eCommerce.query.FindProductsBy;
 
 @RestController
-@RequestMapping("/product")
+@RequestMapping("/products")
 public class ProductController {
 
 	private static int requestTicketId = 0;
-	private static Map<Integer, List<Product>> queryReturnVal = new HashMap<>();
 	private static Map<Integer, Boolean> commandReturnVal = new HashMap<>();
+	private static Map<Integer, List<Product>> queryReturnVal = new HashMap<>();
+	private static Map<String, RequestMethod> validRequests = new HashMap<>();
 
-	/**
-	 * 
-	 * @return returns a list with all products from ofbiz
-	 * 
-	 */
-	@RequestMapping(method = RequestMethod.GET, value = { "/findAll", "/find", "/", "list" })
-	public List<Product> findAll() {
-		FindAllProducts query = new FindAllProducts();
-		int usedTicketId;
+	public ProductController() {
 
-		synchronized (ProductController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(ProductsFound.class,
-				event -> sendProductFoundMessage(((ProductsFound) event).getFoundProducts(), usedTicketId));
-
-		query.execute();
-
-		while (!queryReturnVal.containsKey(usedTicketId)) {
-		}
-		return queryReturnVal.remove(usedTicketId);
+		validRequests.put("find", RequestMethod.GET);
+		validRequests.put("add", RequestMethod.POST);
+		validRequests.put("update", RequestMethod.PUT);
+		validRequests.put("removeById", RequestMethod.DELETE);
 
 	}
 
 	/**
-	 * searches for products by:
 	 * 
-	 * 
-	 * @param name:
-	 *            name of the product
-	 * @param id:
-	 *            id of the product
-	 * 
-	 * @return a list of Products the filter applys to if no name or id is given,
-	 *         every product will be returned
-	 * 
+	 * @param allRequestParams
+	 *            all params by which you want to find a Product
+	 * @return a List with the Products
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/findBy")
-	public List<Product> findBy(@RequestParam Map<String, String> allRequestParams) {
+	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	public ResponseEntity<Object> findProductsBy(@RequestParam Map<String, String> allRequestParams) {
 
 		FindProductsBy query = new FindProductsBy(allRequestParams);
+
 		int usedTicketId;
 
 		synchronized (ProductController.class) {
 			usedTicketId = requestTicketId;
 			requestTicketId++;
 		}
-		Broker.instance().subscribe(ProductsFound.class,
-				event -> sendProductFoundMessage(((ProductsFound) event).getFoundProducts(), usedTicketId));
+		Broker.instance().subscribe(ProductFound.class,
+				event -> sendProductsFoundMessage(((ProductFound) event).getProducts(), usedTicketId));
 
 		query.execute();
 
 		while (!queryReturnVal.containsKey(usedTicketId)) {
 
 		}
-		return queryReturnVal.remove(usedTicketId);
+		return ResponseEntity.ok().body(queryReturnVal.remove(usedTicketId));
 
 	}
 
-	public void sendProductFoundMessage(List<Product> products, int id) {
-		queryReturnVal.put(id, products);
+	public void sendProductsFoundMessage(List<Product> products, int usedTicketId) {
+		queryReturnVal.put(usedTicketId, products);
 	}
 
 	/**
-	 * Notice: this method will only be called by Spring, if you want to create a
-	 * Product, please use the other method
 	 * 
-	 * @param request:
-	 *            the servletrequest from spring
+	 * this method will only be called by Springs DispatcherServlet
 	 * 
-	 * @return returns true on success
-	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = { "/create",
-			"/insert" }, consumes = "application/x-www-form-urlencoded")
+	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public boolean createProduct(HttpServletRequest request) {
 
 		Product productToBeAdded = new Product();
@@ -128,14 +108,13 @@ public class ProductController {
 	}
 
 	/**
-	 * creates a new Product
+	 * creates a new Product entry in the ofbiz database
 	 * 
-	 * @param productToBeAdded:
-	 *            the product thats to be added
-	 * 
-	 * @return returns true on success and false on fail
-	 * 
+	 * @param productToBeAdded
+	 *            the Product thats to be added
+	 * @return true on success; false on fail
 	 */
+	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public boolean createProduct(Product productToBeAdded) {
 
 		AddProduct com = new AddProduct(productToBeAdded);
@@ -160,19 +139,18 @@ public class ProductController {
 		}
 
 		return commandReturnVal.remove(usedTicketId);
+
 	}
 
 	/**
-	 * updates a product in the ofbiz database; this method will only be calles by
-	 * the Spring DispatcherServlet
+	 * this method will only be called by Springs DispatcherServlet
 	 * 
-	 * @param newProduct:
-	 *            The product that will be created
-	 * 
-	 * @return returns true on success / false when failed
-	 * 
+	 * @deprecated
+	 * @param request
+	 *            HttpServletRequest object
+	 * @return true on success, false on fail
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update")
+	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProduct(HttpServletRequest request) {
 
 		BufferedReader br;
@@ -193,28 +171,29 @@ public class ProductController {
 				.split(data);
 
 		Product productToBeUpdated = new Product();
+
 		try {
 			productToBeUpdated = ProductMapper.mapstrstr(dataMap);
-		} catch (Exception e1) {
-			e1.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 			return false;
 		}
 
-		return this.updateProducut(productToBeUpdated);
+		return updateProduct(productToBeUpdated, productToBeUpdated.getProductId());
 
 	}
 
 	/**
-	 * updates a product in the ofbiz database will change any other attributes of
-	 * the product according to the parameters for the product with given ID
+	 * Updates the Product with the specific Id
 	 * 
-	 * @param productToBeUpdated:
-	 *            the product that will be updated
-	 * 
-	 * @return returns true on success / false when failed
-	 * 
+	 * @param productToBeUpdated
+	 *            the Product thats to be updated
+	 * @return true on success, false on fail
 	 */
-	public boolean updateProducut(Product productToBeUpdated) {
+	@RequestMapping(method = RequestMethod.PUT, value = "/{productId}/update", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public boolean updateProduct(Product productToBeUpdated, @PathVariable String productId) {
+
+		productToBeUpdated.setProductId(productId);
 
 		UpdateProduct com = new UpdateProduct(productToBeUpdated);
 
@@ -239,20 +218,20 @@ public class ProductController {
 		}
 
 		return commandReturnVal.remove(usedTicketId);
-
 	}
 
 	/**
-	 * removes a product from the database
+	 * removes a Product from the database
 	 * 
+	 * @deprecated
 	 * @param productId:
-	 *            the id of the product thats to be removed
+	 *            the id of the Product thats to be removed
 	 * 
 	 * @return true on success; false on fail
 	 * 
 	 */
-	@RequestMapping(method = RequestMethod.DELETE, value = { "/removeById", "/removeBy" })
-	public boolean removeProductById(@RequestParam(value = "productId") String productId) {
+	@RequestMapping(method = RequestMethod.DELETE, value = "/removeById")
+	public boolean deleteproductById(@RequestParam(value = "productId") String productId) {
 
 		DeleteProduct com = new DeleteProduct(productId);
 
@@ -279,14 +258,82 @@ public class ProductController {
 		return commandReturnVal.remove(usedTicketId);
 	}
 
-	public void sendProductChangedMessage(boolean success, int id) {
-		commandReturnVal.put(id, success);
+	public void sendProductChangedMessage(boolean success, int usedTicketId) {
+		commandReturnVal.put(usedTicketId, success);
 	}
 
-	@RequestMapping(value = (" * "))
-	public String returnErrorPage() {
+	@RequestMapping(method = RequestMethod.GET, value = "/{productId}")
+	public ResponseEntity<Object> findById(@PathVariable String productId) {
+		HashMap<String, String> requestParams = new HashMap<String, String>();
+		requestParams.put("productId", productId);
 
-		return "Error 404: Page not found! Check your spelling and/or your request method.";
+		return findProductsBy(requestParams);
 	}
 
+	@RequestMapping(method = RequestMethod.DELETE, value = "/{productId}")
+	public ResponseEntity<Object> deleteProductByIdUpdated(@PathVariable String productId) {
+		DeleteProduct com = new DeleteProduct(productId);
+
+		int usedTicketId;
+
+		synchronized (ProductController.class) {
+
+			usedTicketId = requestTicketId;
+			requestTicketId++;
+		}
+		Broker.instance().subscribe(ProductDeleted.class,
+				event -> sendProductChangedMessage(((ProductDeleted) event).isSuccess(), usedTicketId));
+
+		try {
+			Scheduler.instance().schedule(com).executeNext();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("An Error ocuured while processing Command!");
+		}
+		while (!commandReturnVal.containsKey(usedTicketId)) {
+		}
+
+		if (commandReturnVal.remove(usedTicketId)) {
+
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Product was deleted successfully.");
+
+		}
+		return ResponseEntity.status(HttpStatus.CONFLICT).body("Product could not be deleted");
+
+	}
+
+	@RequestMapping(value = (" ** "))
+	public ResponseEntity<Object> returnErrorPage(HttpServletRequest request) {
+
+		String usedUri = request.getRequestURI();
+		String[] splittedString = usedUri.split("/");
+
+		String usedRequest = splittedString[splittedString.length - 1];
+
+		if (validRequests.containsKey(usedRequest)) {
+			String returnVal = "Error: request method " + request.getMethod() + " not allowed for \"" + usedUri
+					+ "\"!\n" + "Please use " + validRequests.get(usedRequest) + "!";
+
+			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(returnVal);
+		}
+
+		String returnVal = "Error 404: Page not found! Valid pages are: \"eCommerce/api/product/\" plus one of the following: "
+				+ "";
+
+		Set<String> keySet = validRequests.keySet();
+		Iterator<String> it = keySet.iterator();
+
+		while (it.hasNext()) {
+			returnVal += "\"" + it.next() + "\"";
+			if (it.hasNext())
+				returnVal += ", ";
+		}
+
+		returnVal += "!";
+
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(returnVal);
+
+	}
 }

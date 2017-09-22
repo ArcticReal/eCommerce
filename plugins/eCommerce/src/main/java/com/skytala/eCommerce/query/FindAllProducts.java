@@ -11,7 +11,7 @@ import org.apache.ofbiz.entity.GenericValue;
 import com.skytala.eCommerce.control.Broker;
 import com.skytala.eCommerce.entity.Product;
 import com.skytala.eCommerce.entity.ProductMapper;
-import com.skytala.eCommerce.event.ProductsFound;;
+import com.skytala.eCommerce.event.ProductFound;;
 
 public class FindAllProducts implements Query{
 
@@ -34,7 +34,7 @@ public class FindAllProducts implements Query{
 			e.printStackTrace();
 		}
 		
-		Broker.instance().publish(new ProductsFound(foundProducts));
+		Broker.instance().publish(new ProductFound(foundProducts));
 		
 	}
 

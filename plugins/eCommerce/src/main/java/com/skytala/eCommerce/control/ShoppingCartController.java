@@ -92,10 +92,12 @@ public class ShoppingCartController {
 			return false;
 		}
 
-		List<Product> products = pc.findBy(find);
+		
+		
+		List<Product> products = (List<Product>) pc.findProductsBy(find).getBody();
 		Product pro = new Product();
 		for (int i = 0; i < products.size(); i++) {
-			pro = pc.findBy(find).get(i);
+			pro = products.get(i);
 
 			if (pro.getProductId().equals(allRequestParams.get("productId"))) {
 				break;

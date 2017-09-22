@@ -11,6 +11,10 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,7 +33,7 @@ import com.skytala.eCommerce.event.UserLoginUpdated;
 import com.skytala.eCommerce.query.FindUserLoginsBy;
 
 @RestController
-@RequestMapping("/userLogin")
+@RequestMapping("/userLogins")
 public class UserLoginController {
 
 	private static int requestTicketId = 0;
@@ -53,7 +57,7 @@ public class UserLoginController {
 	 * @return a List with the UserLogins
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public List<UserLogin> findUserLoginsBy(@RequestParam Map<String, String> allRequestParams) {
+	public ResponseEntity<Object> findUserLoginsBy(@RequestParam Map<String, String> allRequestParams) {
 
 		FindUserLoginsBy query = new FindUserLoginsBy(allRequestParams);
 
@@ -71,7 +75,7 @@ public class UserLoginController {
 		while (!queryReturnVal.containsKey(usedTicketId)) {
 
 		}
-		return queryReturnVal.remove(usedTicketId);
+		return ResponseEntity.ok().body(queryReturnVal.remove(usedTicketId));
 
 	}
 
@@ -87,7 +91,7 @@ public class UserLoginController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = "application/x-www-form-urlencoded")
+	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public boolean createUserLogin(HttpServletRequest request) {
 
 		UserLogin userLoginToBeAdded = new UserLogin();
@@ -110,6 +114,7 @@ public class UserLoginController {
 	 *            the UserLogin thats to be added
 	 * @return true on success; false on fail
 	 */
+	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public boolean createUserLogin(UserLogin userLoginToBeAdded) {
 
 		AddUserLogin com = new AddUserLogin(userLoginToBeAdded);
@@ -140,7 +145,9 @@ public class UserLoginController {
 	/**
 	 * this method will only be called by Springs DispatcherServlet
 	 * 
-	 * @param request HttpServletRequest object
+	 * @deprecated
+	 * @param request
+	 *            HttpServletRequest object
 	 * @return true on success, false on fail
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
@@ -172,17 +179,21 @@ public class UserLoginController {
 			return false;
 		}
 
-		return updateUserLogin(userLoginToBeUpdated);
+		return updateUserLogin(userLoginToBeUpdated, userLoginToBeUpdated.getUserLoginId());
 
 	}
 
 	/**
 	 * Updates the UserLogin with the specific Id
 	 * 
-	 * @param userLoginToBeUpdated the UserLogin thats to be updated
+	 * @param userLoginToBeUpdated
+	 *            the UserLogin thats to be updated
 	 * @return true on success, false on fail
 	 */
-	public boolean updateUserLogin(UserLogin userLoginToBeUpdated) {
+	@RequestMapping(method = RequestMethod.PUT, value = "/{userLoginId}/update", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public boolean updateUserLogin(UserLogin userLoginToBeUpdated, @PathVariable String userLoginId) {
+
+		userLoginToBeUpdated.setUserLoginId(userLoginId);
 
 		UpdateUserLogin com = new UpdateUserLogin(userLoginToBeUpdated);
 
@@ -212,6 +223,7 @@ public class UserLoginController {
 	/**
 	 * removes a UserLogin from the database
 	 * 
+	 * @deprecated
 	 * @param userLoginId:
 	 *            the id of the UserLogin thats to be removed
 	 * 
@@ -250,8 +262,50 @@ public class UserLoginController {
 		commandReturnVal.put(usedTicketId, success);
 	}
 
-	@RequestMapping(value = (" * "))
-	public String returnErrorPage(HttpServletRequest request) {
+	@RequestMapping(method = RequestMethod.GET, value = "/{userLoginId}")
+	public ResponseEntity<Object> findById(@PathVariable String userLoginId) {
+		HashMap<String, String> requestParams = new HashMap<String, String>();
+		requestParams.put("userLoginId", userLoginId);
+
+		return findUserLoginsBy(requestParams);
+	}
+
+	@RequestMapping(method = RequestMethod.DELETE, value = "/{userLoginId}")
+	public ResponseEntity<Object> deleteUserLoginByIdUpdated(@PathVariable String userLoginId) {
+		DeleteUserLogin com = new DeleteUserLogin(userLoginId);
+
+		int usedTicketId;
+
+		synchronized (UserLoginController.class) {
+
+			usedTicketId = requestTicketId;
+			requestTicketId++;
+		}
+		Broker.instance().subscribe(UserLoginDeleted.class,
+				event -> sendUserLoginChangedMessage(((UserLoginDeleted) event).isSuccess(), usedTicketId));
+
+		try {
+			Scheduler.instance().schedule(com).executeNext();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("An Error ocuured while processing Command!");
+		}
+		while (!commandReturnVal.containsKey(usedTicketId)) {
+		}
+
+		if (commandReturnVal.remove(usedTicketId)) {
+
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("UserLogin was deleted successfully.");
+
+		}
+		return ResponseEntity.status(HttpStatus.CONFLICT).body("UserLogin could not be deleted");
+
+	}
+
+	@RequestMapping(value = (" ** "))
+	public ResponseEntity<Object> returnErrorPage(HttpServletRequest request) {
 
 		String usedUri = request.getRequestURI();
 		String[] splittedString = usedUri.split("/");
@@ -259,9 +313,10 @@ public class UserLoginController {
 		String usedRequest = splittedString[splittedString.length - 1];
 
 		if (validRequests.containsKey(usedRequest)) {
-			return "Error: request method " + request.getMethod() + " not allowed for \"" + usedUri + "\"!\n"
-					+ "Please use " + validRequests.get(usedRequest) + "!";
+			String returnVal = "Error: request method " + request.getMethod() + " not allowed for \"" + usedUri
+					+ "\"!\n" + "Please use " + validRequests.get(usedRequest) + "!";
 
+			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(returnVal);
 		}
 
 		String returnVal = "Error 404: Page not found! Valid pages are: \"eCommerce/api/userLogin/\" plus one of the following: "
@@ -278,7 +333,7 @@ public class UserLoginController {
 
 		returnVal += "!";
 
-		return returnVal;
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(returnVal);
 
 	}
 }

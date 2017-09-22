@@ -11,6 +11,10 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,7 +33,7 @@ import com.skytala.eCommerce.event.PartyUpdated;
 import com.skytala.eCommerce.query.FindPartysBy;
 
 @RestController
-@RequestMapping("/party")
+@RequestMapping("/partys")
 public class PartyController {
 
 	private static int requestTicketId = 0;
@@ -52,8 +56,8 @@ public class PartyController {
 	 *            all params by which you want to find a Party
 	 * @return a List with the Partys
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = { "/find" })
-	public List<Party> findPartysBy(@RequestParam Map<String, String> allRequestParams) {
+	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	public ResponseEntity<Object> findPartysBy(@RequestParam Map<String, String> allRequestParams) {
 
 		FindPartysBy query = new FindPartysBy(allRequestParams);
 
@@ -71,7 +75,7 @@ public class PartyController {
 		while (!queryReturnVal.containsKey(usedTicketId)) {
 
 		}
-		return queryReturnVal.remove(usedTicketId);
+		return ResponseEntity.ok().body(queryReturnVal.remove(usedTicketId));
 
 	}
 
@@ -87,7 +91,7 @@ public class PartyController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = "application/x-www-form-urlencoded")
+	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public boolean createParty(HttpServletRequest request) {
 
 		Party partyToBeAdded = new Party();
@@ -110,6 +114,7 @@ public class PartyController {
 	 *            the Party thats to be added
 	 * @return true on success; false on fail
 	 */
+	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public boolean createParty(Party partyToBeAdded) {
 
 		AddParty com = new AddParty(partyToBeAdded);
@@ -140,6 +145,7 @@ public class PartyController {
 	/**
 	 * this method will only be called by Springs DispatcherServlet
 	 * 
+	 * @deprecated
 	 * @param request
 	 *            HttpServletRequest object
 	 * @return true on success, false on fail
@@ -173,7 +179,7 @@ public class PartyController {
 			return false;
 		}
 
-		return updateParty(partyToBeUpdated);
+		return updateParty(partyToBeUpdated, partyToBeUpdated.getPartyId());
 
 	}
 
@@ -184,7 +190,10 @@ public class PartyController {
 	 *            the Party thats to be updated
 	 * @return true on success, false on fail
 	 */
-	public boolean updateParty(Party partyToBeUpdated) {
+	@RequestMapping(method = RequestMethod.PUT, value = "/{partyId}/update", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public boolean updateParty(Party partyToBeUpdated, @PathVariable String partyId) {
+
+		partyToBeUpdated.setPartyId(partyId);
 
 		UpdateParty com = new UpdateParty(partyToBeUpdated);
 
@@ -214,6 +223,7 @@ public class PartyController {
 	/**
 	 * removes a Party from the database
 	 * 
+	 * @deprecated
 	 * @param partyId:
 	 *            the id of the Party thats to be removed
 	 * 
@@ -252,8 +262,50 @@ public class PartyController {
 		commandReturnVal.put(usedTicketId, success);
 	}
 
-	@RequestMapping(value = (" * "))
-	public String returnErrorPage(HttpServletRequest request) {
+	@RequestMapping(method = RequestMethod.GET, value = "/{partyId}")
+	public ResponseEntity<Object> findById(@PathVariable String partyId) {
+		HashMap<String, String> requestParams = new HashMap<String, String>();
+		requestParams.put("partyId", partyId);
+
+		return findPartysBy(requestParams);
+	}
+
+	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyId}")
+	public ResponseEntity<Object> deletePartyByIdUpdated(@PathVariable String partyId) {
+		DeleteParty com = new DeleteParty(partyId);
+
+		int usedTicketId;
+
+		synchronized (PartyController.class) {
+
+			usedTicketId = requestTicketId;
+			requestTicketId++;
+		}
+		Broker.instance().subscribe(PartyDeleted.class,
+				event -> sendPartyChangedMessage(((PartyDeleted) event).isSuccess(), usedTicketId));
+
+		try {
+			Scheduler.instance().schedule(com).executeNext();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("An Error ocuured while processing Command!");
+		}
+		while (!commandReturnVal.containsKey(usedTicketId)) {
+		}
+
+		if (commandReturnVal.remove(usedTicketId)) {
+
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Party was deleted successfully.");
+
+		}
+		return ResponseEntity.status(HttpStatus.CONFLICT).body("Party could not be deleted");
+
+	}
+
+	@RequestMapping(value = (" ** "))
+	public ResponseEntity<Object> returnErrorPage(HttpServletRequest request) {
 
 		String usedUri = request.getRequestURI();
 		String[] splittedString = usedUri.split("/");
@@ -261,9 +313,10 @@ public class PartyController {
 		String usedRequest = splittedString[splittedString.length - 1];
 
 		if (validRequests.containsKey(usedRequest)) {
-			return "Error: request method " + request.getMethod() + " not allowed for \"" + usedUri + "\"!\n"
-					+ "Please use " + validRequests.get(usedRequest) + "!";
+			String returnVal = "Error: request method " + request.getMethod() + " not allowed for \"" + usedUri
+					+ "\"!\n" + "Please use " + validRequests.get(usedRequest) + "!";
 
+			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(returnVal);
 		}
 
 		String returnVal = "Error 404: Page not found! Valid pages are: \"eCommerce/api/party/\" plus one of the following: "
@@ -280,7 +333,7 @@ public class PartyController {
 
 		returnVal += "!";
 
-		return returnVal;
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(returnVal);
 
 	}
 }
