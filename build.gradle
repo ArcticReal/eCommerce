@@ -29,12 +29,14 @@ buildscript {
     }
     dependencies {
       classpath "at.bxm.gradleplugins:gradle-svntools-plugin:latest.release"
+      classpath "org.junit.platform:junit-platform-gradle-plugin:1.0.0"
     }
 }
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'application'
 apply plugin: 'maven-publish'
+apply plugin: 'org.junit.platform.gradle.plugin'
 apply plugin: "at.bxm.svntools"
 
 apply from: 'common.gradle'
@@ -42,6 +44,9 @@ apply from: 'common.gradle'
 // global properties
 ext.os = System.getProperty('os.name').toLowerCase()
 ext.pluginsDir = "${rootDir}/plugins"
+ext.springVersion = '3.5.2'
+ext.junitPlatformVersion = '1.0.0'
+ext.junitJupiterVersion = '5.0.0'
 
 // java settings
 def jvmArguments = ['-Xms128M', '-Xmx1024M']
@@ -97,6 +102,14 @@ configurations {
     }
 }
 
+junitPlatform {
+    logManager 'org.apache.logging.log4j.jul.LogManager'
+    reportsDir file('build/test-results/junit-platform') // this is the default
+    // enableStandardTestTask true
+    // selectors (optional)
+    // filters (optional)
+}
+
 dependencies {
     // ofbiz compile libs
     compile 'apache-xerces:xercesImpl:2.9.1'
@@ -147,18 +160,26 @@ dependencies {
     compile 'oro:oro:2.0.8'
     compile 'wsdl4j:wsdl4j:1.6.2'
     
-    compile 'org.springframework:spring-core:3.2.5.RELEASE'
-    compile 'org.springframework:spring-beans:3.2.5.RELEASE'
-    compile 'org.springframework:spring-context:3.2.5.RELEASE'
-    compile 'org.springframework:spring-webmvc:4.1.6.RELEASE'    
+    compile 'org.springframework:spring-core:4.2.3.RELEASE'
+    compile 'org.springframework:spring-beans:4.2.3.RELEASE'
+    compile 'org.springframework:spring-context:4.2.3.RELEASE'
+    compile 'org.springframework:spring-webmvc:4.2.3.RELEASE'    
     compile 'com.fasterxml.jackson.core:jackson-databind:2.2'
     compile 'com.fasterxml.jackson.core:jackson-core:2.2'
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.2'
     compile 'io.springfox:springfox-swagger2:2.6.0'
     compile 'io.springfox:springfox-swagger-ui:2.6.0'
+    compile 'org.mockito:mockito-core:1.+'
+
+
 
     // ofbiz unit-test compile libs
     testCompile 'org.mockito:mockito-core:1.+'
+
+
+	testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
+	testCompile "com.jayway.jsonpath:json-path:2.2.0"
+	testCompile "com.jayway.jsonpath:json-path-assert:2.2.0"
 
     // ofbiz runtime libs
     runtime 'de.odysseus.juel:juel-spi:2.2.7'
@@ -173,6 +194,9 @@ dependencies {
     runtime 'org.apache.logging.log4j:log4j-jul:2.6.2' // for external jars using the java.util.logging: routes logging to log4j 2
     runtime 'org.apache.logging.log4j:log4j-slf4j-impl:2.6.2' // for external jars using slf4j: routes logging to log4j 2
     runtime 'org.codeartisans.thirdparties.swing:batik-all:1.8pre-r1084380'
+
+	testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
+
 
     // plugin libs
     subprojects.each { subProject ->
@@ -320,6 +344,7 @@ if (project.hasProperty('enableOwasp')) {
  * ======================================================== */
 
 // ========== Task group labels ==========
+def eCommerce = 'eCommerceTests'
 def cleanupGroup = 'Cleaning'
 def ofbizServer = 'OFBiz Server'
 def ofbizPlugin = 'OFBiz Plugin'
@@ -336,6 +361,11 @@ task loadDefault(group: ofbizServer) {
 task testIntegration(group: ofbizServer) {
     dependsOn 'ofbiz --test'
     description 'Run OFBiz integration tests; You must run loadDefault before running this task'
+}
+
+task testEcommerce(group: eCommerce) {
+	dependsOn 'ofbiz --test suitename=ecommercetests'
+	description 'Run self written tests for eCommerce plugin'
 }
 
 task terminateOfbiz(group: ofbizServer,

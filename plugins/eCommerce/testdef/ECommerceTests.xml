@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<test-suite suite-name="ECommercetests"
+<test-suite suite-name="ecommercetests"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/test-suite.xsd">
 
 
+    <test-group case-name="testtests">
+
+
+        <junit-test-suite class-name="com.skytala.eCommerce.test.Sometest"/>
+       	<junit-test-suite class-name="com.skytala.eCommerce.test.AnotherTest"/>
+
+    </test-group>
 </test-suite>

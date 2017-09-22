@@ -19,12 +19,20 @@ public class SwaggerConfig{
 	@Bean
 	public Docket api() {
 
+		
+		boolean enableSwagger = true;
+        if(System.getProperty("sun.java.command").contains("--test")) {
+        	enableSwagger = false;
+        }
+ 
+        
+        
 		return new Docket(DocumentationType.SWAGGER_2)
 				.select()
 				.apis(RequestHandlerSelectors.any())
 				.paths(PathSelectors.any())
 				.build()
-				.apiInfo(apiInfo());
+				.apiInfo(apiInfo()).enable(enableSwagger);
 	}
 	
 
