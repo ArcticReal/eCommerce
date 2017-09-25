@@ -92,7 +92,7 @@ public class ProductController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public boolean createProduct(HttpServletRequest request) {
+	public ResponseEntity<Object> createProduct(HttpServletRequest request) {
 
 		Product productToBeAdded = new Product();
 		try {
@@ -100,7 +100,7 @@ public class ProductController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return false;
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
 		}
 
 		return this.createProduct(productToBeAdded);
@@ -115,7 +115,7 @@ public class ProductController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public boolean createProduct(Product productToBeAdded) {
+	public ResponseEntity<Object> createProduct(Product productToBeAdded) {
 
 		AddProduct com = new AddProduct(productToBeAdded);
 		int usedTicketId;
@@ -133,12 +133,19 @@ public class ProductController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return false;
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("An Error ocuured while processing Command!");
 		}
 		while (!commandReturnVal.containsKey(usedTicketId)) {
 		}
 
-		return commandReturnVal.remove(usedTicketId);
+		if (commandReturnVal.remove(usedTicketId)) {
+
+			return ResponseEntity.status(HttpStatus.CREATED).body("Product was created successfully.");
+
+		}
+		return ResponseEntity.status(HttpStatus.CONFLICT).body("Product could not be created.");
+
 
 	}
 
