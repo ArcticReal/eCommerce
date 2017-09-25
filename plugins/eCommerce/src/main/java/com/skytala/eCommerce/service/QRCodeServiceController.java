@@ -1,26 +1,24 @@
 package com.skytala.eCommerce.service;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.Base64;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
 
 import org.apache.ofbiz.service.GenericServiceException;
 import org.apache.ofbiz.service.LocalDispatcher;
+import org.apache.ofbiz.entity.GenericValue;
 import org.apache.ofbiz.service.ServiceAuthException;
 import org.apache.ofbiz.service.ServiceValidationException;
-import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMethod;
+
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -57,22 +55,7 @@ public class QRCodeServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-
-		//encode BufferedImage to String
-		final ByteArrayOutputStream os = new ByteArrayOutputStream();
-		BufferedImage image = (BufferedImage)result.remove("bufferedImage");
-		try {
-			ImageIO.write(image, "png", os);
-			String encodedBase64 = Base64.getEncoder().encodeToString(os.toByteArray());
-			os.close();
-			result.put("Base64Data", encodedBase64);
-			return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(encodedBase64);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		
+		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
 	@RequestMapping(value = (" * "))
