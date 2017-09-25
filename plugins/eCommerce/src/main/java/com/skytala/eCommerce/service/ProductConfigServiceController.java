@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductConfigServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProdConfItemContentType")
-	public ResponseEntity<Object> createProdConfItemContentType(HttpSession session, @RequestParam(value="confItemContentTypeId", required=false) String confItemContentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> createProdConfItemContentType(HttpSession session, @RequestParam(value="confItemContentTypeId", required=false) String confItemContentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("confItemContentTypeId",confItemContentTypeId);
@@ -170,7 +170,7 @@ public class ProductConfigServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProdConfItemContentType")
-	public ResponseEntity<Object> updateProdConfItemContentType(HttpSession session, @RequestParam(value="confItemContentTypeId") String confItemContentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> updateProdConfItemContentType(HttpSession session, @RequestParam(value="confItemContentTypeId") String confItemContentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("confItemContentTypeId",confItemContentTypeId);

@@ -51,7 +51,7 @@ public class ProductComponentMaintenanceServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getProductVariantTree")
-	public ResponseEntity<Object> getProductVariantTree(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="featureOrder") java.util.Collection featureOrder, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="checkInventory", required=false) Boolean checkInventory) {
+	public ResponseEntity<Object> getProductVariantTree(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="featureOrder") java.util.Collection featureOrder, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="checkInventory", required=false) String checkInventory) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -79,7 +79,7 @@ public class ProductComponentMaintenanceServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getProductCategoryAndLimitedMembers")
-	public ResponseEntity<Object> getProductCategoryAndLimitedMembers(HttpSession session, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="defaultViewSize") Integer defaultViewSize, @RequestParam(value="limitView") Boolean limitView, @RequestParam(value="activeOnly", required=false) Boolean activeOnly, @RequestParam(value="orderByFields", required=false) List orderByFields, @RequestParam(value="checkViewAllow", required=false) Boolean checkViewAllow, @RequestParam(value="viewIndexString", required=false) String viewIndexString, @RequestParam(value="introductionDateLimit", required=false) java.sql.Timestamp introductionDateLimit, @RequestParam(value="useCacheForMembers", required=false) Boolean useCacheForMembers, @RequestParam(value="viewSizeString", required=false) String viewSizeString, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="releaseDateLimit", required=false) java.sql.Timestamp releaseDateLimit, @RequestParam(value="prodCatalogId", required=false) String prodCatalogId) {
+	public ResponseEntity<Object> getProductCategoryAndLimitedMembers(HttpSession session, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="defaultViewSize") Integer defaultViewSize, @RequestParam(value="limitView") String limitView, @RequestParam(value="activeOnly", required=false) String activeOnly, @RequestParam(value="orderByFields", required=false) List orderByFields, @RequestParam(value="checkViewAllow", required=false) String checkViewAllow, @RequestParam(value="viewIndexString", required=false) String viewIndexString, @RequestParam(value="introductionDateLimit", required=false) java.sql.Timestamp introductionDateLimit, @RequestParam(value="useCacheForMembers", required=false) String useCacheForMembers, @RequestParam(value="viewSizeString", required=false) String viewSizeString, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="releaseDateLimit", required=false) java.sql.Timestamp releaseDateLimit, @RequestParam(value="prodCatalogId", required=false) String prodCatalogId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productCategoryId",productCategoryId);
@@ -142,7 +142,7 @@ public class ProductComponentMaintenanceServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getAssociatedProducts")
-	public ResponseEntity<Object> getAssociatedProducts(HttpSession session, @RequestParam(value="type") String type, @RequestParam(value="sortDescending", required=false) Boolean sortDescending, @RequestParam(value="checkViewAllow", required=false) Boolean checkViewAllow, @RequestParam(value="bidirectional", required=false) Boolean bidirectional, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="productIdTo", required=false) String productIdTo, @RequestParam(value="prodCatalogId", required=false) String prodCatalogId) {
+	public ResponseEntity<Object> getAssociatedProducts(HttpSession session, @RequestParam(value="type") String type, @RequestParam(value="sortDescending", required=false) String sortDescending, @RequestParam(value="checkViewAllow", required=false) String checkViewAllow, @RequestParam(value="bidirectional", required=false) String bidirectional, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="productIdTo", required=false) String productIdTo, @RequestParam(value="prodCatalogId", required=false) String prodCatalogId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("type",type);
@@ -228,7 +228,7 @@ public class ProductComponentMaintenanceServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getPreviousNextProducts")
-	public ResponseEntity<Object> getPreviousNextProducts(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="categoryId") String categoryId, @RequestParam(value="activeOnly", required=false) Boolean activeOnly, @RequestParam(value="orderByFields", required=false) List orderByFields, @RequestParam(value="introductionDateLimit", required=false) java.sql.Timestamp introductionDateLimit, @RequestParam(value="releaseDateLimit", required=false) java.sql.Timestamp releaseDateLimit) {
+	public ResponseEntity<Object> getPreviousNextProducts(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="categoryId") String categoryId, @RequestParam(value="activeOnly", required=false) String activeOnly, @RequestParam(value="orderByFields", required=false) List orderByFields, @RequestParam(value="introductionDateLimit", required=false) java.sql.Timestamp introductionDateLimit, @RequestParam(value="releaseDateLimit", required=false) java.sql.Timestamp releaseDateLimit) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);

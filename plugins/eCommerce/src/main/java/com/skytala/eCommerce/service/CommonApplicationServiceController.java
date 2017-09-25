@@ -54,7 +54,7 @@ public class CommonApplicationServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/ftpInterface")
-	public ResponseEntity<Object> ftpInterface(HttpSession session, @RequestParam(value="hostname") String hostname, @RequestParam(value="password") String password, @RequestParam(value="remoteFilename") String remoteFilename, @RequestParam(value="localFilename") String localFilename, @RequestParam(value="username") String username, @RequestParam(value="defaultTimeout", required=false) Integer defaultTimeout, @RequestParam(value="binaryTransfer", required=false) Boolean binaryTransfer, @RequestParam(value="passiveMode", required=false) Boolean passiveMode) {
+	public ResponseEntity<Object> ftpInterface(HttpSession session, @RequestParam(value="hostname") String hostname, @RequestParam(value="password") String password, @RequestParam(value="remoteFilename") String remoteFilename, @RequestParam(value="localFilename") String localFilename, @RequestParam(value="username") String username, @RequestParam(value="defaultTimeout", required=false) Integer defaultTimeout, @RequestParam(value="binaryTransfer", required=false) String binaryTransfer, @RequestParam(value="passiveMode", required=false) String passiveMode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("hostname",hostname);
@@ -705,7 +705,7 @@ public class CommonApplicationServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateGeoType")
-	public ResponseEntity<Object> updateGeoType(HttpSession session, @RequestParam(value="geoTypeId") String geoTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> updateGeoType(HttpSession session, @RequestParam(value="geoTypeId") String geoTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("geoTypeId",geoTypeId);
@@ -839,7 +839,7 @@ public class CommonApplicationServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCustomTimePeriod")
-	public ResponseEntity<Object> createCustomTimePeriod(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="periodTypeId") String periodTypeId, @RequestParam(value="organizationPartyId") String organizationPartyId, @RequestParam(value="customTimePeriodId") String customTimePeriodId, @RequestParam(value="thruDate") Timestamp thruDate, @RequestParam(value="periodNum", required=false) Long periodNum, @RequestParam(value="isClosed", required=false) Boolean isClosed, @RequestParam(value="periodName", required=false) String periodName, @RequestParam(value="parentPeriodId", required=false) String parentPeriodId) {
+	public ResponseEntity<Object> createCustomTimePeriod(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="periodTypeId") String periodTypeId, @RequestParam(value="organizationPartyId") String organizationPartyId, @RequestParam(value="customTimePeriodId") String customTimePeriodId, @RequestParam(value="thruDate") Timestamp thruDate, @RequestParam(value="periodNum", required=false) Long periodNum, @RequestParam(value="isClosed", required=false) String isClosed, @RequestParam(value="periodName", required=false) String periodName, @RequestParam(value="parentPeriodId", required=false) String parentPeriodId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -1047,7 +1047,7 @@ public class CommonApplicationServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateUomType")
-	public ResponseEntity<Object> updateUomType(HttpSession session, @RequestParam(value="uomTypeId") String uomTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> updateUomType(HttpSession session, @RequestParam(value="uomTypeId") String uomTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("uomTypeId",uomTypeId);
@@ -1572,7 +1572,7 @@ public class CommonApplicationServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/userLogin")
-	public ResponseEntity<Object> userLogin(HttpSession session, @RequestParam(value="login.username") String loginusername, @RequestParam(value="login.password") String loginpassword, @RequestParam(value="visitId", required=false) String visitId, @RequestParam(value="isServiceAuth", required=false) Boolean isServiceAuth) {
+	public ResponseEntity<Object> userLogin(HttpSession session, @RequestParam(value="login.username") String loginusername, @RequestParam(value="login.password") String loginpassword, @RequestParam(value="visitId", required=false) String visitId, @RequestParam(value="isServiceAuth", required=false) String isServiceAuth) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("login.username",loginusername);
@@ -2148,7 +2148,7 @@ public class CommonApplicationServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/ftpPutFile")
-	public ResponseEntity<Object> ftpPutFile(HttpSession session, @RequestParam(value="hostname") String hostname, @RequestParam(value="password") String password, @RequestParam(value="remoteFilename") String remoteFilename, @RequestParam(value="localFilename") String localFilename, @RequestParam(value="username") String username, @RequestParam(value="defaultTimeout", required=false) Integer defaultTimeout, @RequestParam(value="binaryTransfer", required=false) Boolean binaryTransfer, @RequestParam(value="siteCommands", required=false) List siteCommands, @RequestParam(value="passiveMode", required=false) Boolean passiveMode) {
+	public ResponseEntity<Object> ftpPutFile(HttpSession session, @RequestParam(value="hostname") String hostname, @RequestParam(value="password") String password, @RequestParam(value="remoteFilename") String remoteFilename, @RequestParam(value="localFilename") String localFilename, @RequestParam(value="username") String username, @RequestParam(value="defaultTimeout", required=false) Integer defaultTimeout, @RequestParam(value="binaryTransfer", required=false) String binaryTransfer, @RequestParam(value="siteCommands", required=false) List siteCommands, @RequestParam(value="passiveMode", required=false) String passiveMode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("hostname",hostname);
@@ -2474,7 +2474,7 @@ public class CommonApplicationServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createGeoType")
-	public ResponseEntity<Object> createGeoType(HttpSession session, @RequestParam(value="geoTypeId", required=false) String geoTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> createGeoType(HttpSession session, @RequestParam(value="geoTypeId", required=false) String geoTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("geoTypeId",geoTypeId);
@@ -2589,7 +2589,7 @@ public class CommonApplicationServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/ftpGetFile")
-	public ResponseEntity<Object> ftpGetFile(HttpSession session, @RequestParam(value="hostname") String hostname, @RequestParam(value="password") String password, @RequestParam(value="remoteFilename") String remoteFilename, @RequestParam(value="localFilename") String localFilename, @RequestParam(value="username") String username, @RequestParam(value="defaultTimeout", required=false) Integer defaultTimeout, @RequestParam(value="binaryTransfer", required=false) Boolean binaryTransfer, @RequestParam(value="passiveMode", required=false) Boolean passiveMode) {
+	public ResponseEntity<Object> ftpGetFile(HttpSession session, @RequestParam(value="hostname") String hostname, @RequestParam(value="password") String password, @RequestParam(value="remoteFilename") String remoteFilename, @RequestParam(value="localFilename") String localFilename, @RequestParam(value="username") String username, @RequestParam(value="defaultTimeout", required=false) Integer defaultTimeout, @RequestParam(value="binaryTransfer", required=false) String binaryTransfer, @RequestParam(value="passiveMode", required=false) String passiveMode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("hostname",hostname);
@@ -2947,7 +2947,7 @@ public class CommonApplicationServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCustomTimePeriod")
-	public ResponseEntity<Object> updateCustomTimePeriod(HttpSession session, @RequestParam(value="customTimePeriodId") String customTimePeriodId, @RequestParam(value="periodNum", required=false) Long periodNum, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="isClosed", required=false) Boolean isClosed, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="periodName", required=false) String periodName, @RequestParam(value="parentPeriodId", required=false) String parentPeriodId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Object> updateCustomTimePeriod(HttpSession session, @RequestParam(value="customTimePeriodId") String customTimePeriodId, @RequestParam(value="periodNum", required=false) Long periodNum, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="isClosed", required=false) String isClosed, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="periodName", required=false) String periodName, @RequestParam(value="parentPeriodId", required=false) String parentPeriodId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("customTimePeriodId",customTimePeriodId);
@@ -3146,7 +3146,7 @@ public class CommonApplicationServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createUomType")
-	public ResponseEntity<Object> createUomType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description, @RequestParam(value="uomTypeId", required=false) String uomTypeId) {
+	public ResponseEntity<Object> createUomType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description, @RequestParam(value="uomTypeId", required=false) String uomTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("parentTypeId",parentTypeId);

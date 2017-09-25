@@ -331,7 +331,7 @@ public class ProductComponentServiceController1{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductFeatureType")
-	public ResponseEntity<Object> updateProductFeatureType(HttpSession session, @RequestParam(value="productFeatureTypeId") String productFeatureTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> updateProductFeatureType(HttpSession session, @RequestParam(value="productFeatureTypeId") String productFeatureTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productFeatureTypeId",productFeatureTypeId);
@@ -421,7 +421,7 @@ public class ProductComponentServiceController1{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductFeatureApplType")
-	public ResponseEntity<Object> createProductFeatureApplType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="productFeatureApplTypeId", required=false) String productFeatureApplTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> createProductFeatureApplType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="productFeatureApplTypeId", required=false) String productFeatureApplTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("parentTypeId",parentTypeId);
@@ -449,7 +449,7 @@ public class ProductComponentServiceController1{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductFeatureApplType")
-	public ResponseEntity<Object> updateProductFeatureApplType(HttpSession session, @RequestParam(value="productFeatureApplTypeId") String productFeatureApplTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> updateProductFeatureApplType(HttpSession session, @RequestParam(value="productFeatureApplTypeId") String productFeatureApplTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productFeatureApplTypeId",productFeatureApplTypeId);
@@ -477,7 +477,7 @@ public class ProductComponentServiceController1{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductFeatureType")
-	public ResponseEntity<Object> createProductFeatureType(HttpSession session, @RequestParam(value="productFeatureTypeId", required=false) String productFeatureTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> createProductFeatureType(HttpSession session, @RequestParam(value="productFeatureTypeId", required=false) String productFeatureTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productFeatureTypeId",productFeatureTypeId);
@@ -614,7 +614,7 @@ public class ProductComponentServiceController1{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductFeatureIactnType")
-	public ResponseEntity<Object> createProductFeatureIactnType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="productFeatureIactnTypeId", required=false) String productFeatureIactnTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> createProductFeatureIactnType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="productFeatureIactnTypeId", required=false) String productFeatureIactnTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("parentTypeId",parentTypeId);
@@ -896,7 +896,7 @@ public class ProductComponentServiceController1{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductFeatureIactnType")
-	public ResponseEntity<Object> updateProductFeatureIactnType(HttpSession session, @RequestParam(value="productFeatureIactnTypeId") String productFeatureIactnTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> updateProductFeatureIactnType(HttpSession session, @RequestParam(value="productFeatureIactnTypeId") String productFeatureIactnTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productFeatureIactnTypeId",productFeatureIactnTypeId);

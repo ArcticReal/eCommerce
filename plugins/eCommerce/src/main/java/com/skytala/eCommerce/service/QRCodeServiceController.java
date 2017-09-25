@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class QRCodeServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/generateQRCodeImage")
-	public ResponseEntity<Object> generateQRCodeImage(HttpSession session, @RequestParam(value="message") String message, @RequestParam(value="logoImage", required=false) java.awt.image.BufferedImage logoImage, @RequestParam(value="logoImageMaxWidth", required=false) Integer logoImageMaxWidth, @RequestParam(value="logoImageMaxHeight", required=false) Integer logoImageMaxHeight, @RequestParam(value="format", required=false) String format, @RequestParam(value="width", required=false) Integer width, @RequestParam(value="verifyOutput", required=false) Boolean verifyOutput, @RequestParam(value="encoding", required=false) String encoding, @RequestParam(value="height", required=false) Integer height) {
+	public ResponseEntity<Object> generateQRCodeImage(HttpSession session, @RequestParam(value="message") String message, @RequestParam(value="logoImage", required=false) java.awt.image.BufferedImage logoImage, @RequestParam(value="logoImageMaxWidth", required=false) Integer logoImageMaxWidth, @RequestParam(value="logoImageMaxHeight", required=false) Integer logoImageMaxHeight, @RequestParam(value="format", required=false) String format, @RequestParam(value="width", required=false) Integer width, @RequestParam(value="verifyOutput", required=false) String verifyOutput, @RequestParam(value="encoding", required=false) String encoding, @RequestParam(value="height", required=false) Integer height) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("message",message);

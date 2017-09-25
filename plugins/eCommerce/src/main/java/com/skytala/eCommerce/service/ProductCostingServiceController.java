@@ -272,7 +272,7 @@ public class ProductCostingServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCostComponentType")
-	public ResponseEntity<Object> createCostComponentType(HttpSession session, @RequestParam(value="costComponentTypeId", required=false) String costComponentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> createCostComponentType(HttpSession session, @RequestParam(value="costComponentTypeId", required=false) String costComponentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentTypeId",costComponentTypeId);
@@ -596,7 +596,7 @@ public class ProductCostingServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCostComponentType")
-	public ResponseEntity<Object> updateCostComponentType(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> updateCostComponentType(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentTypeId",costComponentTypeId);

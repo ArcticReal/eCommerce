@@ -700,7 +700,7 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getInventoryAvailableByFacility")
-	public ResponseEntity<Object> getInventoryAvailableByFacility(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="productId") String productId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="useCache", required=false) Boolean useCache, @RequestParam(value="lotId", required=false) String lotId) {
+	public ResponseEntity<Object> getInventoryAvailableByFacility(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="productId") String productId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="useCache", required=false) String useCache, @RequestParam(value="lotId", required=false) String lotId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("facilityId",facilityId);
@@ -729,7 +729,7 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getInventoryAvailableByLocation")
-	public ResponseEntity<Object> getInventoryAvailableByLocation(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="productId") String productId, @RequestParam(value="locationSeqId") String locationSeqId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="useCache", required=false) Boolean useCache) {
+	public ResponseEntity<Object> getInventoryAvailableByLocation(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="productId") String productId, @RequestParam(value="locationSeqId") String locationSeqId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="useCache", required=false) String useCache) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("facilityId",facilityId);
@@ -784,7 +784,7 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createInventoryItemType")
-	public ResponseEntity<Object> createInventoryItemType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description, @RequestParam(value="inventoryItemTypeId", required=false) String inventoryItemTypeId) {
+	public ResponseEntity<Object> createInventoryItemType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description, @RequestParam(value="inventoryItemTypeId", required=false) String inventoryItemTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("parentTypeId",parentTypeId);
@@ -1012,7 +1012,7 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getProductInventoryAvailable")
-	public ResponseEntity<Object> getProductInventoryAvailable(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="useCache", required=false) Boolean useCache) {
+	public ResponseEntity<Object> getProductInventoryAvailable(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="useCache", required=false) String useCache) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -1100,7 +1100,7 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFacilityType")
-	public ResponseEntity<Object> createFacilityType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="facilityTypeId", required=false) String facilityTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> createFacilityType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="facilityTypeId", required=false) String facilityTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("parentTypeId",parentTypeId);
@@ -1715,7 +1715,7 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getInventoryAvailableByItem")
-	public ResponseEntity<Object> getInventoryAvailableByItem(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="useCache", required=false) Boolean useCache) {
+	public ResponseEntity<Object> getInventoryAvailableByItem(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="useCache", required=false) String useCache) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("inventoryItemId",inventoryItemId);
@@ -1803,7 +1803,7 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createInventoryItemLabelType")
-	public ResponseEntity<Object> createInventoryItemLabelType(HttpSession session, @RequestParam(value="inventoryItemLabelTypeId") String inventoryItemLabelTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> createInventoryItemLabelType(HttpSession session, @RequestParam(value="inventoryItemLabelTypeId") String inventoryItemLabelTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("inventoryItemLabelTypeId",inventoryItemLabelTypeId);
@@ -1900,7 +1900,7 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateInventoryItemType")
-	public ResponseEntity<Object> updateInventoryItemType(HttpSession session, @RequestParam(value="inventoryItemTypeId") String inventoryItemTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> updateInventoryItemType(HttpSession session, @RequestParam(value="inventoryItemTypeId") String inventoryItemTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("inventoryItemTypeId",inventoryItemTypeId);
@@ -2203,7 +2203,7 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateInventoryItemLabelType")
-	public ResponseEntity<Object> updateInventoryItemLabelType(HttpSession session, @RequestParam(value="inventoryItemLabelTypeId") String inventoryItemLabelTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> updateInventoryItemLabelType(HttpSession session, @RequestParam(value="inventoryItemLabelTypeId") String inventoryItemLabelTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("inventoryItemLabelTypeId",inventoryItemLabelTypeId);
@@ -2364,7 +2364,7 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getProductInventoryAvailableBySupplier")
-	public ResponseEntity<Object> getProductInventoryAvailableBySupplier(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="partyId") String partyId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="useCache", required=false) Boolean useCache) {
+	public ResponseEntity<Object> getProductInventoryAvailableBySupplier(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="partyId") String partyId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="useCache", required=false) String useCache) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -3198,7 +3198,7 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateFacilityType")
-	public ResponseEntity<Object> updateFacilityType(HttpSession session, @RequestParam(value="facilityTypeId") String facilityTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> updateFacilityType(HttpSession session, @RequestParam(value="facilityTypeId") String facilityTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("facilityTypeId",facilityTypeId);
@@ -3226,7 +3226,7 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/reserveOrderItemInventory")
-	public ResponseEntity<Object> reserveOrderItemInventory(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="orderId") String orderId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="promisedDatetime", required=false) Timestamp promisedDatetime, @RequestParam(value="quantityNotAvailable", required=false) BigDecimal quantityNotAvailable, @RequestParam(value="reserveOrderEnumId", required=false) String reserveOrderEnumId, @RequestParam(value="reservedDatetime", required=false) Timestamp reservedDatetime, @RequestParam(value="priority", required=false) Boolean priority, @RequestParam(value="sequenceId", required=false) Long sequenceId, @RequestParam(value="oldPickStartDate", required=false) Timestamp oldPickStartDate, @RequestParam(value="currentPromisedDate", required=false) Timestamp currentPromisedDate) {
+	public ResponseEntity<Object> reserveOrderItemInventory(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="orderId") String orderId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="promisedDatetime", required=false) Timestamp promisedDatetime, @RequestParam(value="quantityNotAvailable", required=false) BigDecimal quantityNotAvailable, @RequestParam(value="reserveOrderEnumId", required=false) String reserveOrderEnumId, @RequestParam(value="reservedDatetime", required=false) Timestamp reservedDatetime, @RequestParam(value="priority", required=false) String priority, @RequestParam(value="sequenceId", required=false) Long sequenceId, @RequestParam(value="oldPickStartDate", required=false) Timestamp oldPickStartDate, @RequestParam(value="currentPromisedDate", required=false) Timestamp currentPromisedDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderItemSeqId",orderItemSeqId);
