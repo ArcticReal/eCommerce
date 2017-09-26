@@ -353,7 +353,7 @@ public class ProductComponentMaintenanceServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/mergeVirtualWithSingleVariant")
-	public ResponseEntity<Object> mergeVirtualWithSingleVariant(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="removeOld") String removeOld, @RequestParam(value="test", required=false) String test) {
+	public ResponseEntity<Object> mergeVirtualWithSingleVariant(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="removeOld") Boolean removeOld, @RequestParam(value="test", required=false) Boolean test) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -554,7 +554,7 @@ public class ProductComponentMaintenanceServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/checkImageUrlForAllCategories")
-	public ResponseEntity<Object> checkImageUrlForAllCategories(HttpSession session, @RequestParam(value="excludeEmpty", required=false) String excludeEmpty, @RequestParam(value="topCategory", required=false) String topCategory) {
+	public ResponseEntity<Object> checkImageUrlForAllCategories(HttpSession session, @RequestParam(value="excludeEmpty", required=false) Boolean excludeEmpty, @RequestParam(value="topCategory", required=false) String topCategory) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("excludeEmpty",excludeEmpty);

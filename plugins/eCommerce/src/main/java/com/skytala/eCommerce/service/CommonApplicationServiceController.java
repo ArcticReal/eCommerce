@@ -54,7 +54,7 @@ public class CommonApplicationServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/ftpInterface")
-	public ResponseEntity<Object> ftpInterface(HttpSession session, @RequestParam(value="hostname") String hostname, @RequestParam(value="password") String password, @RequestParam(value="remoteFilename") String remoteFilename, @RequestParam(value="localFilename") String localFilename, @RequestParam(value="username") String username, @RequestParam(value="defaultTimeout", required=false) Integer defaultTimeout, @RequestParam(value="binaryTransfer", required=false) String binaryTransfer, @RequestParam(value="passiveMode", required=false) String passiveMode) {
+	public ResponseEntity<Object> ftpInterface(HttpSession session, @RequestParam(value="hostname") String hostname, @RequestParam(value="password") String password, @RequestParam(value="remoteFilename") String remoteFilename, @RequestParam(value="localFilename") String localFilename, @RequestParam(value="username") String username, @RequestParam(value="defaultTimeout", required=false) Integer defaultTimeout, @RequestParam(value="binaryTransfer", required=false) Boolean binaryTransfer, @RequestParam(value="passiveMode", required=false) Boolean passiveMode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("hostname",hostname);
@@ -1572,7 +1572,7 @@ public class CommonApplicationServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/userLogin")
-	public ResponseEntity<Object> userLogin(HttpSession session, @RequestParam(value="login.username") String loginusername, @RequestParam(value="login.password") String loginpassword, @RequestParam(value="visitId", required=false) String visitId, @RequestParam(value="isServiceAuth", required=false) String isServiceAuth) {
+	public ResponseEntity<Object> userLogin(HttpSession session, @RequestParam(value="login.username") String loginusername, @RequestParam(value="login.password") String loginpassword, @RequestParam(value="visitId", required=false) String visitId, @RequestParam(value="isServiceAuth", required=false) Boolean isServiceAuth) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("login.username",loginusername);
@@ -2148,7 +2148,7 @@ public class CommonApplicationServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/ftpPutFile")
-	public ResponseEntity<Object> ftpPutFile(HttpSession session, @RequestParam(value="hostname") String hostname, @RequestParam(value="password") String password, @RequestParam(value="remoteFilename") String remoteFilename, @RequestParam(value="localFilename") String localFilename, @RequestParam(value="username") String username, @RequestParam(value="defaultTimeout", required=false) Integer defaultTimeout, @RequestParam(value="binaryTransfer", required=false) String binaryTransfer, @RequestParam(value="siteCommands", required=false) List siteCommands, @RequestParam(value="passiveMode", required=false) String passiveMode) {
+	public ResponseEntity<Object> ftpPutFile(HttpSession session, @RequestParam(value="hostname") String hostname, @RequestParam(value="password") String password, @RequestParam(value="remoteFilename") String remoteFilename, @RequestParam(value="localFilename") String localFilename, @RequestParam(value="username") String username, @RequestParam(value="defaultTimeout", required=false) Integer defaultTimeout, @RequestParam(value="binaryTransfer", required=false) Boolean binaryTransfer, @RequestParam(value="siteCommands", required=false) List siteCommands, @RequestParam(value="passiveMode", required=false) Boolean passiveMode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("hostname",hostname);
@@ -2589,7 +2589,7 @@ public class CommonApplicationServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/ftpGetFile")
-	public ResponseEntity<Object> ftpGetFile(HttpSession session, @RequestParam(value="hostname") String hostname, @RequestParam(value="password") String password, @RequestParam(value="remoteFilename") String remoteFilename, @RequestParam(value="localFilename") String localFilename, @RequestParam(value="username") String username, @RequestParam(value="defaultTimeout", required=false) Integer defaultTimeout, @RequestParam(value="binaryTransfer", required=false) String binaryTransfer, @RequestParam(value="passiveMode", required=false) String passiveMode) {
+	public ResponseEntity<Object> ftpGetFile(HttpSession session, @RequestParam(value="hostname") String hostname, @RequestParam(value="password") String password, @RequestParam(value="remoteFilename") String remoteFilename, @RequestParam(value="localFilename") String localFilename, @RequestParam(value="username") String username, @RequestParam(value="defaultTimeout", required=false) Integer defaultTimeout, @RequestParam(value="binaryTransfer", required=false) Boolean binaryTransfer, @RequestParam(value="passiveMode", required=false) Boolean passiveMode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("hostname",hostname);

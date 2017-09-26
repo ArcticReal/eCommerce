@@ -7122,7 +7122,7 @@ public class ProductComponentServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/productImportFromSpreadsheet")
-	public ResponseEntity<Object> productImportFromSpreadsheet(HttpSession session, @RequestParam(value="dirName", required=false) String dirName) {
+	public ResponseEntity<Object> productImportFromSpreadsheet(HttpSession session, @RequestParam(value="dirName", required=false) java.lang.String dirName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("dirName",dirName);

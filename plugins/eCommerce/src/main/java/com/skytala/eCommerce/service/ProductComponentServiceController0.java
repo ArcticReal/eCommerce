@@ -700,7 +700,7 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getInventoryAvailableByFacility")
-	public ResponseEntity<Object> getInventoryAvailableByFacility(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="productId") String productId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="useCache", required=false) String useCache, @RequestParam(value="lotId", required=false) String lotId) {
+	public ResponseEntity<Object> getInventoryAvailableByFacility(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="productId") String productId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="useCache", required=false) Boolean useCache, @RequestParam(value="lotId", required=false) String lotId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("facilityId",facilityId);
@@ -729,7 +729,7 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getInventoryAvailableByLocation")
-	public ResponseEntity<Object> getInventoryAvailableByLocation(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="productId") String productId, @RequestParam(value="locationSeqId") String locationSeqId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="useCache", required=false) String useCache) {
+	public ResponseEntity<Object> getInventoryAvailableByLocation(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="productId") String productId, @RequestParam(value="locationSeqId") String locationSeqId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="useCache", required=false) Boolean useCache) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("facilityId",facilityId);
@@ -1012,7 +1012,7 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getProductInventoryAvailable")
-	public ResponseEntity<Object> getProductInventoryAvailable(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="useCache", required=false) String useCache) {
+	public ResponseEntity<Object> getProductInventoryAvailable(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="useCache", required=false) Boolean useCache) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -1715,7 +1715,7 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getInventoryAvailableByItem")
-	public ResponseEntity<Object> getInventoryAvailableByItem(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="useCache", required=false) String useCache) {
+	public ResponseEntity<Object> getInventoryAvailableByItem(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="useCache", required=false) Boolean useCache) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("inventoryItemId",inventoryItemId);
@@ -2364,7 +2364,7 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getProductInventoryAvailableBySupplier")
-	public ResponseEntity<Object> getProductInventoryAvailableBySupplier(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="partyId") String partyId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="useCache", required=false) String useCache) {
+	public ResponseEntity<Object> getProductInventoryAvailableBySupplier(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="partyId") String partyId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="useCache", required=false) Boolean useCache) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
