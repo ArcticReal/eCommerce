@@ -29,7 +29,7 @@ public class DeleteProduct implements Command{
 				success = true;
 			}
 		} catch (GenericEntityException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 		
 		Broker.instance().publish(new ProductDeleted(success));

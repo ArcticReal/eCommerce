@@ -2,6 +2,7 @@ package com.skytala.eCommerce.query;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import com.skytala.eCommerce.control.Broker;
 import com.skytala.eCommerce.entity.Product;
 import com.skytala.eCommerce.entity.ProductMapper;
 import com.skytala.eCommerce.event.ProductFound;
+import com.skytala.eCommerce.exceptions.RecordNotFoundException;
 
 public class FindProductsBy implements Query{
 
@@ -30,7 +32,19 @@ public class FindProductsBy implements Query{
 		List<Product> foundProducts = new ArrayList<Product>();		
 
 		try {
-			List<GenericValue> buf = delegator.findAll("Product", false);
+			List<GenericValue> buf = new LinkedList<>();
+			
+			if(filter.size()==1&&filter.containsKey("productId")) {
+				GenericValue foundProduct = delegator.findOne("Product", false, filter);
+				if(foundProduct != null) {
+					buf.add(foundProduct);
+				}else {
+					throw new RecordNotFoundException(Product.class);
+				}
+			}else {
+				buf = delegator.findAll("Product", false);
+				
+			}
 			
 			for (int i = 0; i < buf.size(); i++) {
 				if(applysToFilter(buf.get(i))) {

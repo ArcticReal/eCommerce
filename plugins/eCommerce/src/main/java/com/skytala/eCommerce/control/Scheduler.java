@@ -37,7 +37,7 @@ public class Scheduler {
 		
 	}
 	
-	public void executeAll() throws InterruptedException {
+	public void executeAll() throws Exception {
 		for(int i = 0; i < queue.size(); i++) {
 			queue.take().execute();
 		}

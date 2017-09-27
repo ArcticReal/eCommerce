@@ -8,6 +8,7 @@ import org.apache.ofbiz.entity.GenericValue;
 import com.skytala.eCommerce.control.Broker;
 import com.skytala.eCommerce.entity.Product;
 import com.skytala.eCommerce.event.ProductUpdated;
+import com.skytala.eCommerce.exceptions.RecordNotFoundException;
 
 public class UpdateProduct implements Command{
 
@@ -26,14 +27,16 @@ public class UpdateProduct implements Command{
 	}
 
 	@Override
-	public void execute() {
+	public void execute() throws RecordNotFoundException{
 		
 		Delegator delegator = DelegatorFactory.getDelegator("default");
 
 		boolean success;
 		try {
 			GenericValue newValue = delegator.makeValue("Product", productToBeUpdated.mapAttributeField());
-			delegator.store(newValue);
+			if(delegator.store(newValue) == 0) {
+				throw new RecordNotFoundException(Product.class);
+			}
 			success = true;
 		} catch (GenericEntityException e) {
 			e.printStackTrace();

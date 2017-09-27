@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,6 +31,7 @@ import com.skytala.eCommerce.event.ProductAdded;
 import com.skytala.eCommerce.event.ProductDeleted;
 import com.skytala.eCommerce.event.ProductFound;
 import com.skytala.eCommerce.event.ProductUpdated;
+import com.skytala.eCommerce.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.query.FindProductsBy;
 
 @RestController
@@ -75,6 +77,7 @@ public class ProductController {
 		while (!queryReturnVal.containsKey(usedTicketId)) {
 
 		}
+
 		return ResponseEntity.ok().body(queryReturnVal.remove(usedTicketId));
 
 	}
@@ -115,7 +118,7 @@ public class ProductController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProduct(Product productToBeAdded) {
+	public ResponseEntity<Object> createProduct(@RequestBody Product productToBeAdded) {
 
 		AddProduct com = new AddProduct(productToBeAdded);
 		int usedTicketId;
@@ -145,7 +148,6 @@ public class ProductController {
 
 		}
 		return ResponseEntity.status(HttpStatus.CONFLICT).body("Product could not be created.");
-
 
 	}
 
@@ -186,7 +188,11 @@ public class ProductController {
 			return false;
 		}
 
-		return updateProduct(productToBeUpdated, productToBeUpdated.getProductId());
+		if (updateProduct(productToBeUpdated, productToBeUpdated.getProductId()).getStatusCode()
+				.equals(HttpStatus.NO_CONTENT)) {
+			return true;
+		}
+		return false;
 
 	}
 
@@ -197,8 +203,8 @@ public class ProductController {
 	 *            the Product thats to be updated
 	 * @return true on success, false on fail
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/{productId}/update", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public boolean updateProduct(Product productToBeUpdated, @PathVariable String productId) {
+	@RequestMapping(method = RequestMethod.PUT, value = "/{productId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<Object> updateProduct(@RequestBody Product productToBeUpdated, @PathVariable String productId) {
 
 		productToBeUpdated.setProductId(productId);
 
@@ -216,15 +222,23 @@ public class ProductController {
 
 		try {
 			Scheduler.instance().schedule(com).executeNext();
+		} catch (RecordNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return false;
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An internal error occured");
 		}
 		while (!commandReturnVal.containsKey(usedTicketId)) {
 		}
 
-		return commandReturnVal.remove(usedTicketId);
+		if (commandReturnVal.remove(usedTicketId)) {
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+
+		}
+
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
 	/**
@@ -273,8 +287,16 @@ public class ProductController {
 	public ResponseEntity<Object> findById(@PathVariable String productId) {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productId", productId);
+		try {
+			
+			ResponseEntity<Object> retVal = findProductsBy(requestParams);
+			return retVal;
+		} catch(RecordNotFoundException e) {
+			
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
 
-		return findProductsBy(requestParams);
+		
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{productId}")
@@ -304,7 +326,7 @@ public class ProductController {
 
 		if (commandReturnVal.remove(usedTicketId)) {
 
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Product was deleted successfully.");
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 
 		}
 		return ResponseEntity.status(HttpStatus.CONFLICT).body("Product could not be deleted");

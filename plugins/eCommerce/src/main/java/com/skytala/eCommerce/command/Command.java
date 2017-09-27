@@ -2,5 +2,5 @@ package com.skytala.eCommerce.command;
 
 public interface Command {
 
-	public void execute();
+	public void execute() throws Exception;
 }
