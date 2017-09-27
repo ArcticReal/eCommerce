@@ -1107,10 +1107,9 @@ public class ProductComponentServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductGroupOrder")
-	public ResponseEntity<Object> createProductGroupOrder(HttpSession session, @RequestParam(value="groupOrderId") String groupOrderId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="jobId", required=false) String jobId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="reqOrderQty", required=false) BigDecimal reqOrderQty, @RequestParam(value="soldOrderQty", required=false) BigDecimal soldOrderQty, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Object> createProductGroupOrder(HttpSession session, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="jobId", required=false) String jobId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="reqOrderQty", required=false) BigDecimal reqOrderQty, @RequestParam(value="soldOrderQty", required=false) BigDecimal soldOrderQty, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("groupOrderId",groupOrderId);
 		paramMap.put("fromDate",fromDate);
 		paramMap.put("jobId",jobId);
 		paramMap.put("productId",productId);
@@ -3356,11 +3355,10 @@ public class ProductComponentServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductConfigOption")
-	public ResponseEntity<Object> createProductConfigOption(HttpSession session, @RequestParam(value="configItemId") String configItemId, @RequestParam(value="configOptionId") String configOptionId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="configOptionName", required=false) String configOptionName, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> createProductConfigOption(HttpSession session, @RequestParam(value="configItemId") String configItemId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="configOptionName", required=false) String configOptionName, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("configItemId",configItemId);
-		paramMap.put("configOptionId",configOptionId);
 		paramMap.put("sequenceNum",sequenceNum);
 		paramMap.put("configOptionName",configOptionName);
 		paramMap.put("description",description);
@@ -4496,9 +4494,10 @@ public class ProductComponentServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createSalesAgreement")
-	public ResponseEntity<Object> createSalesAgreement(HttpSession session, @RequestParam(value="agreementItemSeqId") String agreementItemSeqId, @RequestParam(value="roleTypeIdTo", required=false) String roleTypeIdTo, @RequestParam(value="partyIdFrom", required=false) String partyIdFrom, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="agreementDate", required=false) Timestamp agreementDate, @RequestParam(value="agreementTypeId", required=false) String agreementTypeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="roleTypeIdFrom", required=false) String roleTypeIdFrom, @RequestParam(value="agreementItemTypeId", required=false) String agreementItemTypeId, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="textData", required=false) String textData, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="agreementText", required=false) String agreementText, @RequestParam(value="agreementImage", required=false) Object agreementImage, @RequestParam(value="price", required=false) BigDecimal price, @RequestParam(value="agreementId", required=false) String agreementId, @RequestParam(value="partyIdTo", required=false) String partyIdTo) {
+	public ResponseEntity<Object> createSalesAgreement(HttpSession session, @RequestParam(value="agreementId") String agreementId, @RequestParam(value="agreementItemSeqId") String agreementItemSeqId, @RequestParam(value="roleTypeIdTo", required=false) String roleTypeIdTo, @RequestParam(value="partyIdFrom", required=false) String partyIdFrom, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="agreementDate", required=false) Timestamp agreementDate, @RequestParam(value="agreementTypeId", required=false) String agreementTypeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="roleTypeIdFrom", required=false) String roleTypeIdFrom, @RequestParam(value="agreementItemTypeId", required=false) String agreementItemTypeId, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="textData", required=false) String textData, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="agreementText", required=false) String agreementText, @RequestParam(value="agreementImage", required=false) Object agreementImage, @RequestParam(value="price", required=false) BigDecimal price, @RequestParam(value="partyIdTo", required=false) String partyIdTo) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("agreementId",agreementId);
 		paramMap.put("agreementItemSeqId",agreementItemSeqId);
 		paramMap.put("roleTypeIdTo",roleTypeIdTo);
 		paramMap.put("partyIdFrom",partyIdFrom);
@@ -4515,7 +4514,6 @@ public class ProductComponentServiceController{
 		paramMap.put("agreementText",agreementText);
 		paramMap.put("agreementImage",agreementImage);
 		paramMap.put("price",price);
-		paramMap.put("agreementId",agreementId);
 		paramMap.put("partyIdTo",partyIdTo);
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
 

@@ -353,11 +353,10 @@ public class ProductCostingServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCostComponent")
-	public ResponseEntity<Object> createCostComponent(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="costComponentId") String costComponentId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="cost", required=false) BigDecimal cost, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="geoId", required=false) String geoId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="costUomId", required=false) String costUomId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Object> createCostComponent(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="cost", required=false) BigDecimal cost, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="geoId", required=false) String geoId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="costUomId", required=false) String costUomId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentTypeId",costComponentTypeId);
-		paramMap.put("costComponentId",costComponentId);
 		paramMap.put("workEffortId",workEffortId);
 		paramMap.put("fromDate",fromDate);
 		paramMap.put("cost",cost);
@@ -624,10 +623,9 @@ public class ProductCostingServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/recreateCostComponent")
-	public ResponseEntity<Object> recreateCostComponent(HttpSession session, @RequestParam(value="costComponentId") String costComponentId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="costComponentTypeId", required=false) String costComponentTypeId, @RequestParam(value="cost", required=false) BigDecimal cost, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="geoId", required=false) String geoId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="costUomId", required=false) String costUomId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Object> recreateCostComponent(HttpSession session, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="costComponentTypeId", required=false) String costComponentTypeId, @RequestParam(value="cost", required=false) BigDecimal cost, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="geoId", required=false) String geoId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="costUomId", required=false) String costUomId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("costComponentId",costComponentId);
 		paramMap.put("workEffortId",workEffortId);
 		paramMap.put("fromDate",fromDate);
 		paramMap.put("costComponentTypeId",costComponentTypeId);
