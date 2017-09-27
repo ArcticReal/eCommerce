@@ -839,13 +839,12 @@ public class CommonApplicationServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCustomTimePeriod")
-	public ResponseEntity<Object> createCustomTimePeriod(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="periodTypeId") String periodTypeId, @RequestParam(value="organizationPartyId") String organizationPartyId, @RequestParam(value="customTimePeriodId") String customTimePeriodId, @RequestParam(value="thruDate") Timestamp thruDate, @RequestParam(value="periodNum", required=false) Long periodNum, @RequestParam(value="isClosed", required=false) String isClosed, @RequestParam(value="periodName", required=false) String periodName, @RequestParam(value="parentPeriodId", required=false) String parentPeriodId) {
+	public ResponseEntity<Object> createCustomTimePeriod(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="periodTypeId") String periodTypeId, @RequestParam(value="organizationPartyId") String organizationPartyId, @RequestParam(value="thruDate") Timestamp thruDate, @RequestParam(value="periodNum", required=false) Long periodNum, @RequestParam(value="isClosed", required=false) String isClosed, @RequestParam(value="periodName", required=false) String periodName, @RequestParam(value="parentPeriodId", required=false) String parentPeriodId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
 		paramMap.put("periodTypeId",periodTypeId);
 		paramMap.put("organizationPartyId",organizationPartyId);
-		paramMap.put("customTimePeriodId",customTimePeriodId);
 		paramMap.put("thruDate",thruDate);
 		paramMap.put("periodNum",periodNum);
 		paramMap.put("isClosed",isClosed);
@@ -1155,12 +1154,11 @@ public class CommonApplicationServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createVisualThemeResource")
-	public ResponseEntity<Object> createVisualThemeResource(HttpSession session, @RequestParam(value="resourceTypeEnumId") String resourceTypeEnumId, @RequestParam(value="visualThemeId") String visualThemeId, @RequestParam(value="sequenceId") String sequenceId, @RequestParam(value="resourceValue", required=false) Long resourceValue) {
+	public ResponseEntity<Object> createVisualThemeResource(HttpSession session, @RequestParam(value="resourceTypeEnumId") String resourceTypeEnumId, @RequestParam(value="visualThemeId") String visualThemeId, @RequestParam(value="resourceValue", required=false) Long resourceValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("resourceTypeEnumId",resourceTypeEnumId);
 		paramMap.put("visualThemeId",visualThemeId);
-		paramMap.put("sequenceId",sequenceId);
 		paramMap.put("resourceValue",resourceValue);
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
 
@@ -1183,11 +1181,10 @@ public class CommonApplicationServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createEnumeration")
-	public ResponseEntity<Object> createEnumeration(HttpSession session, @RequestParam(value="enumTypeId") String enumTypeId, @RequestParam(value="enumId") String enumId, @RequestParam(value="description") String description, @RequestParam(value="enumCode", required=false) String enumCode, @RequestParam(value="sequenceId", required=false) String sequenceId) {
+	public ResponseEntity<Object> createEnumeration(HttpSession session, @RequestParam(value="enumTypeId") String enumTypeId, @RequestParam(value="description") String description, @RequestParam(value="enumCode", required=false) String enumCode, @RequestParam(value="sequenceId", required=false) String sequenceId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("enumTypeId",enumTypeId);
-		paramMap.put("enumId",enumId);
 		paramMap.put("description",description);
 		paramMap.put("enumCode",enumCode);
 		paramMap.put("sequenceId",sequenceId);
@@ -2502,12 +2499,11 @@ public class CommonApplicationServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createGeoPoint")
-	public ResponseEntity<Object> createGeoPoint(HttpSession session, @RequestParam(value="dataSourceId") String dataSourceId, @RequestParam(value="latitude") String latitude, @RequestParam(value="geoPointId") String geoPointId, @RequestParam(value="longitude") String longitude, @RequestParam(value="elevation", required=false) BigDecimal elevation, @RequestParam(value="elevationUomId", required=false) String elevationUomId, @RequestParam(value="geoPointTypeEnumId", required=false) String geoPointTypeEnumId, @RequestParam(value="description", required=false) String description, @RequestParam(value="information", required=false) String information) {
+	public ResponseEntity<Object> createGeoPoint(HttpSession session, @RequestParam(value="dataSourceId") String dataSourceId, @RequestParam(value="latitude") String latitude, @RequestParam(value="longitude") String longitude, @RequestParam(value="elevation", required=false) BigDecimal elevation, @RequestParam(value="elevationUomId", required=false) String elevationUomId, @RequestParam(value="geoPointTypeEnumId", required=false) String geoPointTypeEnumId, @RequestParam(value="description", required=false) String description, @RequestParam(value="information", required=false) String information) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("dataSourceId",dataSourceId);
 		paramMap.put("latitude",latitude);
-		paramMap.put("geoPointId",geoPointId);
 		paramMap.put("longitude",longitude);
 		paramMap.put("elevation",elevation);
 		paramMap.put("elevationUomId",elevationUomId);

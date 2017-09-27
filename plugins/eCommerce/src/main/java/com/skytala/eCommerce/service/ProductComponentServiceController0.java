@@ -899,10 +899,9 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createPhysicalInventory")
-	public ResponseEntity<Object> createPhysicalInventory(HttpSession session, @RequestParam(value="physicalInventoryId") String physicalInventoryId, @RequestParam(value="physicalInventoryDate", required=false) Timestamp physicalInventoryDate, @RequestParam(value="generalComments", required=false) String generalComments, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Object> createPhysicalInventory(HttpSession session, @RequestParam(value="physicalInventoryDate", required=false) Timestamp physicalInventoryDate, @RequestParam(value="generalComments", required=false) String generalComments, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("physicalInventoryId",physicalInventoryId);
 		paramMap.put("physicalInventoryDate",physicalInventoryDate);
 		paramMap.put("generalComments",generalComments);
 		paramMap.put("partyId",partyId);
@@ -1128,10 +1127,9 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createInventoryItem")
-	public ResponseEntity<Object> createInventoryItem(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="isReturned") String isReturned, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="productId") String productId, @RequestParam(value="inventoryItemTypeId") String inventoryItemTypeId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="serialNumber", required=false) Long serialNumber, @RequestParam(value="softIdentifier", required=false) Long softIdentifier, @RequestParam(value="binNumber", required=false) String binNumber, @RequestParam(value="lotId", required=false) String lotId, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="accountingQuantityTotal", required=false) BigDecimal accountingQuantityTotal, @RequestParam(value="ownerPartyId", required=false) String ownerPartyId, @RequestParam(value="oldAvailableToPromise", required=false) BigDecimal oldAvailableToPromise, @RequestParam(value="activationValidThru", required=false) Timestamp activationValidThru, @RequestParam(value="activationNumber", required=false) Long activationNumber, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="unitCost", required=false) BigDecimal unitCost, @RequestParam(value="datetimeManufactured", required=false) Timestamp datetimeManufactured, @RequestParam(value="datetimeReceived", required=false) Timestamp datetimeReceived, @RequestParam(value="expireDate", required=false) Timestamp expireDate, @RequestParam(value="oldQuantityOnHand", required=false) BigDecimal oldQuantityOnHand, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="containerId", required=false) String containerId, @RequestParam(value="locationSeqId", required=false) String locationSeqId) {
+	public ResponseEntity<Object> createInventoryItem(HttpSession session, @RequestParam(value="isReturned") String isReturned, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="productId") String productId, @RequestParam(value="inventoryItemTypeId") String inventoryItemTypeId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="serialNumber", required=false) Long serialNumber, @RequestParam(value="softIdentifier", required=false) Long softIdentifier, @RequestParam(value="binNumber", required=false) String binNumber, @RequestParam(value="lotId", required=false) String lotId, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="accountingQuantityTotal", required=false) BigDecimal accountingQuantityTotal, @RequestParam(value="ownerPartyId", required=false) String ownerPartyId, @RequestParam(value="oldAvailableToPromise", required=false) BigDecimal oldAvailableToPromise, @RequestParam(value="activationValidThru", required=false) Timestamp activationValidThru, @RequestParam(value="activationNumber", required=false) Long activationNumber, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="unitCost", required=false) BigDecimal unitCost, @RequestParam(value="datetimeManufactured", required=false) Timestamp datetimeManufactured, @RequestParam(value="datetimeReceived", required=false) Timestamp datetimeReceived, @RequestParam(value="expireDate", required=false) Timestamp expireDate, @RequestParam(value="oldQuantityOnHand", required=false) BigDecimal oldQuantityOnHand, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="containerId", required=false) String containerId, @RequestParam(value="locationSeqId", required=false) String locationSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("inventoryItemId",inventoryItemId);
 		paramMap.put("isReturned",isReturned);
 		paramMap.put("facilityId",facilityId);
 		paramMap.put("productId",productId);
@@ -1673,11 +1671,10 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFacility")
-	public ResponseEntity<Object> createFacility(HttpSession session, @RequestParam(value="ownerPartyId") String ownerPartyId, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="facilityTypeId") String facilityTypeId, @RequestParam(value="facilityName") String facilityName, @RequestParam(value="defaultInventoryItemTypeId", required=false) String defaultInventoryItemTypeId, @RequestParam(value="parentFacilityId", required=false) String parentFacilityId, @RequestParam(value="description", required=false) String description, @RequestParam(value="defaultWeightUomId", required=false) String defaultWeightUomId, @RequestParam(value="primaryFacilityGroupId", required=false) String primaryFacilityGroupId, @RequestParam(value="openedDate", required=false) Timestamp openedDate, @RequestParam(value="facilitySize", required=false) BigDecimal facilitySize, @RequestParam(value="facilitySizeUomId", required=false) String facilitySizeUomId, @RequestParam(value="closedDate", required=false) Timestamp closedDate, @RequestParam(value="defaultDaysToShip", required=false) Long defaultDaysToShip, @RequestParam(value="defaultDimensionUomId", required=false) String defaultDimensionUomId, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="geoPointId", required=false) String geoPointId, @RequestParam(value="oldSquareFootage", required=false) Long oldSquareFootage) {
+	public ResponseEntity<Object> createFacility(HttpSession session, @RequestParam(value="ownerPartyId") String ownerPartyId, @RequestParam(value="facilityTypeId") String facilityTypeId, @RequestParam(value="facilityName") String facilityName, @RequestParam(value="defaultInventoryItemTypeId", required=false) String defaultInventoryItemTypeId, @RequestParam(value="parentFacilityId", required=false) String parentFacilityId, @RequestParam(value="description", required=false) String description, @RequestParam(value="defaultWeightUomId", required=false) String defaultWeightUomId, @RequestParam(value="primaryFacilityGroupId", required=false) String primaryFacilityGroupId, @RequestParam(value="openedDate", required=false) Timestamp openedDate, @RequestParam(value="facilitySize", required=false) BigDecimal facilitySize, @RequestParam(value="facilitySizeUomId", required=false) String facilitySizeUomId, @RequestParam(value="closedDate", required=false) Timestamp closedDate, @RequestParam(value="defaultDaysToShip", required=false) Long defaultDaysToShip, @RequestParam(value="defaultDimensionUomId", required=false) String defaultDimensionUomId, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="geoPointId", required=false) String geoPointId, @RequestParam(value="oldSquareFootage", required=false) Long oldSquareFootage) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("ownerPartyId",ownerPartyId);
-		paramMap.put("facilityId",facilityId);
 		paramMap.put("facilityTypeId",facilityTypeId);
 		paramMap.put("facilityName",facilityName);
 		paramMap.put("defaultInventoryItemTypeId",defaultInventoryItemTypeId);
@@ -3434,11 +3431,10 @@ public class ProductComponentServiceController0{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFacilityGroup")
-	public ResponseEntity<Object> createFacilityGroup(HttpSession session, @RequestParam(value="facilityGroupTypeId") String facilityGroupTypeId, @RequestParam(value="facilityGroupId") String facilityGroupId, @RequestParam(value="facilityGroupName") String facilityGroupName, @RequestParam(value="primaryParentGroupId", required=false) String primaryParentGroupId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> createFacilityGroup(HttpSession session, @RequestParam(value="facilityGroupTypeId") String facilityGroupTypeId, @RequestParam(value="facilityGroupName") String facilityGroupName, @RequestParam(value="primaryParentGroupId", required=false) String primaryParentGroupId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("facilityGroupTypeId",facilityGroupTypeId);
-		paramMap.put("facilityGroupId",facilityGroupId);
 		paramMap.put("facilityGroupName",facilityGroupName);
 		paramMap.put("primaryParentGroupId",primaryParentGroupId);
 		paramMap.put("description",description);

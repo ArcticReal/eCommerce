@@ -540,11 +540,10 @@ public class ProductComponentServiceController2{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductPromo")
-	public ResponseEntity<Object> createProductPromo(HttpSession session, @RequestParam(value="promoName") String promoName, @RequestParam(value="productPromoId") String productPromoId, @RequestParam(value="showToCustomer", required=false) String showToCustomer, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="requireCode", required=false) String requireCode, @RequestParam(value="overrideOrgPartyId", required=false) String overrideOrgPartyId, @RequestParam(value="useLimitPerCustomer", required=false) Long useLimitPerCustomer, @RequestParam(value="useLimitPerOrder", required=false) Long useLimitPerOrder, @RequestParam(value="useLimitPerPromotion", required=false) Long useLimitPerPromotion, @RequestParam(value="promoText", required=false) String promoText, @RequestParam(value="userEntered", required=false) String userEntered, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="billbackFactor", required=false) BigDecimal billbackFactor, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin) {
+	public ResponseEntity<Object> createProductPromo(HttpSession session, @RequestParam(value="promoName") String promoName, @RequestParam(value="showToCustomer", required=false) String showToCustomer, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="requireCode", required=false) String requireCode, @RequestParam(value="overrideOrgPartyId", required=false) String overrideOrgPartyId, @RequestParam(value="useLimitPerCustomer", required=false) Long useLimitPerCustomer, @RequestParam(value="useLimitPerOrder", required=false) Long useLimitPerOrder, @RequestParam(value="useLimitPerPromotion", required=false) Long useLimitPerPromotion, @RequestParam(value="promoText", required=false) String promoText, @RequestParam(value="userEntered", required=false) String userEntered, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="billbackFactor", required=false) BigDecimal billbackFactor, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("promoName",promoName);
-		paramMap.put("productPromoId",productPromoId);
 		paramMap.put("showToCustomer",showToCustomer);
 		paramMap.put("lastModifiedDate",lastModifiedDate);
 		paramMap.put("requireCode",requireCode);
@@ -1215,11 +1214,10 @@ public class ProductComponentServiceController2{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductPriceRule")
-	public ResponseEntity<Object> createProductPriceRule(HttpSession session, @RequestParam(value="ruleName") String ruleName, @RequestParam(value="productPriceRuleId") String productPriceRuleId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="description", required=false) String description, @RequestParam(value="isSale", required=false) String isSale, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Object> createProductPriceRule(HttpSession session, @RequestParam(value="ruleName") String ruleName, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="description", required=false) String description, @RequestParam(value="isSale", required=false) String isSale, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("ruleName",ruleName);
-		paramMap.put("productPriceRuleId",productPriceRuleId);
 		paramMap.put("fromDate",fromDate);
 		paramMap.put("description",description);
 		paramMap.put("isSale",isSale);

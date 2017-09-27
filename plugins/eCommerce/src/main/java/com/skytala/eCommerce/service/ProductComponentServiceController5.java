@@ -52,10 +52,9 @@ public class ProductComponentServiceController5{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createSubscriptionResource")
-	public ResponseEntity<Object> createSubscriptionResource(HttpSession session, @RequestParam(value="subscriptionResourceId") String subscriptionResourceId, @RequestParam(value="serviceNameOnExpiry", required=false) String serviceNameOnExpiry, @RequestParam(value="contentId", required=false) String contentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="parentResourceId", required=false) String parentResourceId, @RequestParam(value="webSiteId", required=false) String webSiteId) {
+	public ResponseEntity<Object> createSubscriptionResource(HttpSession session, @RequestParam(value="serviceNameOnExpiry", required=false) String serviceNameOnExpiry, @RequestParam(value="contentId", required=false) String contentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="parentResourceId", required=false) String parentResourceId, @RequestParam(value="webSiteId", required=false) String webSiteId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("subscriptionResourceId",subscriptionResourceId);
 		paramMap.put("serviceNameOnExpiry",serviceNameOnExpiry);
 		paramMap.put("contentId",contentId);
 		paramMap.put("description",description);
