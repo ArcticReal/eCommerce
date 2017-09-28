@@ -14,7 +14,7 @@ import org.apache.ofbiz.entity.GenericValue;
 import com.skytala.eCommerce.control.Broker;
 import com.skytala.eCommerce.entity.ProductPrice;
 import com.skytala.eCommerce.entity.ProductPriceMapper;
-import com.skytala.eCommerce.event.ProductPricesFound;
+import com.skytala.eCommerce.event.ProductPriceFound;
 import com.skytala.eCommerce.exceptions.RecordNotFoundException;
 
 public class FindProductPricesBy implements Query {
@@ -53,7 +53,7 @@ public class FindProductPricesBy implements Query {
 		} catch (GenericEntityException e) {
 			e.printStackTrace();
 		}
-		Broker.instance().publish(new ProductPricesFound(foundProductPrices));
+		Broker.instance().publish(new ProductPriceFound(foundProductPrices));
 
 	}
 

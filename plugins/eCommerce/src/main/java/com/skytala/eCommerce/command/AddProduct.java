@@ -7,6 +7,7 @@ import org.apache.ofbiz.entity.GenericValue;
 
 import com.skytala.eCommerce.control.Broker;
 import com.skytala.eCommerce.entity.Product;
+import com.skytala.eCommerce.entity.ProductMapper;
 import com.skytala.eCommerce.event.ProductAdded;
 
 public class AddProduct implements Command{
@@ -22,19 +23,20 @@ public class AddProduct implements Command{
 
 		Delegator delegator = DelegatorFactory.getDelegator("default");
 
-		boolean success;
+		Product addedProduct = null;
+		boolean success = false;
 		try {
 			productToBeAdded.setProductId(delegator.getNextSeqId("Product"));
 			productToBeAdded.setAutoCreateKeywords(false);
 			GenericValue newValue = delegator.makeValue("Product", productToBeAdded.mapAttributeField());
-			delegator.create(newValue);
+			addedProduct = ProductMapper.map(delegator.create(newValue));
 			success = true;
 		} catch (GenericEntityException e) {
 			e.printStackTrace();
-			success = false;
+			addedProduct = null;
 		}
 		
-		Broker.instance().publish(new ProductAdded(success));
+		Broker.instance().publish(new ProductAdded(addedProduct, success));
 		
 	}
 
