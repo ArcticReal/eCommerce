@@ -3,6 +3,7 @@ package com.skytala.eCommerce.control;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import com.skytala.eCommerce.command.Command;
+import com.skytala.eCommerce.exceptions.RecordNotFoundException;
 
 public class Scheduler {
 

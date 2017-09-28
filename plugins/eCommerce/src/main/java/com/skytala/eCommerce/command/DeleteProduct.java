@@ -4,9 +4,12 @@ import org.apache.ofbiz.base.util.UtilMisc;
 import org.apache.ofbiz.entity.Delegator;
 import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
+import org.apache.ofbiz.entity.GenericEntityNotFoundException;
 
 import com.skytala.eCommerce.control.Broker;
+import com.skytala.eCommerce.entity.Product;
 import com.skytala.eCommerce.event.ProductDeleted;
+import com.skytala.eCommerce.exceptions.RecordNotFoundException;
 
 public class DeleteProduct implements Command{
 
@@ -27,9 +30,15 @@ public class DeleteProduct implements Command{
 			int countRemoved = delegator.removeByAnd("Product", UtilMisc.toMap("productId", toBeDeletedId));
 			if(countRemoved > 0) {
 				success = true;
+			}else {
+				throw new RecordNotFoundException(Product.class);
+
 			}
 		} catch (GenericEntityException e) {
 			System.err.println(e.getMessage());
+			if(e.getCause().getClass().equals(GenericEntityNotFoundException.class)) {
+				throw new RecordNotFoundException(Product.class);
+			}
 		}
 		
 		Broker.instance().publish(new ProductDeleted(success));

@@ -88,4 +88,7 @@ public class FindProductsBy implements Query{
 		return true;
 	}
 
+	public void setFilter(Map<String, String> newFilter) {
+		this.filter = newFilter;
+	}
 }

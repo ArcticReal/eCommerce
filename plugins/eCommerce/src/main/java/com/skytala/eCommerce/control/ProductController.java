@@ -59,9 +59,13 @@ public class ProductController {
 	 * @return a List with the Products
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findProductsBy(@RequestParam Map<String, String> allRequestParams) {
+	public ResponseEntity<Object> findProductsBy(@RequestParam(required = false) Map<String, String> allRequestParams) {
+		
 
 		FindProductsBy query = new FindProductsBy(allRequestParams);
+		if(allRequestParams == null) {
+			query.setFilter(new HashMap<>());
+		}
 
 		int usedTicketId;
 
@@ -77,7 +81,6 @@ public class ProductController {
 		while (!queryReturnVal.containsKey(usedTicketId)) {
 
 		}
-
 		return ResponseEntity.ok().body(queryReturnVal.remove(usedTicketId));
 
 	}
@@ -204,7 +207,8 @@ public class ProductController {
 	 * @return true on success, false on fail
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{productId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProduct(@RequestBody Product productToBeUpdated, @PathVariable String productId) {
+	public ResponseEntity<Object> updateProduct(@RequestBody Product productToBeUpdated,
+			@PathVariable String productId) {
 
 		productToBeUpdated.setProductId(productId);
 
@@ -288,15 +292,14 @@ public class ProductController {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productId", productId);
 		try {
-			
+
 			ResponseEntity<Object> retVal = findProductsBy(requestParams);
 			return retVal;
-		} catch(RecordNotFoundException e) {
-			
+		} catch (RecordNotFoundException e) {
+
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 
-		
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{productId}")
@@ -315,6 +318,8 @@ public class ProductController {
 
 		try {
 			Scheduler.instance().schedule(com).executeNext();
+		} catch(RecordNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();

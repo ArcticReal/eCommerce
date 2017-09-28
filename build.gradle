@@ -357,6 +357,10 @@ task testIntegration(group: ofbizServer) {
 task testEcommerce(group: eCommerce) {
 	dependsOn 'ofbiz --test suitename=ecommercetests'
 	description 'Run self written tests for eCommerce plugin'
+	doLast {
+		createTestReports
+	
+	}
 }
 
 task terminateOfbiz(group: ofbizServer,

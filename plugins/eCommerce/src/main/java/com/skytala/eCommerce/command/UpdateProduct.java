@@ -3,6 +3,7 @@ package com.skytala.eCommerce.command;
 import org.apache.ofbiz.entity.Delegator;
 import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
+import org.apache.ofbiz.entity.GenericEntityNotFoundException;
 import org.apache.ofbiz.entity.GenericValue;
 
 import com.skytala.eCommerce.control.Broker;
@@ -40,6 +41,9 @@ public class UpdateProduct implements Command{
 			success = true;
 		} catch (GenericEntityException e) {
 			e.printStackTrace();
+			if(e.getCause().getClass().equals(GenericEntityNotFoundException.class)) {
+				throw new RecordNotFoundException(Product.class);
+			}
 			success = false;
 		}
 		

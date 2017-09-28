@@ -7,8 +7,8 @@
     <test-group case-name="testtests">
 
 
-        <junit-test-suite class-name="com.skytala.eCommerce.test.Sometest"/>
-       	<junit-test-suite class-name="com.skytala.eCommerce.test.AnotherTest"/>
+
+       	<junit-test-suite class-name="com.skytala.eCommerce.test.ProductControllerTest"/>
 
     </test-group>
 </test-suite>
