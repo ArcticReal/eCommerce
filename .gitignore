@@ -21,6 +21,7 @@ runtime/indexes/products/
 !runtime/tempfiles/README
 applications/content/index/
 changelog
+plugins/eCommerce/config/swagger.conf
 .classpath
 .project
 .settings
