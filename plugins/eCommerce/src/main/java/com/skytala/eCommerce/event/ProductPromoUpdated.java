@@ -2,11 +2,11 @@ package com.skytala.eCommerce.event;
 
 import com.skytala.eCommerce.control.Event;
 
-public class ProductPriceAdded implements Event{
+public class ProductPromoUpdated implements Event{
 
 	private boolean success;
 
-	public ProductPriceAdded(boolean success) {
+	public ProductPromoUpdated(boolean success) {
 		this.setSuccess(success);
 	}
 
