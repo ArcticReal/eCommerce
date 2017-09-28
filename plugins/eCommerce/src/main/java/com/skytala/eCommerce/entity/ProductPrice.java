@@ -1,10 +1,13 @@
 package com.skytala.eCommerce.entity;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.Map;
 
-public class ProductPrice {
+public class ProductPrice implements Serializable {
 
+	private static final long serialVersionUID = 1L;
 	private String productId;
 	private String productPriceTypeId;
 	private String productPricePurposeId;
@@ -27,16 +30,6 @@ public class ProductPrice {
 	private Timestamp lastModifiedDate;
 	private String lastModifiedByUserLogin;
 
-	public ProductPrice() {
-		this.setCurrencyUomId("EUR");
-		this.setProductStoreGroupId("SKYTALA_GROUP");
-		Timestamp currentDate = new Timestamp(System.currentTimeMillis());
-		currentDate.setNanos(0);
-		this.setFromDate(currentDate);
-		this.setProductPricePurposeId("PURCHASE");
-		
-	}
-	
 	public String getProductId() {
 		return productId;
 	}
@@ -205,4 +198,7 @@ public class ProductPrice {
 		this.lastModifiedByUserLogin = lastModifiedByUserLogin;
 	}
 
+	public Map<String, Object> mapAttributeField() {
+		return ProductPriceMapper.map(this);
+	}
 }

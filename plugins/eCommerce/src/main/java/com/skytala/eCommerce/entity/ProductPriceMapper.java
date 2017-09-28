@@ -350,9 +350,7 @@ public class ProductPriceMapper {
 
 		Map<String, String[]> paramMap = request.getParameterMap();
 
-		if (!paramMap.containsKey("productId")) {
-			throw new Exception("Error! Id required");
-		} else {
+		if (paramMap.containsKey("productId")) {
 			returnVal.setProductId(request.getParameter("productId"));
 		}
 

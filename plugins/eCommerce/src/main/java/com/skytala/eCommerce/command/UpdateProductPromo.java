@@ -4,21 +4,21 @@ import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
 import org.apache.ofbiz.entity.GenericValue;
 import com.skytala.eCommerce.control.Broker;
-import com.skytala.eCommerce.entity.ProductPrice;
-import com.skytala.eCommerce.event.ProductPriceUpdated;
+import com.skytala.eCommerce.entity.ProductPromo;
+import com.skytala.eCommerce.event.ProductPromoUpdated;
 import com.skytala.eCommerce.exceptions.RecordNotFoundException;
 
-public class UpdateProductPrice implements Command {
+public class UpdateProductPromo implements Command {
 
-private ProductPrice elementToBeUpdated;
+private ProductPromo elementToBeUpdated;
 
-public UpdateProductPrice(ProductPrice elementToBeUpdated){
+public UpdateProductPromo(ProductPromo elementToBeUpdated){
 this.elementToBeUpdated = elementToBeUpdated;
 }
-public ProductPrice getElementToBeUpdated() {
+public ProductPromo getElementToBeUpdated() {
 return elementToBeUpdated;
 }
-public void setElementToBeUpdated(ProductPrice elementToBeUpdated){
+public void setElementToBeUpdated(ProductPromo elementToBeUpdated){
 this.elementToBeUpdated = elementToBeUpdated;
 }
 
@@ -30,16 +30,16 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 
 boolean success;
 try{
-GenericValue newValue = delegator.makeValue("ProductPrice", elementToBeUpdated.mapAttributeField());
+GenericValue newValue = delegator.makeValue("ProductPromo", elementToBeUpdated.mapAttributeField());
 delegator.store(newValue);
 if(delegator.store(newValue) == 0) { 
-throw new RecordNotFoundException(ProductPrice.class); 
+throw new RecordNotFoundException(ProductPromo.class); 
 }
 success = true;
 } catch (GenericEntityException e) {
  System.err.println(e.getMessage()); 
 success = false;
 }
-Broker.instance().publish(new ProductPriceUpdated(success));
+Broker.instance().publish(new ProductPromoUpdated(success));
 }
 }

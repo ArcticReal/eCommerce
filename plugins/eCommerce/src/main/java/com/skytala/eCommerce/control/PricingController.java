@@ -45,7 +45,7 @@ public class PricingController {
 	public List<ProductPrice> findProductPricesBy(@RequestParam String productId,
 			@RequestParam String productPriceTypeId) {
 
-		FindProductPricesBy query = new FindProductPricesBy(productId, productPriceTypeId);
+		//FindProductPricesBy query = new FindProductPricesBy(productId, productPriceTypeId);
 
 		int usedTicketId;
 
@@ -57,7 +57,7 @@ public class PricingController {
 				event -> sendProductPricesFoundMessage(((ProductPricesFound) event).getFoundProductPrices(),
 						usedTicketId));
 
-		query.execute();
+		//query.execute();
 
 		while (!queryReturnVal.containsKey(usedTicketId)) {
 

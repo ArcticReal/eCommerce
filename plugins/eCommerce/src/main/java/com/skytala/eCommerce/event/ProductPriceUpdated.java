@@ -7,15 +7,14 @@ public class ProductPriceUpdated implements Event{
 	private boolean success;
 
 	public ProductPriceUpdated(boolean success) {
-		this.success = success;
+		this.setSuccess(success);
 	}
 
-	public boolean isSuccess() {
+	public boolean isSuccess()	{
 		return success;
 	}
 
-	public void setSuccess(boolean success) {
+	public void setSuccess(boolean success)	{
 		this.success = success;
 	}
-
 }
