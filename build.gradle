@@ -155,6 +155,7 @@ dependencies {
     compile 'org.springframework:spring-beans:4.2.3.RELEASE'
     compile 'org.springframework:spring-context:4.2.3.RELEASE'
     compile 'org.springframework:spring-webmvc:4.2.3.RELEASE'    
+    compile 'org.springframework:spring-tx:4.2.3.RELEASE'    
     compile 'com.fasterxml.jackson.core:jackson-databind:2.2'
     compile 'com.fasterxml.jackson.core:jackson-core:2.2'
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.2'
