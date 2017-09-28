@@ -20,11 +20,13 @@ import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,7 +57,6 @@ public class ProductControllerTest extends TestCase {
 	ObjectMapper objectMapper;
 
 	MockMvc mockMvc;
-
 
 	@Override
 	@Before
@@ -91,16 +92,6 @@ public class ProductControllerTest extends TestCase {
 
 		super.setUp();
 	}
-	
-	@Override
-	protected void tearDown() throws Exception {
-	
-		Delegator delegator = DelegatorFactory.getDelegator("test");
-		//delegator.rollback();
-		
-		super.tearDown();
-	}
-	
 
 	/**
 	 * Create test
@@ -117,16 +108,26 @@ public class ProductControllerTest extends TestCase {
 	 * 
 	 */
 	@Test
+	@Transactional
+	@Rollback
 	public void testCreateProductThatDoesntExist() throws JsonProcessingException, Exception {
 
 		Product product = new Product();
 		product.setProductId(DEFAULT_PRODUCT_ID);
 		product.setProductName(DEFAULT_PRODUCT_NAME);
 
-		mockMvc.perform(post("/products/add").contentType(MediaType.APPLICATION_JSON_UTF8)
-				.content(objectMapper.writeValueAsString(product))).andExpect(status().isCreated());
+		String contentExpected = mockMvc
+				.perform(post("/products/add").contentType(MediaType.APPLICATION_JSON_UTF8)
+						.content(objectMapper.writeValueAsString(product)))
+				.andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
 
-		mockMvc.perform(get("/products/" + DEFAULT_PRODUCT_ID)).andExpect(status().isNotFound());
+		Product createdProduct = objectMapper.readValue(contentExpected, Product.class);
+
+		String contentIs = mockMvc.perform(get("/products/" + createdProduct.getProductId())).andExpect(status().isOk())
+				.andReturn().getResponse().getContentAsString();
+		
+		assertEquals(contentIs, contentExpected);
+		
 	}
 
 	/**
@@ -212,13 +213,11 @@ public class ProductControllerTest extends TestCase {
 		product.setProductName(UPDATED_PRODUCT_NAME);
 
 		mockMvc.perform(put("/products/" + EXISTING_PRODUCT_ID_NON_DELETABLE)
-				.contentType(MediaType.APPLICATION_JSON_UTF8)
-				.content(objectMapper.writeValueAsString(product)))
-		.andExpect(status().isNoContent());
+				.contentType(MediaType.APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(product)))
+				.andExpect(status().isNoContent());
 
-		mockMvc.perform(get("/products/" + EXISTING_PRODUCT_ID_NON_DELETABLE))
-		.andExpect(status().isOk())
-				.andExpect(jsonPath("$[0].productName").value(UPDATED_PRODUCT_NAME));
+		mockMvc.perform(get("/products/" + EXISTING_PRODUCT_ID_NON_DELETABLE)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.productName").value(UPDATED_PRODUCT_NAME));
 
 	}
 
@@ -243,9 +242,8 @@ public class ProductControllerTest extends TestCase {
 		product.setProductId(NON_EXISTING_PRODUCT_ID);
 		product.setProductName(UPDATED_PRODUCT_NAME);
 
-		mockMvc.perform(put("/products/" + NON_EXISTING_PRODUCT_ID)
-				.contentType(MediaType.APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(product)))
-				.andExpect(status().isNotFound());
+		mockMvc.perform(put("/products/" + NON_EXISTING_PRODUCT_ID).contentType(MediaType.APPLICATION_JSON_UTF8)
+				.content(objectMapper.writeValueAsString(product))).andExpect(status().isNotFound());
 
 		mockMvc.perform(get("/products/" + NON_EXISTING_PRODUCT_ID)).andExpect(status().isNotFound());
 
@@ -273,11 +271,12 @@ public class ProductControllerTest extends TestCase {
 		product.setProductName(UPDATED_PRODUCT_NAME);
 		product.setFacilityId(INVALID_FACILITY_ID);
 
-		mockMvc.perform(put("/products/" + EXISTING_PRODUCT_ID_NON_DELETABLE).contentType(MediaType.APPLICATION_JSON_UTF8)
-				.content(objectMapper.writeValueAsString(product))).andExpect(status().isConflict());
+		mockMvc.perform(put("/products/" + EXISTING_PRODUCT_ID_NON_DELETABLE)
+				.contentType(MediaType.APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(product)))
+				.andExpect(status().isConflict());
 
 		mockMvc.perform(get("/products/" + EXISTING_PRODUCT_ID_NON_DELETABLE)).andExpect(status().isOk())
-				.andExpect(jsonPath("$[0].productName").value(EXISTING_PRODUCT_NAME));
+				.andExpect(jsonPath("$.productName").value(EXISTING_PRODUCT_NAME));
 	}
 
 	/**
@@ -303,9 +302,8 @@ public class ProductControllerTest extends TestCase {
 		product.setProductName(UPDATED_PRODUCT_NAME);
 		product.setFacilityId(INVALID_FACILITY_ID);
 
-		mockMvc.perform(put("/products/" + NON_EXISTING_PRODUCT_ID)
-				.contentType(MediaType.APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(product)))
-				.andExpect(status().isNotFound());
+		mockMvc.perform(put("/products/" + NON_EXISTING_PRODUCT_ID).contentType(MediaType.APPLICATION_JSON_UTF8)
+				.content(objectMapper.writeValueAsString(product))).andExpect(status().isNotFound());
 
 		mockMvc.perform(get("/products/" + NON_EXISTING_PRODUCT_ID)).andExpect(status().isNotFound());
 
@@ -328,7 +326,7 @@ public class ProductControllerTest extends TestCase {
 	@Test
 	public void testGetExistingProduct() throws Exception {
 		mockMvc.perform(get("/products/" + EXISTING_PRODUCT_ID_NON_DELETABLE)).andExpect(status().isOk())
-				.andExpect(jsonPath("$[0].productId", containsString(EXISTING_PRODUCT_ID_NON_DELETABLE)));
+				.andExpect(jsonPath("$.productId", containsString(EXISTING_PRODUCT_ID_NON_DELETABLE)));
 
 	}
 
@@ -370,9 +368,8 @@ public class ProductControllerTest extends TestCase {
 		String result = mockMvc.perform(delete("/products/" + EXISTING_PRODUCT_ID_DELETABLE))
 				.andExpect(status().isNoContent()).andReturn().getResponse().getContentAsString();
 
-
 		assertEquals(result, "");
-		
+
 		mockMvc.perform(get("/products/" + EXISTING_PRODUCT_ID_DELETABLE)).andExpect(status().isNotFound());
 
 	}
@@ -398,7 +395,7 @@ public class ProductControllerTest extends TestCase {
 				.andExpect(jsonPath("$").value("Product could not be deleted"));
 
 		mockMvc.perform(get("/products/" + EXISTING_PRODUCT_ID_NON_DELETABLE)).andExpect(status().isOk())
-				.andExpect(jsonPath("$[0].productId").value(EXISTING_PRODUCT_ID_NON_DELETABLE));
+				.andExpect(jsonPath("$.productId").value(EXISTING_PRODUCT_ID_NON_DELETABLE));
 
 	}
 

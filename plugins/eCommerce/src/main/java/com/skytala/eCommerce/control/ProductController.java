@@ -39,7 +39,7 @@ import com.skytala.eCommerce.query.FindProductsBy;
 public class ProductController {
 
 	private static int requestTicketId = 0;
-	private static Map<Integer, Boolean> commandReturnVal = new HashMap<>();
+	private static Map<Integer, Event> commandReturnVal = new HashMap<>();
 	private static Map<Integer, List<Product>> queryReturnVal = new HashMap<>();
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();
 
@@ -60,10 +60,9 @@ public class ProductController {
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
 	public ResponseEntity<Object> findProductsBy(@RequestParam(required = false) Map<String, String> allRequestParams) {
-		
 
 		FindProductsBy query = new FindProductsBy(allRequestParams);
-		if(allRequestParams == null) {
+		if (allRequestParams == null) {
 			query.setFilter(new HashMap<>());
 		}
 
@@ -81,7 +80,13 @@ public class ProductController {
 		while (!queryReturnVal.containsKey(usedTicketId)) {
 
 		}
-		return ResponseEntity.ok().body(queryReturnVal.remove(usedTicketId));
+
+		List<Product> products = queryReturnVal.remove(usedTicketId);
+
+		if (products.size() == 1) {
+			return ResponseEntity.ok().body(products.get(0));
+		}
+		return ResponseEntity.ok().body(products);
 
 	}
 
@@ -132,7 +137,7 @@ public class ProductController {
 			requestTicketId++;
 		}
 		Broker.instance().subscribe(ProductAdded.class,
-				event -> sendProductChangedMessage(((ProductAdded) event).isSuccess(), usedTicketId));
+				event -> sendProductChangedMessage(((ProductAdded) event), usedTicketId));
 
 		try {
 			Scheduler.instance().schedule(com).executeNext();
@@ -145,9 +150,10 @@ public class ProductController {
 		while (!commandReturnVal.containsKey(usedTicketId)) {
 		}
 
-		if (commandReturnVal.remove(usedTicketId)) {
+		ProductAdded event = (ProductAdded) commandReturnVal.remove(usedTicketId);
+		if (event.isSuccess()) {
 
-			return ResponseEntity.status(HttpStatus.CREATED).body("Product was created successfully.");
+			return ResponseEntity.status(HttpStatus.CREATED).body(event.getAddedProduct());
 
 		}
 		return ResponseEntity.status(HttpStatus.CONFLICT).body("Product could not be created.");
@@ -222,7 +228,7 @@ public class ProductController {
 			requestTicketId++;
 		}
 		Broker.instance().subscribe(ProductUpdated.class,
-				event -> sendProductChangedMessage(((ProductUpdated) event).isSuccess(), usedTicketId));
+				event -> sendProductChangedMessage(((ProductUpdated) event), usedTicketId));
 
 		try {
 			Scheduler.instance().schedule(com).executeNext();
@@ -237,7 +243,7 @@ public class ProductController {
 		while (!commandReturnVal.containsKey(usedTicketId)) {
 		}
 
-		if (commandReturnVal.remove(usedTicketId)) {
+		if (((ProductUpdated) commandReturnVal.remove(usedTicketId)).isSuccess()) {
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 
 		}
@@ -268,7 +274,7 @@ public class ProductController {
 			requestTicketId++;
 		}
 		Broker.instance().subscribe(ProductDeleted.class,
-				event -> sendProductChangedMessage(((ProductDeleted) event).isSuccess(), usedTicketId));
+				event -> sendProductChangedMessage(((ProductDeleted) event), usedTicketId));
 
 		try {
 			Scheduler.instance().schedule(com).executeNext();
@@ -280,11 +286,11 @@ public class ProductController {
 		while (!commandReturnVal.containsKey(usedTicketId)) {
 		}
 
-		return commandReturnVal.remove(usedTicketId);
+		return ((ProductDeleted) commandReturnVal.remove(usedTicketId)).isSuccess();
 	}
 
-	public void sendProductChangedMessage(boolean success, int usedTicketId) {
-		commandReturnVal.put(usedTicketId, success);
+	public void sendProductChangedMessage(Event event, int usedTicketId) {
+		commandReturnVal.put(usedTicketId, event);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{productId}")
@@ -293,8 +299,8 @@ public class ProductController {
 		requestParams.put("productId", productId);
 		try {
 
-			ResponseEntity<Object> retVal = findProductsBy(requestParams);
-			return retVal;
+			Object foundProduct = findProductsBy(requestParams).getBody();
+			return ResponseEntity.status(HttpStatus.OK).body(foundProduct);
 		} catch (RecordNotFoundException e) {
 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -314,11 +320,11 @@ public class ProductController {
 			requestTicketId++;
 		}
 		Broker.instance().subscribe(ProductDeleted.class,
-				event -> sendProductChangedMessage(((ProductDeleted) event).isSuccess(), usedTicketId));
+				event -> sendProductChangedMessage(((ProductDeleted) event), usedTicketId));
 
 		try {
 			Scheduler.instance().schedule(com).executeNext();
-		} catch(RecordNotFoundException e) {
+		} catch (RecordNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -329,7 +335,7 @@ public class ProductController {
 		while (!commandReturnVal.containsKey(usedTicketId)) {
 		}
 
-		if (commandReturnVal.remove(usedTicketId)) {
+		if (((ProductDeleted) commandReturnVal.remove(usedTicketId)).isSuccess()) {
 
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 
