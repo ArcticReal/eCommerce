@@ -1,21 +1,21 @@
-package com.skytala.eCommerce.domain.userLogin.command;
+package com.skytala.eCommerce.domain.productStore.command;
 
 import org.apache.ofbiz.entity.Delegator;
 import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
 import org.apache.ofbiz.entity.GenericValue;
 
-import com.skytala.eCommerce.domain.userLogin.event.UserLoginAdded;
-import com.skytala.eCommerce.domain.userLogin.model.UserLogin;
+import com.skytala.eCommerce.domain.productStore.event.ProductStoreAdded;
+import com.skytala.eCommerce.domain.productStore.model.ProductStore;
 import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Command;
 import com.skytala.eCommerce.framework.pubsub.Event;
 
-public class AddUserLogin extends Command {
+public class AddProductStore extends Command {
 
-	private UserLogin elementToBeAdded;
+	private ProductStore elementToBeAdded;
 
-	public AddUserLogin(UserLogin elementToBeAdded) {
+	public AddProductStore(ProductStore elementToBeAdded) {
 		this.elementToBeAdded = elementToBeAdded;
 	}
 
@@ -26,16 +26,16 @@ public class AddUserLogin extends Command {
 
 		boolean success;
 		try {
-			elementToBeAdded.setUserLoginId(delegator.getNextSeqId("UserLogin"));
-			GenericValue newValue = delegator.makeValue("UserLogin", elementToBeAdded.mapAttributeField());
+			elementToBeAdded.setProductStoreId(delegator.getNextSeqId("ProductStore"));
+			GenericValue newValue = delegator.makeValue("ProductStore", elementToBeAdded.mapAttributeField());
 			delegator.create(newValue);
 			success = true;
 		} catch (GenericEntityException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 			success = false;
 		}
 
-		Broker.instance().publish(new UserLoginAdded(null, success));
+		Broker.instance().publish(new ProductStoreAdded(elementToBeAdded, success));
 		return null;
 	}
 }

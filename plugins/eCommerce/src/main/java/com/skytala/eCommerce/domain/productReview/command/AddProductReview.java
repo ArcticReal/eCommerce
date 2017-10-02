@@ -7,7 +7,6 @@ import org.apache.ofbiz.entity.GenericValue;
 
 import com.skytala.eCommerce.domain.productReview.event.ProductReviewAdded;
 import com.skytala.eCommerce.domain.productReview.model.ProductReview;
-import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Command;
 import com.skytala.eCommerce.framework.pubsub.Event;
@@ -26,6 +25,7 @@ public class AddProductReview extends Command {
 		Delegator delegator = DelegatorFactory.getDelegator("default");
 
 		boolean success;
+		ProductReview addedReview = null;
 		try {
 			elementToBeAdded.setProductReviewId(delegator.getNextSeqId("ProductReview"));
 			GenericValue newValue = delegator.makeValue("ProductReview", elementToBeAdded.mapAttributeField());
@@ -36,7 +36,8 @@ public class AddProductReview extends Command {
 			success = false;
 		}
 
-		Broker.instance().publish(new ProductReviewAdded(success));
-		return null;
+		Event resultingEvent = new ProductReviewAdded(addedReview, success);
+		Broker.instance().publish(resultingEvent);
+		return resultingEvent;
 	}
 }

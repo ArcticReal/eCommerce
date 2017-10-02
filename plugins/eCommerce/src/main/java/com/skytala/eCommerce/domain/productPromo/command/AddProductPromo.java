@@ -36,7 +36,7 @@ public class AddProductPromo extends Command {
 			success = false;
 		}
 
-		Broker.instance().publish(new ProductPromoAdded(success));
+		Broker.instance().publish(new ProductPromoAdded(null, success));
 		return null;
 	}
 }

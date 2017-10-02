@@ -35,7 +35,7 @@ public class AddProductPrice extends Command {
 			success = false;
 		}
 
-		Broker.instance().publish(new ProductPriceAdded(success));
+		Broker.instance().publish(new ProductPriceAdded(null, success));
 		return null;
 	}
 }
