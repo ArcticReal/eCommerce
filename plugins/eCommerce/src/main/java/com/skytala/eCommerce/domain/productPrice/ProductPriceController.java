@@ -33,16 +33,12 @@ import com.skytala.eCommerce.domain.productPrice.mapper.ProductPriceMapper;
 import com.skytala.eCommerce.domain.productPrice.model.ProductPrice;
 import com.skytala.eCommerce.domain.productPrice.query.FindProductPricesBy;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
 @RequestMapping("/productPrices")
 public class ProductPriceController {
 
-	private static int requestTicketId = 0;
-	private static Map<Integer, Boolean> commandReturnVal = new HashMap<>();
-	private static Map<Integer, List<ProductPrice>> queryReturnVal = new HashMap<>();
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();
 
 	public ProductPriceController() {
@@ -51,7 +47,6 @@ public class ProductPriceController {
 		validRequests.put("add", RequestMethod.POST);
 		validRequests.put("update", RequestMethod.PUT);
 		validRequests.put("removeById", RequestMethod.DELETE);
-
 	}
 
 	/**
@@ -59,32 +54,24 @@ public class ProductPriceController {
 	 * @param allRequestParams
 	 *            all params by which you want to find a ProductPrice
 	 * @return a List with the ProductPrices
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findProductPricesBy(@RequestParam Map<String, String> allRequestParams) {
+	public ResponseEntity<Object> findProductPricesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductPricesBy query = new FindProductPricesBy(allRequestParams);
-
-		int usedTicketId;
-
-		synchronized (ProductPriceController.class) {
-			usedTicketId = requestTicketId;
-			requestTicketId++;
+		if (allRequestParams == null) {
+			query.setFilter(new HashMap<>());
 		}
-		Broker.instance().subscribe(ProductPriceFound.class,
-				event -> sendProductPricesFoundMessage(((ProductPriceFound) event).getProductPrices(), usedTicketId));
 
-		query.execute();
+		List<ProductPrice> productPrices =((ProductPriceFound) Scheduler.execute(query).data()).getProductPrices();
 
-		while (!queryReturnVal.containsKey(usedTicketId)) {
-
+		if (productPrices.size() == 1) {
+			return ResponseEntity.ok().body(productPrices.get(0));
 		}
-		return ResponseEntity.ok().body(queryReturnVal.remove(usedTicketId));
 
-	}
+		return ResponseEntity.ok().body(productPrices);
 
-	public void sendProductPricesFoundMessage(List<ProductPrice> productPrices, int usedTicketId) {
-		queryReturnVal.put(usedTicketId, productPrices);
 	}
 
 	/**
@@ -96,7 +83,7 @@ public class ProductPriceController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductPrice(HttpServletRequest request) {
+	public ResponseEntity<Object> createProductPrice(HttpServletRequest request) throws Exception {
 
 		ProductPrice productPriceToBeAdded = new ProductPrice();
 		try {
@@ -119,42 +106,17 @@ public class ProductPriceController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductPrice(@RequestBody ProductPrice productPriceToBeAdded) {
+	public ResponseEntity<Object> createProductPrice(@RequestBody ProductPrice productPriceToBeAdded) throws Exception {
 
 		AddProductPrice command = new AddProductPrice(productPriceToBeAdded);
+		ProductPrice productPrice = ((ProductPriceAdded) Scheduler.execute(command).data()).getAddedProductPrice();
 		
-		int usedTicketId;
-		synchronized (ProductPriceController.class) {
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		
-		// Success-Handler for adding a product
-		Broker.instance().subscribe(ProductPriceAdded.class,
-				event -> sendProductPriceChangedMessage(((ProductPriceAdded) event).isSuccess(), usedTicketId));
-	
-		
-		try {
-			// Add the product to the database (command pattern!)
-			Scheduler.instance().schedule(command).executeNext();
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
-			e.printStackTrace();
-			
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-						         .body("An Error ocuured while processing Command!");
-		}
-		
-		
-		while (!commandReturnVal.containsKey(usedTicketId)) {}
-
-		
-		if (commandReturnVal.remove(usedTicketId))
+		if (productPrice != null) 
 			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body("ProductPrice was created successfully.");
+					             .body(productPrice);
 		else 
 			return ResponseEntity.status(HttpStatus.CONFLICT)
-								 .body("ProductPrice could not be created.");
+					             .body("ProductPrice could not be created.");
 	}
 
 	/**
@@ -164,9 +126,10 @@ public class ProductPriceController {
 	 * @param request
 	 *            HttpServletRequest object
 	 * @return true on success, false on fail
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductPrice(HttpServletRequest request) {
+	public boolean updateProductPrice(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
 		String data = null;
@@ -194,6 +157,10 @@ public class ProductPriceController {
 			return false;
 		}
 
+		if (updateProductPrice(productPriceToBeUpdated, productPriceToBeUpdated.getProductId()).getStatusCode()
+				.equals(HttpStatus.NO_CONTENT)) {
+			return true;
+		}
 		return false;
 
 	}
@@ -204,96 +171,34 @@ public class ProductPriceController {
 	 * @param productPriceToBeUpdated
 	 *            the ProductPrice thats to be updated
 	 * @return true on success, false on fail
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{productPriceId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<Object> updateProductPrice(@RequestBody ProductPrice productPriceToBeUpdated,
-			@PathVariable String productPriceId) {
+			@PathVariable String productPriceId) throws Exception { // FIXME primary key 
 
-		// productPriceToBeUpdated.setProductPriceId(productPriceId);
+		productPriceToBeUpdated.setProductId(productPriceId);// FIXME 
 
-		UpdateProductPrice com = new UpdateProductPrice(productPriceToBeUpdated);
-
-		int usedTicketId;
-
-		synchronized (ProductPriceController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(ProductPriceUpdated.class,
-				event -> sendProductPriceChangedMessage(((ProductPriceUpdated) event).isSuccess(), usedTicketId));
+		UpdateProductPrice command = new UpdateProductPrice(productPriceToBeUpdated);
 
 		try {
-			Scheduler.instance().schedule(com).executeNext();
+			if(((ProductPriceUpdated) Scheduler.execute(command).data()).isSuccess()) 
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
 		} catch (RecordNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An internal error occured");
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
-		}
-
-		if (commandReturnVal.remove(usedTicketId)) {
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-
 		}
 
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	/**
-	 * removes a ProductPrice from the database
-	 * 
-	 * @deprecated
-	 * @param productPriceId:
-	 *            the id of the ProductPrice thats to be removed
-	 * 
-	 * @return true on success; false on fail
-	 * 
-	 */
-	@RequestMapping(method = RequestMethod.DELETE, value = "/removeById")
-	public boolean deleteproductPriceById(@RequestParam(value = "productPriceId") String productPriceId) {
-
-		DeleteProductPrice com = new DeleteProductPrice(productPriceId);
-
-		int usedTicketId;
-
-		synchronized (ProductPriceController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(ProductPriceDeleted.class,
-				event -> sendProductPriceChangedMessage(((ProductPriceDeleted) event).isSuccess(), usedTicketId));
-
-		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
-		}
-
-		return commandReturnVal.remove(usedTicketId);
-	}
-
-	public void sendProductPriceChangedMessage(boolean success, int usedTicketId) {
-		commandReturnVal.put(usedTicketId, success);
-	}
-
 	@RequestMapping(method = RequestMethod.GET, value = "/{productPriceId}")
-	public ResponseEntity<Object> findById(@PathVariable String productPriceId) {
+	public ResponseEntity<Object> findById(@PathVariable String productPriceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productPriceId", productPriceId);
 		try {
 
-			ResponseEntity<Object> retVal = findProductPricesBy(requestParams);
-			return retVal;
+			Object foundProductPrice = findProductPricesBy(requestParams).getBody();
+			return ResponseEntity.status(HttpStatus.OK).body(foundProductPrice);
 		} catch (RecordNotFoundException e) {
 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -302,35 +207,16 @@ public class ProductPriceController {
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{productPriceId}")
-	public ResponseEntity<Object> deleteProductPriceByIdUpdated(@PathVariable String productPriceId) {
-		DeleteProductPrice com = new DeleteProductPrice(productPriceId);
-
-		int usedTicketId;
-
-		synchronized (ProductPriceController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(ProductPriceDeleted.class,
-				event -> sendProductPriceChangedMessage(((ProductPriceDeleted) event).isSuccess(), usedTicketId));
+	public ResponseEntity<Object> deleteProductPriceByIdUpdated(@PathVariable String productPriceId) throws Exception {
+		DeleteProductPrice command = new DeleteProductPrice(productPriceId);
 
 		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("An Error ocuured while processing Command!");
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
+			if (((ProductPriceDeleted) Scheduler.execute(command).data()).isSuccess())
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+		} catch (RecordNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 
-		if (commandReturnVal.remove(usedTicketId)) {
-
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-
-		}
 		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductPrice could not be deleted");
 
 	}

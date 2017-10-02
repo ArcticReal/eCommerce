@@ -79,4 +79,9 @@ public class FindProductPricesBy extends Query {
 		}
 		return true;
 	}
+	
+	public void setFilter(Map<String, String> filter) {
+		this.filter = filter;
+	}
+
 }

@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,16 +32,13 @@ import com.skytala.eCommerce.domain.party.event.PartyUpdated;
 import com.skytala.eCommerce.domain.party.mapper.PartyMapper;
 import com.skytala.eCommerce.domain.party.model.Party;
 import com.skytala.eCommerce.domain.party.query.FindPartysBy;
-import com.skytala.eCommerce.framework.pubsub.Broker;
+import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
 @RequestMapping("/partys")
 public class PartyController {
 
-	private static int requestTicketId = 0;
-	private static Map<Integer, Boolean> commandReturnVal = new HashMap<>();
-	private static Map<Integer, List<Party>> queryReturnVal = new HashMap<>();
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();
 
 	public PartyController() {
@@ -49,7 +47,6 @@ public class PartyController {
 		validRequests.put("add", RequestMethod.POST);
 		validRequests.put("update", RequestMethod.PUT);
 		validRequests.put("removeById", RequestMethod.DELETE);
-
 	}
 
 	/**
@@ -57,32 +54,24 @@ public class PartyController {
 	 * @param allRequestParams
 	 *            all params by which you want to find a Party
 	 * @return a List with the Partys
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findPartysBy(@RequestParam Map<String, String> allRequestParams) {
+	public ResponseEntity<Object> findPartysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartysBy query = new FindPartysBy(allRequestParams);
-
-		int usedTicketId;
-
-		synchronized (PartyController.class) {
-			usedTicketId = requestTicketId;
-			requestTicketId++;
+		if (allRequestParams == null) {
+			query.setFilter(new HashMap<>());
 		}
-		Broker.instance().subscribe(PartyFound.class,
-				event -> sendPartysFoundMessage(((PartyFound) event).getPartys(), usedTicketId));
 
-		query.execute();
+		List<Party> partys =((PartyFound) Scheduler.execute(query).data()).getPartys();
 
-		while (!queryReturnVal.containsKey(usedTicketId)) {
-
+		if (partys.size() == 1) {
+			return ResponseEntity.ok().body(partys.get(0));
 		}
-		return ResponseEntity.ok().body(queryReturnVal.remove(usedTicketId));
 
-	}
+		return ResponseEntity.ok().body(partys);
 
-	public void sendPartysFoundMessage(List<Party> partys, int usedTicketId) {
-		queryReturnVal.put(usedTicketId, partys);
 	}
 
 	/**
@@ -94,7 +83,7 @@ public class PartyController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public boolean createParty(HttpServletRequest request) {
+	public ResponseEntity<Object> createParty(HttpServletRequest request) throws Exception {
 
 		Party partyToBeAdded = new Party();
 		try {
@@ -102,7 +91,7 @@ public class PartyController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return false;
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
 		}
 
 		return this.createParty(partyToBeAdded);
@@ -117,31 +106,17 @@ public class PartyController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public boolean createParty(Party partyToBeAdded) {
+	public ResponseEntity<Object> createParty(@RequestBody Party partyToBeAdded) throws Exception {
 
-		AddParty com = new AddParty(partyToBeAdded);
-		int usedTicketId;
-
-		synchronized (PartyController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(PartyAdded.class,
-				event -> sendPartyChangedMessage(((PartyAdded) event).isSuccess(), usedTicketId));
-
-		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
-		}
-
-		return commandReturnVal.remove(usedTicketId);
-
+		AddParty command = new AddParty(partyToBeAdded);
+		Party party = ((PartyAdded) Scheduler.execute(command).data()).getAddedParty();
+		
+		if (party != null) 
+			return ResponseEntity.status(HttpStatus.CREATED)
+					             .body(party);
+		else 
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					             .body("Party could not be created.");
 	}
 
 	/**
@@ -151,9 +126,10 @@ public class PartyController {
 	 * @param request
 	 *            HttpServletRequest object
 	 * @return true on success, false on fail
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateParty(HttpServletRequest request) {
+	public boolean updateParty(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
 		String data = null;
@@ -181,7 +157,11 @@ public class PartyController {
 			return false;
 		}
 
-		return updateParty(partyToBeUpdated, partyToBeUpdated.getPartyId());
+		if (updateParty(partyToBeUpdated, partyToBeUpdated.getPartyId()).getStatusCode()
+				.equals(HttpStatus.NO_CONTENT)) {
+			return true;
+		}
+		return false;
 
 	}
 
@@ -191,117 +171,52 @@ public class PartyController {
 	 * @param partyToBeUpdated
 	 *            the Party thats to be updated
 	 * @return true on success, false on fail
+	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/{partyId}/update", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public boolean updateParty(Party partyToBeUpdated, @PathVariable String partyId) {
+	@RequestMapping(method = RequestMethod.PUT, value = "/{partyId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<Object> updateParty(@RequestBody Party partyToBeUpdated,
+			@PathVariable String partyId) throws Exception {
 
 		partyToBeUpdated.setPartyId(partyId);
 
-		UpdateParty com = new UpdateParty(partyToBeUpdated);
-
-		int usedTicketId;
-
-		synchronized (PartyController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(PartyUpdated.class,
-				event -> sendPartyChangedMessage(((PartyUpdated) event).isSuccess(), usedTicketId));
+		UpdateParty command = new UpdateParty(partyToBeUpdated);
 
 		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
+			if(((PartyUpdated) Scheduler.execute(command).data()).isSuccess()) 
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+		} catch (RecordNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 
-		return commandReturnVal.remove(usedTicketId);
-	}
-
-	/**
-	 * removes a Party from the database
-	 * 
-	 * @deprecated
-	 * @param partyId:
-	 *            the id of the Party thats to be removed
-	 * 
-	 * @return true on success; false on fail
-	 * 
-	 */
-	@RequestMapping(method = RequestMethod.DELETE, value = "/removeById")
-	public boolean deletepartyById(@RequestParam(value = "partyId") String partyId) {
-
-		DeleteParty com = new DeleteParty(partyId);
-
-		int usedTicketId;
-
-		synchronized (PartyController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(PartyDeleted.class,
-				event -> sendPartyChangedMessage(((PartyDeleted) event).isSuccess(), usedTicketId));
-
-		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
-		}
-
-		return commandReturnVal.remove(usedTicketId);
-	}
-
-	public void sendPartyChangedMessage(boolean success, int usedTicketId) {
-		commandReturnVal.put(usedTicketId, success);
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{partyId}")
-	public ResponseEntity<Object> findById(@PathVariable String partyId) {
+	public ResponseEntity<Object> findById(@PathVariable String partyId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyId", partyId);
+		try {
 
-		return findPartysBy(requestParams);
+			Object foundParty = findPartysBy(requestParams).getBody();
+			return ResponseEntity.status(HttpStatus.OK).body(foundParty);
+		} catch (RecordNotFoundException e) {
+
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyId}")
-	public ResponseEntity<Object> deletePartyByIdUpdated(@PathVariable String partyId) {
-		DeleteParty com = new DeleteParty(partyId);
-
-		int usedTicketId;
-
-		synchronized (PartyController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(PartyDeleted.class,
-				event -> sendPartyChangedMessage(((PartyDeleted) event).isSuccess(), usedTicketId));
+	public ResponseEntity<Object> deletePartyByIdUpdated(@PathVariable String partyId) throws Exception {
+		DeleteParty command = new DeleteParty(partyId);
 
 		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("An Error ocuured while processing Command!");
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
+			if (((PartyDeleted) Scheduler.execute(command).data()).isSuccess())
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+		} catch (RecordNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 
-		if (commandReturnVal.remove(usedTicketId)) {
-
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Party was deleted successfully.");
-
-		}
 		return ResponseEntity.status(HttpStatus.CONFLICT).body("Party could not be deleted");
 
 	}

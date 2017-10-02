@@ -33,16 +33,12 @@ import com.skytala.eCommerce.domain.productCategory.mapper.ProductCategoryMapper
 import com.skytala.eCommerce.domain.productCategory.model.ProductCategory;
 import com.skytala.eCommerce.domain.productCategory.query.FindProductCategorysBy;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
 @RequestMapping("/productCategorys")
 public class ProductCategoryController {
 
-	private static int requestTicketId = 0;
-	private static Map<Integer, Boolean> commandReturnVal = new HashMap<>();
-	private static Map<Integer, List<ProductCategory>> queryReturnVal = new HashMap<>();
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();
 
 	public ProductCategoryController() {
@@ -51,7 +47,6 @@ public class ProductCategoryController {
 		validRequests.put("add", RequestMethod.POST);
 		validRequests.put("update", RequestMethod.PUT);
 		validRequests.put("removeById", RequestMethod.DELETE);
-
 	}
 
 	/**
@@ -59,33 +54,24 @@ public class ProductCategoryController {
 	 * @param allRequestParams
 	 *            all params by which you want to find a ProductCategory
 	 * @return a List with the ProductCategorys
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findProductCategorysBy(@RequestParam Map<String, String> allRequestParams) {
+	public ResponseEntity<Object> findProductCategorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductCategorysBy query = new FindProductCategorysBy(allRequestParams);
-
-		int usedTicketId;
-
-		synchronized (ProductCategoryController.class) {
-			usedTicketId = requestTicketId;
-			requestTicketId++;
+		if (allRequestParams == null) {
+			query.setFilter(new HashMap<>());
 		}
-		Broker.instance().subscribe(ProductCategoryFound.class,
-				event -> sendProductCategorysFoundMessage(((ProductCategoryFound) event).getProductCategorys(),
-						usedTicketId));
 
-		query.execute();
+		List<ProductCategory> productCategorys =((ProductCategoryFound) Scheduler.execute(query).data()).getProductCategorys();
 
-		while (!queryReturnVal.containsKey(usedTicketId)) {
-
+		if (productCategorys.size() == 1) {
+			return ResponseEntity.ok().body(productCategorys.get(0));
 		}
-		return ResponseEntity.ok().body(queryReturnVal.remove(usedTicketId));
 
-	}
+		return ResponseEntity.ok().body(productCategorys);
 
-	public void sendProductCategorysFoundMessage(List<ProductCategory> productCategorys, int usedTicketId) {
-		queryReturnVal.put(usedTicketId, productCategorys);
 	}
 
 	/**
@@ -97,7 +83,7 @@ public class ProductCategoryController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductCategory(HttpServletRequest request) {
+	public ResponseEntity<Object> createProductCategory(HttpServletRequest request) throws Exception {
 
 		ProductCategory productCategoryToBeAdded = new ProductCategory();
 		try {
@@ -120,37 +106,17 @@ public class ProductCategoryController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductCategory(@RequestBody ProductCategory productCategoryToBeAdded) {
+	public ResponseEntity<Object> createProductCategory(@RequestBody ProductCategory productCategoryToBeAdded) throws Exception {
 
-		AddProductCategory com = new AddProductCategory(productCategoryToBeAdded);
-		int usedTicketId;
-
-		synchronized (ProductCategoryController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(ProductCategoryAdded.class,
-				event -> sendProductCategoryChangedMessage(((ProductCategoryAdded) event).isSuccess(), usedTicketId));
-
-		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("An Error ocuured while processing Command!");
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
-		}
-
-		if (commandReturnVal.remove(usedTicketId)) {
-
-			return ResponseEntity.status(HttpStatus.CREATED).body("ProductCategory was created successfully.");
-
-		}
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductCategory could not be created.");
-
+		AddProductCategory command = new AddProductCategory(productCategoryToBeAdded);
+		ProductCategory productCategory = ((ProductCategoryAdded) Scheduler.execute(command).data()).getAddedProductCategory();
+		
+		if (productCategory != null) 
+			return ResponseEntity.status(HttpStatus.CREATED)
+					             .body(productCategory);
+		else 
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					             .body("ProductCategory could not be created.");
 	}
 
 	/**
@@ -160,9 +126,10 @@ public class ProductCategoryController {
 	 * @param request
 	 *            HttpServletRequest object
 	 * @return true on success, false on fail
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductCategory(HttpServletRequest request) {
+	public boolean updateProductCategory(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
 		String data = null;
@@ -190,8 +157,8 @@ public class ProductCategoryController {
 			return false;
 		}
 
-		if (updateProductCategory(productCategoryToBeUpdated, productCategoryToBeUpdated.getProductCategoryId())
-				.getStatusCode().equals(HttpStatus.NO_CONTENT)) {
+		if (updateProductCategory(productCategoryToBeUpdated, productCategoryToBeUpdated.getProductCategoryId()).getStatusCode()
+				.equals(HttpStatus.NO_CONTENT)) {
 			return true;
 		}
 		return false;
@@ -204,96 +171,34 @@ public class ProductCategoryController {
 	 * @param productCategoryToBeUpdated
 	 *            the ProductCategory thats to be updated
 	 * @return true on success, false on fail
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{productCategoryId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<Object> updateProductCategory(@RequestBody ProductCategory productCategoryToBeUpdated,
-			@PathVariable String productCategoryId) {
+			@PathVariable String productCategoryId) throws Exception {
 
 		productCategoryToBeUpdated.setProductCategoryId(productCategoryId);
 
-		UpdateProductCategory com = new UpdateProductCategory(productCategoryToBeUpdated);
-
-		int usedTicketId;
-
-		synchronized (ProductCategoryController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(ProductCategoryUpdated.class,
-				event -> sendProductCategoryChangedMessage(((ProductCategoryUpdated) event).isSuccess(), usedTicketId));
+		UpdateProductCategory command = new UpdateProductCategory(productCategoryToBeUpdated);
 
 		try {
-			Scheduler.instance().schedule(com).executeNext();
+			if(((ProductCategoryUpdated) Scheduler.execute(command).data()).isSuccess()) 
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
 		} catch (RecordNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An internal error occured");
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
-		}
-
-		if (commandReturnVal.remove(usedTicketId)) {
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-
 		}
 
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	/**
-	 * removes a ProductCategory from the database
-	 * 
-	 * @deprecated
-	 * @param productCategoryId:
-	 *            the id of the ProductCategory thats to be removed
-	 * 
-	 * @return true on success; false on fail
-	 * 
-	 */
-	@RequestMapping(method = RequestMethod.DELETE, value = "/removeById")
-	public boolean deleteproductCategoryById(@RequestParam(value = "productCategoryId") String productCategoryId) {
-
-		DeleteProductCategory com = new DeleteProductCategory(productCategoryId);
-
-		int usedTicketId;
-
-		synchronized (ProductCategoryController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(ProductCategoryDeleted.class,
-				event -> sendProductCategoryChangedMessage(((ProductCategoryDeleted) event).isSuccess(), usedTicketId));
-
-		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
-		}
-
-		return commandReturnVal.remove(usedTicketId);
-	}
-
-	public void sendProductCategoryChangedMessage(boolean success, int usedTicketId) {
-		commandReturnVal.put(usedTicketId, success);
-	}
-
 	@RequestMapping(method = RequestMethod.GET, value = "/{productCategoryId}")
-	public ResponseEntity<Object> findById(@PathVariable String productCategoryId) {
+	public ResponseEntity<Object> findById(@PathVariable String productCategoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productCategoryId", productCategoryId);
 		try {
 
-			ResponseEntity<Object> retVal = findProductCategorysBy(requestParams);
-			return retVal;
+			Object foundProductCategory = findProductCategorysBy(requestParams).getBody();
+			return ResponseEntity.status(HttpStatus.OK).body(foundProductCategory);
 		} catch (RecordNotFoundException e) {
 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -302,35 +207,16 @@ public class ProductCategoryController {
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{productCategoryId}")
-	public ResponseEntity<Object> deleteProductCategoryByIdUpdated(@PathVariable String productCategoryId) {
-		DeleteProductCategory com = new DeleteProductCategory(productCategoryId);
-
-		int usedTicketId;
-
-		synchronized (ProductCategoryController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(ProductCategoryDeleted.class,
-				event -> sendProductCategoryChangedMessage(((ProductCategoryDeleted) event).isSuccess(), usedTicketId));
+	public ResponseEntity<Object> deleteProductCategoryByIdUpdated(@PathVariable String productCategoryId) throws Exception {
+		DeleteProductCategory command = new DeleteProductCategory(productCategoryId);
 
 		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("An Error ocuured while processing Command!");
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
+			if (((ProductCategoryDeleted) Scheduler.execute(command).data()).isSuccess())
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+		} catch (RecordNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 
-		if (commandReturnVal.remove(usedTicketId)) {
-
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-
-		}
 		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductCategory could not be deleted");
 
 	}

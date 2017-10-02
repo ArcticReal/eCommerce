@@ -69,7 +69,7 @@ public class ProductController {
 		if (products.size() == 1) {
 			return ResponseEntity.ok().body(products.get(0));
 		}
-		
+
 		return ResponseEntity.ok().body(products);
 
 	}
@@ -187,8 +187,8 @@ public class ProductController {
 		} catch (RecordNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
-		
-	return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{productId}")

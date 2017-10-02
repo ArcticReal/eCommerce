@@ -33,16 +33,12 @@ import com.skytala.eCommerce.domain.productReview.mapper.ProductReviewMapper;
 import com.skytala.eCommerce.domain.productReview.model.ProductReview;
 import com.skytala.eCommerce.domain.productReview.query.FindProductReviewsBy;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
 @RequestMapping("/productReviews")
 public class ProductReviewController {
 
-	private static int requestTicketId = 0;
-	private static Map<Integer, Boolean> commandReturnVal = new HashMap<>();
-	private static Map<Integer, List<ProductReview>> queryReturnVal = new HashMap<>();
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();
 
 	public ProductReviewController() {
@@ -51,7 +47,6 @@ public class ProductReviewController {
 		validRequests.put("add", RequestMethod.POST);
 		validRequests.put("update", RequestMethod.PUT);
 		validRequests.put("removeById", RequestMethod.DELETE);
-
 	}
 
 	/**
@@ -59,33 +54,24 @@ public class ProductReviewController {
 	 * @param allRequestParams
 	 *            all params by which you want to find a ProductReview
 	 * @return a List with the ProductReviews
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findProductReviewsBy(@RequestParam Map<String, String> allRequestParams) {
+	public ResponseEntity<Object> findProductReviewsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductReviewsBy query = new FindProductReviewsBy(allRequestParams);
-
-		int usedTicketId;
-
-		synchronized (ProductReviewController.class) {
-			usedTicketId = requestTicketId;
-			requestTicketId++;
+		if (allRequestParams == null) {
+			query.setFilter(new HashMap<>());
 		}
-		Broker.instance().subscribe(ProductReviewFound.class,
-				event -> sendProductReviewsFoundMessage(((ProductReviewFound) event).getProductReviews(),
-						usedTicketId));
 
-		query.execute();
+		List<ProductReview> productReviews =((ProductReviewFound) Scheduler.execute(query).data()).getProductReviews();
 
-		while (!queryReturnVal.containsKey(usedTicketId)) {
-
+		if (productReviews.size() == 1) {
+			return ResponseEntity.ok().body(productReviews.get(0));
 		}
-		return ResponseEntity.ok().body(queryReturnVal.remove(usedTicketId));
 
-	}
+		return ResponseEntity.ok().body(productReviews);
 
-	public void sendProductReviewsFoundMessage(List<ProductReview> productReviews, int usedTicketId) {
-		queryReturnVal.put(usedTicketId, productReviews);
 	}
 
 	/**
@@ -97,7 +83,7 @@ public class ProductReviewController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductReview(HttpServletRequest request) {
+	public ResponseEntity<Object> createProductReview(HttpServletRequest request) throws Exception {
 
 		ProductReview productReviewToBeAdded = new ProductReview();
 		try {
@@ -120,37 +106,17 @@ public class ProductReviewController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductReview(@RequestBody ProductReview productReviewToBeAdded) {
+	public ResponseEntity<Object> createProductReview(@RequestBody ProductReview productReviewToBeAdded) throws Exception {
 
-		AddProductReview com = new AddProductReview(productReviewToBeAdded);
-		int usedTicketId;
-
-		synchronized (ProductReviewController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(ProductReviewAdded.class,
-				event -> sendProductReviewChangedMessage(((ProductReviewAdded) event).isSuccess(), usedTicketId));
-
-		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("An Error ocuured while processing Command!");
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
-		}
-
-		if (commandReturnVal.remove(usedTicketId)) {
-
-			return ResponseEntity.status(HttpStatus.CREATED).body("ProductReview was created successfully.");
-
-		}
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductReview could not be created.");
-
+		AddProductReview command = new AddProductReview(productReviewToBeAdded);
+		ProductReview productReview = ((ProductReviewAdded) Scheduler.execute(command).data()).getAddedProductReview();
+		
+		if (productReview != null) 
+			return ResponseEntity.status(HttpStatus.CREATED)
+					             .body(productReview);
+		else 
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					             .body("ProductReview could not be created.");
 	}
 
 	/**
@@ -160,9 +126,10 @@ public class ProductReviewController {
 	 * @param request
 	 *            HttpServletRequest object
 	 * @return true on success, false on fail
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductReview(HttpServletRequest request) {
+	public boolean updateProductReview(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
 		String data = null;
@@ -204,96 +171,34 @@ public class ProductReviewController {
 	 * @param productReviewToBeUpdated
 	 *            the ProductReview thats to be updated
 	 * @return true on success, false on fail
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{productReviewId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<Object> updateProductReview(@RequestBody ProductReview productReviewToBeUpdated,
-			@PathVariable String productReviewId) {
+			@PathVariable String productReviewId) throws Exception {
 
 		productReviewToBeUpdated.setProductReviewId(productReviewId);
 
-		UpdateProductReview com = new UpdateProductReview(productReviewToBeUpdated);
-
-		int usedTicketId;
-
-		synchronized (ProductReviewController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(ProductReviewUpdated.class,
-				event -> sendProductReviewChangedMessage(((ProductReviewUpdated) event).isSuccess(), usedTicketId));
+		UpdateProductReview command = new UpdateProductReview(productReviewToBeUpdated);
 
 		try {
-			Scheduler.instance().schedule(com).executeNext();
+			if(((ProductReviewUpdated) Scheduler.execute(command).data()).isSuccess()) 
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
 		} catch (RecordNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An internal error occured");
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
-		}
-
-		if (commandReturnVal.remove(usedTicketId)) {
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-
 		}
 
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	/**
-	 * removes a ProductReview from the database
-	 * 
-	 * @deprecated
-	 * @param productReviewId:
-	 *            the id of the ProductReview thats to be removed
-	 * 
-	 * @return true on success; false on fail
-	 * 
-	 */
-	@RequestMapping(method = RequestMethod.DELETE, value = "/removeById")
-	public boolean deleteproductReviewById(@RequestParam(value = "productReviewId") String productReviewId) {
-
-		DeleteProductReview com = new DeleteProductReview(productReviewId);
-
-		int usedTicketId;
-
-		synchronized (ProductReviewController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(ProductReviewDeleted.class,
-				event -> sendProductReviewChangedMessage(((ProductReviewDeleted) event).isSuccess(), usedTicketId));
-
-		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
-		}
-
-		return commandReturnVal.remove(usedTicketId);
-	}
-
-	public void sendProductReviewChangedMessage(boolean success, int usedTicketId) {
-		commandReturnVal.put(usedTicketId, success);
-	}
-
 	@RequestMapping(method = RequestMethod.GET, value = "/{productReviewId}")
-	public ResponseEntity<Object> findById(@PathVariable String productReviewId) {
+	public ResponseEntity<Object> findById(@PathVariable String productReviewId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productReviewId", productReviewId);
 		try {
 
-			ResponseEntity<Object> retVal = findProductReviewsBy(requestParams);
-			return retVal;
+			Object foundProductReview = findProductReviewsBy(requestParams).getBody();
+			return ResponseEntity.status(HttpStatus.OK).body(foundProductReview);
 		} catch (RecordNotFoundException e) {
 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -302,35 +207,16 @@ public class ProductReviewController {
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{productReviewId}")
-	public ResponseEntity<Object> deleteProductReviewByIdUpdated(@PathVariable String productReviewId) {
-		DeleteProductReview com = new DeleteProductReview(productReviewId);
-
-		int usedTicketId;
-
-		synchronized (ProductReviewController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(ProductReviewDeleted.class,
-				event -> sendProductReviewChangedMessage(((ProductReviewDeleted) event).isSuccess(), usedTicketId));
+	public ResponseEntity<Object> deleteProductReviewByIdUpdated(@PathVariable String productReviewId) throws Exception {
+		DeleteProductReview command = new DeleteProductReview(productReviewId);
 
 		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("An Error ocuured while processing Command!");
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
+			if (((ProductReviewDeleted) Scheduler.execute(command).data()).isSuccess())
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+		} catch (RecordNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 
-		if (commandReturnVal.remove(usedTicketId)) {
-
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-
-		}
 		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductReview could not be deleted");
 
 	}

@@ -33,16 +33,12 @@ import com.skytala.eCommerce.domain.productPromo.mapper.ProductPromoMapper;
 import com.skytala.eCommerce.domain.productPromo.model.ProductPromo;
 import com.skytala.eCommerce.domain.productPromo.query.FindProductPromosBy;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
 @RequestMapping("/productPromos")
 public class ProductPromoController {
 
-	private static int requestTicketId = 0;
-	private static Map<Integer, Boolean> commandReturnVal = new HashMap<>();
-	private static Map<Integer, List<ProductPromo>> queryReturnVal = new HashMap<>();
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();
 
 	public ProductPromoController() {
@@ -51,7 +47,6 @@ public class ProductPromoController {
 		validRequests.put("add", RequestMethod.POST);
 		validRequests.put("update", RequestMethod.PUT);
 		validRequests.put("removeById", RequestMethod.DELETE);
-
 	}
 
 	/**
@@ -59,32 +54,24 @@ public class ProductPromoController {
 	 * @param allRequestParams
 	 *            all params by which you want to find a ProductPromo
 	 * @return a List with the ProductPromos
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findProductPromosBy(@RequestParam Map<String, String> allRequestParams) {
+	public ResponseEntity<Object> findProductPromosBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductPromosBy query = new FindProductPromosBy(allRequestParams);
-
-		int usedTicketId;
-
-		synchronized (ProductPromoController.class) {
-			usedTicketId = requestTicketId;
-			requestTicketId++;
+		if (allRequestParams == null) {
+			query.setFilter(new HashMap<>());
 		}
-		Broker.instance().subscribe(ProductPromoFound.class,
-				event -> sendProductPromosFoundMessage(((ProductPromoFound) event).getProductPromos(), usedTicketId));
 
-		query.execute();
+		List<ProductPromo> productPromos =((ProductPromoFound) Scheduler.execute(query).data()).getProductPromos();
 
-		while (!queryReturnVal.containsKey(usedTicketId)) {
-
+		if (productPromos.size() == 1) {
+			return ResponseEntity.ok().body(productPromos.get(0));
 		}
-		return ResponseEntity.ok().body(queryReturnVal.remove(usedTicketId));
 
-	}
+		return ResponseEntity.ok().body(productPromos);
 
-	public void sendProductPromosFoundMessage(List<ProductPromo> productPromos, int usedTicketId) {
-		queryReturnVal.put(usedTicketId, productPromos);
 	}
 
 	/**
@@ -96,7 +83,7 @@ public class ProductPromoController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductPromo(HttpServletRequest request) {
+	public ResponseEntity<Object> createProductPromo(HttpServletRequest request) throws Exception {
 
 		ProductPromo productPromoToBeAdded = new ProductPromo();
 		try {
@@ -119,37 +106,17 @@ public class ProductPromoController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductPromo(@RequestBody ProductPromo productPromoToBeAdded) {
+	public ResponseEntity<Object> createProductPromo(@RequestBody ProductPromo productPromoToBeAdded) throws Exception {
 
-		AddProductPromo com = new AddProductPromo(productPromoToBeAdded);
-		int usedTicketId;
-
-		synchronized (ProductPromoController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(ProductPromoAdded.class,
-				event -> sendProductPromoChangedMessage(((ProductPromoAdded) event).isSuccess(), usedTicketId));
-
-		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("An Error ocuured while processing Command!");
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
-		}
-
-		if (commandReturnVal.remove(usedTicketId)) {
-
-			return ResponseEntity.status(HttpStatus.CREATED).body("ProductPromo was created successfully.");
-
-		}
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductPromo could not be created.");
-
+		AddProductPromo command = new AddProductPromo(productPromoToBeAdded);
+		ProductPromo productPromo = ((ProductPromoAdded) Scheduler.execute(command).data()).getAddedProductPromo();
+		
+		if (productPromo != null) 
+			return ResponseEntity.status(HttpStatus.CREATED)
+					             .body(productPromo);
+		else 
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					             .body("ProductPromo could not be created.");
 	}
 
 	/**
@@ -159,9 +126,10 @@ public class ProductPromoController {
 	 * @param request
 	 *            HttpServletRequest object
 	 * @return true on success, false on fail
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductPromo(HttpServletRequest request) {
+	public boolean updateProductPromo(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
 		String data = null;
@@ -203,96 +171,34 @@ public class ProductPromoController {
 	 * @param productPromoToBeUpdated
 	 *            the ProductPromo thats to be updated
 	 * @return true on success, false on fail
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{productPromoId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<Object> updateProductPromo(@RequestBody ProductPromo productPromoToBeUpdated,
-			@PathVariable String productPromoId) {
+			@PathVariable String productPromoId) throws Exception {
 
 		productPromoToBeUpdated.setProductPromoId(productPromoId);
 
-		UpdateProductPromo com = new UpdateProductPromo(productPromoToBeUpdated);
-
-		int usedTicketId;
-
-		synchronized (ProductPromoController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(ProductPromoUpdated.class,
-				event -> sendProductPromoChangedMessage(((ProductPromoUpdated) event).isSuccess(), usedTicketId));
+		UpdateProductPromo command = new UpdateProductPromo(productPromoToBeUpdated);
 
 		try {
-			Scheduler.instance().schedule(com).executeNext();
+			if(((ProductPromoUpdated) Scheduler.execute(command).data()).isSuccess()) 
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
 		} catch (RecordNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An internal error occured");
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
-		}
-
-		if (commandReturnVal.remove(usedTicketId)) {
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-
 		}
 
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	/**
-	 * removes a ProductPromo from the database
-	 * 
-	 * @deprecated
-	 * @param productPromoId:
-	 *            the id of the ProductPromo thats to be removed
-	 * 
-	 * @return true on success; false on fail
-	 * 
-	 */
-	@RequestMapping(method = RequestMethod.DELETE, value = "/removeById")
-	public boolean deleteproductPromoById(@RequestParam(value = "productPromoId") String productPromoId) {
-
-		DeleteProductPromo com = new DeleteProductPromo(productPromoId);
-
-		int usedTicketId;
-
-		synchronized (ProductPromoController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(ProductPromoDeleted.class,
-				event -> sendProductPromoChangedMessage(((ProductPromoDeleted) event).isSuccess(), usedTicketId));
-
-		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
-		}
-
-		return commandReturnVal.remove(usedTicketId);
-	}
-
-	public void sendProductPromoChangedMessage(boolean success, int usedTicketId) {
-		commandReturnVal.put(usedTicketId, success);
-	}
-
 	@RequestMapping(method = RequestMethod.GET, value = "/{productPromoId}")
-	public ResponseEntity<Object> findById(@PathVariable String productPromoId) {
+	public ResponseEntity<Object> findById(@PathVariable String productPromoId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productPromoId", productPromoId);
 		try {
 
-			ResponseEntity<Object> retVal = findProductPromosBy(requestParams);
-			return retVal;
+			Object foundProductPromo = findProductPromosBy(requestParams).getBody();
+			return ResponseEntity.status(HttpStatus.OK).body(foundProductPromo);
 		} catch (RecordNotFoundException e) {
 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -301,35 +207,16 @@ public class ProductPromoController {
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{productPromoId}")
-	public ResponseEntity<Object> deleteProductPromoByIdUpdated(@PathVariable String productPromoId) {
-		DeleteProductPromo com = new DeleteProductPromo(productPromoId);
-
-		int usedTicketId;
-
-		synchronized (ProductPromoController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(ProductPromoDeleted.class,
-				event -> sendProductPromoChangedMessage(((ProductPromoDeleted) event).isSuccess(), usedTicketId));
+	public ResponseEntity<Object> deleteProductPromoByIdUpdated(@PathVariable String productPromoId) throws Exception {
+		DeleteProductPromo command = new DeleteProductPromo(productPromoId);
 
 		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("An Error ocuured while processing Command!");
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
+			if (((ProductPromoDeleted) Scheduler.execute(command).data()).isSuccess())
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+		} catch (RecordNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 
-		if (commandReturnVal.remove(usedTicketId)) {
-
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-
-		}
 		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductPromo could not be deleted");
 
 	}

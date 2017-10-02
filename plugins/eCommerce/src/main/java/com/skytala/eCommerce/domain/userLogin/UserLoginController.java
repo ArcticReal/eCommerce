@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,16 +32,13 @@ import com.skytala.eCommerce.domain.userLogin.event.UserLoginUpdated;
 import com.skytala.eCommerce.domain.userLogin.mapper.UserLoginMapper;
 import com.skytala.eCommerce.domain.userLogin.model.UserLogin;
 import com.skytala.eCommerce.domain.userLogin.query.FindUserLoginsBy;
-import com.skytala.eCommerce.framework.pubsub.Broker;
+import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
 @RequestMapping("/userLogins")
 public class UserLoginController {
 
-	private static int requestTicketId = 0;
-	private static Map<Integer, Boolean> commandReturnVal = new HashMap<>();
-	private static Map<Integer, List<UserLogin>> queryReturnVal = new HashMap<>();
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();
 
 	public UserLoginController() {
@@ -49,7 +47,6 @@ public class UserLoginController {
 		validRequests.put("add", RequestMethod.POST);
 		validRequests.put("update", RequestMethod.PUT);
 		validRequests.put("removeById", RequestMethod.DELETE);
-
 	}
 
 	/**
@@ -57,32 +54,24 @@ public class UserLoginController {
 	 * @param allRequestParams
 	 *            all params by which you want to find a UserLogin
 	 * @return a List with the UserLogins
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findUserLoginsBy(@RequestParam Map<String, String> allRequestParams) {
+	public ResponseEntity<Object> findUserLoginsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindUserLoginsBy query = new FindUserLoginsBy(allRequestParams);
-
-		int usedTicketId;
-
-		synchronized (UserLoginController.class) {
-			usedTicketId = requestTicketId;
-			requestTicketId++;
+		if (allRequestParams == null) {
+			query.setFilter(new HashMap<>());
 		}
-		Broker.instance().subscribe(UserLoginFound.class,
-				event -> sendUserLoginsFoundMessage(((UserLoginFound) event).getUserLogins(), usedTicketId));
 
-		query.execute();
+		List<UserLogin> userLogins =((UserLoginFound) Scheduler.execute(query).data()).getUserLogins();
 
-		while (!queryReturnVal.containsKey(usedTicketId)) {
-
+		if (userLogins.size() == 1) {
+			return ResponseEntity.ok().body(userLogins.get(0));
 		}
-		return ResponseEntity.ok().body(queryReturnVal.remove(usedTicketId));
 
-	}
+		return ResponseEntity.ok().body(userLogins);
 
-	public void sendUserLoginsFoundMessage(List<UserLogin> userLogins, int usedTicketId) {
-		queryReturnVal.put(usedTicketId, userLogins);
 	}
 
 	/**
@@ -94,7 +83,7 @@ public class UserLoginController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public boolean createUserLogin(HttpServletRequest request) {
+	public ResponseEntity<Object> createUserLogin(HttpServletRequest request) throws Exception {
 
 		UserLogin userLoginToBeAdded = new UserLogin();
 		try {
@@ -102,7 +91,7 @@ public class UserLoginController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return false;
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
 		}
 
 		return this.createUserLogin(userLoginToBeAdded);
@@ -117,31 +106,17 @@ public class UserLoginController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public boolean createUserLogin(UserLogin userLoginToBeAdded) {
+	public ResponseEntity<Object> createUserLogin(@RequestBody UserLogin userLoginToBeAdded) throws Exception {
 
-		AddUserLogin com = new AddUserLogin(userLoginToBeAdded);
-		int usedTicketId;
-
-		synchronized (UserLoginController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(UserLoginAdded.class,
-				event -> sendUserLoginChangedMessage(((UserLoginAdded) event).isSuccess(), usedTicketId));
-
-		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
-		}
-
-		return commandReturnVal.remove(usedTicketId);
-
+		AddUserLogin command = new AddUserLogin(userLoginToBeAdded);
+		UserLogin userLogin = ((UserLoginAdded) Scheduler.execute(command).data()).getAddedUserLogin();
+		
+		if (userLogin != null) 
+			return ResponseEntity.status(HttpStatus.CREATED)
+					             .body(userLogin);
+		else 
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					             .body("UserLogin could not be created.");
 	}
 
 	/**
@@ -151,9 +126,10 @@ public class UserLoginController {
 	 * @param request
 	 *            HttpServletRequest object
 	 * @return true on success, false on fail
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateUserLogin(HttpServletRequest request) {
+	public boolean updateUserLogin(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
 		String data = null;
@@ -181,7 +157,11 @@ public class UserLoginController {
 			return false;
 		}
 
-		return updateUserLogin(userLoginToBeUpdated, userLoginToBeUpdated.getUserLoginId());
+		if (updateUserLogin(userLoginToBeUpdated, userLoginToBeUpdated.getUserLoginId()).getStatusCode()
+				.equals(HttpStatus.NO_CONTENT)) {
+			return true;
+		}
+		return false;
 
 	}
 
@@ -191,117 +171,52 @@ public class UserLoginController {
 	 * @param userLoginToBeUpdated
 	 *            the UserLogin thats to be updated
 	 * @return true on success, false on fail
+	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/{userLoginId}/update", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public boolean updateUserLogin(UserLogin userLoginToBeUpdated, @PathVariable String userLoginId) {
+	@RequestMapping(method = RequestMethod.PUT, value = "/{userLoginId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<Object> updateUserLogin(@RequestBody UserLogin userLoginToBeUpdated,
+			@PathVariable String userLoginId) throws Exception {
 
 		userLoginToBeUpdated.setUserLoginId(userLoginId);
 
-		UpdateUserLogin com = new UpdateUserLogin(userLoginToBeUpdated);
-
-		int usedTicketId;
-
-		synchronized (UserLoginController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(UserLoginUpdated.class,
-				event -> sendUserLoginChangedMessage(((UserLoginUpdated) event).isSuccess(), usedTicketId));
+		UpdateUserLogin command = new UpdateUserLogin(userLoginToBeUpdated);
 
 		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
+			if(((UserLoginUpdated) Scheduler.execute(command).data()).isSuccess()) 
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+		} catch (RecordNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 
-		return commandReturnVal.remove(usedTicketId);
-	}
-
-	/**
-	 * removes a UserLogin from the database
-	 * 
-	 * @deprecated
-	 * @param userLoginId:
-	 *            the id of the UserLogin thats to be removed
-	 * 
-	 * @return true on success; false on fail
-	 * 
-	 */
-	@RequestMapping(method = RequestMethod.DELETE, value = "/removeById")
-	public boolean deleteuserLoginById(@RequestParam(value = "userLoginId") String userLoginId) {
-
-		DeleteUserLogin com = new DeleteUserLogin(userLoginId);
-
-		int usedTicketId;
-
-		synchronized (UserLoginController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(UserLoginDeleted.class,
-				event -> sendUserLoginChangedMessage(((UserLoginDeleted) event).isSuccess(), usedTicketId));
-
-		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
-		}
-
-		return commandReturnVal.remove(usedTicketId);
-	}
-
-	public void sendUserLoginChangedMessage(boolean success, int usedTicketId) {
-		commandReturnVal.put(usedTicketId, success);
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{userLoginId}")
-	public ResponseEntity<Object> findById(@PathVariable String userLoginId) {
+	public ResponseEntity<Object> findById(@PathVariable String userLoginId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("userLoginId", userLoginId);
+		try {
 
-		return findUserLoginsBy(requestParams);
+			Object foundUserLogin = findUserLoginsBy(requestParams).getBody();
+			return ResponseEntity.status(HttpStatus.OK).body(foundUserLogin);
+		} catch (RecordNotFoundException e) {
+
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{userLoginId}")
-	public ResponseEntity<Object> deleteUserLoginByIdUpdated(@PathVariable String userLoginId) {
-		DeleteUserLogin com = new DeleteUserLogin(userLoginId);
-
-		int usedTicketId;
-
-		synchronized (UserLoginController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(UserLoginDeleted.class,
-				event -> sendUserLoginChangedMessage(((UserLoginDeleted) event).isSuccess(), usedTicketId));
+	public ResponseEntity<Object> deleteUserLoginByIdUpdated(@PathVariable String userLoginId) throws Exception {
+		DeleteUserLogin command = new DeleteUserLogin(userLoginId);
 
 		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("An Error ocuured while processing Command!");
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
+			if (((UserLoginDeleted) Scheduler.execute(command).data()).isSuccess())
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+		} catch (RecordNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 
-		if (commandReturnVal.remove(usedTicketId)) {
-
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("UserLogin was deleted successfully.");
-
-		}
 		return ResponseEntity.status(HttpStatus.CONFLICT).body("UserLogin could not be deleted");
 
 	}

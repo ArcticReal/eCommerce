@@ -33,17 +33,12 @@ import com.skytala.eCommerce.domain.subscription.mapper.SubscriptionMapper;
 import com.skytala.eCommerce.domain.subscription.model.Subscription;
 import com.skytala.eCommerce.domain.subscription.query.FindSubscriptionsBy;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.framework.pubsub.Broker;
-import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
 @RequestMapping("/subscriptions")
 public class SubscriptionController {
 
-	private static int requestTicketId = 0;
-	private static Map<Integer, Event> commandReturnVal = new HashMap<>();
-	private static Map<Integer, List<Subscription>> queryReturnVal = new HashMap<>();
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();
 
 	public SubscriptionController() {
@@ -52,7 +47,6 @@ public class SubscriptionController {
 		validRequests.put("add", RequestMethod.POST);
 		validRequests.put("update", RequestMethod.PUT);
 		validRequests.put("removeById", RequestMethod.DELETE);
-
 	}
 
 	/**
@@ -60,41 +54,24 @@ public class SubscriptionController {
 	 * @param allRequestParams
 	 *            all params by which you want to find a Subscription
 	 * @return a List with the Subscriptions
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findSubscriptionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) {
+	public ResponseEntity<Object> findSubscriptionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSubscriptionsBy query = new FindSubscriptionsBy(allRequestParams);
 		if (allRequestParams == null) {
 			query.setFilter(new HashMap<>());
 		}
 
-		int usedTicketId;
-
-		synchronized (SubscriptionController.class) {
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(SubscriptionFound.class,
-				event -> sendSubscriptionsFoundMessage(((SubscriptionFound) event).getSubscriptions(), usedTicketId));
-
-		query.execute();
-
-		while (!queryReturnVal.containsKey(usedTicketId)) {
-
-		}
-
-		List<Subscription> subscriptions = queryReturnVal.remove(usedTicketId);
+		List<Subscription> subscriptions =((SubscriptionFound) Scheduler.execute(query).data()).getSubscriptions();
 
 		if (subscriptions.size() == 1) {
 			return ResponseEntity.ok().body(subscriptions.get(0));
 		}
+
 		return ResponseEntity.ok().body(subscriptions);
 
-	}
-
-	public void sendSubscriptionsFoundMessage(List<Subscription> subscriptions, int usedTicketId) {
-		queryReturnVal.put(usedTicketId, subscriptions);
 	}
 
 	/**
@@ -106,7 +83,7 @@ public class SubscriptionController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createSubscription(HttpServletRequest request) {
+	public ResponseEntity<Object> createSubscription(HttpServletRequest request) throws Exception {
 
 		Subscription subscriptionToBeAdded = new Subscription();
 		try {
@@ -129,38 +106,17 @@ public class SubscriptionController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createSubscription(@RequestBody Subscription subscriptionToBeAdded) {
+	public ResponseEntity<Object> createSubscription(@RequestBody Subscription subscriptionToBeAdded) throws Exception {
 
-		AddSubscription com = new AddSubscription(subscriptionToBeAdded);
-		int usedTicketId;
-
-		synchronized (SubscriptionController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(SubscriptionAdded.class,
-				event -> sendSubscriptionChangedMessage(((SubscriptionAdded) event), usedTicketId));
-
-		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("An Error ocuured while processing Command!");
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
-		}
-
-		SubscriptionAdded event = (SubscriptionAdded) commandReturnVal.remove(usedTicketId);
-		if (event.isSuccess()) {
-
-			return ResponseEntity.status(HttpStatus.CREATED).body(event.getAddedSubscription());
-
-		}
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("Subscription could not be created.");
-
+		AddSubscription command = new AddSubscription(subscriptionToBeAdded);
+		Subscription subscription = ((SubscriptionAdded) Scheduler.execute(command).data()).getAddedSubscription();
+		
+		if (subscription != null) 
+			return ResponseEntity.status(HttpStatus.CREATED)
+					             .body(subscription);
+		else 
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					             .body("Subscription could not be created.");
 	}
 
 	/**
@@ -170,9 +126,10 @@ public class SubscriptionController {
 	 * @param request
 	 *            HttpServletRequest object
 	 * @return true on success, false on fail
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateSubscription(HttpServletRequest request) {
+	public boolean updateSubscription(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
 		String data = null;
@@ -214,90 +171,28 @@ public class SubscriptionController {
 	 * @param subscriptionToBeUpdated
 	 *            the Subscription thats to be updated
 	 * @return true on success, false on fail
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{subscriptionId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<Object> updateSubscription(@RequestBody Subscription subscriptionToBeUpdated,
-			@PathVariable String subscriptionId) {
+			@PathVariable String subscriptionId) throws Exception {
 
 		subscriptionToBeUpdated.setSubscriptionId(subscriptionId);
 
-		UpdateSubscription com = new UpdateSubscription(subscriptionToBeUpdated);
-
-		int usedTicketId;
-
-		synchronized (SubscriptionController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(SubscriptionUpdated.class,
-				event -> sendSubscriptionChangedMessage(((SubscriptionUpdated) event), usedTicketId));
+		UpdateSubscription command = new UpdateSubscription(subscriptionToBeUpdated);
 
 		try {
-			Scheduler.instance().schedule(com).executeNext();
+			if(((SubscriptionUpdated) Scheduler.execute(command).data()).isSuccess()) 
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
 		} catch (RecordNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An internal error occured");
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
-		}
-
-		if (((SubscriptionUpdated) commandReturnVal.remove(usedTicketId)).isSuccess()) {
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-
 		}
 
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	/**
-	 * removes a Subscription from the database
-	 * 
-	 * @deprecated
-	 * @param subscriptionId:
-	 *            the id of the Subscription thats to be removed
-	 * 
-	 * @return true on success; false on fail
-	 * 
-	 */
-	@RequestMapping(method = RequestMethod.DELETE, value = "/removeById")
-	public boolean deletesubscriptionById(@RequestParam(value = "subscriptionId") String subscriptionId) {
-
-		DeleteSubscription com = new DeleteSubscription(subscriptionId);
-
-		int usedTicketId;
-
-		synchronized (SubscriptionController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(SubscriptionDeleted.class,
-				event -> sendSubscriptionChangedMessage(((SubscriptionDeleted) event), usedTicketId));
-
-		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
-		}
-
-		return ((SubscriptionDeleted) commandReturnVal.remove(usedTicketId)).isSuccess();
-	}
-
-	public void sendSubscriptionChangedMessage(Event event, int usedTicketId) {
-		commandReturnVal.put(usedTicketId, event);
-	}
-
 	@RequestMapping(method = RequestMethod.GET, value = "/{subscriptionId}")
-	public ResponseEntity<Object> findById(@PathVariable String subscriptionId) {
+	public ResponseEntity<Object> findById(@PathVariable String subscriptionId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("subscriptionId", subscriptionId);
 		try {
@@ -312,37 +207,16 @@ public class SubscriptionController {
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{subscriptionId}")
-	public ResponseEntity<Object> deleteSubscriptionByIdUpdated(@PathVariable String subscriptionId) {
-		DeleteSubscription com = new DeleteSubscription(subscriptionId);
-
-		int usedTicketId;
-
-		synchronized (SubscriptionController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(SubscriptionDeleted.class,
-				event -> sendSubscriptionChangedMessage(((SubscriptionDeleted) event), usedTicketId));
+	public ResponseEntity<Object> deleteSubscriptionByIdUpdated(@PathVariable String subscriptionId) throws Exception {
+		DeleteSubscription command = new DeleteSubscription(subscriptionId);
 
 		try {
-			Scheduler.instance().schedule(com).executeNext();
+			if (((SubscriptionDeleted) Scheduler.execute(command).data()).isSuccess())
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 		} catch (RecordNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("An Error ocuured while processing Command!");
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
 		}
 
-		if (((SubscriptionDeleted) commandReturnVal.remove(usedTicketId)).isSuccess()) {
-
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-
-		}
 		return ResponseEntity.status(HttpStatus.CONFLICT).body("Subscription could not be deleted");
 
 	}

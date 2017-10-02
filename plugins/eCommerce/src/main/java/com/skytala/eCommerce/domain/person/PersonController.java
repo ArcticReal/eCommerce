@@ -11,6 +11,11 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,16 +32,13 @@ import com.skytala.eCommerce.domain.person.event.PersonUpdated;
 import com.skytala.eCommerce.domain.person.mappper.PersonMapper;
 import com.skytala.eCommerce.domain.person.model.Person;
 import com.skytala.eCommerce.domain.person.query.FindPersonsBy;
-import com.skytala.eCommerce.framework.pubsub.Broker;
+import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/person")
+@RequestMapping("/persons")
 public class PersonController {
 
-	private static int requestTicketId = 0;
-	private static Map<Integer, Boolean> commandReturnVal = new HashMap<>();
-	private static Map<Integer, List<Person>> queryReturnVal = new HashMap<>();
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();
 
 	public PersonController() {
@@ -45,7 +47,6 @@ public class PersonController {
 		validRequests.put("add", RequestMethod.POST);
 		validRequests.put("update", RequestMethod.PUT);
 		validRequests.put("removeById", RequestMethod.DELETE);
-
 	}
 
 	/**
@@ -53,32 +54,24 @@ public class PersonController {
 	 * @param allRequestParams
 	 *            all params by which you want to find a Person
 	 * @return a List with the Persons
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public List<Person> findPersonsBy(@RequestParam Map<String, String> allRequestParams) {
+	public ResponseEntity<Object> findPersonsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPersonsBy query = new FindPersonsBy(allRequestParams);
-
-		int usedTicketId;
-
-		synchronized (PersonController.class) {
-			usedTicketId = requestTicketId;
-			requestTicketId++;
+		if (allRequestParams == null) {
+			query.setFilter(new HashMap<>());
 		}
-		Broker.instance().subscribe(PersonFound.class,
-				event -> sendPersonsFoundMessage(((PersonFound) event).getPersons(), usedTicketId));
 
-		query.execute();
+		List<Person> persons =((PersonFound) Scheduler.execute(query).data()).getPersons();
 
-		while (!queryReturnVal.containsKey(usedTicketId)) {
-
+		if (persons.size() == 1) {
+			return ResponseEntity.ok().body(persons.get(0));
 		}
-		return queryReturnVal.remove(usedTicketId);
 
-	}
+		return ResponseEntity.ok().body(persons);
 
-	public void sendPersonsFoundMessage(List<Person> persons, int usedTicketId) {
-		queryReturnVal.put(usedTicketId, persons);
 	}
 
 	/**
@@ -89,8 +82,8 @@ public class PersonController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = "application/x-www-form-urlencoded")
-	public boolean createPerson(HttpServletRequest request) {
+	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<Object> createPerson(HttpServletRequest request) throws Exception {
 
 		Person personToBeAdded = new Person();
 		try {
@@ -98,7 +91,7 @@ public class PersonController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return false;
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
 		}
 
 		return this.createPerson(personToBeAdded);
@@ -112,41 +105,31 @@ public class PersonController {
 	 *            the Person thats to be added
 	 * @return true on success; false on fail
 	 */
-	public boolean createPerson(Person personToBeAdded) {
+	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<Object> createPerson(@RequestBody Person personToBeAdded) throws Exception {
 
-		AddPerson com = new AddPerson(personToBeAdded);
-		int usedTicketId;
-
-		synchronized (PersonController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(PersonAdded.class,
-				event -> sendPersonChangedMessage(((PersonAdded) event).isSuccess(), usedTicketId));
-
-		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
-		}
-
-		return commandReturnVal.remove(usedTicketId);
-
+		AddPerson command = new AddPerson(personToBeAdded);
+		Person person = ((PersonAdded) Scheduler.execute(command).data()).getAddedPerson();
+		
+		if (person != null) 
+			return ResponseEntity.status(HttpStatus.CREATED)
+					             .body(person);
+		else 
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					             .body("Person could not be created.");
 	}
 
 	/**
 	 * this method will only be called by Springs DispatcherServlet
 	 * 
-	 * @param request HttpServletRequest object
+	 * @deprecated
+	 * @param request
+	 *            HttpServletRequest object
 	 * @return true on success, false on fail
+	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePerson(HttpServletRequest request) {
+	public boolean updatePerson(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
 		String data = null;
@@ -174,86 +157,72 @@ public class PersonController {
 			return false;
 		}
 
-		return updatePerson(personToBeUpdated);
+		if (updatePerson(personToBeUpdated, personToBeUpdated.getPartyId()).getStatusCode()
+				.equals(HttpStatus.NO_CONTENT)) {
+			return true;
+		}
+		return false;
 
 	}
 
 	/**
 	 * Updates the Person with the specific Id
 	 * 
-	 * @param personToBeUpdated the Person thats to be updated
+	 * @param personToBeUpdated
+	 *            the Person thats to be updated
 	 * @return true on success, false on fail
+	 * @throws Exception 
 	 */
-	public boolean updatePerson(Person personToBeUpdated) {
+	@RequestMapping(method = RequestMethod.PUT, value = "/{personId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<Object> updatePerson(@RequestBody Person personToBeUpdated,
+			@PathVariable String personId) throws Exception {
 
-		UpdatePerson com = new UpdatePerson(personToBeUpdated);
+		personToBeUpdated.setPartyId(personId);
 
-		int usedTicketId;
-
-		synchronized (PersonController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
-		}
-		Broker.instance().subscribe(PersonUpdated.class,
-				event -> sendPersonChangedMessage(((PersonUpdated) event).isSuccess(), usedTicketId));
+		UpdatePerson command = new UpdatePerson(personToBeUpdated);
 
 		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
+			if(((PersonUpdated) Scheduler.execute(command).data()).isSuccess()) 
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+		} catch (RecordNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 
-		return commandReturnVal.remove(usedTicketId);
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	/**
-	 * removes a Person from the database
-	 * 
-	 * @param personId:
-	 *            the id of the Person thats to be removed
-	 * 
-	 * @return true on success; false on fail
-	 * 
-	 */
-	@RequestMapping(method = RequestMethod.DELETE, value = "/removeById")
-	public boolean deletepersonById(@RequestParam(value = "personId") String personId) {
+	@RequestMapping(method = RequestMethod.GET, value = "/{personId}")
+	public ResponseEntity<Object> findById(@PathVariable String personId) throws Exception {
+		HashMap<String, String> requestParams = new HashMap<String, String>();
+		requestParams.put("personId", personId);
+		try {
 
-		DeletePerson com = new DeletePerson(personId);
+			Object foundPerson = findPersonsBy(requestParams).getBody();
+			return ResponseEntity.status(HttpStatus.OK).body(foundPerson);
+		} catch (RecordNotFoundException e) {
 
-		int usedTicketId;
-
-		synchronized (PersonController.class) {
-
-			usedTicketId = requestTicketId;
-			requestTicketId++;
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
-		Broker.instance().subscribe(PersonDeleted.class,
-				event -> sendPersonChangedMessage(((PersonDeleted) event).isSuccess(), usedTicketId));
+
+	}
+
+	@RequestMapping(method = RequestMethod.DELETE, value = "/{personId}")
+	public ResponseEntity<Object> deletePersonByIdUpdated(@PathVariable String personId) throws Exception {
+		DeletePerson command = new DeletePerson(personId);
 
 		try {
-			Scheduler.instance().schedule(com).executeNext();
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return false;
-		}
-		while (!commandReturnVal.containsKey(usedTicketId)) {
+			if (((PersonDeleted) Scheduler.execute(command).data()).isSuccess())
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+		} catch (RecordNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 
-		return commandReturnVal.remove(usedTicketId);
+		return ResponseEntity.status(HttpStatus.CONFLICT).body("Person could not be deleted");
+
 	}
 
-	public void sendPersonChangedMessage(boolean success, int usedTicketId) {
-		commandReturnVal.put(usedTicketId, success);
-	}
-
-	@RequestMapping(value = (" * "))
-	public String returnErrorPage(HttpServletRequest request) {
+	@RequestMapping(value = (" ** "))
+	public ResponseEntity<Object> returnErrorPage(HttpServletRequest request) {
 
 		String usedUri = request.getRequestURI();
 		String[] splittedString = usedUri.split("/");
@@ -261,9 +230,10 @@ public class PersonController {
 		String usedRequest = splittedString[splittedString.length - 1];
 
 		if (validRequests.containsKey(usedRequest)) {
-			return "Error: request method " + request.getMethod() + " not allowed for \"" + usedUri + "\"!\n"
-					+ "Please use " + validRequests.get(usedRequest) + "!";
+			String returnVal = "Error: request method " + request.getMethod() + " not allowed for \"" + usedUri
+					+ "\"!\n" + "Please use " + validRequests.get(usedRequest) + "!";
 
+			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(returnVal);
 		}
 
 		String returnVal = "Error 404: Page not found! Valid pages are: \"eCommerce/api/person/\" plus one of the following: "
@@ -280,7 +250,7 @@ public class PersonController {
 
 		returnVal += "!";
 
-		return returnVal;
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(returnVal);
 
 	}
 }
