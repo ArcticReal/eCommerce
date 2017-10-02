@@ -2,7 +2,7 @@ package com.skytala.eCommerce.event;
 
 import com.skytala.eCommerce.control.Event;
 
-public class ProductPriceDeleted implements Event{
+public class ProductPriceDeleted implements Event {
 
 	private boolean success;
 
@@ -10,11 +10,11 @@ public class ProductPriceDeleted implements Event{
 		this.setSuccess(success);
 	}
 
-	public boolean isSuccess()	{
+	public boolean isSuccess() {
 		return success;
 	}
 
-	public void setSuccess(boolean success)	{
+	public void setSuccess(boolean success) {
 		this.success = success;
 	}
 }

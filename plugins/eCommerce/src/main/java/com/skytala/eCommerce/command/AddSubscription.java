@@ -6,14 +6,14 @@ import org.apache.ofbiz.entity.GenericEntityException;
 import org.apache.ofbiz.entity.GenericValue;
 
 import com.skytala.eCommerce.control.Broker;
-import com.skytala.eCommerce.entity.ProductReview;
-import com.skytala.eCommerce.event.ProductReviewAdded;
+import com.skytala.eCommerce.entity.Subscription;
+import com.skytala.eCommerce.event.SubscriptionAdded;
 
-public class AddProductReview implements Command {
+public class AddSubscription implements Command {
 
-	private ProductReview elementToBeAdded;
+	private Subscription elementToBeAdded;
 
-	public AddProductReview(ProductReview elementToBeAdded) {
+	public AddSubscription(Subscription elementToBeAdded) {
 		this.elementToBeAdded = elementToBeAdded;
 	}
 
@@ -24,8 +24,8 @@ public class AddProductReview implements Command {
 
 		boolean success;
 		try {
-			elementToBeAdded.setProductReviewId(delegator.getNextSeqId("ProductReview"));
-			GenericValue newValue = delegator.makeValue("ProductReview", elementToBeAdded.mapAttributeField());
+			elementToBeAdded.setSubscriptionId(delegator.getNextSeqId("Subscription"));
+			GenericValue newValue = delegator.makeValue("Subscription", elementToBeAdded.mapAttributeField());
 			delegator.create(newValue);
 			success = true;
 		} catch (GenericEntityException e) {
@@ -33,6 +33,6 @@ public class AddProductReview implements Command {
 			success = false;
 		}
 
-		Broker.instance().publish(new ProductReviewAdded(success));
+		Broker.instance().publish(new SubscriptionAdded(elementToBeAdded, success));
 	}
 }
