@@ -22,7 +22,7 @@
 
 	<context:annotation-config />
 	
-	<bean id="databaseInitializer" class="com.skytala.eCommerce.control.DatabaseInitializer">
+	<bean id="databaseInitializer" class="com.skytala.eCommerce.config.DatabaseInitializer">
 	</bean>
 	
 
