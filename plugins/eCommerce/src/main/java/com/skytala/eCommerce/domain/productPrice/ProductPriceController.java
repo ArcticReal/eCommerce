@@ -157,7 +157,8 @@ public class ProductPriceController {
 			return false;
 		}
 
-		if (updateProductPrice(productPriceToBeUpdated, productPriceToBeUpdated.getProductId()).getStatusCode()
+		//TODO correct PK
+ 		if (updateProductPrice(productPriceToBeUpdated, productPriceToBeUpdated.getProductId()).getStatusCode()
 				.equals(HttpStatus.NO_CONTENT)) {
 			return true;
 		}
@@ -175,9 +176,10 @@ public class ProductPriceController {
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{productPriceId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<Object> updateProductPrice(@RequestBody ProductPrice productPriceToBeUpdated,
-			@PathVariable String productPriceId) throws Exception { // FIXME primary key 
+			@PathVariable String productPriceId) throws Exception {
 
-		productPriceToBeUpdated.setProductId(productPriceId);// FIXME 
+		//TODO correct pk
+		productPriceToBeUpdated.setProductId(productPriceId);
 
 		UpdateProductPrice command = new UpdateProductPrice(productPriceToBeUpdated);
 

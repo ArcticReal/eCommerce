@@ -29,7 +29,7 @@ import com.skytala.eCommerce.domain.person.event.PersonAdded;
 import com.skytala.eCommerce.domain.person.event.PersonDeleted;
 import com.skytala.eCommerce.domain.person.event.PersonFound;
 import com.skytala.eCommerce.domain.person.event.PersonUpdated;
-import com.skytala.eCommerce.domain.person.mappper.PersonMapper;
+import com.skytala.eCommerce.domain.person.mapper.PersonMapper;
 import com.skytala.eCommerce.domain.person.model.Person;
 import com.skytala.eCommerce.domain.person.query.FindPersonsBy;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;

@@ -1,44 +1,43 @@
 package com.skytala.eCommerce.domain.prodCatalog.command;
-
 import org.apache.ofbiz.entity.Delegator;
 import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
 import org.apache.ofbiz.entity.GenericValue;
-
 import com.skytala.eCommerce.domain.prodCatalog.event.ProdCatalogAdded;
 import com.skytala.eCommerce.domain.prodCatalog.mapper.ProdCatalogMapper;
 import com.skytala.eCommerce.domain.prodCatalog.model.ProdCatalog;
 import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Command;
 import com.skytala.eCommerce.framework.pubsub.Event;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class AddProdCatalog extends Command {
 
-	private ProdCatalog elementToBeAdded;
+private ProdCatalog elementToBeAdded;
+public AddProdCatalog(ProdCatalog elementToBeAdded){
+this.elementToBeAdded = elementToBeAdded;
+}
 
-	public AddProdCatalog(ProdCatalog elementToBeAdded) {
-		this.elementToBeAdded = elementToBeAdded;
-	}
+@Override
+public Event execute(){
 
-	@Override
-	public Event execute() {
 
-		Delegator delegator = DelegatorFactory.getDelegator("default");
+Delegator delegator = DelegatorFactory.getDelegator("default");
 
-		boolean success;
-		ProdCatalog addedCatalog = null;
-		try {
-			elementToBeAdded.setProdCatalogId(delegator.getNextSeqId("ProdCatalog"));
-			GenericValue newValue = delegator.makeValue("ProdCatalog", elementToBeAdded.mapAttributeField());
-			addedCatalog = ProdCatalogMapper.map(delegator.create(newValue));
-			success = true;
-		} catch (GenericEntityException e) {
-			System.err.println(e.getMessage());
-			success = false;
-		}
+ProdCatalog addedElement = null;
+boolean success = false;
+try {
+elementToBeAdded.setProdCatalogId(delegator.getNextSeqId("ProdCatalog"));
+GenericValue newValue = delegator.makeValue("ProdCatalog", elementToBeAdded.mapAttributeField());
+addedElement = ProdCatalogMapper.map(delegator.create(newValue));
+success = true;
+} catch(GenericEntityException e) {
+ e.printStackTrace(); 
+addedElement = null;
+}
 
-		Event resultingEvent = new ProdCatalogAdded(addedCatalog, success);
-		Broker.instance().publish(resultingEvent);
-		return resultingEvent;
-	}
+Event resultingEvent = new ProdCatalogAdded(addedElement, success);
+Broker.instance().publish(resultingEvent);
+return resultingEvent;
+}
 }

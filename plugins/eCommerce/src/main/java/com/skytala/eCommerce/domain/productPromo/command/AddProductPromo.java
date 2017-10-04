@@ -1,42 +1,43 @@
 package com.skytala.eCommerce.domain.productPromo.command;
-
 import org.apache.ofbiz.entity.Delegator;
 import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
 import org.apache.ofbiz.entity.GenericValue;
-
 import com.skytala.eCommerce.domain.productPromo.event.ProductPromoAdded;
+import com.skytala.eCommerce.domain.productPromo.mapper.ProductPromoMapper;
 import com.skytala.eCommerce.domain.productPromo.model.ProductPromo;
-import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Command;
 import com.skytala.eCommerce.framework.pubsub.Event;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class AddProductPromo extends Command {
 
-	private ProductPromo elementToBeAdded;
+private ProductPromo elementToBeAdded;
+public AddProductPromo(ProductPromo elementToBeAdded){
+this.elementToBeAdded = elementToBeAdded;
+}
 
-	public AddProductPromo(ProductPromo elementToBeAdded) {
-		this.elementToBeAdded = elementToBeAdded;
-	}
+@Override
+public Event execute(){
 
-	@Override
-	public Event execute() {
 
-		Delegator delegator = DelegatorFactory.getDelegator("default");
+Delegator delegator = DelegatorFactory.getDelegator("default");
 
-		boolean success;
-		try {
-			elementToBeAdded.setProductPromoId(delegator.getNextSeqId("ProductPromo"));
-			GenericValue newValue = delegator.makeValue("ProductPromo", elementToBeAdded.mapAttributeField());
-			delegator.create(newValue);
-			success = true;
-		} catch (GenericEntityException e) {
-			System.err.println(e.getMessage());
-			success = false;
-		}
+ProductPromo addedElement = null;
+boolean success = false;
+try {
+elementToBeAdded.setProductPromoId(delegator.getNextSeqId("ProductPromo"));
+GenericValue newValue = delegator.makeValue("ProductPromo", elementToBeAdded.mapAttributeField());
+addedElement = ProductPromoMapper.map(delegator.create(newValue));
+success = true;
+} catch(GenericEntityException e) {
+ e.printStackTrace(); 
+addedElement = null;
+}
 
-		Broker.instance().publish(new ProductPromoAdded(null, success));
-		return null;
-	}
+Event resultingEvent = new ProductPromoAdded(addedElement, success);
+Broker.instance().publish(resultingEvent);
+return resultingEvent;
+}
 }

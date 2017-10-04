@@ -1,13 +1,10 @@
 package com.skytala.eCommerce.domain.userLogin.mapper;
-
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.ofbiz.entity.GenericValue;
-
 import com.skytala.eCommerce.domain.userLogin.model.UserLogin;
 
 public class UserLoginMapper  {

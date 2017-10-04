@@ -1,53 +1,54 @@
 package com.skytala.eCommerce.domain.productCategory.command;
-
 import org.apache.ofbiz.base.util.UtilMisc;
 import org.apache.ofbiz.entity.Delegator;
 import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
-
+import org.apache.ofbiz.entity.GenericValue;
 import com.skytala.eCommerce.domain.productCategory.event.ProductCategoryDeleted;
 import com.skytala.eCommerce.domain.productCategory.model.ProductCategory;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Command;
 import com.skytala.eCommerce.framework.pubsub.Event;
+import org.apache.ofbiz.entity.GenericEntityNotFoundException;
 
 public class DeleteProductCategory extends Command {
 
-	private String toBeDeletedId;
+private String toBeDeletedId;
+public DeleteProductCategory(String toBeDeletedId){
+this.toBeDeletedId = toBeDeletedId;
+}
 
-	public DeleteProductCategory(String toBeDeletedId) {
-		this.toBeDeletedId = toBeDeletedId;
-	}
+@Override
+public Event execute() {
 
-	@Override
-	public Event execute() throws RecordNotFoundException {
+Delegator delegator = DelegatorFactory.getDelegator("default");
 
-		Delegator delegator = DelegatorFactory.getDelegator("default");
+boolean success = false;
 
-		boolean success = false;
+try{
+int countRemoved = delegator.removeByAnd("ProductCategory", UtilMisc.toMap("productCategoryId", toBeDeletedId));
+if(countRemoved > 0) {
+success = true;
+}
+else{
+throw new RecordNotFoundException(ProductCategory.class);
+}
+} catch (GenericEntityException e) {
+ System.err.println(e.getMessage()); 
+if(e.getCause().getClass().equals(GenericEntityNotFoundException.class)) {
+throw new RecordNotFoundException(ProductCategory.class);
+}
+}
+Event resultingEvent = new ProductCategoryDeleted(success);
+Broker.instance().publish(resultingEvent);
+return resultingEvent;
 
-		try {
-			int countRemoved = delegator.removeByAnd("ProductCategory",
-					UtilMisc.toMap("productCategoryId", toBeDeletedId));
-			if (countRemoved > 0) {
-				success = true;
-			} else {
-				throw new RecordNotFoundException(ProductCategory.class);
-			}
-		} catch (GenericEntityException e) {
-			System.err.println(e.getMessage());
-		}
-		Broker.instance().publish(new ProductCategoryDeleted(success));
-		return null;
-
-	}
-
-	public String getToBeDeletedId() {
-		return toBeDeletedId;
-	}
-
-	public void setToBeDeletedId(String toBeDeletedId) {
-		this.toBeDeletedId = toBeDeletedId;
-	}
+}
+public String getToBeDeletedId() {
+return toBeDeletedId;
+}
+public void setToBeDeletedId(String toBeDeletedId) {
+this.toBeDeletedId = toBeDeletedId;
+}
 }

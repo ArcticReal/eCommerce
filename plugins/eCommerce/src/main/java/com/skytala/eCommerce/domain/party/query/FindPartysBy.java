@@ -1,21 +1,23 @@
 package com.skytala.eCommerce.domain.party.query;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.LinkedList;
 
 import org.apache.ofbiz.entity.Delegator;
 import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
 import org.apache.ofbiz.entity.GenericValue;
-
+import com.skytala.eCommerce.framework.pubsub.Broker;
+import com.skytala.eCommerce.framework.pubsub.Query;
+import com.skytala.eCommerce.framework.pubsub.Event;
+import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
+import com.skytala.eCommerce.domain.party.event.PartyAdded;
 import com.skytala.eCommerce.domain.party.event.PartyFound;
 import com.skytala.eCommerce.domain.party.mapper.PartyMapper;
 import com.skytala.eCommerce.domain.party.model.Party;
-import com.skytala.eCommerce.framework.pubsub.Broker;
-import com.skytala.eCommerce.framework.pubsub.Event;
-import com.skytala.eCommerce.framework.pubsub.Query;
 
 public class FindPartysBy extends Query {
 
@@ -32,7 +34,18 @@ public class FindPartysBy extends Query {
 		List<Party> foundPartys = new ArrayList<Party>();
 
 		try {
-			List<GenericValue> buf = delegator.findAll("Party", false);
+			List<GenericValue> buf = new LinkedList<>();
+			if (filter.size() == 1 && filter.containsKey("partyId")) {
+				GenericValue foundElement = delegator.findOne("Party", false, filter);
+				if (foundElement != null) {
+					buf.add(foundElement);
+				} else {
+					throw new RecordNotFoundException(Party.class);
+				}
+			} else {
+				buf = delegator.findAll("Party", false);
+			}
+
 			for (int i = 0; i < buf.size(); i++) {
 				if (applysToFilter(buf.get(i))) {
 					foundPartys.add(PartyMapper.map(buf.get(i)));
@@ -42,8 +55,9 @@ public class FindPartysBy extends Query {
 		} catch (GenericEntityException e) {
 			e.printStackTrace();
 		}
-		Broker.instance().publish(new PartyFound(foundPartys));
-		return null;
+		Event resultingEvent = new PartyFound(foundPartys);
+		Broker.instance().publish(resultingEvent);
+		return resultingEvent;
 
 	}
 
@@ -66,9 +80,8 @@ public class FindPartysBy extends Query {
 		}
 		return true;
 	}
-	
-	public void setFilter(Map<String, String> filter) {
-		this.filter = filter;
+
+	public void setFilter(Map<String, String> newFilter) {
+		this.filter = newFilter;
 	}
-	
 }

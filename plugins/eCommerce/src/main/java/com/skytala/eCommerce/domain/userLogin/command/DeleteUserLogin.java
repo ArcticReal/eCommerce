@@ -3,11 +3,14 @@ import org.apache.ofbiz.base.util.UtilMisc;
 import org.apache.ofbiz.entity.Delegator;
 import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
-
+import org.apache.ofbiz.entity.GenericValue;
 import com.skytala.eCommerce.domain.userLogin.event.UserLoginDeleted;
+import com.skytala.eCommerce.domain.userLogin.model.UserLogin;
+import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Command;
 import com.skytala.eCommerce.framework.pubsub.Event;
+import org.apache.ofbiz.entity.GenericEntityNotFoundException;
 
 public class DeleteUserLogin extends Command {
 
@@ -17,7 +20,7 @@ this.toBeDeletedId = toBeDeletedId;
 }
 
 @Override
-public Event execute(){
+public Event execute() {
 
 Delegator delegator = DelegatorFactory.getDelegator("default");
 
@@ -28,11 +31,18 @@ int countRemoved = delegator.removeByAnd("UserLogin", UtilMisc.toMap("userLoginI
 if(countRemoved > 0) {
 success = true;
 }
-} catch (GenericEntityException e) {
-e.printStackTrace();
+else{
+throw new RecordNotFoundException(UserLogin.class);
 }
-Broker.instance().publish(new UserLoginDeleted(success));
-return null;
+} catch (GenericEntityException e) {
+ System.err.println(e.getMessage()); 
+if(e.getCause().getClass().equals(GenericEntityNotFoundException.class)) {
+throw new RecordNotFoundException(UserLogin.class);
+}
+}
+Event resultingEvent = new UserLoginDeleted(success);
+Broker.instance().publish(resultingEvent);
+return resultingEvent;
 
 }
 public String getToBeDeletedId() {

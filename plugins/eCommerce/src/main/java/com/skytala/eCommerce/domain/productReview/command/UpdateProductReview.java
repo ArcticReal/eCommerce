@@ -3,7 +3,7 @@ import org.apache.ofbiz.entity.Delegator;
 import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
 import org.apache.ofbiz.entity.GenericValue;
-
+import org.apache.ofbiz.entity.GenericEntityNotFoundException;
 import com.skytala.eCommerce.domain.productReview.event.ProductReviewUpdated;
 import com.skytala.eCommerce.domain.productReview.model.ProductReview;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
@@ -40,10 +40,14 @@ throw new RecordNotFoundException(ProductReview.class);
 }
 success = true;
 } catch (GenericEntityException e) {
- System.err.println(e.getMessage()); 
+e.printStackTrace();
+if(e.getCause().getClass().equals(GenericEntityNotFoundException.class)) {
+throw new RecordNotFoundException(ProductReview.class);
+}
 success = false;
 }
-Broker.instance().publish(new ProductReviewUpdated(success));
-return null;
+Event resultingEvent = new ProductReviewUpdated(success);
+Broker.instance().publish(resultingEvent);
+return resultingEvent;
 }
 }

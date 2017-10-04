@@ -1,73 +1,85 @@
 package com.skytala.eCommerce.domain.userLogin.query;
-
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.LinkedList;
+
 import org.apache.ofbiz.entity.Delegator;
 import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
-import org.apache.ofbiz.entity.GenericValue;
-
+	import org.apache.ofbiz.entity.GenericValue;
+import com.skytala.eCommerce.framework.pubsub.Broker;
+import com.skytala.eCommerce.framework.pubsub.Query;
+import com.skytala.eCommerce.framework.pubsub.Event;
+import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
+import com.skytala.eCommerce.domain.userLogin.event.UserLoginAdded;
 import com.skytala.eCommerce.domain.userLogin.event.UserLoginFound;
 import com.skytala.eCommerce.domain.userLogin.mapper.UserLoginMapper;
 import com.skytala.eCommerce.domain.userLogin.model.UserLogin;
-import com.skytala.eCommerce.framework.pubsub.Broker;
-import com.skytala.eCommerce.framework.pubsub.Event;
-import com.skytala.eCommerce.framework.pubsub.Query;
 
 public class FindUserLoginsBy extends Query {
 
-	Map<String, String> filter;
 
-	public FindUserLoginsBy(Map<String, String> filter) {
-		this.filter = filter;
-	}
+Map<String, String> filter;
+public FindUserLoginsBy(Map<String, String> filter) {
+this.filter = filter;
+}
 
-	@Override
-	public Event execute() {
+@Override
+public Event execute(){
 
-		Delegator delegator = DelegatorFactory.getDelegator("default");
-		List<UserLogin> foundUserLogins = new ArrayList<UserLogin>();
+Delegator delegator = DelegatorFactory.getDelegator("default");
+List<UserLogin> foundUserLogins = new ArrayList<UserLogin>();
 
-		try {
-			List<GenericValue> buf = delegator.findAll("UserLogin", false);
-			for (int i = 0; i < buf.size(); i++) {
-				if (applysToFilter(buf.get(i))) {
-					foundUserLogins.add(UserLoginMapper.map(buf.get(i)));
-				}
-			}
+try{
+List<GenericValue> buf = new LinkedList<>();
+if(filter.size()==1&&filter.containsKey("userLoginId")) { 
+ GenericValue foundElement = delegator.findOne("UserLogin", false, filter);
+if(foundElement != null) { 
+buf.add(foundElement);
+}else { 
+throw new RecordNotFoundException(UserLogin.class); 
+ } 
+}else { 
+ buf = delegator.findAll("UserLogin", false); 
+ }
 
-		} catch (GenericEntityException e) {
-			e.printStackTrace();
-		}
-		Broker.instance().publish(new UserLoginFound(foundUserLogins));
-		return null;
+for (int i = 0; i < buf.size(); i++) {
+if(applysToFilter(buf.get(i))) {
+foundUserLogins.add(UserLoginMapper.map(buf.get(i)));
+}
+}
 
-	}
 
-	public boolean applysToFilter(GenericValue val) {
+}catch(GenericEntityException e) {
+e.printStackTrace();
+}
+Event resultingEvent = new UserLoginFound(foundUserLogins);
+Broker.instance().publish(resultingEvent);
+return resultingEvent;
 
-		Iterator<String> iterator = filter.keySet().iterator();
+}
+public boolean applysToFilter(GenericValue val) {
 
-		while (iterator.hasNext()) {
+Iterator<String> iterator = filter.keySet().iterator();
 
-			String key = iterator.next();
+while(iterator.hasNext()) {
 
-			if (val.get(key) == null) {
-				return false;
-			}
+String key = iterator.next();
 
-			if ((val.get(key).toString()).contains(filter.get(key))) {
-			} else {
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	public void setFilter(Map<String, String> filter) {
-		this.filter = filter;
-	}
+if(val.get(key) == null) {
+return false;
+}
 
+if((val.get(key).toString()).contains(filter.get(key))) {
+}else {
+return false;
+}
+}
+return true;
+}
+public void setFilter(Map<String, String> newFilter) {
+this.filter = newFilter;
+}
 }

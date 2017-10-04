@@ -4,13 +4,13 @@ import org.apache.ofbiz.entity.Delegator;
 import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
 import org.apache.ofbiz.entity.GenericValue;
-
 import com.skytala.eCommerce.domain.person.event.PersonAdded;
-import com.skytala.eCommerce.domain.person.mappper.PersonMapper;
+import com.skytala.eCommerce.domain.person.mapper.PersonMapper;
 import com.skytala.eCommerce.domain.person.model.Person;
 import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Command;
 import com.skytala.eCommerce.framework.pubsub.Event;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class AddPerson extends Command {
 
@@ -25,19 +25,20 @@ public class AddPerson extends Command {
 
 		Delegator delegator = DelegatorFactory.getDelegator("default");
 
-		boolean success;
-		Person addedPerson = null;
+		Person addedElement = null;
+		boolean success = false;
 		try {
-//			elementToBeAdded.setPersonId(delegator.getNextSeqId("Person"));
+			//TODO set correct primary key
+			//elementToBeAdded.setPartyId(delegator.getNextSeqId("Person"));
 			GenericValue newValue = delegator.makeValue("Person", elementToBeAdded.mapAttributeField());
-			addedPerson = PersonMapper.map(delegator.create(newValue));
+			addedElement = PersonMapper.map(delegator.create(newValue));
 			success = true;
 		} catch (GenericEntityException e) {
 			e.printStackTrace();
-			success = false;
+			addedElement = null;
 		}
 
-		Event resultingEvent = new PersonAdded(addedPerson, success);
+		Event resultingEvent = new PersonAdded(addedElement, success);
 		Broker.instance().publish(resultingEvent);
 		return resultingEvent;
 	}
