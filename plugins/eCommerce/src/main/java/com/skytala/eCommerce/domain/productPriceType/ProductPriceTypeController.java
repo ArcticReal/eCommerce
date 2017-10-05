@@ -1,0 +1,256 @@
+package com.skytala.eCommerce.domain.productPriceType;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.google.common.base.Splitter;
+import com.skytala.eCommerce.domain.productPriceType.command.AddProductPriceType;
+import com.skytala.eCommerce.domain.productPriceType.command.DeleteProductPriceType;
+import com.skytala.eCommerce.domain.productPriceType.command.UpdateProductPriceType;
+import com.skytala.eCommerce.domain.productPriceType.event.ProductPriceTypeAdded;
+import com.skytala.eCommerce.domain.productPriceType.event.ProductPriceTypeDeleted;
+import com.skytala.eCommerce.domain.productPriceType.event.ProductPriceTypeFound;
+import com.skytala.eCommerce.domain.productPriceType.event.ProductPriceTypeUpdated;
+import com.skytala.eCommerce.domain.productPriceType.mapper.ProductPriceTypeMapper;
+import com.skytala.eCommerce.domain.productPriceType.model.ProductPriceType;
+import com.skytala.eCommerce.domain.productPriceType.query.FindProductPriceTypesBy;
+import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
+import com.skytala.eCommerce.framework.pubsub.Scheduler;
+
+@RestController
+@RequestMapping("/productPriceTypes")
+public class ProductPriceTypeController {
+
+	private static Map<String, RequestMethod> validRequests = new HashMap<>();
+
+	public ProductPriceTypeController() {
+
+		validRequests.put("find", RequestMethod.GET);
+		validRequests.put("add", RequestMethod.POST);
+		validRequests.put("update", RequestMethod.PUT);
+		validRequests.put("removeById", RequestMethod.DELETE);
+	}
+
+	/**
+	 * 
+	 * @param allRequestParams
+	 *            all params by which you want to find a ProductPriceType
+	 * @return a List with the ProductPriceTypes
+	 * @throws Exception 
+	 */
+	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	public ResponseEntity<Object> findProductPriceTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+
+		FindProductPriceTypesBy query = new FindProductPriceTypesBy(allRequestParams);
+		if (allRequestParams == null) {
+			query.setFilter(new HashMap<>());
+		}
+
+		List<ProductPriceType> productPriceTypes =((ProductPriceTypeFound) Scheduler.execute(query).data()).getProductPriceTypes();
+
+		if (productPriceTypes.size() == 1) {
+			return ResponseEntity.ok().body(productPriceTypes.get(0));
+		}
+
+		return ResponseEntity.ok().body(productPriceTypes);
+
+	}
+
+	/**
+	 * 
+	 * this method will only be called by Springs DispatcherServlet
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @return true on success; false on fail
+	 */
+	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<Object> createProductPriceType(HttpServletRequest request) throws Exception {
+
+		ProductPriceType productPriceTypeToBeAdded = new ProductPriceType();
+		try {
+			productPriceTypeToBeAdded = ProductPriceTypeMapper.map(request);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+		}
+
+		return this.createProductPriceType(productPriceTypeToBeAdded);
+
+	}
+
+	/**
+	 * creates a new ProductPriceType entry in the ofbiz database
+	 * 
+	 * @param productPriceTypeToBeAdded
+	 *            the ProductPriceType thats to be added
+	 * @return true on success; false on fail
+	 */
+	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<Object> createProductPriceType(@RequestBody ProductPriceType productPriceTypeToBeAdded) throws Exception {
+
+		AddProductPriceType command = new AddProductPriceType(productPriceTypeToBeAdded);
+		ProductPriceType productPriceType = ((ProductPriceTypeAdded) Scheduler.execute(command).data()).getAddedProductPriceType();
+		
+		if (productPriceType != null) 
+			return ResponseEntity.status(HttpStatus.CREATED)
+					             .body(productPriceType);
+		else 
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					             .body("ProductPriceType could not be created.");
+	}
+
+	/**
+	 * this method will only be called by Springs DispatcherServlet
+	 * 
+	 * @deprecated
+	 * @param request
+	 *            HttpServletRequest object
+	 * @return true on success, false on fail
+	 * @throws Exception 
+	 */
+	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	public boolean updateProductPriceType(HttpServletRequest request) throws Exception {
+
+		BufferedReader br;
+		String data = null;
+		Map<String, String> dataMap = null;
+
+		try {
+			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
+			if (br != null) {
+				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
+			}
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			return false;
+		}
+
+		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
+				.split(data);
+
+		ProductPriceType productPriceTypeToBeUpdated = new ProductPriceType();
+
+		try {
+			productPriceTypeToBeUpdated = ProductPriceTypeMapper.mapstrstr(dataMap);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		if (updateProductPriceType(productPriceTypeToBeUpdated, productPriceTypeToBeUpdated.getProductPriceTypeId()).getStatusCode()
+				.equals(HttpStatus.NO_CONTENT)) {
+			return true;
+		}
+		return false;
+
+	}
+
+	/**
+	 * Updates the ProductPriceType with the specific Id
+	 * 
+	 * @param productPriceTypeToBeUpdated
+	 *            the ProductPriceType thats to be updated
+	 * @return true on success, false on fail
+	 * @throws Exception 
+	 */
+	@RequestMapping(method = RequestMethod.PUT, value = "/{productPriceTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<Object> updateProductPriceType(@RequestBody ProductPriceType productPriceTypeToBeUpdated,
+			@PathVariable String productPriceTypeId) throws Exception {
+
+		productPriceTypeToBeUpdated.setProductPriceTypeId(productPriceTypeId);
+
+		UpdateProductPriceType command = new UpdateProductPriceType(productPriceTypeToBeUpdated);
+
+		try {
+			if(((ProductPriceTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+		} catch (RecordNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/{productPriceTypeId}")
+	public ResponseEntity<Object> findById(@PathVariable String productPriceTypeId) throws Exception {
+		HashMap<String, String> requestParams = new HashMap<String, String>();
+		requestParams.put("productPriceTypeId", productPriceTypeId);
+		try {
+
+			Object foundProductPriceType = findProductPriceTypesBy(requestParams).getBody();
+			return ResponseEntity.status(HttpStatus.OK).body(foundProductPriceType);
+		} catch (RecordNotFoundException e) {
+
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+
+	}
+
+	@RequestMapping(method = RequestMethod.DELETE, value = "/{productPriceTypeId}")
+	public ResponseEntity<Object> deleteProductPriceTypeByIdUpdated(@PathVariable String productPriceTypeId) throws Exception {
+		DeleteProductPriceType command = new DeleteProductPriceType(productPriceTypeId);
+
+		try {
+			if (((ProductPriceTypeDeleted) Scheduler.execute(command).data()).isSuccess())
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+		} catch (RecordNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+
+		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductPriceType could not be deleted");
+
+	}
+
+	@RequestMapping(value = (" ** "))
+	public ResponseEntity<Object> returnErrorPage(HttpServletRequest request) {
+
+		String usedUri = request.getRequestURI();
+		String[] splittedString = usedUri.split("/");
+
+		String usedRequest = splittedString[splittedString.length - 1];
+
+		if (validRequests.containsKey(usedRequest)) {
+			String returnVal = "Error: request method " + request.getMethod() + " not allowed for \"" + usedUri
+					+ "\"!\n" + "Please use " + validRequests.get(usedRequest) + "!";
+
+			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(returnVal);
+		}
+
+		String returnVal = "Error 404: Page not found! Valid pages are: \"eCommerce/api/productPriceType/\" plus one of the following: "
+				+ "";
+
+		Set<String> keySet = validRequests.keySet();
+		Iterator<String> it = keySet.iterator();
+
+		while (it.hasNext()) {
+			returnVal += "\"" + it.next() + "\"";
+			if (it.hasNext())
+				returnVal += ", ";
+		}
+
+		returnVal += "!";
+
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(returnVal);
+
+	}
+}

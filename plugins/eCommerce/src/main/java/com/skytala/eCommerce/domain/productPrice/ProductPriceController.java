@@ -157,8 +157,7 @@ public class ProductPriceController {
 			return false;
 		}
 
-		//TODO correct PK
- 		if (updateProductPrice(productPriceToBeUpdated, productPriceToBeUpdated.getProductId()).getStatusCode()
+		if (updateProductPrice(productPriceToBeUpdated, null).getStatusCode()
 				.equals(HttpStatus.NO_CONTENT)) {
 			return true;
 		}
@@ -174,12 +173,11 @@ public class ProductPriceController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/{productPriceId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<Object> updateProductPrice(@RequestBody ProductPrice productPriceToBeUpdated,
-			@PathVariable String productPriceId) throws Exception {
+			@PathVariable String nullVal) throws Exception {
 
-		//TODO correct pk
-		productPriceToBeUpdated.setProductId(productPriceId);
+//		productPriceToBeUpdated.setnull(null);
 
 		UpdateProductPrice command = new UpdateProductPrice(productPriceToBeUpdated);
 

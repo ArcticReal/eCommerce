@@ -157,7 +157,7 @@ public class PersonController {
 			return false;
 		}
 
-		if (updatePerson(personToBeUpdated, personToBeUpdated.getPartyId()).getStatusCode()
+		if (updatePerson(personToBeUpdated, null).getStatusCode()
 				.equals(HttpStatus.NO_CONTENT)) {
 			return true;
 		}
@@ -173,11 +173,11 @@ public class PersonController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/{personId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<Object> updatePerson(@RequestBody Person personToBeUpdated,
-			@PathVariable String personId) throws Exception {
+			@PathVariable String nullVal) throws Exception {
 
-		personToBeUpdated.setPartyId(personId);
+//		personToBeUpdated.setnull(null);
 
 		UpdatePerson command = new UpdatePerson(personToBeUpdated);
 
