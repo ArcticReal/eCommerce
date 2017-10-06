@@ -1,5 +1,4 @@
 package com.skytala.eCommerce.domain.productPrice.command;
-
 import org.apache.ofbiz.entity.Delegator;
 import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
@@ -14,33 +13,31 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class AddProductPrice extends Command {
 
-	private ProductPrice elementToBeAdded;
+private ProductPrice elementToBeAdded;
+public AddProductPrice(ProductPrice elementToBeAdded){
+this.elementToBeAdded = elementToBeAdded;
+}
 
-	public AddProductPrice(ProductPrice elementToBeAdded) {
-		this.elementToBeAdded = elementToBeAdded;
-	}
+@Override
+public Event execute(){
 
-	@Override
-	public Event execute() {
 
-		Delegator delegator = DelegatorFactory.getDelegator("default");
+Delegator delegator = DelegatorFactory.getDelegator("default");
 
-		ProductPrice addedElement = null;
-		boolean success = false;
-		try {
+ProductPrice addedElement = null;
+boolean success = false;
+try {
+elementToBeAdded.setProductPriceTypeId(delegator.getNextSeqId("ProductPrice"));
+GenericValue newValue = delegator.makeValue("ProductPrice", elementToBeAdded.mapAttributeField());
+addedElement = ProductPriceMapper.map(delegator.create(newValue));
+success = true;
+} catch(GenericEntityException e) {
+ e.printStackTrace(); 
+addedElement = null;
+}
 
-			// TODO correct pk
-			elementToBeAdded.setProductId(delegator.getNextSeqId("ProductPrice"));
-			GenericValue newValue = delegator.makeValue("ProductPrice", elementToBeAdded.mapAttributeField());
-			addedElement = ProductPriceMapper.map(delegator.create(newValue));
-			success = true;
-		} catch (GenericEntityException e) {
-			e.printStackTrace();
-			addedElement = null;
-		}
-
-		Event resultingEvent = new ProductPriceAdded(addedElement, success);
-		Broker.instance().publish(resultingEvent);
-		return resultingEvent;
-	}
+Event resultingEvent = new ProductPriceAdded(addedElement, success);
+Broker.instance().publish(resultingEvent);
+return resultingEvent;
+}
 }

@@ -157,7 +157,7 @@ public class ProductPriceController {
 			return false;
 		}
 
-		if (updateProductPrice(productPriceToBeUpdated, null).getStatusCode()
+		if (updateProductPrice(productPriceToBeUpdated, productPriceToBeUpdated.getProductPriceTypeId()).getStatusCode()
 				.equals(HttpStatus.NO_CONTENT)) {
 			return true;
 		}
@@ -173,11 +173,11 @@ public class ProductPriceController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(method = RequestMethod.PUT, value = "/{productPriceTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<Object> updateProductPrice(@RequestBody ProductPrice productPriceToBeUpdated,
-			@PathVariable String nullVal) throws Exception {
+			@PathVariable String productPriceTypeId) throws Exception {
 
-//		productPriceToBeUpdated.setnull(null);
+		productPriceToBeUpdated.setProductPriceTypeId(productPriceTypeId);
 
 		UpdateProductPrice command = new UpdateProductPrice(productPriceToBeUpdated);
 
@@ -191,10 +191,10 @@ public class ProductPriceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productPriceId}")
-	public ResponseEntity<Object> findById(@PathVariable String productPriceId) throws Exception {
+	@RequestMapping(method = RequestMethod.GET, value = "/{productPriceTypeId}")
+	public ResponseEntity<Object> findById(@PathVariable String productPriceTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
-		requestParams.put("productPriceId", productPriceId);
+		requestParams.put("productPriceTypeId", productPriceTypeId);
 		try {
 
 			Object foundProductPrice = findProductPricesBy(requestParams).getBody();
@@ -206,9 +206,9 @@ public class ProductPriceController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productPriceId}")
-	public ResponseEntity<Object> deleteProductPriceByIdUpdated(@PathVariable String productPriceId) throws Exception {
-		DeleteProductPrice command = new DeleteProductPrice(productPriceId);
+	@RequestMapping(method = RequestMethod.DELETE, value = "/{productPriceTypeId}")
+	public ResponseEntity<Object> deleteProductPriceByIdUpdated(@PathVariable String productPriceTypeId) throws Exception {
+		DeleteProductPrice command = new DeleteProductPrice(productPriceTypeId);
 
 		try {
 			if (((ProductPriceDeleted) Scheduler.execute(command).data()).isSuccess())

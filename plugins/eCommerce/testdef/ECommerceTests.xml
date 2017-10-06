@@ -9,6 +9,7 @@
 
 
        	<junit-test-suite class-name="com.skytala.eCommerce.domain.product.test.controller.ProductControllerTest"/>
+       	<junit-test-suite class-name="com.skytala.eCommerce.domain.party.test.controller.PartyControllerTest"/>
 
     </test-group>
 </test-suite>

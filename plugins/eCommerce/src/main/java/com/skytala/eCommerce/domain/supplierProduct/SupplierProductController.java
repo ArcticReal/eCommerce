@@ -177,7 +177,7 @@ public class SupplierProductController {
 	public ResponseEntity<Object> updateSupplierProduct(@RequestBody SupplierProduct supplierProductToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
-//		supplierProductToBeUpdated.setnull(null);
+//		supplierProductToBeUpdated.setMinimumOrderQuantity(null);
 
 		UpdateSupplierProduct command = new UpdateSupplierProduct(supplierProductToBeUpdated);
 

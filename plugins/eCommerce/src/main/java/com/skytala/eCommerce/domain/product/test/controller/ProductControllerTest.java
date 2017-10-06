@@ -10,8 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.ofbiz.entity.Delegator;
 import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
@@ -49,11 +47,11 @@ public class ProductControllerTest extends TestCase {
 	private static final String EXISTING_PRODUCT_ID_DELETABLE = "EXISTING_ID_DELABLE";
 	private static final String NON_EXISTING_PRODUCT_ID = "NON_EXISTING_XYZAABC";
 
-	private static final String DEFAULT_PRODUCT_NAME = "AAAAAAAAAA";
-	private static final String UPDATED_PRODUCT_NAME = "BBBBBBBBBB";
-	private static final String EXISTING_PRODUCT_NAME = "EXISTING_PRODUCT";
+	private static final String DEFAULT_INTERNALNAME = "AAAAAAAAAA";
+	private static final String UPDATED_INTERNALNAME = "BBBBBBBBBB";
+	private static final String EXISTING_INTERNALNAME = "EXISTING_INTERNALNAME";
 
-	private static final String INVALID_FACILITY_ID = "NON_EXISTING_XYZAABBC";
+	private static final String PRODUCTTYPEID = "NON_EXISTING_XYZAABBC";
 
 	ObjectMapper objectMapper;
 
@@ -71,8 +69,8 @@ public class ProductControllerTest extends TestCase {
 
 		Product product = new Product();
 		product.setProductId(EXISTING_PRODUCT_ID_NON_DELETABLE);
-		product.setProductName(EXISTING_PRODUCT_NAME);
-		product.setAutoCreateKeywords(true);
+		product.setInternalName(EXISTING_INTERNALNAME);
+//		Product.setAutoCreateKeywords(true);
 
 		try {
 			delegator.createOrStore(delegator.makeValue("Product", product.mapAttributeField()));
@@ -82,8 +80,8 @@ public class ProductControllerTest extends TestCase {
 
 		product = new Product();
 		product.setProductId(EXISTING_PRODUCT_ID_DELETABLE);
-		product.setProductName("testProductDel");
-		product.setAutoCreateKeywords(false);
+		product.setInternalName("testProductDel");
+//		product.setAutoCreateKeywords(false);
 
 		try {
 			delegator.createOrStore(delegator.makeValue("Product", product.mapAttributeField()));
@@ -115,7 +113,7 @@ public class ProductControllerTest extends TestCase {
 
 		Product product = new Product();
 		product.setProductId(DEFAULT_PRODUCT_ID);
-		product.setProductName(DEFAULT_PRODUCT_NAME);
+		product.setInternalName(DEFAULT_INTERNALNAME);
 
 		String contentExpected = mockMvc
 				.perform(post("/products/add").contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -152,7 +150,7 @@ public class ProductControllerTest extends TestCase {
 
 		Product product = new Product();
 		product.setProductId(EXISTING_PRODUCT_ID_DELETABLE);
-		product.setProductName(DEFAULT_PRODUCT_NAME);
+		product.setInternalName(DEFAULT_INTERNALNAME);
 
 		mockMvc.perform(post("/products/add").contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(objectMapper.writeValueAsString(product))).andExpect(status().isCreated());
@@ -182,7 +180,7 @@ public class ProductControllerTest extends TestCase {
 
 		Product product = new Product();
 		product.setProductId(DEFAULT_PRODUCT_ID);
-		product.setFacilityId(INVALID_FACILITY_ID);
+		product.setProductTypeId(PRODUCTTYPEID);
 
 		mockMvc.perform(post("/products/add").contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(objectMapper.writeValueAsString(product))).andExpect(status().isConflict());
@@ -190,7 +188,6 @@ public class ProductControllerTest extends TestCase {
 		mockMvc.perform(get("/products/" + DEFAULT_PRODUCT_ID)).andExpect(status().isNotFound());
 
 	}
-
 	/**
 	 * update test
 	 * 
@@ -211,14 +208,14 @@ public class ProductControllerTest extends TestCase {
 
 		Product product = new Product();
 		product.setProductId(EXISTING_PRODUCT_ID_NON_DELETABLE);
-		product.setProductName(UPDATED_PRODUCT_NAME);
+		product.setInternalName(UPDATED_INTERNALNAME);
 
 		mockMvc.perform(put("/products/" + EXISTING_PRODUCT_ID_NON_DELETABLE)
 				.contentType(MediaType.APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(product)))
 				.andExpect(status().isNoContent());
 
 		mockMvc.perform(get("/products/" + EXISTING_PRODUCT_ID_NON_DELETABLE)).andExpect(status().isOk())
-				.andExpect(jsonPath("$.productName").value(UPDATED_PRODUCT_NAME));
+				.andExpect(jsonPath("$.internalName").value(UPDATED_INTERNALNAME));
 
 	}
 
@@ -241,7 +238,7 @@ public class ProductControllerTest extends TestCase {
 	public void testUpdateNonExistingProductWithValidData() throws JsonProcessingException, Exception {
 		Product product = new Product();
 		product.setProductId(NON_EXISTING_PRODUCT_ID);
-		product.setProductName(UPDATED_PRODUCT_NAME);
+		product.setInternalName(UPDATED_INTERNALNAME);
 
 		mockMvc.perform(put("/products/" + NON_EXISTING_PRODUCT_ID).contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(objectMapper.writeValueAsString(product))).andExpect(status().isNotFound());
@@ -269,15 +266,15 @@ public class ProductControllerTest extends TestCase {
 	public void testUpdateExistingProductWithInvalidData() throws JsonProcessingException, Exception {
 		Product product = new Product();
 		product.setProductId(EXISTING_PRODUCT_ID_NON_DELETABLE);
-		product.setProductName(UPDATED_PRODUCT_NAME);
-		product.setFacilityId(INVALID_FACILITY_ID);
+		product.setInternalName(UPDATED_INTERNALNAME);
+		product.setProductTypeId(PRODUCTTYPEID);
 
 		mockMvc.perform(put("/products/" + EXISTING_PRODUCT_ID_NON_DELETABLE)
 				.contentType(MediaType.APPLICATION_JSON_UTF8).content(objectMapper.writeValueAsString(product)))
 				.andExpect(status().isConflict());
 
 		mockMvc.perform(get("/products/" + EXISTING_PRODUCT_ID_NON_DELETABLE)).andExpect(status().isOk())
-				.andExpect(jsonPath("$.productName").value(EXISTING_PRODUCT_NAME));
+				.andExpect(jsonPath("$.internalName").value(EXISTING_INTERNALNAME));
 	}
 
 	/**
@@ -300,8 +297,8 @@ public class ProductControllerTest extends TestCase {
 	public void testUpdateNonExistingProductWithInvalidData() throws JsonProcessingException, Exception {
 		Product product = new Product();
 		product.setProductId(NON_EXISTING_PRODUCT_ID);
-		product.setProductName(UPDATED_PRODUCT_NAME);
-		product.setFacilityId(INVALID_FACILITY_ID);
+		product.setInternalName(UPDATED_INTERNALNAME);
+		product.setProductTypeId(PRODUCTTYPEID);
 
 		mockMvc.perform(put("/products/" + NON_EXISTING_PRODUCT_ID).contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(objectMapper.writeValueAsString(product))).andExpect(status().isNotFound());
@@ -309,7 +306,6 @@ public class ProductControllerTest extends TestCase {
 		mockMvc.perform(get("/products/" + NON_EXISTING_PRODUCT_ID)).andExpect(status().isNotFound());
 
 	}
-
 	/**
 	 * get test
 	 *
@@ -431,5 +427,4 @@ public class ProductControllerTest extends TestCase {
 				.andExpect(jsonPath("$", hasSize(countProductsBeforeDelete)));
 
 	}
-
 }
