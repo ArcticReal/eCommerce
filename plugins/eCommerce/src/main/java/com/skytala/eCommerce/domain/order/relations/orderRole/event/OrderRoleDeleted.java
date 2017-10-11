@@ -1,0 +1,18 @@
+package com.skytala.eCommerce.domain.order.relations.orderRole.event;
+
+import com.skytala.eCommerce.framework.pubsub.Event;
+
+import com.skytala.eCommerce.domain.order.relations.orderRole.model.OrderRole;
+public class OrderRoleDeleted implements Event{
+
+	private boolean success;
+
+	public OrderRoleDeleted(boolean success) {
+		this.success = success;
+	}
+
+	public boolean isSuccess()	{
+		return success;
+	}
+
+}
