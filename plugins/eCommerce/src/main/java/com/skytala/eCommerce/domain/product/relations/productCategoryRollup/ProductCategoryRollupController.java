@@ -1,0 +1,256 @@
+package com.skytala.eCommerce.domain.product.relations.productCategoryRollup;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.google.common.base.Splitter;
+import com.skytala.eCommerce.domain.product.relations.productCategoryRollup.command.AddProductCategoryRollup;
+import com.skytala.eCommerce.domain.product.relations.productCategoryRollup.command.DeleteProductCategoryRollup;
+import com.skytala.eCommerce.domain.product.relations.productCategoryRollup.command.UpdateProductCategoryRollup;
+import com.skytala.eCommerce.domain.product.relations.productCategoryRollup.event.ProductCategoryRollupAdded;
+import com.skytala.eCommerce.domain.product.relations.productCategoryRollup.event.ProductCategoryRollupDeleted;
+import com.skytala.eCommerce.domain.product.relations.productCategoryRollup.event.ProductCategoryRollupFound;
+import com.skytala.eCommerce.domain.product.relations.productCategoryRollup.event.ProductCategoryRollupUpdated;
+import com.skytala.eCommerce.domain.product.relations.productCategoryRollup.mapper.ProductCategoryRollupMapper;
+import com.skytala.eCommerce.domain.product.relations.productCategoryRollup.model.ProductCategoryRollup;
+import com.skytala.eCommerce.domain.product.relations.productCategoryRollup.query.FindProductCategoryRollupsBy;
+import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
+import com.skytala.eCommerce.framework.pubsub.Scheduler;
+
+@RestController
+@RequestMapping("/productCategoryRollups")
+public class ProductCategoryRollupController {
+
+	private static Map<String, RequestMethod> validRequests = new HashMap<>();
+
+	public ProductCategoryRollupController() {
+
+		validRequests.put("find", RequestMethod.GET);
+		validRequests.put("add", RequestMethod.POST);
+		validRequests.put("update", RequestMethod.PUT);
+		validRequests.put("removeById", RequestMethod.DELETE);
+	}
+
+	/**
+	 * 
+	 * @param allRequestParams
+	 *            all params by which you want to find a ProductCategoryRollup
+	 * @return a List with the ProductCategoryRollups
+	 * @throws Exception 
+	 */
+	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	public ResponseEntity<Object> findProductCategoryRollupsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+
+		FindProductCategoryRollupsBy query = new FindProductCategoryRollupsBy(allRequestParams);
+		if (allRequestParams == null) {
+			query.setFilter(new HashMap<>());
+		}
+
+		List<ProductCategoryRollup> productCategoryRollups =((ProductCategoryRollupFound) Scheduler.execute(query).data()).getProductCategoryRollups();
+
+		if (productCategoryRollups.size() == 1) {
+			return ResponseEntity.ok().body(productCategoryRollups.get(0));
+		}
+
+		return ResponseEntity.ok().body(productCategoryRollups);
+
+	}
+
+	/**
+	 * 
+	 * this method will only be called by Springs DispatcherServlet
+	 * 
+	 * @param request
+	 *            HttpServletRequest
+	 * @return true on success; false on fail
+	 */
+	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<Object> createProductCategoryRollup(HttpServletRequest request) throws Exception {
+
+		ProductCategoryRollup productCategoryRollupToBeAdded = new ProductCategoryRollup();
+		try {
+			productCategoryRollupToBeAdded = ProductCategoryRollupMapper.map(request);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+		}
+
+		return this.createProductCategoryRollup(productCategoryRollupToBeAdded);
+
+	}
+
+	/**
+	 * creates a new ProductCategoryRollup entry in the ofbiz database
+	 * 
+	 * @param productCategoryRollupToBeAdded
+	 *            the ProductCategoryRollup thats to be added
+	 * @return true on success; false on fail
+	 */
+	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<Object> createProductCategoryRollup(@RequestBody ProductCategoryRollup productCategoryRollupToBeAdded) throws Exception {
+
+		AddProductCategoryRollup command = new AddProductCategoryRollup(productCategoryRollupToBeAdded);
+		ProductCategoryRollup productCategoryRollup = ((ProductCategoryRollupAdded) Scheduler.execute(command).data()).getAddedProductCategoryRollup();
+		
+		if (productCategoryRollup != null) 
+			return ResponseEntity.status(HttpStatus.CREATED)
+					             .body(productCategoryRollup);
+		else 
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					             .body("ProductCategoryRollup could not be created.");
+	}
+
+	/**
+	 * this method will only be called by Springs DispatcherServlet
+	 * 
+	 * @deprecated
+	 * @param request
+	 *            HttpServletRequest object
+	 * @return true on success, false on fail
+	 * @throws Exception 
+	 */
+	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	public boolean updateProductCategoryRollup(HttpServletRequest request) throws Exception {
+
+		BufferedReader br;
+		String data = null;
+		Map<String, String> dataMap = null;
+
+		try {
+			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
+			if (br != null) {
+				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
+			}
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			return false;
+		}
+
+		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
+				.split(data);
+
+		ProductCategoryRollup productCategoryRollupToBeUpdated = new ProductCategoryRollup();
+
+		try {
+			productCategoryRollupToBeUpdated = ProductCategoryRollupMapper.mapstrstr(dataMap);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		if (updateProductCategoryRollup(productCategoryRollupToBeUpdated, null).getStatusCode()
+				.equals(HttpStatus.NO_CONTENT)) {
+			return true;
+		}
+		return false;
+
+	}
+
+	/**
+	 * Updates the ProductCategoryRollup with the specific Id
+	 * 
+	 * @param productCategoryRollupToBeUpdated
+	 *            the ProductCategoryRollup thats to be updated
+	 * @return true on success, false on fail
+	 * @throws Exception 
+	 */
+	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<Object> updateProductCategoryRollup(@RequestBody ProductCategoryRollup productCategoryRollupToBeUpdated,
+			@PathVariable String nullVal) throws Exception {
+
+//		productCategoryRollupToBeUpdated.setnull(null);
+
+		UpdateProductCategoryRollup command = new UpdateProductCategoryRollup(productCategoryRollupToBeUpdated);
+
+		try {
+			if(((ProductCategoryRollupUpdated) Scheduler.execute(command).data()).isSuccess()) 
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+		} catch (RecordNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/{productCategoryRollupId}")
+	public ResponseEntity<Object> findById(@PathVariable String productCategoryRollupId) throws Exception {
+		HashMap<String, String> requestParams = new HashMap<String, String>();
+		requestParams.put("productCategoryRollupId", productCategoryRollupId);
+		try {
+
+			Object foundProductCategoryRollup = findProductCategoryRollupsBy(requestParams).getBody();
+			return ResponseEntity.status(HttpStatus.OK).body(foundProductCategoryRollup);
+		} catch (RecordNotFoundException e) {
+
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+
+	}
+
+	@RequestMapping(method = RequestMethod.DELETE, value = "/{productCategoryRollupId}")
+	public ResponseEntity<Object> deleteProductCategoryRollupByIdUpdated(@PathVariable String productCategoryRollupId) throws Exception {
+		DeleteProductCategoryRollup command = new DeleteProductCategoryRollup(productCategoryRollupId);
+
+		try {
+			if (((ProductCategoryRollupDeleted) Scheduler.execute(command).data()).isSuccess())
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+		} catch (RecordNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+
+		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductCategoryRollup could not be deleted");
+
+	}
+
+	@RequestMapping(value = (" ** "))
+	public ResponseEntity<Object> returnErrorPage(HttpServletRequest request) {
+
+		String usedUri = request.getRequestURI();
+		String[] splittedString = usedUri.split("/");
+
+		String usedRequest = splittedString[splittedString.length - 1];
+
+		if (validRequests.containsKey(usedRequest)) {
+			String returnVal = "Error: request method " + request.getMethod() + " not allowed for \"" + usedUri
+					+ "\"!\n" + "Please use " + validRequests.get(usedRequest) + "!";
+
+			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(returnVal);
+		}
+
+		String returnVal = "Error 404: Page not found! Valid pages are: \"eCommerce/api/productCategoryRollup/\" plus one of the following: "
+				+ "";
+
+		Set<String> keySet = validRequests.keySet();
+		Iterator<String> it = keySet.iterator();
+
+		while (it.hasNext()) {
+			returnVal += "\"" + it.next() + "\"";
+			if (it.hasNext())
+				returnVal += ", ";
+		}
+
+		returnVal += "!";
+
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(returnVal);
+
+	}
+}
