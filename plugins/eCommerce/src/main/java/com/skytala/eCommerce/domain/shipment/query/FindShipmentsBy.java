@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import org.apache.ofbiz.entity.Delegator;
 import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
-	import org.apache.ofbiz.entity.GenericValue;
+import org.apache.ofbiz.entity.GenericValue;
 import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
