@@ -46,6 +46,10 @@ public class ProductServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
+		if(result.get("responseMessage").equals("error")) {
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+		}
+
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -70,6 +74,10 @@ public class ProductServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
+		if(result.get("responseMessage").equals("error")) {
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+		}
+
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -94,6 +102,10 @@ public class ProductServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
+		if(result.get("responseMessage").equals("error")) {
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+		}
+
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
