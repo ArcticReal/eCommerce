@@ -49,10 +49,6 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -79,10 +75,6 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -110,10 +102,6 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -141,10 +129,6 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -173,10 +157,6 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -207,10 +187,6 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -237,10 +213,6 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -269,10 +241,6 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -300,15 +268,11 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCostComponentType")
-	public ResponseEntity<Object> createCostComponentType(HttpSession session, @RequestParam(value="costComponentTypeId", required=false) String costComponentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> createCostComponentType(HttpSession session, @RequestParam(value="costComponentTypeId", required=false) String costComponentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentTypeId",costComponentTypeId);
@@ -332,10 +296,6 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -364,10 +324,6 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -393,19 +349,14 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCostComponent")
-	public ResponseEntity<Object> createCostComponent(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="costComponentId") String costComponentId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="cost", required=false) BigDecimal cost, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="geoId", required=false) String geoId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="costUomId", required=false) String costUomId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Object> createCostComponent(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="cost", required=false) BigDecimal cost, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="geoId", required=false) String geoId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="costUomId", required=false) String costUomId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentTypeId",costComponentTypeId);
-		paramMap.put("costComponentId",costComponentId);
 		paramMap.put("workEffortId",workEffortId);
 		paramMap.put("fromDate",fromDate);
 		paramMap.put("cost",cost);
@@ -434,10 +385,6 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -475,10 +422,6 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -506,10 +449,6 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -540,10 +479,6 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -572,10 +507,6 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -602,10 +533,6 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -635,10 +562,6 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -668,15 +591,11 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCostComponentType")
-	public ResponseEntity<Object> updateCostComponentType(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> updateCostComponentType(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentTypeId",costComponentTypeId);
@@ -700,18 +619,13 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/recreateCostComponent")
-	public ResponseEntity<Object> recreateCostComponent(HttpSession session, @RequestParam(value="costComponentId") String costComponentId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="costComponentTypeId", required=false) String costComponentTypeId, @RequestParam(value="cost", required=false) BigDecimal cost, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="geoId", required=false) String geoId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="costUomId", required=false) String costUomId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Object> recreateCostComponent(HttpSession session, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="costComponentTypeId", required=false) String costComponentTypeId, @RequestParam(value="cost", required=false) BigDecimal cost, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="geoId", required=false) String geoId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="costUomId", required=false) String costUomId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("costComponentId",costComponentId);
 		paramMap.put("workEffortId",workEffortId);
 		paramMap.put("fromDate",fromDate);
 		paramMap.put("costComponentTypeId",costComponentTypeId);
@@ -741,10 +655,6 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -772,10 +682,6 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -801,10 +707,6 @@ public class ProductCostingServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 

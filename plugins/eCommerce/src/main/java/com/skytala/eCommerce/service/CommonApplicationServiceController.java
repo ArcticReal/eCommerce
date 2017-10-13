@@ -50,10 +50,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -86,10 +82,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -116,10 +108,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -145,10 +133,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -185,10 +169,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -217,10 +197,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -249,10 +225,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -282,10 +254,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -314,10 +282,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -342,10 +306,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -375,10 +335,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -407,10 +363,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -445,10 +397,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -476,10 +424,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -511,10 +455,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -542,10 +482,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -577,10 +513,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -610,10 +542,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -642,10 +570,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -671,10 +595,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -702,10 +622,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -731,10 +647,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -764,10 +676,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -793,15 +701,11 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateGeoType")
-	public ResponseEntity<Object> updateGeoType(HttpSession session, @RequestParam(value="geoTypeId") String geoTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> updateGeoType(HttpSession session, @RequestParam(value="geoTypeId") String geoTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("geoTypeId",geoTypeId);
@@ -825,10 +729,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -854,10 +754,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -883,10 +779,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -912,10 +804,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -947,21 +835,16 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCustomTimePeriod")
-	public ResponseEntity<Object> createCustomTimePeriod(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="periodTypeId") String periodTypeId, @RequestParam(value="organizationPartyId") String organizationPartyId, @RequestParam(value="customTimePeriodId") String customTimePeriodId, @RequestParam(value="thruDate") Timestamp thruDate, @RequestParam(value="periodNum", required=false) Long periodNum, @RequestParam(value="isClosed", required=false) Boolean isClosed, @RequestParam(value="periodName", required=false) String periodName, @RequestParam(value="parentPeriodId", required=false) String parentPeriodId) {
+	public ResponseEntity<Object> createCustomTimePeriod(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="periodTypeId") String periodTypeId, @RequestParam(value="organizationPartyId") String organizationPartyId, @RequestParam(value="thruDate") Timestamp thruDate, @RequestParam(value="periodNum", required=false) Long periodNum, @RequestParam(value="isClosed", required=false) String isClosed, @RequestParam(value="periodName", required=false) String periodName, @RequestParam(value="parentPeriodId", required=false) String parentPeriodId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
 		paramMap.put("periodTypeId",periodTypeId);
 		paramMap.put("organizationPartyId",organizationPartyId);
-		paramMap.put("customTimePeriodId",customTimePeriodId);
 		paramMap.put("thruDate",thruDate);
 		paramMap.put("periodNum",periodNum);
 		paramMap.put("isClosed",isClosed);
@@ -984,10 +867,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1013,10 +892,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1045,10 +920,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1074,10 +945,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1111,10 +978,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1146,10 +1009,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1183,15 +1042,11 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateUomType")
-	public ResponseEntity<Object> updateUomType(HttpSession session, @RequestParam(value="uomTypeId") String uomTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> updateUomType(HttpSession session, @RequestParam(value="uomTypeId") String uomTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("uomTypeId",uomTypeId);
@@ -1215,10 +1070,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1247,10 +1098,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1277,10 +1124,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1307,20 +1150,15 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createVisualThemeResource")
-	public ResponseEntity<Object> createVisualThemeResource(HttpSession session, @RequestParam(value="resourceTypeEnumId") String resourceTypeEnumId, @RequestParam(value="visualThemeId") String visualThemeId, @RequestParam(value="sequenceId") String sequenceId, @RequestParam(value="resourceValue", required=false) Long resourceValue) {
+	public ResponseEntity<Object> createVisualThemeResource(HttpSession session, @RequestParam(value="resourceTypeEnumId") String resourceTypeEnumId, @RequestParam(value="visualThemeId") String visualThemeId, @RequestParam(value="resourceValue", required=false) Long resourceValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("resourceTypeEnumId",resourceTypeEnumId);
 		paramMap.put("visualThemeId",visualThemeId);
-		paramMap.put("sequenceId",sequenceId);
 		paramMap.put("resourceValue",resourceValue);
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
 
@@ -1339,19 +1177,14 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createEnumeration")
-	public ResponseEntity<Object> createEnumeration(HttpSession session, @RequestParam(value="enumTypeId") String enumTypeId, @RequestParam(value="enumId") String enumId, @RequestParam(value="description") String description, @RequestParam(value="enumCode", required=false) String enumCode, @RequestParam(value="sequenceId", required=false) String sequenceId) {
+	public ResponseEntity<Object> createEnumeration(HttpSession session, @RequestParam(value="enumTypeId") String enumTypeId, @RequestParam(value="description") String description, @RequestParam(value="enumCode", required=false) String enumCode, @RequestParam(value="sequenceId", required=false) String sequenceId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("enumTypeId",enumTypeId);
-		paramMap.put("enumId",enumId);
 		paramMap.put("description",description);
 		paramMap.put("enumCode",enumCode);
 		paramMap.put("sequenceId",sequenceId);
@@ -1372,10 +1205,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1405,10 +1234,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1434,10 +1259,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1469,10 +1290,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1500,10 +1317,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1532,10 +1345,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1560,10 +1369,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1591,10 +1396,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1621,10 +1422,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1652,10 +1449,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1682,10 +1475,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1714,10 +1503,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1746,10 +1531,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1784,10 +1565,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1816,10 +1593,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1847,10 +1620,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1875,10 +1644,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1904,10 +1669,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1941,10 +1702,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -1973,10 +1730,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2004,10 +1757,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2041,10 +1790,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2072,10 +1817,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2102,10 +1843,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2131,10 +1868,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2167,10 +1900,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2198,10 +1927,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2230,10 +1955,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2258,10 +1979,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2288,10 +2005,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2319,10 +2032,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2351,10 +2060,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2381,10 +2086,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2413,10 +2114,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2444,10 +2141,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2481,10 +2174,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2511,10 +2200,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2542,10 +2227,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2578,10 +2259,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2606,10 +2283,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2635,10 +2308,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2665,10 +2334,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2693,10 +2358,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2722,10 +2383,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2752,10 +2409,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2782,10 +2435,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2818,15 +2467,11 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createGeoType")
-	public ResponseEntity<Object> createGeoType(HttpSession session, @RequestParam(value="geoTypeId", required=false) String geoTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Object> createGeoType(HttpSession session, @RequestParam(value="geoTypeId", required=false) String geoTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("geoTypeId",geoTypeId);
@@ -2850,20 +2495,15 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createGeoPoint")
-	public ResponseEntity<Object> createGeoPoint(HttpSession session, @RequestParam(value="dataSourceId") String dataSourceId, @RequestParam(value="latitude") String latitude, @RequestParam(value="geoPointId") String geoPointId, @RequestParam(value="longitude") String longitude, @RequestParam(value="elevation", required=false) BigDecimal elevation, @RequestParam(value="elevationUomId", required=false) String elevationUomId, @RequestParam(value="geoPointTypeEnumId", required=false) String geoPointTypeEnumId, @RequestParam(value="description", required=false) String description, @RequestParam(value="information", required=false) String information) {
+	public ResponseEntity<Object> createGeoPoint(HttpSession session, @RequestParam(value="dataSourceId") String dataSourceId, @RequestParam(value="latitude") String latitude, @RequestParam(value="longitude") String longitude, @RequestParam(value="elevation", required=false) BigDecimal elevation, @RequestParam(value="elevationUomId", required=false) String elevationUomId, @RequestParam(value="geoPointTypeEnumId", required=false) String geoPointTypeEnumId, @RequestParam(value="description", required=false) String description, @RequestParam(value="information", required=false) String information) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("dataSourceId",dataSourceId);
 		paramMap.put("latitude",latitude);
-		paramMap.put("geoPointId",geoPointId);
 		paramMap.put("longitude",longitude);
 		paramMap.put("elevation",elevation);
 		paramMap.put("elevationUomId",elevationUomId);
@@ -2887,10 +2527,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2918,10 +2554,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2949,10 +2581,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -2985,10 +2613,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3015,10 +2639,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3045,10 +2665,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3077,10 +2693,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3108,10 +2720,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3137,10 +2745,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3167,10 +2771,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3197,10 +2797,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3229,10 +2825,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3257,10 +2849,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3287,10 +2875,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3323,10 +2907,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3359,15 +2939,11 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCustomTimePeriod")
-	public ResponseEntity<Object> updateCustomTimePeriod(HttpSession session, @RequestParam(value="customTimePeriodId") String customTimePeriodId, @RequestParam(value="periodNum", required=false) Long periodNum, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="isClosed", required=false) Boolean isClosed, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="periodName", required=false) String periodName, @RequestParam(value="parentPeriodId", required=false) String parentPeriodId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Object> updateCustomTimePeriod(HttpSession session, @RequestParam(value="customTimePeriodId") String customTimePeriodId, @RequestParam(value="periodNum", required=false) Long periodNum, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="isClosed", required=false) String isClosed, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="periodName", required=false) String periodName, @RequestParam(value="parentPeriodId", required=false) String parentPeriodId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("customTimePeriodId",customTimePeriodId);
@@ -3395,10 +2971,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3427,10 +2999,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3456,10 +3024,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3486,10 +3050,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3523,10 +3083,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3556,10 +3112,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3586,15 +3138,11 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createUomType")
-	public ResponseEntity<Object> createUomType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) Boolean hasTable, @RequestParam(value="description", required=false) String description, @RequestParam(value="uomTypeId", required=false) String uomTypeId) {
+	public ResponseEntity<Object> createUomType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description, @RequestParam(value="uomTypeId", required=false) String uomTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("parentTypeId",parentTypeId);
@@ -3618,10 +3166,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3655,10 +3199,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3684,10 +3224,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3713,10 +3249,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3745,10 +3277,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3776,10 +3304,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3806,10 +3330,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3835,10 +3355,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3872,10 +3388,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3902,10 +3414,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3930,10 +3438,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
@@ -3958,10 +3462,6 @@ public class CommonApplicationServiceController{
 			e.printStackTrace();
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
