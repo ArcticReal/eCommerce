@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.humanres.relations.validResponsibility.event.ValidResponsibilityAdded;
 import com.skytala.eCommerce.domain.humanres.relations.validResponsibility.event.ValidResponsibilityFound;
 import com.skytala.eCommerce.domain.humanres.relations.validResponsibility.mapper.ValidResponsibilityMapper;
 import com.skytala.eCommerce.domain.humanres.relations.validResponsibility.model.ValidResponsibility;

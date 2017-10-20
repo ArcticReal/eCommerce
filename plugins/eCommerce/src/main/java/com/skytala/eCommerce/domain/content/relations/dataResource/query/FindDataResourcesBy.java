@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.content.relations.dataResource.event.DataResourceAdded;
 import com.skytala.eCommerce.domain.content.relations.dataResource.event.DataResourceFound;
 import com.skytala.eCommerce.domain.content.relations.dataResource.mapper.DataResourceMapper;
 import com.skytala.eCommerce.domain.content.relations.dataResource.model.DataResource;

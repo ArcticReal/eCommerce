@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.marketing.relations.trackingCode.event.TrackingCodeAdded;
 import com.skytala.eCommerce.domain.marketing.relations.trackingCode.event.TrackingCodeFound;
 import com.skytala.eCommerce.domain.marketing.relations.trackingCode.mapper.TrackingCodeMapper;
 import com.skytala.eCommerce.domain.marketing.relations.trackingCode.model.TrackingCode;

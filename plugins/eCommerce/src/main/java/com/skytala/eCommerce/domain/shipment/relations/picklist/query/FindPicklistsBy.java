@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.shipment.relations.picklist.event.PicklistAdded;
 import com.skytala.eCommerce.domain.shipment.relations.picklist.event.PicklistFound;
 import com.skytala.eCommerce.domain.shipment.relations.picklist.mapper.PicklistMapper;
 import com.skytala.eCommerce.domain.shipment.relations.picklist.model.Picklist;

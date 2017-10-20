@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.product.relations.supplierRatingType.event.SupplierRatingTypeAdded;
 import com.skytala.eCommerce.domain.product.relations.supplierRatingType.event.SupplierRatingTypeFound;
 import com.skytala.eCommerce.domain.product.relations.supplierRatingType.mapper.SupplierRatingTypeMapper;
 import com.skytala.eCommerce.domain.product.relations.supplierRatingType.model.SupplierRatingType;

@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.party.relations.postalAddress.event.PostalAddressAdded;
 import com.skytala.eCommerce.domain.party.relations.postalAddress.event.PostalAddressFound;
 import com.skytala.eCommerce.domain.party.relations.postalAddress.mapper.PostalAddressMapper;
 import com.skytala.eCommerce.domain.party.relations.postalAddress.model.PostalAddress;

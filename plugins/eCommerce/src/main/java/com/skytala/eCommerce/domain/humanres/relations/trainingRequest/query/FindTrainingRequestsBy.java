@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.humanres.relations.trainingRequest.event.TrainingRequestAdded;
 import com.skytala.eCommerce.domain.humanres.relations.trainingRequest.event.TrainingRequestFound;
 import com.skytala.eCommerce.domain.humanres.relations.trainingRequest.mapper.TrainingRequestMapper;
 import com.skytala.eCommerce.domain.humanres.relations.trainingRequest.model.TrainingRequest;

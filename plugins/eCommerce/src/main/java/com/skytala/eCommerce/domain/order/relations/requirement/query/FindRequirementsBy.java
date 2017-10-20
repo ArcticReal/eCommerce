@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.order.relations.requirement.event.RequirementAdded;
 import com.skytala.eCommerce.domain.order.relations.requirement.event.RequirementFound;
 import com.skytala.eCommerce.domain.order.relations.requirement.mapper.RequirementMapper;
 import com.skytala.eCommerce.domain.order.relations.requirement.model.Requirement;

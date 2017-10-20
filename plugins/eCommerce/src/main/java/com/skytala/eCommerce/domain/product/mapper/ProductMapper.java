@@ -1,4 +1,5 @@
 package com.skytala.eCommerce.domain.product.mapper;
+
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.HashMap;

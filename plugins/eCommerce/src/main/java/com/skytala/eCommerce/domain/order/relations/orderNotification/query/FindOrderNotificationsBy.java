@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.order.relations.orderNotification.event.OrderNotificationAdded;
 import com.skytala.eCommerce.domain.order.relations.orderNotification.event.OrderNotificationFound;
 import com.skytala.eCommerce.domain.order.relations.orderNotification.mapper.OrderNotificationMapper;
 import com.skytala.eCommerce.domain.order.relations.orderNotification.model.OrderNotification;

@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.humanres.relations.partySkill.event.PartySkillAdded;
 import com.skytala.eCommerce.domain.humanres.relations.partySkill.event.PartySkillFound;
 import com.skytala.eCommerce.domain.humanres.relations.partySkill.mapper.PartySkillMapper;
 import com.skytala.eCommerce.domain.humanres.relations.partySkill.model.PartySkill;

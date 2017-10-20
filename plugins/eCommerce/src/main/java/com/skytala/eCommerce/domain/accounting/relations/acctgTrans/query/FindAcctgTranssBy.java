@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.accounting.relations.acctgTrans.event.AcctgTransAdded;
 import com.skytala.eCommerce.domain.accounting.relations.acctgTrans.event.AcctgTransFound;
 import com.skytala.eCommerce.domain.accounting.relations.acctgTrans.mapper.AcctgTransMapper;
 import com.skytala.eCommerce.domain.accounting.relations.acctgTrans.model.AcctgTrans;

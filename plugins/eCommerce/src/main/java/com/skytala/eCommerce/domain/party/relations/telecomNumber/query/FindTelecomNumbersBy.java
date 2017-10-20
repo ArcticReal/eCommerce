@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.party.relations.telecomNumber.event.TelecomNumberAdded;
 import com.skytala.eCommerce.domain.party.relations.telecomNumber.event.TelecomNumberFound;
 import com.skytala.eCommerce.domain.party.relations.telecomNumber.mapper.TelecomNumberMapper;
 import com.skytala.eCommerce.domain.party.relations.telecomNumber.model.TelecomNumber;

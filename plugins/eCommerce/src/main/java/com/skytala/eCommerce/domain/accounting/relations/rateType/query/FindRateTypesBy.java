@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.accounting.relations.rateType.event.RateTypeAdded;
 import com.skytala.eCommerce.domain.accounting.relations.rateType.event.RateTypeFound;
 import com.skytala.eCommerce.domain.accounting.relations.rateType.mapper.RateTypeMapper;
 import com.skytala.eCommerce.domain.accounting.relations.rateType.model.RateType;

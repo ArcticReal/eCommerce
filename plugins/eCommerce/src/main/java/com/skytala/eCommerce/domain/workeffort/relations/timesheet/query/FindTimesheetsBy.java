@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.workeffort.relations.timesheet.event.TimesheetAdded;
 import com.skytala.eCommerce.domain.workeffort.relations.timesheet.event.TimesheetFound;
 import com.skytala.eCommerce.domain.workeffort.relations.timesheet.mapper.TimesheetMapper;
 import com.skytala.eCommerce.domain.workeffort.relations.timesheet.model.Timesheet;

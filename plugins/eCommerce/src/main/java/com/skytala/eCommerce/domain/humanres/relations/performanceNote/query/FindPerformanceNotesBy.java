@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.humanres.relations.performanceNote.event.PerformanceNoteAdded;
 import com.skytala.eCommerce.domain.humanres.relations.performanceNote.event.PerformanceNoteFound;
 import com.skytala.eCommerce.domain.humanres.relations.performanceNote.mapper.PerformanceNoteMapper;
 import com.skytala.eCommerce.domain.humanres.relations.performanceNote.model.PerformanceNote;

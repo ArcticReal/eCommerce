@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.marketing.relations.salesForecast.event.SalesForecastAdded;
 import com.skytala.eCommerce.domain.marketing.relations.salesForecast.event.SalesForecastFound;
 import com.skytala.eCommerce.domain.marketing.relations.salesForecast.mapper.SalesForecastMapper;
 import com.skytala.eCommerce.domain.marketing.relations.salesForecast.model.SalesForecast;

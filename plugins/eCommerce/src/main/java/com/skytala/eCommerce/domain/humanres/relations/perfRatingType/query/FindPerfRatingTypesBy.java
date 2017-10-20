@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.humanres.relations.perfRatingType.event.PerfRatingTypeAdded;
 import com.skytala.eCommerce.domain.humanres.relations.perfRatingType.event.PerfRatingTypeFound;
 import com.skytala.eCommerce.domain.humanres.relations.perfRatingType.mapper.PerfRatingTypeMapper;
 import com.skytala.eCommerce.domain.humanres.relations.perfRatingType.model.PerfRatingType;

@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.accounting.relations.valueLinkKey.event.ValueLinkKeyAdded;
 import com.skytala.eCommerce.domain.accounting.relations.valueLinkKey.event.ValueLinkKeyFound;
 import com.skytala.eCommerce.domain.accounting.relations.valueLinkKey.mapper.ValueLinkKeyMapper;
 import com.skytala.eCommerce.domain.accounting.relations.valueLinkKey.model.ValueLinkKey;

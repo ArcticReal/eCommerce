@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.product.relations.inventoryTransfer.event.InventoryTransferAdded;
 import com.skytala.eCommerce.domain.product.relations.inventoryTransfer.event.InventoryTransferFound;
 import com.skytala.eCommerce.domain.product.relations.inventoryTransfer.mapper.InventoryTransferMapper;
 import com.skytala.eCommerce.domain.product.relations.inventoryTransfer.model.InventoryTransfer;

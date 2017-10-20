@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.order.relations.cartAbandonedLine.event.CartAbandonedLineAdded;
 import com.skytala.eCommerce.domain.order.relations.cartAbandonedLine.event.CartAbandonedLineFound;
 import com.skytala.eCommerce.domain.order.relations.cartAbandonedLine.mapper.CartAbandonedLineMapper;
 import com.skytala.eCommerce.domain.order.relations.cartAbandonedLine.model.CartAbandonedLine;

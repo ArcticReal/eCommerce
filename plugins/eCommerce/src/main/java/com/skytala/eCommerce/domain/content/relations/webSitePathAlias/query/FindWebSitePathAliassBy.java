@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.content.relations.webSitePathAlias.event.WebSitePathAliasAdded;
 import com.skytala.eCommerce.domain.content.relations.webSitePathAlias.event.WebSitePathAliasFound;
 import com.skytala.eCommerce.domain.content.relations.webSitePathAlias.mapper.WebSitePathAliasMapper;
 import com.skytala.eCommerce.domain.content.relations.webSitePathAlias.model.WebSitePathAlias;

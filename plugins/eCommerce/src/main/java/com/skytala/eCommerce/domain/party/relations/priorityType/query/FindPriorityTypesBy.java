@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.party.relations.priorityType.event.PriorityTypeAdded;
 import com.skytala.eCommerce.domain.party.relations.priorityType.event.PriorityTypeFound;
 import com.skytala.eCommerce.domain.party.relations.priorityType.mapper.PriorityTypeMapper;
 import com.skytala.eCommerce.domain.party.relations.priorityType.model.PriorityType;

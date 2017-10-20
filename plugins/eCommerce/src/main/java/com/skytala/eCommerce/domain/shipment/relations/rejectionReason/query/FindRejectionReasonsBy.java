@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.shipment.relations.rejectionReason.event.RejectionReasonAdded;
 import com.skytala.eCommerce.domain.shipment.relations.rejectionReason.event.RejectionReasonFound;
 import com.skytala.eCommerce.domain.shipment.relations.rejectionReason.mapper.RejectionReasonMapper;
 import com.skytala.eCommerce.domain.shipment.relations.rejectionReason.model.RejectionReason;

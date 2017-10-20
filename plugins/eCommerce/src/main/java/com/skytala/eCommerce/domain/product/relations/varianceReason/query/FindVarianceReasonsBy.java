@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.product.relations.varianceReason.event.VarianceReasonAdded;
 import com.skytala.eCommerce.domain.product.relations.varianceReason.event.VarianceReasonFound;
 import com.skytala.eCommerce.domain.product.relations.varianceReason.mapper.VarianceReasonMapper;
 import com.skytala.eCommerce.domain.product.relations.varianceReason.model.VarianceReason;

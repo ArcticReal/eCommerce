@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/products")
 public class ProductController {
 
@@ -54,7 +56,7 @@ public class ProductController {
 	 * @param allRequestParams
 	 *            all params by which you want to find a Product
 	 * @return a List with the Products
-	 * @throws Exception 
+	 * @throws Exception d
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
 	public ResponseEntity<Object> findProductsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {

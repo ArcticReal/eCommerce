@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.product.relations.supplierPrefOrder.event.SupplierPrefOrderAdded;
 import com.skytala.eCommerce.domain.product.relations.supplierPrefOrder.event.SupplierPrefOrderFound;
 import com.skytala.eCommerce.domain.product.relations.supplierPrefOrder.mapper.SupplierPrefOrderMapper;
 import com.skytala.eCommerce.domain.product.relations.supplierPrefOrder.model.SupplierPrefOrder;

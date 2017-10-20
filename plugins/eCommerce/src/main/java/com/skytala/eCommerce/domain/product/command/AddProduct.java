@@ -1,5 +1,4 @@
 package com.skytala.eCommerce.domain.product.command;
-
 import org.apache.ofbiz.entity.Delegator;
 import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;

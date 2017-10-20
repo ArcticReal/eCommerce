@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.party.relations.addressMatchMap.event.AddressMatchMapAdded;
 import com.skytala.eCommerce.domain.party.relations.addressMatchMap.event.AddressMatchMapFound;
 import com.skytala.eCommerce.domain.party.relations.addressMatchMap.mapper.AddressMatchMapMapper;
 import com.skytala.eCommerce.domain.party.relations.addressMatchMap.model.AddressMatchMap;

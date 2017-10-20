@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.order.relations.shoppingList.event.ShoppingListAdded;
 import com.skytala.eCommerce.domain.order.relations.shoppingList.event.ShoppingListFound;
 import com.skytala.eCommerce.domain.order.relations.shoppingList.mapper.ShoppingListMapper;
 import com.skytala.eCommerce.domain.order.relations.shoppingList.model.ShoppingList;

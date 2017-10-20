@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.order.relations.orderBlacklist.event.OrderBlacklistAdded;
 import com.skytala.eCommerce.domain.order.relations.orderBlacklist.event.OrderBlacklistFound;
 import com.skytala.eCommerce.domain.order.relations.orderBlacklist.mapper.OrderBlacklistMapper;
 import com.skytala.eCommerce.domain.order.relations.orderBlacklist.model.OrderBlacklist;

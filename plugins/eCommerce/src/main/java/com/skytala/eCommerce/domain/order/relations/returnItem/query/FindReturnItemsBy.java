@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.order.relations.returnItem.event.ReturnItemAdded;
 import com.skytala.eCommerce.domain.order.relations.returnItem.event.ReturnItemFound;
 import com.skytala.eCommerce.domain.order.relations.returnItem.mapper.ReturnItemMapper;
 import com.skytala.eCommerce.domain.order.relations.returnItem.model.ReturnItem;

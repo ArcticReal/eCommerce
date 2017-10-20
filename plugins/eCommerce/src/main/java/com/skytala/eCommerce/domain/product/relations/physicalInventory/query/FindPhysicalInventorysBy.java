@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.product.relations.physicalInventory.event.PhysicalInventoryAdded;
 import com.skytala.eCommerce.domain.product.relations.physicalInventory.event.PhysicalInventoryFound;
 import com.skytala.eCommerce.domain.product.relations.physicalInventory.mapper.PhysicalInventoryMapper;
 import com.skytala.eCommerce.domain.product.relations.physicalInventory.model.PhysicalInventory;

@@ -1,5 +1,4 @@
 package com.skytala.eCommerce.domain.party.query;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
@@ -14,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.party.event.PartyAdded;
 import com.skytala.eCommerce.domain.party.event.PartyFound;
 import com.skytala.eCommerce.domain.party.mapper.PartyMapper;
 import com.skytala.eCommerce.domain.party.model.Party;

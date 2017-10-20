@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.workeffort.relations.workEffort.event.WorkEffortAdded;
 import com.skytala.eCommerce.domain.workeffort.relations.workEffort.event.WorkEffortFound;
 import com.skytala.eCommerce.domain.workeffort.relations.workEffort.mapper.WorkEffortMapper;
 import com.skytala.eCommerce.domain.workeffort.relations.workEffort.model.WorkEffort;

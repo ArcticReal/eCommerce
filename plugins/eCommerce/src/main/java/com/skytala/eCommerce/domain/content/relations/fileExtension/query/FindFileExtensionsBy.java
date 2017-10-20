@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.content.relations.fileExtension.event.FileExtensionAdded;
 import com.skytala.eCommerce.domain.content.relations.fileExtension.event.FileExtensionFound;
 import com.skytala.eCommerce.domain.content.relations.fileExtension.mapper.FileExtensionMapper;
 import com.skytala.eCommerce.domain.content.relations.fileExtension.model.FileExtension;

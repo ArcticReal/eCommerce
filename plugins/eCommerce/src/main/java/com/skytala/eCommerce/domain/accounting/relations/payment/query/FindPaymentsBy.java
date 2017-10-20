@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.accounting.relations.payment.event.PaymentAdded;
 import com.skytala.eCommerce.domain.accounting.relations.payment.event.PaymentFound;
 import com.skytala.eCommerce.domain.accounting.relations.payment.mapper.PaymentMapper;
 import com.skytala.eCommerce.domain.accounting.relations.payment.model.Payment;

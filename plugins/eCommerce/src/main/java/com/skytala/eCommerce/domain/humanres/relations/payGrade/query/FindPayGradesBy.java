@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.humanres.relations.payGrade.event.PayGradeAdded;
 import com.skytala.eCommerce.domain.humanres.relations.payGrade.event.PayGradeFound;
 import com.skytala.eCommerce.domain.humanres.relations.payGrade.mapper.PayGradeMapper;
 import com.skytala.eCommerce.domain.humanres.relations.payGrade.model.PayGrade;

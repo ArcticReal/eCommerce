@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.humanres.relations.payHistory.event.PayHistoryAdded;
 import com.skytala.eCommerce.domain.humanres.relations.payHistory.event.PayHistoryFound;
 import com.skytala.eCommerce.domain.humanres.relations.payHistory.mapper.PayHistoryMapper;
 import com.skytala.eCommerce.domain.humanres.relations.payHistory.model.PayHistory;

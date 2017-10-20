@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.humanres.relations.terminationType.event.TerminationTypeAdded;
 import com.skytala.eCommerce.domain.humanres.relations.terminationType.event.TerminationTypeFound;
 import com.skytala.eCommerce.domain.humanres.relations.terminationType.mapper.TerminationTypeMapper;
 import com.skytala.eCommerce.domain.humanres.relations.terminationType.model.TerminationType;

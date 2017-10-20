@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.accounting.relations.glXbrlClass.event.GlXbrlClassAdded;
 import com.skytala.eCommerce.domain.accounting.relations.glXbrlClass.event.GlXbrlClassFound;
 import com.skytala.eCommerce.domain.accounting.relations.glXbrlClass.mapper.GlXbrlClassMapper;
 import com.skytala.eCommerce.domain.accounting.relations.glXbrlClass.model.GlXbrlClass;

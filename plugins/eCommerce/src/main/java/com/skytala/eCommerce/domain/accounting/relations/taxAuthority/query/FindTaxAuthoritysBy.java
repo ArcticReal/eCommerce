@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.accounting.relations.taxAuthority.event.TaxAuthorityAdded;
 import com.skytala.eCommerce.domain.accounting.relations.taxAuthority.event.TaxAuthorityFound;
 import com.skytala.eCommerce.domain.accounting.relations.taxAuthority.mapper.TaxAuthorityMapper;
 import com.skytala.eCommerce.domain.accounting.relations.taxAuthority.model.TaxAuthority;

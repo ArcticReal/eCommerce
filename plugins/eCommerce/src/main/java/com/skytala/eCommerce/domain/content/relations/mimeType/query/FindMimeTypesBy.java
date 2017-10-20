@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.content.relations.mimeType.event.MimeTypeAdded;
 import com.skytala.eCommerce.domain.content.relations.mimeType.event.MimeTypeFound;
 import com.skytala.eCommerce.domain.content.relations.mimeType.mapper.MimeTypeMapper;
 import com.skytala.eCommerce.domain.content.relations.mimeType.model.MimeType;

@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.order.relations.returnContactMech.event.ReturnContactMechAdded;
 import com.skytala.eCommerce.domain.order.relations.returnContactMech.event.ReturnContactMechFound;
 import com.skytala.eCommerce.domain.order.relations.returnContactMech.mapper.ReturnContactMechMapper;
 import com.skytala.eCommerce.domain.order.relations.returnContactMech.model.ReturnContactMech;

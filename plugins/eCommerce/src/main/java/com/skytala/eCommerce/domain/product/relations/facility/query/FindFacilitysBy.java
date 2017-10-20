@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.product.relations.facility.event.FacilityAdded;
 import com.skytala.eCommerce.domain.product.relations.facility.event.FacilityFound;
 import com.skytala.eCommerce.domain.product.relations.facility.mapper.FacilityMapper;
 import com.skytala.eCommerce.domain.product.relations.facility.model.Facility;

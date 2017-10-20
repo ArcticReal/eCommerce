@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.content.relations.survey.event.SurveyAdded;
 import com.skytala.eCommerce.domain.content.relations.survey.event.SurveyFound;
 import com.skytala.eCommerce.domain.content.relations.survey.mapper.SurveyMapper;
 import com.skytala.eCommerce.domain.content.relations.survey.model.Survey;

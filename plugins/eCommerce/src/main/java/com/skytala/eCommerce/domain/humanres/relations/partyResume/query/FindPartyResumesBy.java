@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.humanres.relations.partyResume.event.PartyResumeAdded;
 import com.skytala.eCommerce.domain.humanres.relations.partyResume.event.PartyResumeFound;
 import com.skytala.eCommerce.domain.humanres.relations.partyResume.mapper.PartyResumeMapper;
 import com.skytala.eCommerce.domain.humanres.relations.partyResume.model.PartyResume;

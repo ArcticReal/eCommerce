@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.shipment.event.ShipmentAdded;
 import com.skytala.eCommerce.domain.shipment.event.ShipmentFound;
 import com.skytala.eCommerce.domain.shipment.mapper.ShipmentMapper;
 import com.skytala.eCommerce.domain.shipment.model.Shipment;

@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.accounting.relations.fixedAsset.event.FixedAssetAdded;
 import com.skytala.eCommerce.domain.accounting.relations.fixedAsset.event.FixedAssetFound;
 import com.skytala.eCommerce.domain.accounting.relations.fixedAsset.mapper.FixedAssetMapper;
 import com.skytala.eCommerce.domain.accounting.relations.fixedAsset.model.FixedAsset;

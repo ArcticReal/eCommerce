@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.content.relations.webPreferenceType.event.WebPreferenceTypeAdded;
 import com.skytala.eCommerce.domain.content.relations.webPreferenceType.event.WebPreferenceTypeFound;
 import com.skytala.eCommerce.domain.content.relations.webPreferenceType.mapper.WebPreferenceTypeMapper;
 import com.skytala.eCommerce.domain.content.relations.webPreferenceType.model.WebPreferenceType;

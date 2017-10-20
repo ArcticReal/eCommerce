@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.order.relations.orderPaymentPreference.event.OrderPaymentPreferenceAdded;
 import com.skytala.eCommerce.domain.order.relations.orderPaymentPreference.event.OrderPaymentPreferenceFound;
 import com.skytala.eCommerce.domain.order.relations.orderPaymentPreference.mapper.OrderPaymentPreferenceMapper;
 import com.skytala.eCommerce.domain.order.relations.orderPaymentPreference.model.OrderPaymentPreference;

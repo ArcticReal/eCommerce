@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.humanres.relations.payrollPreference.event.PayrollPreferenceAdded;
 import com.skytala.eCommerce.domain.humanres.relations.payrollPreference.event.PayrollPreferenceFound;
 import com.skytala.eCommerce.domain.humanres.relations.payrollPreference.mapper.PayrollPreferenceMapper;
 import com.skytala.eCommerce.domain.humanres.relations.payrollPreference.model.PayrollPreference;

@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.content.relations.metaDataPredicate.event.MetaDataPredicateAdded;
 import com.skytala.eCommerce.domain.content.relations.metaDataPredicate.event.MetaDataPredicateFound;
 import com.skytala.eCommerce.domain.content.relations.metaDataPredicate.mapper.MetaDataPredicateMapper;
 import com.skytala.eCommerce.domain.content.relations.metaDataPredicate.model.MetaDataPredicate;

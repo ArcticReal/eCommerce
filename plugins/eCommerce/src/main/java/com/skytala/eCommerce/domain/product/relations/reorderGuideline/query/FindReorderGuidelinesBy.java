@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.product.relations.reorderGuideline.event.ReorderGuidelineAdded;
 import com.skytala.eCommerce.domain.product.relations.reorderGuideline.event.ReorderGuidelineFound;
 import com.skytala.eCommerce.domain.product.relations.reorderGuideline.mapper.ReorderGuidelineMapper;
 import com.skytala.eCommerce.domain.product.relations.reorderGuideline.model.ReorderGuideline;

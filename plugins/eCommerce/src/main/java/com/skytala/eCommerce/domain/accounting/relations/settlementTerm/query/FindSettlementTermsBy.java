@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.accounting.relations.settlementTerm.event.SettlementTermAdded;
 import com.skytala.eCommerce.domain.accounting.relations.settlementTerm.event.SettlementTermFound;
 import com.skytala.eCommerce.domain.accounting.relations.settlementTerm.mapper.SettlementTermMapper;
 import com.skytala.eCommerce.domain.accounting.relations.settlementTerm.model.SettlementTerm;

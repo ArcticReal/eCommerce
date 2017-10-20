@@ -1,4 +1,5 @@
 package com.skytala.eCommerce.domain.content.model;
+
 import java.util.Map;
 import java.math.BigDecimal;
 import java.sql.Timestamp;

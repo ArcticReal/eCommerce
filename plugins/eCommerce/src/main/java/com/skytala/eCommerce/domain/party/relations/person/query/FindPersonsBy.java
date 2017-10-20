@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.party.relations.person.event.PersonAdded;
 import com.skytala.eCommerce.domain.party.relations.person.event.PersonFound;
 import com.skytala.eCommerce.domain.party.relations.person.mapper.PersonMapper;
 import com.skytala.eCommerce.domain.party.relations.person.model.Person;

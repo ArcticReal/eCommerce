@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.accounting.relations.accommodationMap.event.AccommodationMapAdded;
 import com.skytala.eCommerce.domain.accounting.relations.accommodationMap.event.AccommodationMapFound;
 import com.skytala.eCommerce.domain.accounting.relations.accommodationMap.mapper.AccommodationMapMapper;
 import com.skytala.eCommerce.domain.accounting.relations.accommodationMap.model.AccommodationMap;

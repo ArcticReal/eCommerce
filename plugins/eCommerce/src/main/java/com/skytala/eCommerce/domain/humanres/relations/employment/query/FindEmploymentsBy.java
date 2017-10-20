@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.humanres.relations.employment.event.EmploymentAdded;
 import com.skytala.eCommerce.domain.humanres.relations.employment.event.EmploymentFound;
 import com.skytala.eCommerce.domain.humanres.relations.employment.mapper.EmploymentMapper;
 import com.skytala.eCommerce.domain.humanres.relations.employment.model.Employment;

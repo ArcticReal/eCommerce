@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.accounting.relations.glJournal.event.GlJournalAdded;
 import com.skytala.eCommerce.domain.accounting.relations.glJournal.event.GlJournalFound;
 import com.skytala.eCommerce.domain.accounting.relations.glJournal.mapper.GlJournalMapper;
 import com.skytala.eCommerce.domain.accounting.relations.glJournal.model.GlJournal;

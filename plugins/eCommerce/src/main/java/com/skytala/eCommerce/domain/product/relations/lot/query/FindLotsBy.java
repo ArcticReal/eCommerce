@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.product.relations.lot.event.LotAdded;
 import com.skytala.eCommerce.domain.product.relations.lot.event.LotFound;
 import com.skytala.eCommerce.domain.product.relations.lot.mapper.LotMapper;
 import com.skytala.eCommerce.domain.product.relations.lot.model.Lot;

@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.accounting.relations.checkAccount.event.CheckAccountAdded;
 import com.skytala.eCommerce.domain.accounting.relations.checkAccount.event.CheckAccountFound;
 import com.skytala.eCommerce.domain.accounting.relations.checkAccount.mapper.CheckAccountMapper;
 import com.skytala.eCommerce.domain.accounting.relations.checkAccount.model.CheckAccount;

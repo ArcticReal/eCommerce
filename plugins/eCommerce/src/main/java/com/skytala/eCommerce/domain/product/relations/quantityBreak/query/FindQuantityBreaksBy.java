@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.product.relations.quantityBreak.event.QuantityBreakAdded;
 import com.skytala.eCommerce.domain.product.relations.quantityBreak.event.QuantityBreakFound;
 import com.skytala.eCommerce.domain.product.relations.quantityBreak.mapper.QuantityBreakMapper;
 import com.skytala.eCommerce.domain.product.relations.quantityBreak.model.QuantityBreak;

@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.humanres.relations.emplLeave.event.EmplLeaveAdded;
 import com.skytala.eCommerce.domain.humanres.relations.emplLeave.event.EmplLeaveFound;
 import com.skytala.eCommerce.domain.humanres.relations.emplLeave.mapper.EmplLeaveMapper;
 import com.skytala.eCommerce.domain.humanres.relations.emplLeave.model.EmplLeave;

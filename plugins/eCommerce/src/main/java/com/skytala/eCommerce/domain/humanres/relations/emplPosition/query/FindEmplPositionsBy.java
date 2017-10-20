@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.humanres.relations.emplPosition.event.EmplPositionAdded;
 import com.skytala.eCommerce.domain.humanres.relations.emplPosition.event.EmplPositionFound;
 import com.skytala.eCommerce.domain.humanres.relations.emplPosition.mapper.EmplPositionMapper;
 import com.skytala.eCommerce.domain.humanres.relations.emplPosition.model.EmplPosition;

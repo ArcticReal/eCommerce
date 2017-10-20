@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.content.relations.webSiteRole.event.WebSiteRoleAdded;
 import com.skytala.eCommerce.domain.content.relations.webSiteRole.event.WebSiteRoleFound;
 import com.skytala.eCommerce.domain.content.relations.webSiteRole.mapper.WebSiteRoleMapper;
 import com.skytala.eCommerce.domain.content.relations.webSiteRole.model.WebSiteRole;

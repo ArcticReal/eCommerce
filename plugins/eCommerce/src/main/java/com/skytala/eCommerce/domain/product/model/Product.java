@@ -1,8 +1,9 @@
 package com.skytala.eCommerce.domain.product.model;
+
 import java.util.Map;
 import java.math.BigDecimal;
-	import java.sql.Timestamp;
-	import java.util.Map;
+import java.sql.Timestamp;
+import java.util.Map;
 import java.io.Serializable;
 import com.skytala.eCommerce.domain.product.mapper.ProductMapper;
 

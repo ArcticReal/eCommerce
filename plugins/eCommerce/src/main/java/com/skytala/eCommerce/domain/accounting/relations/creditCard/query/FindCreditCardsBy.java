@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.accounting.relations.creditCard.event.CreditCardAdded;
 import com.skytala.eCommerce.domain.accounting.relations.creditCard.event.CreditCardFound;
 import com.skytala.eCommerce.domain.accounting.relations.creditCard.mapper.CreditCardMapper;
 import com.skytala.eCommerce.domain.accounting.relations.creditCard.model.CreditCard;

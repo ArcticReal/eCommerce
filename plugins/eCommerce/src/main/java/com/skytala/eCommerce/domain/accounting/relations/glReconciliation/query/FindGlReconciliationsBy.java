@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.accounting.relations.glReconciliation.event.GlReconciliationAdded;
 import com.skytala.eCommerce.domain.accounting.relations.glReconciliation.event.GlReconciliationFound;
 import com.skytala.eCommerce.domain.accounting.relations.glReconciliation.mapper.GlReconciliationMapper;
 import com.skytala.eCommerce.domain.accounting.relations.glReconciliation.model.GlReconciliation;

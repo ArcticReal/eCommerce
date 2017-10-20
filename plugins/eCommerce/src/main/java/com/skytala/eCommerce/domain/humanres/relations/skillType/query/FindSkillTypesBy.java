@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.humanres.relations.skillType.event.SkillTypeAdded;
 import com.skytala.eCommerce.domain.humanres.relations.skillType.event.SkillTypeFound;
 import com.skytala.eCommerce.domain.humanres.relations.skillType.mapper.SkillTypeMapper;
 import com.skytala.eCommerce.domain.humanres.relations.skillType.model.SkillType;

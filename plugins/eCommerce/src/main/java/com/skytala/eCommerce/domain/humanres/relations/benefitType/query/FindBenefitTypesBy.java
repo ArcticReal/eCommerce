@@ -13,7 +13,6 @@ import com.skytala.eCommerce.framework.pubsub.Broker;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
-import com.skytala.eCommerce.domain.humanres.relations.benefitType.event.BenefitTypeAdded;
 import com.skytala.eCommerce.domain.humanres.relations.benefitType.event.BenefitTypeFound;
 import com.skytala.eCommerce.domain.humanres.relations.benefitType.mapper.BenefitTypeMapper;
 import com.skytala.eCommerce.domain.humanres.relations.benefitType.model.BenefitType;
