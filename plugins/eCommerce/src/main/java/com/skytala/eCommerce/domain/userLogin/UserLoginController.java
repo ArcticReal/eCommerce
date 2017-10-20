@@ -1,4 +1,4 @@
-package com.skytala.eCommerce.domain.product;
+package com.skytala.eCommerce.domain.userLogin;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,27 +22,26 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Splitter;
-import com.skytala.eCommerce.domain.product.command.AddProduct;
-import com.skytala.eCommerce.domain.product.command.DeleteProduct;
-import com.skytala.eCommerce.domain.product.command.UpdateProduct;
-import com.skytala.eCommerce.domain.product.event.ProductAdded;
-import com.skytala.eCommerce.domain.product.event.ProductDeleted;
-import com.skytala.eCommerce.domain.product.event.ProductFound;
-import com.skytala.eCommerce.domain.product.event.ProductUpdated;
-import com.skytala.eCommerce.domain.product.mapper.ProductMapper;
-import com.skytala.eCommerce.domain.product.model.Product;
-import com.skytala.eCommerce.domain.product.query.FindProductsBy;
+import com.skytala.eCommerce.domain.userLogin.command.AddUserLogin;
+import com.skytala.eCommerce.domain.userLogin.command.DeleteUserLogin;
+import com.skytala.eCommerce.domain.userLogin.command.UpdateUserLogin;
+import com.skytala.eCommerce.domain.userLogin.event.UserLoginAdded;
+import com.skytala.eCommerce.domain.userLogin.event.UserLoginDeleted;
+import com.skytala.eCommerce.domain.userLogin.event.UserLoginFound;
+import com.skytala.eCommerce.domain.userLogin.event.UserLoginUpdated;
+import com.skytala.eCommerce.domain.userLogin.mapper.UserLoginMapper;
+import com.skytala.eCommerce.domain.userLogin.model.UserLogin;
+import com.skytala.eCommerce.domain.userLogin.query.FindUserLoginsBy;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@CrossOrigin
-@RequestMapping("/products")
-public class ProductController {
+@RequestMapping("/userLogins")
+public class UserLoginController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();
 
-	public ProductController() {
+	public UserLoginController() {
 
 		validRequests.put("find", RequestMethod.GET);
 		validRequests.put("add", RequestMethod.POST);
@@ -54,25 +52,25 @@ public class ProductController {
 	/**
 	 * 
 	 * @param allRequestParams
-	 *            all params by which you want to find a Product
-	 * @return a List with the Products
+	 *            all params by which you want to find a UserLogin
+	 * @return a List with the UserLogins
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findProductsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<Object> findUserLoginsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
-		FindProductsBy query = new FindProductsBy(allRequestParams);
+		FindUserLoginsBy query = new FindUserLoginsBy(allRequestParams);
 		if (allRequestParams == null) {
 			query.setFilter(new HashMap<>());
 		}
 
-		List<Product> products =((ProductFound) Scheduler.execute(query).data()).getProducts();
+		List<UserLogin> userLogins =((UserLoginFound) Scheduler.execute(query).data()).getUserLogins();
 
-		if (products.size() == 1) {
-			return ResponseEntity.ok().body(products.get(0));
+		if (userLogins.size() == 1) {
+			return ResponseEntity.ok().body(userLogins.get(0));
 		}
 
-		return ResponseEntity.ok().body(products);
+		return ResponseEntity.ok().body(userLogins);
 
 	}
 
@@ -85,40 +83,40 @@ public class ProductController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProduct(HttpServletRequest request) throws Exception {
+	public ResponseEntity<Object> createUserLogin(HttpServletRequest request) throws Exception {
 
-		Product productToBeAdded = new Product();
+		UserLogin userLoginToBeAdded = new UserLogin();
 		try {
-			productToBeAdded = ProductMapper.map(request);
+			userLoginToBeAdded = UserLoginMapper.map(request);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
 		}
 
-		return this.createProduct(productToBeAdded);
+		return this.createUserLogin(userLoginToBeAdded);
 
 	}
 
 	/**
-	 * creates a new Product entry in the ofbiz database
+	 * creates a new UserLogin entry in the ofbiz database
 	 * 
-	 * @param productToBeAdded
-	 *            the Product thats to be added
+	 * @param userLoginToBeAdded
+	 *            the UserLogin thats to be added
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProduct(@RequestBody Product productToBeAdded) throws Exception {
+	public ResponseEntity<Object> createUserLogin(@RequestBody UserLogin userLoginToBeAdded) throws Exception {
 
-		AddProduct command = new AddProduct(productToBeAdded);
-		Product product = ((ProductAdded) Scheduler.execute(command).data()).getAddedProduct();
+		AddUserLogin command = new AddUserLogin(userLoginToBeAdded);
+		UserLogin userLogin = ((UserLoginAdded) Scheduler.execute(command).data()).getAddedUserLogin();
 		
-		if (product != null) 
+		if (userLogin != null) 
 			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(product);
+					             .body(userLogin);
 		else 
 			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("Product could not be created.");
+					             .body("UserLogin could not be created.");
 	}
 
 	/**
@@ -131,7 +129,7 @@ public class ProductController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProduct(HttpServletRequest request) throws Exception {
+	public boolean updateUserLogin(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
 		String data = null;
@@ -150,16 +148,16 @@ public class ProductController {
 		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
 				.split(data);
 
-		Product productToBeUpdated = new Product();
+		UserLogin userLoginToBeUpdated = new UserLogin();
 
 		try {
-			productToBeUpdated = ProductMapper.mapstrstr(dataMap);
+			userLoginToBeUpdated = UserLoginMapper.mapstrstr(dataMap);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
 
-		if (updateProduct(productToBeUpdated, productToBeUpdated.getProductId()).getStatusCode()
+		if (updateUserLogin(userLoginToBeUpdated, userLoginToBeUpdated.getUserLoginId()).getStatusCode()
 				.equals(HttpStatus.NO_CONTENT)) {
 			return true;
 		}
@@ -168,23 +166,23 @@ public class ProductController {
 	}
 
 	/**
-	 * Updates the Product with the specific Id
+	 * Updates the UserLogin with the specific Id
 	 * 
-	 * @param productToBeUpdated
-	 *            the Product thats to be updated
+	 * @param userLoginToBeUpdated
+	 *            the UserLogin thats to be updated
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/{productId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProduct(@RequestBody Product productToBeUpdated,
-			@PathVariable String productId) throws Exception {
+	@RequestMapping(method = RequestMethod.PUT, value = "/{userLoginId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<Object> updateUserLogin(@RequestBody UserLogin userLoginToBeUpdated,
+			@PathVariable String userLoginId) throws Exception {
 
-		productToBeUpdated.setProductId(productId);
+		userLoginToBeUpdated.setUserLoginId(userLoginId);
 
-		UpdateProduct command = new UpdateProduct(productToBeUpdated);
+		UpdateUserLogin command = new UpdateUserLogin(userLoginToBeUpdated);
 
 		try {
-			if(((ProductUpdated) Scheduler.execute(command).data()).isSuccess()) 
+			if(((UserLoginUpdated) Scheduler.execute(command).data()).isSuccess()) 
 				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
 		} catch (RecordNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -193,14 +191,14 @@ public class ProductController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productId}")
-	public ResponseEntity<Object> findById(@PathVariable String productId) throws Exception {
+	@RequestMapping(method = RequestMethod.GET, value = "/{userLoginId}")
+	public ResponseEntity<Object> findById(@PathVariable String userLoginId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
-		requestParams.put("productId", productId);
+		requestParams.put("userLoginId", userLoginId);
 		try {
 
-			Object foundProduct = findProductsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProduct);
+			Object foundUserLogin = findUserLoginsBy(requestParams).getBody();
+			return ResponseEntity.status(HttpStatus.OK).body(foundUserLogin);
 		} catch (RecordNotFoundException e) {
 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -208,18 +206,18 @@ public class ProductController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productId}")
-	public ResponseEntity<Object> deleteProductByIdUpdated(@PathVariable String productId) throws Exception {
-		DeleteProduct command = new DeleteProduct(productId);
+	@RequestMapping(method = RequestMethod.DELETE, value = "/{userLoginId}")
+	public ResponseEntity<Object> deleteUserLoginByIdUpdated(@PathVariable String userLoginId) throws Exception {
+		DeleteUserLogin command = new DeleteUserLogin(userLoginId);
 
 		try {
-			if (((ProductDeleted) Scheduler.execute(command).data()).isSuccess())
+			if (((UserLoginDeleted) Scheduler.execute(command).data()).isSuccess())
 				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 		} catch (RecordNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("Product could not be deleted");
+		return ResponseEntity.status(HttpStatus.CONFLICT).body("UserLogin could not be deleted");
 
 	}
 
@@ -238,7 +236,7 @@ public class ProductController {
 			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(returnVal);
 		}
 
-		String returnVal = "Error 404: Page not found! Valid pages are: \"eCommerce/api/product/\" plus one of the following: "
+		String returnVal = "Error 404: Page not found! Valid pages are: \"eCommerce/api/userLogin/\" plus one of the following: "
 				+ "";
 
 		Set<String> keySet = validRequests.keySet();

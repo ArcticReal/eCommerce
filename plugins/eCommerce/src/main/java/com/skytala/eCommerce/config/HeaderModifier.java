@@ -19,7 +19,8 @@ public class HeaderModifier implements ResponseBodyAdvice{
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
                                   Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
 
-        response.getHeaders().add(" Access-Control-Allow-Origin","*");
+        // allow content loading by cross origin javascript calls
+        response.getHeaders().add(" Access-Control-Allow-Origin","*"); //TODO allow only specific pages to load contents cross origin
         return body;
     }
 }
