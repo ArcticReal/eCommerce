@@ -1,26 +1,18 @@
 package com.skytala.eCommerce.service.order;
 
-import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpSession;
-
 import org.apache.ofbiz.service.GenericServiceException;
 import org.apache.ofbiz.service.LocalDispatcher;
-import org.apache.ofbiz.entity.GenericValue;
 import org.apache.ofbiz.service.ServiceAuthException;
 import org.apache.ofbiz.service.ServiceValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.bind.annotation.RestController;
+import javax.servlet.http.HttpSession;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -355,7 +347,7 @@ public class OrderCart{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/interfaceProductPromoAction")
-	public ResponseEntity<Object> interfaceProductPromoAction(HttpSession session, @RequestParam(value="productPromoAction") org.apache.ofbiz.entity.GenericValue productPromoAction, @RequestParam(value="shoppingCart") org.apache.ofbiz.order.shoppingcart.ShoppingCart shoppingCart, @RequestParam(value="nowTimestamp") Timestamp nowTimestamp, @RequestParam(value="actionResultInfo") org.apache.ofbiz.order.shoppingcart.product.ProductPromoWorker$ActionResultInfo actionResultInfo) {
+	public ResponseEntity<Object> interfaceProductPromoAction(HttpSession session, @RequestParam(value="productPromoAction") org.apache.ofbiz.entity.GenericValue productPromoAction, @RequestParam(value="shoppingCart") org.apache.ofbiz.order.shoppingcart.ShoppingCart shoppingCart, @RequestParam(value="nowTimestamp") Timestamp nowTimestamp, @RequestParam(value="actionResultInfo") org.apache.ofbiz.order.shoppingcart.product.ProductPromoWorker.ActionResultInfo actionResultInfo) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productPromoAction",productPromoAction);
