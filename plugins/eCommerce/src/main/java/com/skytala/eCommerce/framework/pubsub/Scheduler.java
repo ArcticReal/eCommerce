@@ -18,13 +18,13 @@ public class Scheduler {
 		return instance;
 	}
 	
-	public static EventAccessor execute(Command command) throws Exception {
+	public static EventAccessor execute(Command command){
 		Thread thread = new Thread(command);
 		thread.start();
 		return new EventAccessor(command, thread);
 	}
 	
-	public static QueryDataAccessor execute(Query query) throws Exception {
+	public static QueryDataAccessor execute(Query query){
 		Thread thread = new Thread(query);
 		thread.start();
 		return new QueryDataAccessor(query, thread);

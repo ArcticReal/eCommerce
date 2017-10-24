@@ -18,7 +18,7 @@ private String question;
 private String hint;
 private String enumTypeId;
 private String geoId;
-private Long formatString;
+private String formatString;
 
 public String getSurveyQuestionId() {
 return surveyQuestionId;
@@ -84,11 +84,11 @@ public void setGeoId(String  geoId) {
 this.geoId = geoId;
 }
 
-public Long getFormatString() {
+public String getFormatString() {
 return formatString;
 }
 
-public void setFormatString(Long  formatString) {
+public void setFormatString(String  formatString) {
 this.formatString = formatString;
 }
 

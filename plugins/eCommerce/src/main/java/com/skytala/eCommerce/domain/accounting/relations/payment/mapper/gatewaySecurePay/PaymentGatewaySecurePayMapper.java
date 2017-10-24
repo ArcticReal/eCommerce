@@ -53,15 +53,15 @@ public class PaymentGatewaySecurePayMapper  {
 }
 
 		if(fields.get("merchantId") != null) {
-			returnVal.setMerchantId((long) fields.get("merchantId"));
+			returnVal.setMerchantId((String) fields.get("merchantId"));
 }
 
 		if(fields.get("pwd") != null) {
-			returnVal.setPwd((long) fields.get("pwd"));
+			returnVal.setPwd((String) fields.get("pwd"));
 }
 
 		if(fields.get("serverURL") != null) {
-			returnVal.setServerURL((long) fields.get("serverURL"));
+			returnVal.setServerURL((String) fields.get("serverURL"));
 }
 
 		if(fields.get("processTimeout") != null) {
@@ -84,24 +84,15 @@ public class PaymentGatewaySecurePayMapper  {
 }
 
 		if(fields.get("merchantId") != null) {
-String buf;
-buf = fields.get("merchantId");
-long ibuf = Long.parseLong(buf);
-			returnVal.setMerchantId(ibuf);
+			returnVal.setMerchantId((String) fields.get("merchantId"));
 }
 
 		if(fields.get("pwd") != null) {
-String buf;
-buf = fields.get("pwd");
-long ibuf = Long.parseLong(buf);
-			returnVal.setPwd(ibuf);
+			returnVal.setPwd((String) fields.get("pwd"));
 }
 
 		if(fields.get("serverURL") != null) {
-String buf;
-buf = fields.get("serverURL");
-long ibuf = Long.parseLong(buf);
-			returnVal.setServerURL(ibuf);
+			returnVal.setServerURL((String) fields.get("serverURL"));
 }
 
 		if(fields.get("processTimeout") != null) {
@@ -125,9 +116,9 @@ Boolean ibuf = Boolean.parseBoolean(buf);
 
 PaymentGatewaySecurePay returnVal = new PaymentGatewaySecurePay();
 		returnVal.setPaymentGatewayConfigId(val.getString("paymentGatewayConfigId"));
-		returnVal.setMerchantId(val.getLong("merchantId"));
-		returnVal.setPwd(val.getLong("pwd"));
-		returnVal.setServerURL(val.getLong("serverURL"));
+		returnVal.setMerchantId(val.getString("merchantId"));
+		returnVal.setPwd(val.getString("pwd"));
+		returnVal.setServerURL(val.getString("serverURL"));
 		returnVal.setProcessTimeout(val.getLong("processTimeout"));
 		returnVal.setEnableAmountRound(val.getBoolean("enableAmountRound"));
 
@@ -147,19 +138,13 @@ returnVal.setPaymentGatewayConfigId(request.getParameter("paymentGatewayConfigId
 }
 
 		if(paramMap.containsKey("merchantId"))  {
-String buf = request.getParameter("merchantId");
-Long ibuf = Long.parseLong(buf);
-returnVal.setMerchantId(ibuf);
+returnVal.setMerchantId(request.getParameter("merchantId"));
 }
 		if(paramMap.containsKey("pwd"))  {
-String buf = request.getParameter("pwd");
-Long ibuf = Long.parseLong(buf);
-returnVal.setPwd(ibuf);
+returnVal.setPwd(request.getParameter("pwd"));
 }
 		if(paramMap.containsKey("serverURL"))  {
-String buf = request.getParameter("serverURL");
-Long ibuf = Long.parseLong(buf);
-returnVal.setServerURL(ibuf);
+returnVal.setServerURL(request.getParameter("serverURL"));
 }
 		if(paramMap.containsKey("processTimeout"))  {
 String buf = request.getParameter("processTimeout");

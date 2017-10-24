@@ -14,7 +14,7 @@ private String contactListId;
 private String communicationEventId;
 private String contactMechId;
 private String partyId;
-private Long messageId;
+private String messageId;
 private String statusId;
 private String changeByUserLoginId;
 
@@ -50,11 +50,11 @@ public void setPartyId(String  partyId) {
 this.partyId = partyId;
 }
 
-public Long getMessageId() {
+public String getMessageId() {
 return messageId;
 }
 
-public void setMessageId(Long  messageId) {
+public void setMessageId(String  messageId) {
 this.messageId = messageId;
 }
 

@@ -53,11 +53,11 @@ public class PaymentGatewayEwayMapper  {
 }
 
 		if(fields.get("customerId") != null) {
-			returnVal.setCustomerId((long) fields.get("customerId"));
+			returnVal.setCustomerId((String) fields.get("customerId"));
 }
 
 		if(fields.get("refundPwd") != null) {
-			returnVal.setRefundPwd((long) fields.get("refundPwd"));
+			returnVal.setRefundPwd((String) fields.get("refundPwd"));
 }
 
 		if(fields.get("testMode") != null) {
@@ -84,17 +84,11 @@ public class PaymentGatewayEwayMapper  {
 }
 
 		if(fields.get("customerId") != null) {
-String buf;
-buf = fields.get("customerId");
-long ibuf = Long.parseLong(buf);
-			returnVal.setCustomerId(ibuf);
+			returnVal.setCustomerId((String) fields.get("customerId"));
 }
 
 		if(fields.get("refundPwd") != null) {
-String buf;
-buf = fields.get("refundPwd");
-long ibuf = Long.parseLong(buf);
-			returnVal.setRefundPwd(ibuf);
+			returnVal.setRefundPwd((String) fields.get("refundPwd"));
 }
 
 		if(fields.get("testMode") != null) {
@@ -116,8 +110,8 @@ long ibuf = Long.parseLong(buf);
 
 PaymentGatewayEway returnVal = new PaymentGatewayEway();
 		returnVal.setPaymentGatewayConfigId(val.getString("paymentGatewayConfigId"));
-		returnVal.setCustomerId(val.getLong("customerId"));
-		returnVal.setRefundPwd(val.getLong("refundPwd"));
+		returnVal.setCustomerId(val.getString("customerId"));
+		returnVal.setRefundPwd(val.getString("refundPwd"));
 		returnVal.setTestMode(val.getString("testMode"));
 		returnVal.setEnableCvn(val.getString("enableCvn"));
 		returnVal.setEnableBeagle(val.getString("enableBeagle"));
@@ -138,14 +132,10 @@ returnVal.setPaymentGatewayConfigId(request.getParameter("paymentGatewayConfigId
 }
 
 		if(paramMap.containsKey("customerId"))  {
-String buf = request.getParameter("customerId");
-Long ibuf = Long.parseLong(buf);
-returnVal.setCustomerId(ibuf);
+returnVal.setCustomerId(request.getParameter("customerId"));
 }
 		if(paramMap.containsKey("refundPwd"))  {
-String buf = request.getParameter("refundPwd");
-Long ibuf = Long.parseLong(buf);
-returnVal.setRefundPwd(ibuf);
+returnVal.setRefundPwd(request.getParameter("refundPwd"));
 }
 		if(paramMap.containsKey("testMode"))  {
 returnVal.setTestMode(request.getParameter("testMode"));

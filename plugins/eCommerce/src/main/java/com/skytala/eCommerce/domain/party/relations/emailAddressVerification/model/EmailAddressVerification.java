@@ -11,7 +11,7 @@ public class EmailAddressVerification implements Serializable{
 
 private static final long serialVersionUID = 1L;
 private String emailAddress;
-private Long verifyHash;
+private String verifyHash;
 private Timestamp expireDate;
 
 public String getEmailAddress() {
@@ -22,11 +22,11 @@ public void setEmailAddress(String  emailAddress) {
 this.emailAddress = emailAddress;
 }
 
-public Long getVerifyHash() {
+public String getVerifyHash() {
 return verifyHash;
 }
 
-public void setVerifyHash(Long  verifyHash) {
+public void setVerifyHash(String  verifyHash) {
 this.verifyHash = verifyHash;
 }
 

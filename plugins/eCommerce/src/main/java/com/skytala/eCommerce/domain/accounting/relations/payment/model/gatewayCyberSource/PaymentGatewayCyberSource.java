@@ -11,23 +11,23 @@ public class PaymentGatewayCyberSource implements Serializable{
 
 private static final long serialVersionUID = 1L;
 private String paymentGatewayConfigId;
-private Long merchantId;
+private String merchantId;
 private String apiVersion;
 private String production;
-private Long keysDir;
-private Long keysFile;
+private String keysDir;
+private String keysFile;
 private String logEnabled;
-private Long logDir;
-private Long logFile;
+private String logDir;
+private String logFile;
 private Long logSize;
-private Long merchantDescr;
-private Long merchantContact;
+private String merchantDescr;
+private String merchantContact;
 private String autoBill;
 private Boolean enableDav;
 private Boolean fraudScore;
 private String ignoreAvs;
 private Boolean disableBillAvs;
-private Long avsDeclineCodes;
+private String avsDeclineCodes;
 
 public String getPaymentGatewayConfigId() {
 return paymentGatewayConfigId;
@@ -37,11 +37,11 @@ public void setPaymentGatewayConfigId(String  paymentGatewayConfigId) {
 this.paymentGatewayConfigId = paymentGatewayConfigId;
 }
 
-public Long getMerchantId() {
+public String getMerchantId() {
 return merchantId;
 }
 
-public void setMerchantId(Long  merchantId) {
+public void setMerchantId(String  merchantId) {
 this.merchantId = merchantId;
 }
 
@@ -61,19 +61,19 @@ public void setProduction(String  production) {
 this.production = production;
 }
 
-public Long getKeysDir() {
+public String getKeysDir() {
 return keysDir;
 }
 
-public void setKeysDir(Long  keysDir) {
+public void setKeysDir(String  keysDir) {
 this.keysDir = keysDir;
 }
 
-public Long getKeysFile() {
+public String getKeysFile() {
 return keysFile;
 }
 
-public void setKeysFile(Long  keysFile) {
+public void setKeysFile(String  keysFile) {
 this.keysFile = keysFile;
 }
 
@@ -85,19 +85,19 @@ public void setLogEnabled(String  logEnabled) {
 this.logEnabled = logEnabled;
 }
 
-public Long getLogDir() {
+public String getLogDir() {
 return logDir;
 }
 
-public void setLogDir(Long  logDir) {
+public void setLogDir(String  logDir) {
 this.logDir = logDir;
 }
 
-public Long getLogFile() {
+public String getLogFile() {
 return logFile;
 }
 
-public void setLogFile(Long  logFile) {
+public void setLogFile(String  logFile) {
 this.logFile = logFile;
 }
 
@@ -109,19 +109,19 @@ public void setLogSize(Long  logSize) {
 this.logSize = logSize;
 }
 
-public Long getMerchantDescr() {
+public String getMerchantDescr() {
 return merchantDescr;
 }
 
-public void setMerchantDescr(Long  merchantDescr) {
+public void setMerchantDescr(String  merchantDescr) {
 this.merchantDescr = merchantDescr;
 }
 
-public Long getMerchantContact() {
+public String getMerchantContact() {
 return merchantContact;
 }
 
-public void setMerchantContact(Long  merchantContact) {
+public void setMerchantContact(String  merchantContact) {
 this.merchantContact = merchantContact;
 }
 
@@ -165,11 +165,11 @@ public void setDisableBillAvs(Boolean  disableBillAvs) {
 this.disableBillAvs = disableBillAvs;
 }
 
-public Long getAvsDeclineCodes() {
+public String getAvsDeclineCodes() {
 return avsDeclineCodes;
 }
 
-public void setAvsDeclineCodes(Long  avsDeclineCodes) {
+public void setAvsDeclineCodes(String  avsDeclineCodes) {
 this.avsDeclineCodes = avsDeclineCodes;
 }
 

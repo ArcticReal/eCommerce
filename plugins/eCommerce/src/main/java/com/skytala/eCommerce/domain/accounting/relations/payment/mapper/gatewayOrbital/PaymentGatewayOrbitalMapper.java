@@ -93,19 +93,19 @@ public class PaymentGatewayOrbitalMapper  {
 }
 
 		if(fields.get("connectionPassword") != null) {
-			returnVal.setConnectionPassword((long) fields.get("connectionPassword"));
+			returnVal.setConnectionPassword((String) fields.get("connectionPassword"));
 }
 
 		if(fields.get("merchantId") != null) {
-			returnVal.setMerchantId((long) fields.get("merchantId"));
+			returnVal.setMerchantId((String) fields.get("merchantId"));
 }
 
 		if(fields.get("engineClass") != null) {
-			returnVal.setEngineClass((long) fields.get("engineClass"));
+			returnVal.setEngineClass((String) fields.get("engineClass"));
 }
 
 		if(fields.get("hostName") != null) {
-			returnVal.setHostName((long) fields.get("hostName"));
+			returnVal.setHostName((String) fields.get("hostName"));
 }
 
 		if(fields.get("port") != null) {
@@ -113,7 +113,7 @@ public class PaymentGatewayOrbitalMapper  {
 }
 
 		if(fields.get("hostNameFailover") != null) {
-			returnVal.setHostNameFailover((long) fields.get("hostNameFailover"));
+			returnVal.setHostNameFailover((String) fields.get("hostNameFailover"));
 }
 
 		if(fields.get("portFailover") != null) {
@@ -129,7 +129,7 @@ public class PaymentGatewayOrbitalMapper  {
 }
 
 		if(fields.get("authorizationURI") != null) {
-			returnVal.setAuthorizationURI((long) fields.get("authorizationURI"));
+			returnVal.setAuthorizationURI((String) fields.get("authorizationURI"));
 }
 
 		if(fields.get("sdkVersion") != null) {
@@ -160,31 +160,19 @@ public class PaymentGatewayOrbitalMapper  {
 }
 
 		if(fields.get("connectionPassword") != null) {
-String buf;
-buf = fields.get("connectionPassword");
-long ibuf = Long.parseLong(buf);
-			returnVal.setConnectionPassword(ibuf);
+			returnVal.setConnectionPassword((String) fields.get("connectionPassword"));
 }
 
 		if(fields.get("merchantId") != null) {
-String buf;
-buf = fields.get("merchantId");
-long ibuf = Long.parseLong(buf);
-			returnVal.setMerchantId(ibuf);
+			returnVal.setMerchantId((String) fields.get("merchantId"));
 }
 
 		if(fields.get("engineClass") != null) {
-String buf;
-buf = fields.get("engineClass");
-long ibuf = Long.parseLong(buf);
-			returnVal.setEngineClass(ibuf);
+			returnVal.setEngineClass((String) fields.get("engineClass"));
 }
 
 		if(fields.get("hostName") != null) {
-String buf;
-buf = fields.get("hostName");
-long ibuf = Long.parseLong(buf);
-			returnVal.setHostName(ibuf);
+			returnVal.setHostName((String) fields.get("hostName"));
 }
 
 		if(fields.get("port") != null) {
@@ -195,10 +183,7 @@ long ibuf = Long.parseLong(buf);
 }
 
 		if(fields.get("hostNameFailover") != null) {
-String buf;
-buf = fields.get("hostNameFailover");
-long ibuf = Long.parseLong(buf);
-			returnVal.setHostNameFailover(ibuf);
+			returnVal.setHostNameFailover((String) fields.get("hostNameFailover"));
 }
 
 		if(fields.get("portFailover") != null) {
@@ -223,10 +208,7 @@ long ibuf = Long.parseLong(buf);
 }
 
 		if(fields.get("authorizationURI") != null) {
-String buf;
-buf = fields.get("authorizationURI");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAuthorizationURI(ibuf);
+			returnVal.setAuthorizationURI((String) fields.get("authorizationURI"));
 }
 
 		if(fields.get("sdkVersion") != null) {
@@ -249,16 +231,16 @@ long ibuf = Long.parseLong(buf);
 PaymentGatewayOrbital returnVal = new PaymentGatewayOrbital();
 		returnVal.setPaymentGatewayConfigId(val.getString("paymentGatewayConfigId"));
 		returnVal.setUsername(val.getString("username"));
-		returnVal.setConnectionPassword(val.getLong("connectionPassword"));
-		returnVal.setMerchantId(val.getLong("merchantId"));
-		returnVal.setEngineClass(val.getLong("engineClass"));
-		returnVal.setHostName(val.getLong("hostName"));
+		returnVal.setConnectionPassword(val.getString("connectionPassword"));
+		returnVal.setMerchantId(val.getString("merchantId"));
+		returnVal.setEngineClass(val.getString("engineClass"));
+		returnVal.setHostName(val.getString("hostName"));
 		returnVal.setPort(val.getLong("port"));
-		returnVal.setHostNameFailover(val.getLong("hostNameFailover"));
+		returnVal.setHostNameFailover(val.getString("hostNameFailover"));
 		returnVal.setPortFailover(val.getLong("portFailover"));
 		returnVal.setConnectionTimeoutSeconds(val.getLong("connectionTimeoutSeconds"));
 		returnVal.setReadTimeoutSeconds(val.getLong("readTimeoutSeconds"));
-		returnVal.setAuthorizationURI(val.getLong("authorizationURI"));
+		returnVal.setAuthorizationURI(val.getString("authorizationURI"));
 		returnVal.setSdkVersion(val.getString("sdkVersion"));
 		returnVal.setSslSocketFactory(val.getString("sslSocketFactory"));
 		returnVal.setResponseType(val.getString("responseType"));
@@ -282,24 +264,16 @@ returnVal.setPaymentGatewayConfigId(request.getParameter("paymentGatewayConfigId
 returnVal.setUsername(request.getParameter("username"));
 }
 		if(paramMap.containsKey("connectionPassword"))  {
-String buf = request.getParameter("connectionPassword");
-Long ibuf = Long.parseLong(buf);
-returnVal.setConnectionPassword(ibuf);
+returnVal.setConnectionPassword(request.getParameter("connectionPassword"));
 }
 		if(paramMap.containsKey("merchantId"))  {
-String buf = request.getParameter("merchantId");
-Long ibuf = Long.parseLong(buf);
-returnVal.setMerchantId(ibuf);
+returnVal.setMerchantId(request.getParameter("merchantId"));
 }
 		if(paramMap.containsKey("engineClass"))  {
-String buf = request.getParameter("engineClass");
-Long ibuf = Long.parseLong(buf);
-returnVal.setEngineClass(ibuf);
+returnVal.setEngineClass(request.getParameter("engineClass"));
 }
 		if(paramMap.containsKey("hostName"))  {
-String buf = request.getParameter("hostName");
-Long ibuf = Long.parseLong(buf);
-returnVal.setHostName(ibuf);
+returnVal.setHostName(request.getParameter("hostName"));
 }
 		if(paramMap.containsKey("port"))  {
 String buf = request.getParameter("port");
@@ -307,9 +281,7 @@ Long ibuf = Long.parseLong(buf);
 returnVal.setPort(ibuf);
 }
 		if(paramMap.containsKey("hostNameFailover"))  {
-String buf = request.getParameter("hostNameFailover");
-Long ibuf = Long.parseLong(buf);
-returnVal.setHostNameFailover(ibuf);
+returnVal.setHostNameFailover(request.getParameter("hostNameFailover"));
 }
 		if(paramMap.containsKey("portFailover"))  {
 String buf = request.getParameter("portFailover");
@@ -327,9 +299,7 @@ Long ibuf = Long.parseLong(buf);
 returnVal.setReadTimeoutSeconds(ibuf);
 }
 		if(paramMap.containsKey("authorizationURI"))  {
-String buf = request.getParameter("authorizationURI");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAuthorizationURI(ibuf);
+returnVal.setAuthorizationURI(request.getParameter("authorizationURI"));
 }
 		if(paramMap.containsKey("sdkVersion"))  {
 returnVal.setSdkVersion(request.getParameter("sdkVersion"));

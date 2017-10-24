@@ -11,8 +11,8 @@ public class PaymentGatewayEway implements Serializable{
 
 private static final long serialVersionUID = 1L;
 private String paymentGatewayConfigId;
-private Long customerId;
-private Long refundPwd;
+private String customerId;
+private String refundPwd;
 private String testMode;
 private String enableCvn;
 private String enableBeagle;
@@ -25,19 +25,19 @@ public void setPaymentGatewayConfigId(String  paymentGatewayConfigId) {
 this.paymentGatewayConfigId = paymentGatewayConfigId;
 }
 
-public Long getCustomerId() {
+public String getCustomerId() {
 return customerId;
 }
 
-public void setCustomerId(Long  customerId) {
+public void setCustomerId(String  customerId) {
 this.customerId = customerId;
 }
 
-public Long getRefundPwd() {
+public String getRefundPwd() {
 return refundPwd;
 }
 
-public void setRefundPwd(Long  refundPwd) {
+public void setRefundPwd(String  refundPwd) {
 this.refundPwd = refundPwd;
 }
 

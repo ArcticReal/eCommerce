@@ -105,11 +105,11 @@ public class PaymentGatewayAuthorizeNetMapper  {
 }
 
 		if(fields.get("transactionUrl") != null) {
-			returnVal.setTransactionUrl((long) fields.get("transactionUrl"));
+			returnVal.setTransactionUrl((String) fields.get("transactionUrl"));
 }
 
 		if(fields.get("certificateAlias") != null) {
-			returnVal.setCertificateAlias((long) fields.get("certificateAlias"));
+			returnVal.setCertificateAlias((String) fields.get("certificateAlias"));
 }
 
 		if(fields.get("apiVersion") != null) {
@@ -157,19 +157,19 @@ public class PaymentGatewayAuthorizeNetMapper  {
 }
 
 		if(fields.get("tranKey") != null) {
-			returnVal.setTranKey((long) fields.get("tranKey"));
+			returnVal.setTranKey((String) fields.get("tranKey"));
 }
 
 		if(fields.get("userId") != null) {
-			returnVal.setUserId((long) fields.get("userId"));
+			returnVal.setUserId((String) fields.get("userId"));
 }
 
 		if(fields.get("pwd") != null) {
-			returnVal.setPwd((long) fields.get("pwd"));
+			returnVal.setPwd((String) fields.get("pwd"));
 }
 
 		if(fields.get("transDescription") != null) {
-			returnVal.setTransDescription((long) fields.get("transDescription"));
+			returnVal.setTransDescription((String) fields.get("transDescription"));
 }
 
 		if(fields.get("duplicateWindow") != null) {
@@ -188,17 +188,11 @@ public class PaymentGatewayAuthorizeNetMapper  {
 }
 
 		if(fields.get("transactionUrl") != null) {
-String buf;
-buf = fields.get("transactionUrl");
-long ibuf = Long.parseLong(buf);
-			returnVal.setTransactionUrl(ibuf);
+			returnVal.setTransactionUrl((String) fields.get("transactionUrl"));
 }
 
 		if(fields.get("certificateAlias") != null) {
-String buf;
-buf = fields.get("certificateAlias");
-long ibuf = Long.parseLong(buf);
-			returnVal.setCertificateAlias(ibuf);
+			returnVal.setCertificateAlias((String) fields.get("certificateAlias"));
 }
 
 		if(fields.get("apiVersion") != null) {
@@ -246,31 +240,19 @@ long ibuf = Long.parseLong(buf);
 }
 
 		if(fields.get("tranKey") != null) {
-String buf;
-buf = fields.get("tranKey");
-long ibuf = Long.parseLong(buf);
-			returnVal.setTranKey(ibuf);
+			returnVal.setTranKey((String) fields.get("tranKey"));
 }
 
 		if(fields.get("userId") != null) {
-String buf;
-buf = fields.get("userId");
-long ibuf = Long.parseLong(buf);
-			returnVal.setUserId(ibuf);
+			returnVal.setUserId((String) fields.get("userId"));
 }
 
 		if(fields.get("pwd") != null) {
-String buf;
-buf = fields.get("pwd");
-long ibuf = Long.parseLong(buf);
-			returnVal.setPwd(ibuf);
+			returnVal.setPwd((String) fields.get("pwd"));
 }
 
 		if(fields.get("transDescription") != null) {
-String buf;
-buf = fields.get("transDescription");
-long ibuf = Long.parseLong(buf);
-			returnVal.setTransDescription(ibuf);
+			returnVal.setTransDescription((String) fields.get("transDescription"));
 }
 
 		if(fields.get("duplicateWindow") != null) {
@@ -287,8 +269,8 @@ long ibuf = Long.parseLong(buf);
 
 PaymentGatewayAuthorizeNet returnVal = new PaymentGatewayAuthorizeNet();
 		returnVal.setPaymentGatewayConfigId(val.getString("paymentGatewayConfigId"));
-		returnVal.setTransactionUrl(val.getLong("transactionUrl"));
-		returnVal.setCertificateAlias(val.getLong("certificateAlias"));
+		returnVal.setTransactionUrl(val.getString("transactionUrl"));
+		returnVal.setCertificateAlias(val.getString("certificateAlias"));
 		returnVal.setApiVersion(val.getString("apiVersion"));
 		returnVal.setDelimitedData(val.getString("delimitedData"));
 		returnVal.setDelimiterChar(val.getString("delimiterChar"));
@@ -300,10 +282,10 @@ PaymentGatewayAuthorizeNet returnVal = new PaymentGatewayAuthorizeNet();
 		returnVal.setEmailMerchant(val.getString("emailMerchant"));
 		returnVal.setTestMode(val.getString("testMode"));
 		returnVal.setRelayResponse(val.getString("relayResponse"));
-		returnVal.setTranKey(val.getLong("tranKey"));
-		returnVal.setUserId(val.getLong("userId"));
-		returnVal.setPwd(val.getLong("pwd"));
-		returnVal.setTransDescription(val.getLong("transDescription"));
+		returnVal.setTranKey(val.getString("tranKey"));
+		returnVal.setUserId(val.getString("userId"));
+		returnVal.setPwd(val.getString("pwd"));
+		returnVal.setTransDescription(val.getString("transDescription"));
 		returnVal.setDuplicateWindow(val.getLong("duplicateWindow"));
 
 
@@ -322,14 +304,10 @@ returnVal.setPaymentGatewayConfigId(request.getParameter("paymentGatewayConfigId
 }
 
 		if(paramMap.containsKey("transactionUrl"))  {
-String buf = request.getParameter("transactionUrl");
-Long ibuf = Long.parseLong(buf);
-returnVal.setTransactionUrl(ibuf);
+returnVal.setTransactionUrl(request.getParameter("transactionUrl"));
 }
 		if(paramMap.containsKey("certificateAlias"))  {
-String buf = request.getParameter("certificateAlias");
-Long ibuf = Long.parseLong(buf);
-returnVal.setCertificateAlias(ibuf);
+returnVal.setCertificateAlias(request.getParameter("certificateAlias"));
 }
 		if(paramMap.containsKey("apiVersion"))  {
 returnVal.setApiVersion(request.getParameter("apiVersion"));
@@ -365,24 +343,16 @@ returnVal.setTestMode(request.getParameter("testMode"));
 returnVal.setRelayResponse(request.getParameter("relayResponse"));
 }
 		if(paramMap.containsKey("tranKey"))  {
-String buf = request.getParameter("tranKey");
-Long ibuf = Long.parseLong(buf);
-returnVal.setTranKey(ibuf);
+returnVal.setTranKey(request.getParameter("tranKey"));
 }
 		if(paramMap.containsKey("userId"))  {
-String buf = request.getParameter("userId");
-Long ibuf = Long.parseLong(buf);
-returnVal.setUserId(ibuf);
+returnVal.setUserId(request.getParameter("userId"));
 }
 		if(paramMap.containsKey("pwd"))  {
-String buf = request.getParameter("pwd");
-Long ibuf = Long.parseLong(buf);
-returnVal.setPwd(ibuf);
+returnVal.setPwd(request.getParameter("pwd"));
 }
 		if(paramMap.containsKey("transDescription"))  {
-String buf = request.getParameter("transDescription");
-Long ibuf = Long.parseLong(buf);
-returnVal.setTransDescription(ibuf);
+returnVal.setTransDescription(request.getParameter("transDescription"));
 }
 		if(paramMap.containsKey("duplicateWindow"))  {
 String buf = request.getParameter("duplicateWindow");

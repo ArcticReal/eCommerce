@@ -93,7 +93,7 @@ public class SurveyQuestionMapper  {
 }
 
 		if(fields.get("formatString") != null) {
-			returnVal.setFormatString((long) fields.get("formatString"));
+			returnVal.setFormatString((String) fields.get("formatString"));
 }
 
 
@@ -136,10 +136,7 @@ public class SurveyQuestionMapper  {
 }
 
 		if(fields.get("formatString") != null) {
-String buf;
-buf = fields.get("formatString");
-long ibuf = Long.parseLong(buf);
-			returnVal.setFormatString(ibuf);
+			returnVal.setFormatString((String) fields.get("formatString"));
 }
 
 
@@ -156,7 +153,7 @@ SurveyQuestion returnVal = new SurveyQuestion();
 		returnVal.setHint(val.getString("hint"));
 		returnVal.setEnumTypeId(val.getString("enumTypeId"));
 		returnVal.setGeoId(val.getString("geoId"));
-		returnVal.setFormatString(val.getLong("formatString"));
+		returnVal.setFormatString(val.getString("formatString"));
 
 
 return returnVal;
@@ -195,9 +192,7 @@ returnVal.setEnumTypeId(request.getParameter("enumTypeId"));
 returnVal.setGeoId(request.getParameter("geoId"));
 }
 		if(paramMap.containsKey("formatString"))  {
-String buf = request.getParameter("formatString");
-Long ibuf = Long.parseLong(buf);
-returnVal.setFormatString(ibuf);
+returnVal.setFormatString(request.getParameter("formatString"));
 }
 return returnVal;
 

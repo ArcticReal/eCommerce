@@ -11,8 +11,8 @@ public class PaymentGatewayAuthorizeNet implements Serializable{
 
 private static final long serialVersionUID = 1L;
 private String paymentGatewayConfigId;
-private Long transactionUrl;
-private Long certificateAlias;
+private String transactionUrl;
+private String certificateAlias;
 private String apiVersion;
 private String delimitedData;
 private String delimiterChar;
@@ -24,10 +24,10 @@ private String emailCustomer;
 private String emailMerchant;
 private String testMode;
 private String relayResponse;
-private Long tranKey;
-private Long userId;
-private Long pwd;
-private Long transDescription;
+private String tranKey;
+private String userId;
+private String pwd;
+private String transDescription;
 private Long duplicateWindow;
 
 public String getPaymentGatewayConfigId() {
@@ -38,19 +38,19 @@ public void setPaymentGatewayConfigId(String  paymentGatewayConfigId) {
 this.paymentGatewayConfigId = paymentGatewayConfigId;
 }
 
-public Long getTransactionUrl() {
+public String getTransactionUrl() {
 return transactionUrl;
 }
 
-public void setTransactionUrl(Long  transactionUrl) {
+public void setTransactionUrl(String  transactionUrl) {
 this.transactionUrl = transactionUrl;
 }
 
-public Long getCertificateAlias() {
+public String getCertificateAlias() {
 return certificateAlias;
 }
 
-public void setCertificateAlias(Long  certificateAlias) {
+public void setCertificateAlias(String  certificateAlias) {
 this.certificateAlias = certificateAlias;
 }
 
@@ -142,35 +142,35 @@ public void setRelayResponse(String  relayResponse) {
 this.relayResponse = relayResponse;
 }
 
-public Long getTranKey() {
+public String getTranKey() {
 return tranKey;
 }
 
-public void setTranKey(Long  tranKey) {
+public void setTranKey(String  tranKey) {
 this.tranKey = tranKey;
 }
 
-public Long getUserId() {
+public String getUserId() {
 return userId;
 }
 
-public void setUserId(Long  userId) {
+public void setUserId(String  userId) {
 this.userId = userId;
 }
 
-public Long getPwd() {
+public String getPwd() {
 return pwd;
 }
 
-public void setPwd(Long  pwd) {
+public void setPwd(String  pwd) {
 this.pwd = pwd;
 }
 
-public Long getTransDescription() {
+public String getTransDescription() {
 return transDescription;
 }
 
-public void setTransDescription(Long  transDescription) {
+public void setTransDescription(String  transDescription) {
 this.transDescription = transDescription;
 }
 

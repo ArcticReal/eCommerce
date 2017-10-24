@@ -31,9 +31,9 @@ private BigDecimal availableToPromiseTotal;
 private BigDecimal accountingQuantityTotal;
 private BigDecimal oldQuantityOnHand;
 private BigDecimal oldAvailableToPromise;
-private Long serialNumber;
-private Long softIdentifier;
-private Long activationNumber;
+private String serialNumber;
+private String softIdentifier;
+private String activationNumber;
 private Timestamp activationValidThru;
 private BigDecimal unitCost;
 private String currencyUomId;
@@ -206,27 +206,27 @@ public void setOldAvailableToPromise(BigDecimal  oldAvailableToPromise) {
 this.oldAvailableToPromise = oldAvailableToPromise;
 }
 
-public Long getSerialNumber() {
+public String getSerialNumber() {
 return serialNumber;
 }
 
-public void setSerialNumber(Long  serialNumber) {
+public void setSerialNumber(String  serialNumber) {
 this.serialNumber = serialNumber;
 }
 
-public Long getSoftIdentifier() {
+public String getSoftIdentifier() {
 return softIdentifier;
 }
 
-public void setSoftIdentifier(Long  softIdentifier) {
+public void setSoftIdentifier(String  softIdentifier) {
 this.softIdentifier = softIdentifier;
 }
 
-public Long getActivationNumber() {
+public String getActivationNumber() {
 return activationNumber;
 }
 
-public void setActivationNumber(Long  activationNumber) {
+public void setActivationNumber(String  activationNumber) {
 this.activationNumber = activationNumber;
 }
 

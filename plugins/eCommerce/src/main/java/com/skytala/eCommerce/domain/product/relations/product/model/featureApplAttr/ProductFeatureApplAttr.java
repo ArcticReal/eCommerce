@@ -14,7 +14,7 @@ private String productId;
 private String productFeatureId;
 private Timestamp fromDate;
 private String attrName;
-private Long attrValue;
+private String attrValue;
 
 public String getProductId() {
 return productId;
@@ -48,11 +48,11 @@ public void setAttrName(String  attrName) {
 this.attrName = attrName;
 }
 
-public Long getAttrValue() {
+public String getAttrValue() {
 return attrValue;
 }
 
-public void setAttrValue(Long  attrValue) {
+public void setAttrValue(String  attrValue) {
 this.attrValue = attrValue;
 }
 

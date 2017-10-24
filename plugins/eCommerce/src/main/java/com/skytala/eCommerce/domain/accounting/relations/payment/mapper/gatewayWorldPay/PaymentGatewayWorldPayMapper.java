@@ -73,11 +73,11 @@ public class PaymentGatewayWorldPayMapper  {
 }
 
 		if(fields.get("redirectUrl") != null) {
-			returnVal.setRedirectUrl((long) fields.get("redirectUrl"));
+			returnVal.setRedirectUrl((String) fields.get("redirectUrl"));
 }
 
 		if(fields.get("instId") != null) {
-			returnVal.setInstId((long) fields.get("instId"));
+			returnVal.setInstId((String) fields.get("instId"));
 }
 
 		if(fields.get("authMode") != null) {
@@ -124,17 +124,11 @@ public class PaymentGatewayWorldPayMapper  {
 }
 
 		if(fields.get("redirectUrl") != null) {
-String buf;
-buf = fields.get("redirectUrl");
-long ibuf = Long.parseLong(buf);
-			returnVal.setRedirectUrl(ibuf);
+			returnVal.setRedirectUrl((String) fields.get("redirectUrl"));
 }
 
 		if(fields.get("instId") != null) {
-String buf;
-buf = fields.get("instId");
-long ibuf = Long.parseLong(buf);
-			returnVal.setInstId(ibuf);
+			returnVal.setInstId((String) fields.get("instId"));
 }
 
 		if(fields.get("authMode") != null) {
@@ -197,8 +191,8 @@ long ibuf = Long.parseLong(buf);
 
 PaymentGatewayWorldPay returnVal = new PaymentGatewayWorldPay();
 		returnVal.setPaymentGatewayConfigId(val.getString("paymentGatewayConfigId"));
-		returnVal.setRedirectUrl(val.getLong("redirectUrl"));
-		returnVal.setInstId(val.getLong("instId"));
+		returnVal.setRedirectUrl(val.getString("redirectUrl"));
+		returnVal.setInstId(val.getString("instId"));
 		returnVal.setAuthMode(val.getBoolean("authMode"));
 		returnVal.setFixContact(val.getBoolean("fixContact"));
 		returnVal.setHideContact(val.getBoolean("hideContact"));
@@ -224,14 +218,10 @@ returnVal.setPaymentGatewayConfigId(request.getParameter("paymentGatewayConfigId
 }
 
 		if(paramMap.containsKey("redirectUrl"))  {
-String buf = request.getParameter("redirectUrl");
-Long ibuf = Long.parseLong(buf);
-returnVal.setRedirectUrl(ibuf);
+returnVal.setRedirectUrl(request.getParameter("redirectUrl"));
 }
 		if(paramMap.containsKey("instId"))  {
-String buf = request.getParameter("instId");
-Long ibuf = Long.parseLong(buf);
-returnVal.setInstId(ibuf);
+returnVal.setInstId(request.getParameter("instId"));
 }
 		if(paramMap.containsKey("authMode"))  {
 String buf = request.getParameter("authMode");

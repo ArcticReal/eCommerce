@@ -11,11 +11,11 @@ public class ShipmentGatewayUsps implements Serializable{
 
 private static final long serialVersionUID = 1L;
 private String shipmentGatewayConfigId;
-private Long connectUrl;
-private Long connectUrlLabels;
+private String connectUrl;
+private String connectUrlLabels;
 private Long connectTimeout;
-private Long accessUserId;
-private Long accessPassword;
+private String accessUserId;
+private String accessPassword;
 private Long maxEstimateWeight;
 private String test;
 
@@ -27,19 +27,19 @@ public void setShipmentGatewayConfigId(String  shipmentGatewayConfigId) {
 this.shipmentGatewayConfigId = shipmentGatewayConfigId;
 }
 
-public Long getConnectUrl() {
+public String getConnectUrl() {
 return connectUrl;
 }
 
-public void setConnectUrl(Long  connectUrl) {
+public void setConnectUrl(String  connectUrl) {
 this.connectUrl = connectUrl;
 }
 
-public Long getConnectUrlLabels() {
+public String getConnectUrlLabels() {
 return connectUrlLabels;
 }
 
-public void setConnectUrlLabels(Long  connectUrlLabels) {
+public void setConnectUrlLabels(String  connectUrlLabels) {
 this.connectUrlLabels = connectUrlLabels;
 }
 
@@ -51,19 +51,19 @@ public void setConnectTimeout(Long  connectTimeout) {
 this.connectTimeout = connectTimeout;
 }
 
-public Long getAccessUserId() {
+public String getAccessUserId() {
 return accessUserId;
 }
 
-public void setAccessUserId(Long  accessUserId) {
+public void setAccessUserId(String  accessUserId) {
 this.accessUserId = accessUserId;
 }
 
-public Long getAccessPassword() {
+public String getAccessPassword() {
 return accessPassword;
 }
 
-public void setAccessPassword(Long  accessPassword) {
+public void setAccessPassword(String  accessPassword) {
 this.accessPassword = accessPassword;
 }
 

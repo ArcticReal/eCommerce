@@ -85,11 +85,11 @@ public class ShipmentGatewayFedexMapper  {
 }
 
 		if(fields.get("connectUrl") != null) {
-			returnVal.setConnectUrl((long) fields.get("connectUrl"));
+			returnVal.setConnectUrl((String) fields.get("connectUrl"));
 }
 
 		if(fields.get("connectSoapUrl") != null) {
-			returnVal.setConnectSoapUrl((long) fields.get("connectSoapUrl"));
+			returnVal.setConnectSoapUrl((String) fields.get("connectSoapUrl"));
 }
 
 		if(fields.get("connectTimeout") != null) {
@@ -97,19 +97,19 @@ public class ShipmentGatewayFedexMapper  {
 }
 
 		if(fields.get("accessAccountNbr") != null) {
-			returnVal.setAccessAccountNbr((long) fields.get("accessAccountNbr"));
+			returnVal.setAccessAccountNbr((String) fields.get("accessAccountNbr"));
 }
 
 		if(fields.get("accessMeterNumber") != null) {
-			returnVal.setAccessMeterNumber((long) fields.get("accessMeterNumber"));
+			returnVal.setAccessMeterNumber((String) fields.get("accessMeterNumber"));
 }
 
 		if(fields.get("accessUserKey") != null) {
-			returnVal.setAccessUserKey((long) fields.get("accessUserKey"));
+			returnVal.setAccessUserKey((String) fields.get("accessUserKey"));
 }
 
 		if(fields.get("accessUserPwd") != null) {
-			returnVal.setAccessUserPwd((long) fields.get("accessUserPwd"));
+			returnVal.setAccessUserPwd((String) fields.get("accessUserPwd"));
 }
 
 		if(fields.get("labelImageType") != null) {
@@ -117,23 +117,23 @@ public class ShipmentGatewayFedexMapper  {
 }
 
 		if(fields.get("defaultDropoffType") != null) {
-			returnVal.setDefaultDropoffType((long) fields.get("defaultDropoffType"));
+			returnVal.setDefaultDropoffType((String) fields.get("defaultDropoffType"));
 }
 
 		if(fields.get("defaultPackagingType") != null) {
-			returnVal.setDefaultPackagingType((long) fields.get("defaultPackagingType"));
+			returnVal.setDefaultPackagingType((String) fields.get("defaultPackagingType"));
 }
 
 		if(fields.get("templateShipment") != null) {
-			returnVal.setTemplateShipment((long) fields.get("templateShipment"));
+			returnVal.setTemplateShipment((String) fields.get("templateShipment"));
 }
 
 		if(fields.get("templateSubscription") != null) {
-			returnVal.setTemplateSubscription((long) fields.get("templateSubscription"));
+			returnVal.setTemplateSubscription((String) fields.get("templateSubscription"));
 }
 
 		if(fields.get("rateEstimateTemplate") != null) {
-			returnVal.setRateEstimateTemplate((long) fields.get("rateEstimateTemplate"));
+			returnVal.setRateEstimateTemplate((String) fields.get("rateEstimateTemplate"));
 }
 
 
@@ -148,17 +148,11 @@ public class ShipmentGatewayFedexMapper  {
 }
 
 		if(fields.get("connectUrl") != null) {
-String buf;
-buf = fields.get("connectUrl");
-long ibuf = Long.parseLong(buf);
-			returnVal.setConnectUrl(ibuf);
+			returnVal.setConnectUrl((String) fields.get("connectUrl"));
 }
 
 		if(fields.get("connectSoapUrl") != null) {
-String buf;
-buf = fields.get("connectSoapUrl");
-long ibuf = Long.parseLong(buf);
-			returnVal.setConnectSoapUrl(ibuf);
+			returnVal.setConnectSoapUrl((String) fields.get("connectSoapUrl"));
 }
 
 		if(fields.get("connectTimeout") != null) {
@@ -169,31 +163,19 @@ long ibuf = Long.parseLong(buf);
 }
 
 		if(fields.get("accessAccountNbr") != null) {
-String buf;
-buf = fields.get("accessAccountNbr");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAccessAccountNbr(ibuf);
+			returnVal.setAccessAccountNbr((String) fields.get("accessAccountNbr"));
 }
 
 		if(fields.get("accessMeterNumber") != null) {
-String buf;
-buf = fields.get("accessMeterNumber");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAccessMeterNumber(ibuf);
+			returnVal.setAccessMeterNumber((String) fields.get("accessMeterNumber"));
 }
 
 		if(fields.get("accessUserKey") != null) {
-String buf;
-buf = fields.get("accessUserKey");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAccessUserKey(ibuf);
+			returnVal.setAccessUserKey((String) fields.get("accessUserKey"));
 }
 
 		if(fields.get("accessUserPwd") != null) {
-String buf;
-buf = fields.get("accessUserPwd");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAccessUserPwd(ibuf);
+			returnVal.setAccessUserPwd((String) fields.get("accessUserPwd"));
 }
 
 		if(fields.get("labelImageType") != null) {
@@ -201,38 +183,23 @@ long ibuf = Long.parseLong(buf);
 }
 
 		if(fields.get("defaultDropoffType") != null) {
-String buf;
-buf = fields.get("defaultDropoffType");
-long ibuf = Long.parseLong(buf);
-			returnVal.setDefaultDropoffType(ibuf);
+			returnVal.setDefaultDropoffType((String) fields.get("defaultDropoffType"));
 }
 
 		if(fields.get("defaultPackagingType") != null) {
-String buf;
-buf = fields.get("defaultPackagingType");
-long ibuf = Long.parseLong(buf);
-			returnVal.setDefaultPackagingType(ibuf);
+			returnVal.setDefaultPackagingType((String) fields.get("defaultPackagingType"));
 }
 
 		if(fields.get("templateShipment") != null) {
-String buf;
-buf = fields.get("templateShipment");
-long ibuf = Long.parseLong(buf);
-			returnVal.setTemplateShipment(ibuf);
+			returnVal.setTemplateShipment((String) fields.get("templateShipment"));
 }
 
 		if(fields.get("templateSubscription") != null) {
-String buf;
-buf = fields.get("templateSubscription");
-long ibuf = Long.parseLong(buf);
-			returnVal.setTemplateSubscription(ibuf);
+			returnVal.setTemplateSubscription((String) fields.get("templateSubscription"));
 }
 
 		if(fields.get("rateEstimateTemplate") != null) {
-String buf;
-buf = fields.get("rateEstimateTemplate");
-long ibuf = Long.parseLong(buf);
-			returnVal.setRateEstimateTemplate(ibuf);
+			returnVal.setRateEstimateTemplate((String) fields.get("rateEstimateTemplate"));
 }
 
 
@@ -242,19 +209,19 @@ long ibuf = Long.parseLong(buf);
 
 ShipmentGatewayFedex returnVal = new ShipmentGatewayFedex();
 		returnVal.setShipmentGatewayConfigId(val.getString("shipmentGatewayConfigId"));
-		returnVal.setConnectUrl(val.getLong("connectUrl"));
-		returnVal.setConnectSoapUrl(val.getLong("connectSoapUrl"));
+		returnVal.setConnectUrl(val.getString("connectUrl"));
+		returnVal.setConnectSoapUrl(val.getString("connectSoapUrl"));
 		returnVal.setConnectTimeout(val.getLong("connectTimeout"));
-		returnVal.setAccessAccountNbr(val.getLong("accessAccountNbr"));
-		returnVal.setAccessMeterNumber(val.getLong("accessMeterNumber"));
-		returnVal.setAccessUserKey(val.getLong("accessUserKey"));
-		returnVal.setAccessUserPwd(val.getLong("accessUserPwd"));
+		returnVal.setAccessAccountNbr(val.getString("accessAccountNbr"));
+		returnVal.setAccessMeterNumber(val.getString("accessMeterNumber"));
+		returnVal.setAccessUserKey(val.getString("accessUserKey"));
+		returnVal.setAccessUserPwd(val.getString("accessUserPwd"));
 		returnVal.setLabelImageType(val.getString("labelImageType"));
-		returnVal.setDefaultDropoffType(val.getLong("defaultDropoffType"));
-		returnVal.setDefaultPackagingType(val.getLong("defaultPackagingType"));
-		returnVal.setTemplateShipment(val.getLong("templateShipment"));
-		returnVal.setTemplateSubscription(val.getLong("templateSubscription"));
-		returnVal.setRateEstimateTemplate(val.getLong("rateEstimateTemplate"));
+		returnVal.setDefaultDropoffType(val.getString("defaultDropoffType"));
+		returnVal.setDefaultPackagingType(val.getString("defaultPackagingType"));
+		returnVal.setTemplateShipment(val.getString("templateShipment"));
+		returnVal.setTemplateSubscription(val.getString("templateSubscription"));
+		returnVal.setRateEstimateTemplate(val.getString("rateEstimateTemplate"));
 
 
 return returnVal;
@@ -272,14 +239,10 @@ returnVal.setShipmentGatewayConfigId(request.getParameter("shipmentGatewayConfig
 }
 
 		if(paramMap.containsKey("connectUrl"))  {
-String buf = request.getParameter("connectUrl");
-Long ibuf = Long.parseLong(buf);
-returnVal.setConnectUrl(ibuf);
+returnVal.setConnectUrl(request.getParameter("connectUrl"));
 }
 		if(paramMap.containsKey("connectSoapUrl"))  {
-String buf = request.getParameter("connectSoapUrl");
-Long ibuf = Long.parseLong(buf);
-returnVal.setConnectSoapUrl(ibuf);
+returnVal.setConnectSoapUrl(request.getParameter("connectSoapUrl"));
 }
 		if(paramMap.containsKey("connectTimeout"))  {
 String buf = request.getParameter("connectTimeout");
@@ -287,52 +250,34 @@ Long ibuf = Long.parseLong(buf);
 returnVal.setConnectTimeout(ibuf);
 }
 		if(paramMap.containsKey("accessAccountNbr"))  {
-String buf = request.getParameter("accessAccountNbr");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAccessAccountNbr(ibuf);
+returnVal.setAccessAccountNbr(request.getParameter("accessAccountNbr"));
 }
 		if(paramMap.containsKey("accessMeterNumber"))  {
-String buf = request.getParameter("accessMeterNumber");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAccessMeterNumber(ibuf);
+returnVal.setAccessMeterNumber(request.getParameter("accessMeterNumber"));
 }
 		if(paramMap.containsKey("accessUserKey"))  {
-String buf = request.getParameter("accessUserKey");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAccessUserKey(ibuf);
+returnVal.setAccessUserKey(request.getParameter("accessUserKey"));
 }
 		if(paramMap.containsKey("accessUserPwd"))  {
-String buf = request.getParameter("accessUserPwd");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAccessUserPwd(ibuf);
+returnVal.setAccessUserPwd(request.getParameter("accessUserPwd"));
 }
 		if(paramMap.containsKey("labelImageType"))  {
 returnVal.setLabelImageType(request.getParameter("labelImageType"));
 }
 		if(paramMap.containsKey("defaultDropoffType"))  {
-String buf = request.getParameter("defaultDropoffType");
-Long ibuf = Long.parseLong(buf);
-returnVal.setDefaultDropoffType(ibuf);
+returnVal.setDefaultDropoffType(request.getParameter("defaultDropoffType"));
 }
 		if(paramMap.containsKey("defaultPackagingType"))  {
-String buf = request.getParameter("defaultPackagingType");
-Long ibuf = Long.parseLong(buf);
-returnVal.setDefaultPackagingType(ibuf);
+returnVal.setDefaultPackagingType(request.getParameter("defaultPackagingType"));
 }
 		if(paramMap.containsKey("templateShipment"))  {
-String buf = request.getParameter("templateShipment");
-Long ibuf = Long.parseLong(buf);
-returnVal.setTemplateShipment(ibuf);
+returnVal.setTemplateShipment(request.getParameter("templateShipment"));
 }
 		if(paramMap.containsKey("templateSubscription"))  {
-String buf = request.getParameter("templateSubscription");
-Long ibuf = Long.parseLong(buf);
-returnVal.setTemplateSubscription(ibuf);
+returnVal.setTemplateSubscription(request.getParameter("templateSubscription"));
 }
 		if(paramMap.containsKey("rateEstimateTemplate"))  {
-String buf = request.getParameter("rateEstimateTemplate");
-Long ibuf = Long.parseLong(buf);
-returnVal.setRateEstimateTemplate(ibuf);
+returnVal.setRateEstimateTemplate(request.getParameter("rateEstimateTemplate"));
 }
 return returnVal;
 

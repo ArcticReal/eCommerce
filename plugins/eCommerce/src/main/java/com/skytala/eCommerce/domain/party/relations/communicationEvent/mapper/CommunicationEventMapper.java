@@ -237,7 +237,7 @@ public class CommunicationEventMapper  {
 }
 
 		if(fields.get("messageId") != null) {
-			returnVal.setMessageId((long) fields.get("messageId"));
+			returnVal.setMessageId((String) fields.get("messageId"));
 }
 
 
@@ -358,10 +358,7 @@ Timestamp ibuf = Timestamp.valueOf(buf);
 }
 
 		if(fields.get("messageId") != null) {
-String buf;
-buf = fields.get("messageId");
-long ibuf = Long.parseLong(buf);
-			returnVal.setMessageId(ibuf);
+			returnVal.setMessageId((String) fields.get("messageId"));
 }
 
 
@@ -396,7 +393,7 @@ CommunicationEvent returnVal = new CommunicationEvent();
 		returnVal.setToString(val.getString("toString"));
 		returnVal.setCcString(val.getString("ccString"));
 		returnVal.setBccString(val.getString("bccString"));
-		returnVal.setMessageId(val.getLong("messageId"));
+		returnVal.setMessageId(val.getString("messageId"));
 
 
 return returnVal;
@@ -495,9 +492,7 @@ returnVal.setCcString(request.getParameter("ccString"));
 returnVal.setBccString(request.getParameter("bccString"));
 }
 		if(paramMap.containsKey("messageId"))  {
-String buf = request.getParameter("messageId");
-Long ibuf = Long.parseLong(buf);
-returnVal.setMessageId(ibuf);
+returnVal.setMessageId(request.getParameter("messageId"));
 }
 return returnVal;
 

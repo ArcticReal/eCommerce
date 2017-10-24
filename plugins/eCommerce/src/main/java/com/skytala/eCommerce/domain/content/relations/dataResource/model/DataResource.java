@@ -16,7 +16,7 @@ private String dataTemplateTypeId;
 private String dataCategoryId;
 private String dataSourceId;
 private String statusId;
-private Long dataResourceName;
+private String dataResourceName;
 private String localeString;
 private String mimeTypeId;
 private String characterSetId;
@@ -78,11 +78,11 @@ public void setStatusId(String  statusId) {
 this.statusId = statusId;
 }
 
-public Long getDataResourceName() {
+public String getDataResourceName() {
 return dataResourceName;
 }
 
-public void setDataResourceName(Long  dataResourceName) {
+public void setDataResourceName(String  dataResourceName) {
 this.dataResourceName = dataResourceName;
 }
 

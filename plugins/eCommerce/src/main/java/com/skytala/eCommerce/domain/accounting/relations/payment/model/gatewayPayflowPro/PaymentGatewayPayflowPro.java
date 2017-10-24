@@ -11,29 +11,29 @@ public class PaymentGatewayPayflowPro implements Serializable{
 
 private static final long serialVersionUID = 1L;
 private String paymentGatewayConfigId;
-private Long certsPath;
-private Long hostAddress;
+private String certsPath;
+private String hostAddress;
 private Long hostPort;
 private Long timeout;
-private Long proxyAddress;
+private String proxyAddress;
 private Long proxyPort;
-private Long proxyLogon;
-private Long proxyPassword;
+private String proxyLogon;
+private String proxyPassword;
 private String vendor;
 private String userId;
-private Long pwd;
+private String pwd;
 private String partner;
 private Boolean checkAvs;
 private Boolean checkCvv2;
 private Boolean preAuth;
-private Long enableTransmit;
-private Long logFileName;
+private String enableTransmit;
+private String logFileName;
 private Long loggingLevel;
 private Long maxLogFileSize;
 private Boolean stackTraceOn;
-private Long redirectUrl;
-private Long returnUrl;
-private Long cancelReturnUrl;
+private String redirectUrl;
+private String returnUrl;
+private String cancelReturnUrl;
 
 public String getPaymentGatewayConfigId() {
 return paymentGatewayConfigId;
@@ -43,19 +43,19 @@ public void setPaymentGatewayConfigId(String  paymentGatewayConfigId) {
 this.paymentGatewayConfigId = paymentGatewayConfigId;
 }
 
-public Long getCertsPath() {
+public String getCertsPath() {
 return certsPath;
 }
 
-public void setCertsPath(Long  certsPath) {
+public void setCertsPath(String  certsPath) {
 this.certsPath = certsPath;
 }
 
-public Long getHostAddress() {
+public String getHostAddress() {
 return hostAddress;
 }
 
-public void setHostAddress(Long  hostAddress) {
+public void setHostAddress(String  hostAddress) {
 this.hostAddress = hostAddress;
 }
 
@@ -75,11 +75,11 @@ public void setTimeout(Long  timeout) {
 this.timeout = timeout;
 }
 
-public Long getProxyAddress() {
+public String getProxyAddress() {
 return proxyAddress;
 }
 
-public void setProxyAddress(Long  proxyAddress) {
+public void setProxyAddress(String  proxyAddress) {
 this.proxyAddress = proxyAddress;
 }
 
@@ -91,19 +91,19 @@ public void setProxyPort(Long  proxyPort) {
 this.proxyPort = proxyPort;
 }
 
-public Long getProxyLogon() {
+public String getProxyLogon() {
 return proxyLogon;
 }
 
-public void setProxyLogon(Long  proxyLogon) {
+public void setProxyLogon(String  proxyLogon) {
 this.proxyLogon = proxyLogon;
 }
 
-public Long getProxyPassword() {
+public String getProxyPassword() {
 return proxyPassword;
 }
 
-public void setProxyPassword(Long  proxyPassword) {
+public void setProxyPassword(String  proxyPassword) {
 this.proxyPassword = proxyPassword;
 }
 
@@ -123,11 +123,11 @@ public void setUserId(String  userId) {
 this.userId = userId;
 }
 
-public Long getPwd() {
+public String getPwd() {
 return pwd;
 }
 
-public void setPwd(Long  pwd) {
+public void setPwd(String  pwd) {
 this.pwd = pwd;
 }
 
@@ -163,19 +163,19 @@ public void setPreAuth(Boolean  preAuth) {
 this.preAuth = preAuth;
 }
 
-public Long getEnableTransmit() {
+public String getEnableTransmit() {
 return enableTransmit;
 }
 
-public void setEnableTransmit(Long  enableTransmit) {
+public void setEnableTransmit(String  enableTransmit) {
 this.enableTransmit = enableTransmit;
 }
 
-public Long getLogFileName() {
+public String getLogFileName() {
 return logFileName;
 }
 
-public void setLogFileName(Long  logFileName) {
+public void setLogFileName(String  logFileName) {
 this.logFileName = logFileName;
 }
 
@@ -203,27 +203,27 @@ public void setStackTraceOn(Boolean  stackTraceOn) {
 this.stackTraceOn = stackTraceOn;
 }
 
-public Long getRedirectUrl() {
+public String getRedirectUrl() {
 return redirectUrl;
 }
 
-public void setRedirectUrl(Long  redirectUrl) {
+public void setRedirectUrl(String  redirectUrl) {
 this.redirectUrl = redirectUrl;
 }
 
-public Long getReturnUrl() {
+public String getReturnUrl() {
 return returnUrl;
 }
 
-public void setReturnUrl(Long  returnUrl) {
+public void setReturnUrl(String  returnUrl) {
 this.returnUrl = returnUrl;
 }
 
-public Long getCancelReturnUrl() {
+public String getCancelReturnUrl() {
 return cancelReturnUrl;
 }
 
-public void setCancelReturnUrl(Long  cancelReturnUrl) {
+public void setCancelReturnUrl(String  cancelReturnUrl) {
 this.cancelReturnUrl = cancelReturnUrl;
 }
 

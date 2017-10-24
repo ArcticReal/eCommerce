@@ -22,7 +22,7 @@ private String statusId;
 private String privilegeEnumId;
 private String serviceName;
 private String customMethodId;
-private Long contentName;
+private String contentName;
 private String description;
 private String localeString;
 private String mimeTypeId;
@@ -130,11 +130,11 @@ public void setCustomMethodId(String  customMethodId) {
 this.customMethodId = customMethodId;
 }
 
-public Long getContentName() {
+public String getContentName() {
 return contentName;
 }
 
-public void setContentName(Long  contentName) {
+public void setContentName(String  contentName) {
 this.contentName = contentName;
 }
 

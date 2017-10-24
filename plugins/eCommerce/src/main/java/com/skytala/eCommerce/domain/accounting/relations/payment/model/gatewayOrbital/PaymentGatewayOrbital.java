@@ -12,16 +12,16 @@ public class PaymentGatewayOrbital implements Serializable{
 private static final long serialVersionUID = 1L;
 private String paymentGatewayConfigId;
 private String username;
-private Long connectionPassword;
-private Long merchantId;
-private Long engineClass;
-private Long hostName;
+private String connectionPassword;
+private String merchantId;
+private String engineClass;
+private String hostName;
 private Long port;
-private Long hostNameFailover;
+private String hostNameFailover;
 private Long portFailover;
 private Long connectionTimeoutSeconds;
 private Long readTimeoutSeconds;
-private Long authorizationURI;
+private String authorizationURI;
 private String sdkVersion;
 private String sslSocketFactory;
 private String responseType;
@@ -42,35 +42,35 @@ public void setUsername(String  username) {
 this.username = username;
 }
 
-public Long getConnectionPassword() {
+public String getConnectionPassword() {
 return connectionPassword;
 }
 
-public void setConnectionPassword(Long  connectionPassword) {
+public void setConnectionPassword(String  connectionPassword) {
 this.connectionPassword = connectionPassword;
 }
 
-public Long getMerchantId() {
+public String getMerchantId() {
 return merchantId;
 }
 
-public void setMerchantId(Long  merchantId) {
+public void setMerchantId(String  merchantId) {
 this.merchantId = merchantId;
 }
 
-public Long getEngineClass() {
+public String getEngineClass() {
 return engineClass;
 }
 
-public void setEngineClass(Long  engineClass) {
+public void setEngineClass(String  engineClass) {
 this.engineClass = engineClass;
 }
 
-public Long getHostName() {
+public String getHostName() {
 return hostName;
 }
 
-public void setHostName(Long  hostName) {
+public void setHostName(String  hostName) {
 this.hostName = hostName;
 }
 
@@ -82,11 +82,11 @@ public void setPort(Long  port) {
 this.port = port;
 }
 
-public Long getHostNameFailover() {
+public String getHostNameFailover() {
 return hostNameFailover;
 }
 
-public void setHostNameFailover(Long  hostNameFailover) {
+public void setHostNameFailover(String  hostNameFailover) {
 this.hostNameFailover = hostNameFailover;
 }
 
@@ -114,11 +114,11 @@ public void setReadTimeoutSeconds(Long  readTimeoutSeconds) {
 this.readTimeoutSeconds = readTimeoutSeconds;
 }
 
-public Long getAuthorizationURI() {
+public String getAuthorizationURI() {
 return authorizationURI;
 }
 
-public void setAuthorizationURI(Long  authorizationURI) {
+public void setAuthorizationURI(String  authorizationURI) {
 this.authorizationURI = authorizationURI;
 }
 

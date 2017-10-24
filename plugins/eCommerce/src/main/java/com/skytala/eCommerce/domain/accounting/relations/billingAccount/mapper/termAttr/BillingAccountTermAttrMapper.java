@@ -45,7 +45,7 @@ public class BillingAccountTermAttrMapper  {
 }
 
 		if(fields.get("attrValue") != null) {
-			returnVal.setAttrValue((long) fields.get("attrValue"));
+			returnVal.setAttrValue((String) fields.get("attrValue"));
 }
 
 
@@ -64,10 +64,7 @@ public class BillingAccountTermAttrMapper  {
 }
 
 		if(fields.get("attrValue") != null) {
-String buf;
-buf = fields.get("attrValue");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAttrValue(ibuf);
+			returnVal.setAttrValue((String) fields.get("attrValue"));
 }
 
 
@@ -78,7 +75,7 @@ long ibuf = Long.parseLong(buf);
 BillingAccountTermAttr returnVal = new BillingAccountTermAttr();
 		returnVal.setBillingAccountTermId(val.getString("billingAccountTermId"));
 		returnVal.setAttrName(val.getString("attrName"));
-		returnVal.setAttrValue(val.getLong("attrValue"));
+		returnVal.setAttrValue(val.getString("attrValue"));
 
 
 return returnVal;
@@ -99,9 +96,7 @@ returnVal.setBillingAccountTermId(request.getParameter("billingAccountTermId"));
 returnVal.setAttrName(request.getParameter("attrName"));
 }
 		if(paramMap.containsKey("attrValue"))  {
-String buf = request.getParameter("attrValue");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAttrValue(ibuf);
+returnVal.setAttrValue(request.getParameter("attrValue"));
 }
 return returnVal;
 

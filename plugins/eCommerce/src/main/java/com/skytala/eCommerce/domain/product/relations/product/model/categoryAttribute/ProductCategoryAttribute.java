@@ -12,7 +12,7 @@ public class ProductCategoryAttribute implements Serializable{
 private static final long serialVersionUID = 1L;
 private String productCategoryId;
 private String attrName;
-private Long attrValue;
+private String attrValue;
 private String attrDescription;
 
 public String getProductCategoryId() {
@@ -31,11 +31,11 @@ public void setAttrName(String  attrName) {
 this.attrName = attrName;
 }
 
-public Long getAttrValue() {
+public String getAttrValue() {
 return attrValue;
 }
 
-public void setAttrValue(Long  attrValue) {
+public void setAttrValue(String  attrValue) {
 this.attrValue = attrValue;
 }
 

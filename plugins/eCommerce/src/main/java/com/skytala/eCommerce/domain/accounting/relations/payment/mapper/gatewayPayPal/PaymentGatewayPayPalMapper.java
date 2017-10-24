@@ -89,7 +89,7 @@ public class PaymentGatewayPayPalMapper  {
 }
 
 		if(fields.get("businessEmail") != null) {
-			returnVal.setBusinessEmail((long) fields.get("businessEmail"));
+			returnVal.setBusinessEmail((String) fields.get("businessEmail"));
 }
 
 		if(fields.get("apiUserName") != null) {
@@ -109,31 +109,31 @@ public class PaymentGatewayPayPalMapper  {
 }
 
 		if(fields.get("notifyUrl") != null) {
-			returnVal.setNotifyUrl((long) fields.get("notifyUrl"));
+			returnVal.setNotifyUrl((String) fields.get("notifyUrl"));
 }
 
 		if(fields.get("returnUrl") != null) {
-			returnVal.setReturnUrl((long) fields.get("returnUrl"));
+			returnVal.setReturnUrl((String) fields.get("returnUrl"));
 }
 
 		if(fields.get("cancelReturnUrl") != null) {
-			returnVal.setCancelReturnUrl((long) fields.get("cancelReturnUrl"));
+			returnVal.setCancelReturnUrl((String) fields.get("cancelReturnUrl"));
 }
 
 		if(fields.get("imageUrl") != null) {
-			returnVal.setImageUrl((long) fields.get("imageUrl"));
+			returnVal.setImageUrl((String) fields.get("imageUrl"));
 }
 
 		if(fields.get("confirmTemplate") != null) {
-			returnVal.setConfirmTemplate((long) fields.get("confirmTemplate"));
+			returnVal.setConfirmTemplate((String) fields.get("confirmTemplate"));
 }
 
 		if(fields.get("redirectUrl") != null) {
-			returnVal.setRedirectUrl((long) fields.get("redirectUrl"));
+			returnVal.setRedirectUrl((String) fields.get("redirectUrl"));
 }
 
 		if(fields.get("confirmUrl") != null) {
-			returnVal.setConfirmUrl((long) fields.get("confirmUrl"));
+			returnVal.setConfirmUrl((String) fields.get("confirmUrl"));
 }
 
 		if(fields.get("shippingCallbackUrl") != null) {
@@ -156,10 +156,7 @@ public class PaymentGatewayPayPalMapper  {
 }
 
 		if(fields.get("businessEmail") != null) {
-String buf;
-buf = fields.get("businessEmail");
-long ibuf = Long.parseLong(buf);
-			returnVal.setBusinessEmail(ibuf);
+			returnVal.setBusinessEmail((String) fields.get("businessEmail"));
 }
 
 		if(fields.get("apiUserName") != null) {
@@ -179,52 +176,31 @@ long ibuf = Long.parseLong(buf);
 }
 
 		if(fields.get("notifyUrl") != null) {
-String buf;
-buf = fields.get("notifyUrl");
-long ibuf = Long.parseLong(buf);
-			returnVal.setNotifyUrl(ibuf);
+			returnVal.setNotifyUrl((String) fields.get("notifyUrl"));
 }
 
 		if(fields.get("returnUrl") != null) {
-String buf;
-buf = fields.get("returnUrl");
-long ibuf = Long.parseLong(buf);
-			returnVal.setReturnUrl(ibuf);
+			returnVal.setReturnUrl((String) fields.get("returnUrl"));
 }
 
 		if(fields.get("cancelReturnUrl") != null) {
-String buf;
-buf = fields.get("cancelReturnUrl");
-long ibuf = Long.parseLong(buf);
-			returnVal.setCancelReturnUrl(ibuf);
+			returnVal.setCancelReturnUrl((String) fields.get("cancelReturnUrl"));
 }
 
 		if(fields.get("imageUrl") != null) {
-String buf;
-buf = fields.get("imageUrl");
-long ibuf = Long.parseLong(buf);
-			returnVal.setImageUrl(ibuf);
+			returnVal.setImageUrl((String) fields.get("imageUrl"));
 }
 
 		if(fields.get("confirmTemplate") != null) {
-String buf;
-buf = fields.get("confirmTemplate");
-long ibuf = Long.parseLong(buf);
-			returnVal.setConfirmTemplate(ibuf);
+			returnVal.setConfirmTemplate((String) fields.get("confirmTemplate"));
 }
 
 		if(fields.get("redirectUrl") != null) {
-String buf;
-buf = fields.get("redirectUrl");
-long ibuf = Long.parseLong(buf);
-			returnVal.setRedirectUrl(ibuf);
+			returnVal.setRedirectUrl((String) fields.get("redirectUrl"));
 }
 
 		if(fields.get("confirmUrl") != null) {
-String buf;
-buf = fields.get("confirmUrl");
-long ibuf = Long.parseLong(buf);
-			returnVal.setConfirmUrl(ibuf);
+			returnVal.setConfirmUrl((String) fields.get("confirmUrl"));
 }
 
 		if(fields.get("shippingCallbackUrl") != null) {
@@ -245,18 +221,18 @@ Boolean ibuf = Boolean.parseBoolean(buf);
 
 PaymentGatewayPayPal returnVal = new PaymentGatewayPayPal();
 		returnVal.setPaymentGatewayConfigId(val.getString("paymentGatewayConfigId"));
-		returnVal.setBusinessEmail(val.getLong("businessEmail"));
+		returnVal.setBusinessEmail(val.getString("businessEmail"));
 		returnVal.setApiUserName(val.getString("apiUserName"));
 		returnVal.setApiPassword(val.getString("apiPassword"));
 		returnVal.setApiSignature(val.getString("apiSignature"));
 		returnVal.setApiEnvironment(val.getString("apiEnvironment"));
-		returnVal.setNotifyUrl(val.getLong("notifyUrl"));
-		returnVal.setReturnUrl(val.getLong("returnUrl"));
-		returnVal.setCancelReturnUrl(val.getLong("cancelReturnUrl"));
-		returnVal.setImageUrl(val.getLong("imageUrl"));
-		returnVal.setConfirmTemplate(val.getLong("confirmTemplate"));
-		returnVal.setRedirectUrl(val.getLong("redirectUrl"));
-		returnVal.setConfirmUrl(val.getLong("confirmUrl"));
+		returnVal.setNotifyUrl(val.getString("notifyUrl"));
+		returnVal.setReturnUrl(val.getString("returnUrl"));
+		returnVal.setCancelReturnUrl(val.getString("cancelReturnUrl"));
+		returnVal.setImageUrl(val.getString("imageUrl"));
+		returnVal.setConfirmTemplate(val.getString("confirmTemplate"));
+		returnVal.setRedirectUrl(val.getString("redirectUrl"));
+		returnVal.setConfirmUrl(val.getString("confirmUrl"));
 		returnVal.setShippingCallbackUrl(val.getString("shippingCallbackUrl"));
 		returnVal.setRequireConfirmedShipping(val.getBoolean("requireConfirmedShipping"));
 
@@ -276,9 +252,7 @@ returnVal.setPaymentGatewayConfigId(request.getParameter("paymentGatewayConfigId
 }
 
 		if(paramMap.containsKey("businessEmail"))  {
-String buf = request.getParameter("businessEmail");
-Long ibuf = Long.parseLong(buf);
-returnVal.setBusinessEmail(ibuf);
+returnVal.setBusinessEmail(request.getParameter("businessEmail"));
 }
 		if(paramMap.containsKey("apiUserName"))  {
 returnVal.setApiUserName(request.getParameter("apiUserName"));
@@ -293,39 +267,25 @@ returnVal.setApiSignature(request.getParameter("apiSignature"));
 returnVal.setApiEnvironment(request.getParameter("apiEnvironment"));
 }
 		if(paramMap.containsKey("notifyUrl"))  {
-String buf = request.getParameter("notifyUrl");
-Long ibuf = Long.parseLong(buf);
-returnVal.setNotifyUrl(ibuf);
+returnVal.setNotifyUrl(request.getParameter("notifyUrl"));
 }
 		if(paramMap.containsKey("returnUrl"))  {
-String buf = request.getParameter("returnUrl");
-Long ibuf = Long.parseLong(buf);
-returnVal.setReturnUrl(ibuf);
+returnVal.setReturnUrl(request.getParameter("returnUrl"));
 }
 		if(paramMap.containsKey("cancelReturnUrl"))  {
-String buf = request.getParameter("cancelReturnUrl");
-Long ibuf = Long.parseLong(buf);
-returnVal.setCancelReturnUrl(ibuf);
+returnVal.setCancelReturnUrl(request.getParameter("cancelReturnUrl"));
 }
 		if(paramMap.containsKey("imageUrl"))  {
-String buf = request.getParameter("imageUrl");
-Long ibuf = Long.parseLong(buf);
-returnVal.setImageUrl(ibuf);
+returnVal.setImageUrl(request.getParameter("imageUrl"));
 }
 		if(paramMap.containsKey("confirmTemplate"))  {
-String buf = request.getParameter("confirmTemplate");
-Long ibuf = Long.parseLong(buf);
-returnVal.setConfirmTemplate(ibuf);
+returnVal.setConfirmTemplate(request.getParameter("confirmTemplate"));
 }
 		if(paramMap.containsKey("redirectUrl"))  {
-String buf = request.getParameter("redirectUrl");
-Long ibuf = Long.parseLong(buf);
-returnVal.setRedirectUrl(ibuf);
+returnVal.setRedirectUrl(request.getParameter("redirectUrl"));
 }
 		if(paramMap.containsKey("confirmUrl"))  {
-String buf = request.getParameter("confirmUrl");
-Long ibuf = Long.parseLong(buf);
-returnVal.setConfirmUrl(ibuf);
+returnVal.setConfirmUrl(request.getParameter("confirmUrl"));
 }
 		if(paramMap.containsKey("shippingCallbackUrl"))  {
 returnVal.setShippingCallbackUrl(request.getParameter("shippingCallbackUrl"));

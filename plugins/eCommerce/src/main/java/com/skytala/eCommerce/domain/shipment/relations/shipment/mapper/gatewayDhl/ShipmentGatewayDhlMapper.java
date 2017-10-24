@@ -73,7 +73,7 @@ public class ShipmentGatewayDhlMapper  {
 }
 
 		if(fields.get("connectUrl") != null) {
-			returnVal.setConnectUrl((long) fields.get("connectUrl"));
+			returnVal.setConnectUrl((String) fields.get("connectUrl"));
 }
 
 		if(fields.get("connectTimeout") != null) {
@@ -85,23 +85,23 @@ public class ShipmentGatewayDhlMapper  {
 }
 
 		if(fields.get("headAction") != null) {
-			returnVal.setHeadAction((long) fields.get("headAction"));
+			returnVal.setHeadAction((String) fields.get("headAction"));
 }
 
 		if(fields.get("accessUserId") != null) {
-			returnVal.setAccessUserId((long) fields.get("accessUserId"));
+			returnVal.setAccessUserId((String) fields.get("accessUserId"));
 }
 
 		if(fields.get("accessPassword") != null) {
-			returnVal.setAccessPassword((long) fields.get("accessPassword"));
+			returnVal.setAccessPassword((String) fields.get("accessPassword"));
 }
 
 		if(fields.get("accessAccountNbr") != null) {
-			returnVal.setAccessAccountNbr((long) fields.get("accessAccountNbr"));
+			returnVal.setAccessAccountNbr((String) fields.get("accessAccountNbr"));
 }
 
 		if(fields.get("accessShippingKey") != null) {
-			returnVal.setAccessShippingKey((long) fields.get("accessShippingKey"));
+			returnVal.setAccessShippingKey((String) fields.get("accessShippingKey"));
 }
 
 		if(fields.get("labelImageFormat") != null) {
@@ -109,7 +109,7 @@ public class ShipmentGatewayDhlMapper  {
 }
 
 		if(fields.get("rateEstimateTemplate") != null) {
-			returnVal.setRateEstimateTemplate((long) fields.get("rateEstimateTemplate"));
+			returnVal.setRateEstimateTemplate((String) fields.get("rateEstimateTemplate"));
 }
 
 
@@ -124,10 +124,7 @@ public class ShipmentGatewayDhlMapper  {
 }
 
 		if(fields.get("connectUrl") != null) {
-String buf;
-buf = fields.get("connectUrl");
-long ibuf = Long.parseLong(buf);
-			returnVal.setConnectUrl(ibuf);
+			returnVal.setConnectUrl((String) fields.get("connectUrl"));
 }
 
 		if(fields.get("connectTimeout") != null) {
@@ -142,38 +139,23 @@ long ibuf = Long.parseLong(buf);
 }
 
 		if(fields.get("headAction") != null) {
-String buf;
-buf = fields.get("headAction");
-long ibuf = Long.parseLong(buf);
-			returnVal.setHeadAction(ibuf);
+			returnVal.setHeadAction((String) fields.get("headAction"));
 }
 
 		if(fields.get("accessUserId") != null) {
-String buf;
-buf = fields.get("accessUserId");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAccessUserId(ibuf);
+			returnVal.setAccessUserId((String) fields.get("accessUserId"));
 }
 
 		if(fields.get("accessPassword") != null) {
-String buf;
-buf = fields.get("accessPassword");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAccessPassword(ibuf);
+			returnVal.setAccessPassword((String) fields.get("accessPassword"));
 }
 
 		if(fields.get("accessAccountNbr") != null) {
-String buf;
-buf = fields.get("accessAccountNbr");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAccessAccountNbr(ibuf);
+			returnVal.setAccessAccountNbr((String) fields.get("accessAccountNbr"));
 }
 
 		if(fields.get("accessShippingKey") != null) {
-String buf;
-buf = fields.get("accessShippingKey");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAccessShippingKey(ibuf);
+			returnVal.setAccessShippingKey((String) fields.get("accessShippingKey"));
 }
 
 		if(fields.get("labelImageFormat") != null) {
@@ -181,10 +163,7 @@ long ibuf = Long.parseLong(buf);
 }
 
 		if(fields.get("rateEstimateTemplate") != null) {
-String buf;
-buf = fields.get("rateEstimateTemplate");
-long ibuf = Long.parseLong(buf);
-			returnVal.setRateEstimateTemplate(ibuf);
+			returnVal.setRateEstimateTemplate((String) fields.get("rateEstimateTemplate"));
 }
 
 
@@ -194,16 +173,16 @@ long ibuf = Long.parseLong(buf);
 
 ShipmentGatewayDhl returnVal = new ShipmentGatewayDhl();
 		returnVal.setShipmentGatewayConfigId(val.getString("shipmentGatewayConfigId"));
-		returnVal.setConnectUrl(val.getLong("connectUrl"));
+		returnVal.setConnectUrl(val.getString("connectUrl"));
 		returnVal.setConnectTimeout(val.getLong("connectTimeout"));
 		returnVal.setHeadVersion(val.getString("headVersion"));
-		returnVal.setHeadAction(val.getLong("headAction"));
-		returnVal.setAccessUserId(val.getLong("accessUserId"));
-		returnVal.setAccessPassword(val.getLong("accessPassword"));
-		returnVal.setAccessAccountNbr(val.getLong("accessAccountNbr"));
-		returnVal.setAccessShippingKey(val.getLong("accessShippingKey"));
+		returnVal.setHeadAction(val.getString("headAction"));
+		returnVal.setAccessUserId(val.getString("accessUserId"));
+		returnVal.setAccessPassword(val.getString("accessPassword"));
+		returnVal.setAccessAccountNbr(val.getString("accessAccountNbr"));
+		returnVal.setAccessShippingKey(val.getString("accessShippingKey"));
 		returnVal.setLabelImageFormat(val.getString("labelImageFormat"));
-		returnVal.setRateEstimateTemplate(val.getLong("rateEstimateTemplate"));
+		returnVal.setRateEstimateTemplate(val.getString("rateEstimateTemplate"));
 
 
 return returnVal;
@@ -221,9 +200,7 @@ returnVal.setShipmentGatewayConfigId(request.getParameter("shipmentGatewayConfig
 }
 
 		if(paramMap.containsKey("connectUrl"))  {
-String buf = request.getParameter("connectUrl");
-Long ibuf = Long.parseLong(buf);
-returnVal.setConnectUrl(ibuf);
+returnVal.setConnectUrl(request.getParameter("connectUrl"));
 }
 		if(paramMap.containsKey("connectTimeout"))  {
 String buf = request.getParameter("connectTimeout");
@@ -234,37 +211,25 @@ returnVal.setConnectTimeout(ibuf);
 returnVal.setHeadVersion(request.getParameter("headVersion"));
 }
 		if(paramMap.containsKey("headAction"))  {
-String buf = request.getParameter("headAction");
-Long ibuf = Long.parseLong(buf);
-returnVal.setHeadAction(ibuf);
+returnVal.setHeadAction(request.getParameter("headAction"));
 }
 		if(paramMap.containsKey("accessUserId"))  {
-String buf = request.getParameter("accessUserId");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAccessUserId(ibuf);
+returnVal.setAccessUserId(request.getParameter("accessUserId"));
 }
 		if(paramMap.containsKey("accessPassword"))  {
-String buf = request.getParameter("accessPassword");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAccessPassword(ibuf);
+returnVal.setAccessPassword(request.getParameter("accessPassword"));
 }
 		if(paramMap.containsKey("accessAccountNbr"))  {
-String buf = request.getParameter("accessAccountNbr");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAccessAccountNbr(ibuf);
+returnVal.setAccessAccountNbr(request.getParameter("accessAccountNbr"));
 }
 		if(paramMap.containsKey("accessShippingKey"))  {
-String buf = request.getParameter("accessShippingKey");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAccessShippingKey(ibuf);
+returnVal.setAccessShippingKey(request.getParameter("accessShippingKey"));
 }
 		if(paramMap.containsKey("labelImageFormat"))  {
 returnVal.setLabelImageFormat(request.getParameter("labelImageFormat"));
 }
 		if(paramMap.containsKey("rateEstimateTemplate"))  {
-String buf = request.getParameter("rateEstimateTemplate");
-Long ibuf = Long.parseLong(buf);
-returnVal.setRateEstimateTemplate(ibuf);
+returnVal.setRateEstimateTemplate(request.getParameter("rateEstimateTemplate"));
 }
 return returnVal;
 

@@ -11,17 +11,17 @@ public class PaymentGatewayiDEAL implements Serializable{
 
 private static final long serialVersionUID = 1L;
 private String paymentGatewayConfigId;
-private Long merchantId;
-private Long merchantSubId;
-private Long merchantReturnURL;
-private Long acquirerURL;
-private Long acquirerTimeout;
-private Long privateCert;
-private Long acquirerKeyStoreFilename;
-private Long acquirerKeyStorePassword;
-private Long merchantKeyStoreFilename;
-private Long merchantKeyStorePassword;
-private Long expirationPeriod;
+private String merchantId;
+private String merchantSubId;
+private String merchantReturnURL;
+private String acquirerURL;
+private String acquirerTimeout;
+private String privateCert;
+private String acquirerKeyStoreFilename;
+private String acquirerKeyStorePassword;
+private String merchantKeyStoreFilename;
+private String merchantKeyStorePassword;
+private String expirationPeriod;
 
 public String getPaymentGatewayConfigId() {
 return paymentGatewayConfigId;
@@ -31,91 +31,91 @@ public void setPaymentGatewayConfigId(String  paymentGatewayConfigId) {
 this.paymentGatewayConfigId = paymentGatewayConfigId;
 }
 
-public Long getMerchantId() {
+public String getMerchantId() {
 return merchantId;
 }
 
-public void setMerchantId(Long  merchantId) {
+public void setMerchantId(String  merchantId) {
 this.merchantId = merchantId;
 }
 
-public Long getMerchantSubId() {
+public String getMerchantSubId() {
 return merchantSubId;
 }
 
-public void setMerchantSubId(Long  merchantSubId) {
+public void setMerchantSubId(String  merchantSubId) {
 this.merchantSubId = merchantSubId;
 }
 
-public Long getMerchantReturnURL() {
+public String getMerchantReturnURL() {
 return merchantReturnURL;
 }
 
-public void setMerchantReturnURL(Long  merchantReturnURL) {
+public void setMerchantReturnURL(String  merchantReturnURL) {
 this.merchantReturnURL = merchantReturnURL;
 }
 
-public Long getAcquirerURL() {
+public String getAcquirerURL() {
 return acquirerURL;
 }
 
-public void setAcquirerURL(Long  acquirerURL) {
+public void setAcquirerURL(String  acquirerURL) {
 this.acquirerURL = acquirerURL;
 }
 
-public Long getAcquirerTimeout() {
+public String getAcquirerTimeout() {
 return acquirerTimeout;
 }
 
-public void setAcquirerTimeout(Long  acquirerTimeout) {
+public void setAcquirerTimeout(String  acquirerTimeout) {
 this.acquirerTimeout = acquirerTimeout;
 }
 
-public Long getPrivateCert() {
+public String getPrivateCert() {
 return privateCert;
 }
 
-public void setPrivateCert(Long  privateCert) {
+public void setPrivateCert(String  privateCert) {
 this.privateCert = privateCert;
 }
 
-public Long getAcquirerKeyStoreFilename() {
+public String getAcquirerKeyStoreFilename() {
 return acquirerKeyStoreFilename;
 }
 
-public void setAcquirerKeyStoreFilename(Long  acquirerKeyStoreFilename) {
+public void setAcquirerKeyStoreFilename(String  acquirerKeyStoreFilename) {
 this.acquirerKeyStoreFilename = acquirerKeyStoreFilename;
 }
 
-public Long getAcquirerKeyStorePassword() {
+public String getAcquirerKeyStorePassword() {
 return acquirerKeyStorePassword;
 }
 
-public void setAcquirerKeyStorePassword(Long  acquirerKeyStorePassword) {
+public void setAcquirerKeyStorePassword(String  acquirerKeyStorePassword) {
 this.acquirerKeyStorePassword = acquirerKeyStorePassword;
 }
 
-public Long getMerchantKeyStoreFilename() {
+public String getMerchantKeyStoreFilename() {
 return merchantKeyStoreFilename;
 }
 
-public void setMerchantKeyStoreFilename(Long  merchantKeyStoreFilename) {
+public void setMerchantKeyStoreFilename(String  merchantKeyStoreFilename) {
 this.merchantKeyStoreFilename = merchantKeyStoreFilename;
 }
 
-public Long getMerchantKeyStorePassword() {
+public String getMerchantKeyStorePassword() {
 return merchantKeyStorePassword;
 }
 
-public void setMerchantKeyStorePassword(Long  merchantKeyStorePassword) {
+public void setMerchantKeyStorePassword(String  merchantKeyStorePassword) {
 this.merchantKeyStorePassword = merchantKeyStorePassword;
 }
 
-public Long getExpirationPeriod() {
+public String getExpirationPeriod() {
 return expirationPeriod;
 }
 
-public void setExpirationPeriod(Long  expirationPeriod) {
+public void setExpirationPeriod(String  expirationPeriod) {
 this.expirationPeriod = expirationPeriod;
 }
 

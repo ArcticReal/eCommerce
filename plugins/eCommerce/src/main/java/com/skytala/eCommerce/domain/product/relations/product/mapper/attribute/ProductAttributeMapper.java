@@ -53,11 +53,11 @@ public class ProductAttributeMapper  {
 }
 
 		if(fields.get("attrValue") != null) {
-			returnVal.setAttrValue((long) fields.get("attrValue"));
+			returnVal.setAttrValue((String) fields.get("attrValue"));
 }
 
 		if(fields.get("attrType") != null) {
-			returnVal.setAttrType((long) fields.get("attrType"));
+			returnVal.setAttrType((String) fields.get("attrType"));
 }
 
 		if(fields.get("attrDescription") != null) {
@@ -80,17 +80,11 @@ public class ProductAttributeMapper  {
 }
 
 		if(fields.get("attrValue") != null) {
-String buf;
-buf = fields.get("attrValue");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAttrValue(ibuf);
+			returnVal.setAttrValue((String) fields.get("attrValue"));
 }
 
 		if(fields.get("attrType") != null) {
-String buf;
-buf = fields.get("attrType");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAttrType(ibuf);
+			returnVal.setAttrType((String) fields.get("attrType"));
 }
 
 		if(fields.get("attrDescription") != null) {
@@ -105,8 +99,8 @@ long ibuf = Long.parseLong(buf);
 ProductAttribute returnVal = new ProductAttribute();
 		returnVal.setProductId(val.getString("productId"));
 		returnVal.setAttrName(val.getString("attrName"));
-		returnVal.setAttrValue(val.getLong("attrValue"));
-		returnVal.setAttrType(val.getLong("attrType"));
+		returnVal.setAttrValue(val.getString("attrValue"));
+		returnVal.setAttrType(val.getString("attrType"));
 		returnVal.setAttrDescription(val.getString("attrDescription"));
 
 
@@ -128,14 +122,10 @@ returnVal.setProductId(request.getParameter("productId"));
 returnVal.setAttrName(request.getParameter("attrName"));
 }
 		if(paramMap.containsKey("attrValue"))  {
-String buf = request.getParameter("attrValue");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAttrValue(ibuf);
+returnVal.setAttrValue(request.getParameter("attrValue"));
 }
 		if(paramMap.containsKey("attrType"))  {
-String buf = request.getParameter("attrType");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAttrType(ibuf);
+returnVal.setAttrType(request.getParameter("attrType"));
 }
 		if(paramMap.containsKey("attrDescription"))  {
 returnVal.setAttrDescription(request.getParameter("attrDescription"));

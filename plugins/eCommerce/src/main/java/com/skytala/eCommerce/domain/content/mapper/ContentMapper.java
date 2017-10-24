@@ -165,7 +165,7 @@ public class ContentMapper  {
 }
 
 		if(fields.get("contentName") != null) {
-			returnVal.setContentName((long) fields.get("contentName"));
+			returnVal.setContentName((String) fields.get("contentName"));
 }
 
 		if(fields.get("description") != null) {
@@ -264,10 +264,7 @@ public class ContentMapper  {
 }
 
 		if(fields.get("contentName") != null) {
-String buf;
-buf = fields.get("contentName");
-long ibuf = Long.parseLong(buf);
-			returnVal.setContentName(ibuf);
+			returnVal.setContentName((String) fields.get("contentName"));
 }
 
 		if(fields.get("description") != null) {
@@ -338,7 +335,7 @@ Content returnVal = new Content();
 		returnVal.setPrivilegeEnumId(val.getString("privilegeEnumId"));
 		returnVal.setServiceName(val.getString("serviceName"));
 		returnVal.setCustomMethodId(val.getString("customMethodId"));
-		returnVal.setContentName(val.getLong("contentName"));
+		returnVal.setContentName(val.getString("contentName"));
 		returnVal.setDescription(val.getString("description"));
 		returnVal.setLocaleString(val.getString("localeString"));
 		returnVal.setMimeTypeId(val.getString("mimeTypeId"));
@@ -399,9 +396,7 @@ returnVal.setServiceName(request.getParameter("serviceName"));
 returnVal.setCustomMethodId(request.getParameter("customMethodId"));
 }
 		if(paramMap.containsKey("contentName"))  {
-String buf = request.getParameter("contentName");
-Long ibuf = Long.parseLong(buf);
-returnVal.setContentName(ibuf);
+returnVal.setContentName(request.getParameter("contentName"));
 }
 		if(paramMap.containsKey("description"))  {
 returnVal.setDescription(request.getParameter("description"));

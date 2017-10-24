@@ -217,15 +217,15 @@ public class InventoryItemMapper  {
 }
 
 		if(fields.get("serialNumber") != null) {
-			returnVal.setSerialNumber((long) fields.get("serialNumber"));
+			returnVal.setSerialNumber((String) fields.get("serialNumber"));
 }
 
 		if(fields.get("softIdentifier") != null) {
-			returnVal.setSoftIdentifier((long) fields.get("softIdentifier"));
+			returnVal.setSoftIdentifier((String) fields.get("softIdentifier"));
 }
 
 		if(fields.get("activationNumber") != null) {
-			returnVal.setActivationNumber((long) fields.get("activationNumber"));
+			returnVal.setActivationNumber((String) fields.get("activationNumber"));
 }
 
 		if(fields.get("activationValidThru") != null) {
@@ -358,24 +358,15 @@ BigDecimal bd = BigDecimal.valueOf(ibuf);
 }
 
 		if(fields.get("serialNumber") != null) {
-String buf;
-buf = fields.get("serialNumber");
-long ibuf = Long.parseLong(buf);
-			returnVal.setSerialNumber(ibuf);
+			returnVal.setSerialNumber((String) fields.get("serialNumber"));
 }
 
 		if(fields.get("softIdentifier") != null) {
-String buf;
-buf = fields.get("softIdentifier");
-long ibuf = Long.parseLong(buf);
-			returnVal.setSoftIdentifier(ibuf);
+			returnVal.setSoftIdentifier((String) fields.get("softIdentifier"));
 }
 
 		if(fields.get("activationNumber") != null) {
-String buf;
-buf = fields.get("activationNumber");
-long ibuf = Long.parseLong(buf);
-			returnVal.setActivationNumber(ibuf);
+			returnVal.setActivationNumber((String) fields.get("activationNumber"));
 }
 
 		if(fields.get("activationValidThru") != null) {
@@ -423,9 +414,9 @@ InventoryItem returnVal = new InventoryItem();
 		returnVal.setAccountingQuantityTotal(val.getBigDecimal("accountingQuantityTotal"));
 		returnVal.setOldQuantityOnHand(val.getBigDecimal("oldQuantityOnHand"));
 		returnVal.setOldAvailableToPromise(val.getBigDecimal("oldAvailableToPromise"));
-		returnVal.setSerialNumber(val.getLong("serialNumber"));
-		returnVal.setSoftIdentifier(val.getLong("softIdentifier"));
-		returnVal.setActivationNumber(val.getLong("activationNumber"));
+		returnVal.setSerialNumber(val.getString("serialNumber"));
+		returnVal.setSoftIdentifier(val.getString("softIdentifier"));
+		returnVal.setActivationNumber(val.getString("activationNumber"));
 		returnVal.setActivationValidThru(val.getTimestamp("activationValidThru"));
 		returnVal.setUnitCost(val.getBigDecimal("unitCost"));
 		returnVal.setCurrencyUomId(val.getString("currencyUomId"));
@@ -527,19 +518,13 @@ BigDecimal bd = BigDecimal.valueOf(ibuf);
 			returnVal.setOldAvailableToPromise(bd);
 }
 		if(paramMap.containsKey("serialNumber"))  {
-String buf = request.getParameter("serialNumber");
-Long ibuf = Long.parseLong(buf);
-returnVal.setSerialNumber(ibuf);
+returnVal.setSerialNumber(request.getParameter("serialNumber"));
 }
 		if(paramMap.containsKey("softIdentifier"))  {
-String buf = request.getParameter("softIdentifier");
-Long ibuf = Long.parseLong(buf);
-returnVal.setSoftIdentifier(ibuf);
+returnVal.setSoftIdentifier(request.getParameter("softIdentifier"));
 }
 		if(paramMap.containsKey("activationNumber"))  {
-String buf = request.getParameter("activationNumber");
-Long ibuf = Long.parseLong(buf);
-returnVal.setActivationNumber(ibuf);
+returnVal.setActivationNumber(request.getParameter("activationNumber"));
 }
 		if(paramMap.containsKey("activationValidThru"))  {
 String buf = request.getParameter("activationValidThru");

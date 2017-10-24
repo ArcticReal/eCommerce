@@ -36,7 +36,7 @@ private String fromString;
 private String toString;
 private String ccString;
 private String bccString;
-private Long messageId;
+private String messageId;
 
 public String getCommunicationEventId() {
 return communicationEventId;
@@ -246,11 +246,11 @@ public void setBccString(String  bccString) {
 this.bccString = bccString;
 }
 
-public Long getMessageId() {
+public String getMessageId() {
 return messageId;
 }
 
-public void setMessageId(Long  messageId) {
+public void setMessageId(String  messageId) {
 this.messageId = messageId;
 }
 

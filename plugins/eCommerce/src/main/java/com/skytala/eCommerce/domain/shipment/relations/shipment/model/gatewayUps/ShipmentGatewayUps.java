@@ -11,26 +11,26 @@ public class ShipmentGatewayUps implements Serializable{
 
 private static final long serialVersionUID = 1L;
 private String shipmentGatewayConfigId;
-private Long connectUrl;
+private String connectUrl;
 private Long connectTimeout;
-private Long shipperNumber;
-private Long billShipperAccountNumber;
-private Long accessLicenseNumber;
-private Long accessUserId;
-private Long accessPassword;
+private String shipperNumber;
+private String billShipperAccountNumber;
+private String accessLicenseNumber;
+private String accessUserId;
+private String accessPassword;
 private String saveCertInfo;
-private Long saveCertPath;
+private String saveCertPath;
 private String shipperPickupType;
 private String customerClassification;
 private BigDecimal maxEstimateWeight;
 private BigDecimal minEstimateWeight;
-private Long codAllowCod;
+private String codAllowCod;
 private BigDecimal codSurchargeAmount;
 private String codSurchargeCurrencyUomId;
 private String codSurchargeApplyToPackage;
 private String codFundsCode;
-private Long defaultReturnLabelMemo;
-private Long defaultReturnLabelSubject;
+private String defaultReturnLabelMemo;
+private String defaultReturnLabelSubject;
 
 public String getShipmentGatewayConfigId() {
 return shipmentGatewayConfigId;
@@ -40,11 +40,11 @@ public void setShipmentGatewayConfigId(String  shipmentGatewayConfigId) {
 this.shipmentGatewayConfigId = shipmentGatewayConfigId;
 }
 
-public Long getConnectUrl() {
+public String getConnectUrl() {
 return connectUrl;
 }
 
-public void setConnectUrl(Long  connectUrl) {
+public void setConnectUrl(String  connectUrl) {
 this.connectUrl = connectUrl;
 }
 
@@ -56,43 +56,43 @@ public void setConnectTimeout(Long  connectTimeout) {
 this.connectTimeout = connectTimeout;
 }
 
-public Long getShipperNumber() {
+public String getShipperNumber() {
 return shipperNumber;
 }
 
-public void setShipperNumber(Long  shipperNumber) {
+public void setShipperNumber(String  shipperNumber) {
 this.shipperNumber = shipperNumber;
 }
 
-public Long getBillShipperAccountNumber() {
+public String getBillShipperAccountNumber() {
 return billShipperAccountNumber;
 }
 
-public void setBillShipperAccountNumber(Long  billShipperAccountNumber) {
+public void setBillShipperAccountNumber(String  billShipperAccountNumber) {
 this.billShipperAccountNumber = billShipperAccountNumber;
 }
 
-public Long getAccessLicenseNumber() {
+public String getAccessLicenseNumber() {
 return accessLicenseNumber;
 }
 
-public void setAccessLicenseNumber(Long  accessLicenseNumber) {
+public void setAccessLicenseNumber(String  accessLicenseNumber) {
 this.accessLicenseNumber = accessLicenseNumber;
 }
 
-public Long getAccessUserId() {
+public String getAccessUserId() {
 return accessUserId;
 }
 
-public void setAccessUserId(Long  accessUserId) {
+public void setAccessUserId(String  accessUserId) {
 this.accessUserId = accessUserId;
 }
 
-public Long getAccessPassword() {
+public String getAccessPassword() {
 return accessPassword;
 }
 
-public void setAccessPassword(Long  accessPassword) {
+public void setAccessPassword(String  accessPassword) {
 this.accessPassword = accessPassword;
 }
 
@@ -104,11 +104,11 @@ public void setSaveCertInfo(String  saveCertInfo) {
 this.saveCertInfo = saveCertInfo;
 }
 
-public Long getSaveCertPath() {
+public String getSaveCertPath() {
 return saveCertPath;
 }
 
-public void setSaveCertPath(Long  saveCertPath) {
+public void setSaveCertPath(String  saveCertPath) {
 this.saveCertPath = saveCertPath;
 }
 
@@ -144,11 +144,11 @@ public void setMinEstimateWeight(BigDecimal  minEstimateWeight) {
 this.minEstimateWeight = minEstimateWeight;
 }
 
-public Long getCodAllowCod() {
+public String getCodAllowCod() {
 return codAllowCod;
 }
 
-public void setCodAllowCod(Long  codAllowCod) {
+public void setCodAllowCod(String  codAllowCod) {
 this.codAllowCod = codAllowCod;
 }
 
@@ -184,19 +184,19 @@ public void setCodFundsCode(String  codFundsCode) {
 this.codFundsCode = codFundsCode;
 }
 
-public Long getDefaultReturnLabelMemo() {
+public String getDefaultReturnLabelMemo() {
 return defaultReturnLabelMemo;
 }
 
-public void setDefaultReturnLabelMemo(Long  defaultReturnLabelMemo) {
+public void setDefaultReturnLabelMemo(String  defaultReturnLabelMemo) {
 this.defaultReturnLabelMemo = defaultReturnLabelMemo;
 }
 
-public Long getDefaultReturnLabelSubject() {
+public String getDefaultReturnLabelSubject() {
 return defaultReturnLabelSubject;
 }
 
-public void setDefaultReturnLabelSubject(Long  defaultReturnLabelSubject) {
+public void setDefaultReturnLabelSubject(String  defaultReturnLabelSubject) {
 this.defaultReturnLabelSubject = defaultReturnLabelSubject;
 }
 

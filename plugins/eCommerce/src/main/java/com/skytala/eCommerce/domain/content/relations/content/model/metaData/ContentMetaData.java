@@ -12,7 +12,7 @@ public class ContentMetaData implements Serializable{
 private static final long serialVersionUID = 1L;
 private String contentId;
 private String metaDataPredicateId;
-private Long metaDataValue;
+private String metaDataValue;
 private String dataSourceId;
 
 public String getContentId() {
@@ -31,11 +31,11 @@ public void setMetaDataPredicateId(String  metaDataPredicateId) {
 this.metaDataPredicateId = metaDataPredicateId;
 }
 
-public Long getMetaDataValue() {
+public String getMetaDataValue() {
 return metaDataValue;
 }
 
-public void setMetaDataValue(Long  metaDataValue) {
+public void setMetaDataValue(String  metaDataValue) {
 this.metaDataValue = metaDataValue;
 }
 

@@ -15,11 +15,11 @@ private String sourceId;
 private String groupId;
 private String clientId;
 private String username;
-private Long pwd;
+private String pwd;
 private String userAlias;
 private String effectiveAlias;
 private Boolean processMode;
-private Long serverURL;
+private String serverURL;
 private Boolean enableCVM;
 
 public String getPaymentGatewayConfigId() {
@@ -62,11 +62,11 @@ public void setUsername(String  username) {
 this.username = username;
 }
 
-public Long getPwd() {
+public String getPwd() {
 return pwd;
 }
 
-public void setPwd(Long  pwd) {
+public void setPwd(String  pwd) {
 this.pwd = pwd;
 }
 
@@ -94,11 +94,11 @@ public void setProcessMode(Boolean  processMode) {
 this.processMode = processMode;
 }
 
-public Long getServerURL() {
+public String getServerURL() {
 return serverURL;
 }
 
-public void setServerURL(Long  serverURL) {
+public void setServerURL(String  serverURL) {
 this.serverURL = serverURL;
 }
 

@@ -125,7 +125,7 @@ public class DataResourceMapper  {
 }
 
 		if(fields.get("dataResourceName") != null) {
-			returnVal.setDataResourceName((long) fields.get("dataResourceName"));
+			returnVal.setDataResourceName((String) fields.get("dataResourceName"));
 }
 
 		if(fields.get("localeString") != null) {
@@ -208,10 +208,7 @@ public class DataResourceMapper  {
 }
 
 		if(fields.get("dataResourceName") != null) {
-String buf;
-buf = fields.get("dataResourceName");
-long ibuf = Long.parseLong(buf);
-			returnVal.setDataResourceName(ibuf);
+			returnVal.setDataResourceName((String) fields.get("dataResourceName"));
 }
 
 		if(fields.get("localeString") != null) {
@@ -281,7 +278,7 @@ DataResource returnVal = new DataResource();
 		returnVal.setDataCategoryId(val.getString("dataCategoryId"));
 		returnVal.setDataSourceId(val.getString("dataSourceId"));
 		returnVal.setStatusId(val.getString("statusId"));
-		returnVal.setDataResourceName(val.getLong("dataResourceName"));
+		returnVal.setDataResourceName(val.getString("dataResourceName"));
 		returnVal.setLocaleString(val.getString("localeString"));
 		returnVal.setMimeTypeId(val.getString("mimeTypeId"));
 		returnVal.setCharacterSetId(val.getString("characterSetId"));
@@ -326,9 +323,7 @@ returnVal.setDataSourceId(request.getParameter("dataSourceId"));
 returnVal.setStatusId(request.getParameter("statusId"));
 }
 		if(paramMap.containsKey("dataResourceName"))  {
-String buf = request.getParameter("dataResourceName");
-Long ibuf = Long.parseLong(buf);
-returnVal.setDataResourceName(ibuf);
+returnVal.setDataResourceName(request.getParameter("dataResourceName"));
 }
 		if(paramMap.containsKey("localeString"))  {
 returnVal.setLocaleString(request.getParameter("localeString"));

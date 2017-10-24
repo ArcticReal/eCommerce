@@ -13,10 +13,10 @@ private static final long serialVersionUID = 1L;
 private String productStoreId;
 private String paymentMethodTypeId;
 private String paymentServiceTypeEnumId;
-private Long paymentService;
+private String paymentService;
 private String paymentCustomMethodId;
 private String paymentGatewayConfigId;
-private Long paymentPropertiesPath;
+private String paymentPropertiesPath;
 private Boolean applyToAllProducts;
 
 public String getProductStoreId() {
@@ -43,11 +43,11 @@ public void setPaymentServiceTypeEnumId(String  paymentServiceTypeEnumId) {
 this.paymentServiceTypeEnumId = paymentServiceTypeEnumId;
 }
 
-public Long getPaymentService() {
+public String getPaymentService() {
 return paymentService;
 }
 
-public void setPaymentService(Long  paymentService) {
+public void setPaymentService(String  paymentService) {
 this.paymentService = paymentService;
 }
 
@@ -67,11 +67,11 @@ public void setPaymentGatewayConfigId(String  paymentGatewayConfigId) {
 this.paymentGatewayConfigId = paymentGatewayConfigId;
 }
 
-public Long getPaymentPropertiesPath() {
+public String getPaymentPropertiesPath() {
 return paymentPropertiesPath;
 }
 
-public void setPaymentPropertiesPath(Long  paymentPropertiesPath) {
+public void setPaymentPropertiesPath(String  paymentPropertiesPath) {
 this.paymentPropertiesPath = paymentPropertiesPath;
 }
 

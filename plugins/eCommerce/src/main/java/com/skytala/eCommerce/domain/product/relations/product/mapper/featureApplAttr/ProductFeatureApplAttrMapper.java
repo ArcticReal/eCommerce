@@ -61,7 +61,7 @@ public class ProductFeatureApplAttrMapper  {
 }
 
 		if(fields.get("attrValue") != null) {
-			returnVal.setAttrValue((long) fields.get("attrValue"));
+			returnVal.setAttrValue((String) fields.get("attrValue"));
 }
 
 
@@ -90,10 +90,7 @@ Timestamp ibuf = Timestamp.valueOf(buf);
 }
 
 		if(fields.get("attrValue") != null) {
-String buf;
-buf = fields.get("attrValue");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAttrValue(ibuf);
+			returnVal.setAttrValue((String) fields.get("attrValue"));
 }
 
 
@@ -106,7 +103,7 @@ ProductFeatureApplAttr returnVal = new ProductFeatureApplAttr();
 		returnVal.setProductFeatureId(val.getString("productFeatureId"));
 		returnVal.setFromDate(val.getTimestamp("fromDate"));
 		returnVal.setAttrName(val.getString("attrName"));
-		returnVal.setAttrValue(val.getLong("attrValue"));
+		returnVal.setAttrValue(val.getString("attrValue"));
 
 
 return returnVal;
@@ -135,9 +132,7 @@ returnVal.setFromDate(ibuf);
 returnVal.setAttrName(request.getParameter("attrName"));
 }
 		if(paramMap.containsKey("attrValue"))  {
-String buf = request.getParameter("attrValue");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAttrValue(ibuf);
+returnVal.setAttrValue(request.getParameter("attrValue"));
 }
 return returnVal;
 

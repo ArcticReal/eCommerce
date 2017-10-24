@@ -11,18 +11,18 @@ public class PaymentGatewayPayPal implements Serializable{
 
 private static final long serialVersionUID = 1L;
 private String paymentGatewayConfigId;
-private Long businessEmail;
+private String businessEmail;
 private String apiUserName;
 private String apiPassword;
 private String apiSignature;
 private String apiEnvironment;
-private Long notifyUrl;
-private Long returnUrl;
-private Long cancelReturnUrl;
-private Long imageUrl;
-private Long confirmTemplate;
-private Long redirectUrl;
-private Long confirmUrl;
+private String notifyUrl;
+private String returnUrl;
+private String cancelReturnUrl;
+private String imageUrl;
+private String confirmTemplate;
+private String redirectUrl;
+private String confirmUrl;
 private String shippingCallbackUrl;
 private Boolean requireConfirmedShipping;
 
@@ -34,11 +34,11 @@ public void setPaymentGatewayConfigId(String  paymentGatewayConfigId) {
 this.paymentGatewayConfigId = paymentGatewayConfigId;
 }
 
-public Long getBusinessEmail() {
+public String getBusinessEmail() {
 return businessEmail;
 }
 
-public void setBusinessEmail(Long  businessEmail) {
+public void setBusinessEmail(String  businessEmail) {
 this.businessEmail = businessEmail;
 }
 
@@ -74,59 +74,59 @@ public void setApiEnvironment(String  apiEnvironment) {
 this.apiEnvironment = apiEnvironment;
 }
 
-public Long getNotifyUrl() {
+public String getNotifyUrl() {
 return notifyUrl;
 }
 
-public void setNotifyUrl(Long  notifyUrl) {
+public void setNotifyUrl(String  notifyUrl) {
 this.notifyUrl = notifyUrl;
 }
 
-public Long getReturnUrl() {
+public String getReturnUrl() {
 return returnUrl;
 }
 
-public void setReturnUrl(Long  returnUrl) {
+public void setReturnUrl(String  returnUrl) {
 this.returnUrl = returnUrl;
 }
 
-public Long getCancelReturnUrl() {
+public String getCancelReturnUrl() {
 return cancelReturnUrl;
 }
 
-public void setCancelReturnUrl(Long  cancelReturnUrl) {
+public void setCancelReturnUrl(String  cancelReturnUrl) {
 this.cancelReturnUrl = cancelReturnUrl;
 }
 
-public Long getImageUrl() {
+public String getImageUrl() {
 return imageUrl;
 }
 
-public void setImageUrl(Long  imageUrl) {
+public void setImageUrl(String  imageUrl) {
 this.imageUrl = imageUrl;
 }
 
-public Long getConfirmTemplate() {
+public String getConfirmTemplate() {
 return confirmTemplate;
 }
 
-public void setConfirmTemplate(Long  confirmTemplate) {
+public void setConfirmTemplate(String  confirmTemplate) {
 this.confirmTemplate = confirmTemplate;
 }
 
-public Long getRedirectUrl() {
+public String getRedirectUrl() {
 return redirectUrl;
 }
 
-public void setRedirectUrl(Long  redirectUrl) {
+public void setRedirectUrl(String  redirectUrl) {
 this.redirectUrl = redirectUrl;
 }
 
-public Long getConfirmUrl() {
+public String getConfirmUrl() {
 return confirmUrl;
 }
 
-public void setConfirmUrl(Long  confirmUrl) {
+public void setConfirmUrl(String  confirmUrl) {
 this.confirmUrl = confirmUrl;
 }
 

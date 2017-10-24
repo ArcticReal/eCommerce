@@ -61,11 +61,11 @@ public class ShipmentGatewayUspsMapper  {
 }
 
 		if(fields.get("connectUrl") != null) {
-			returnVal.setConnectUrl((long) fields.get("connectUrl"));
+			returnVal.setConnectUrl((String) fields.get("connectUrl"));
 }
 
 		if(fields.get("connectUrlLabels") != null) {
-			returnVal.setConnectUrlLabels((long) fields.get("connectUrlLabels"));
+			returnVal.setConnectUrlLabels((String) fields.get("connectUrlLabels"));
 }
 
 		if(fields.get("connectTimeout") != null) {
@@ -73,11 +73,11 @@ public class ShipmentGatewayUspsMapper  {
 }
 
 		if(fields.get("accessUserId") != null) {
-			returnVal.setAccessUserId((long) fields.get("accessUserId"));
+			returnVal.setAccessUserId((String) fields.get("accessUserId"));
 }
 
 		if(fields.get("accessPassword") != null) {
-			returnVal.setAccessPassword((long) fields.get("accessPassword"));
+			returnVal.setAccessPassword((String) fields.get("accessPassword"));
 }
 
 		if(fields.get("maxEstimateWeight") != null) {
@@ -100,17 +100,11 @@ public class ShipmentGatewayUspsMapper  {
 }
 
 		if(fields.get("connectUrl") != null) {
-String buf;
-buf = fields.get("connectUrl");
-long ibuf = Long.parseLong(buf);
-			returnVal.setConnectUrl(ibuf);
+			returnVal.setConnectUrl((String) fields.get("connectUrl"));
 }
 
 		if(fields.get("connectUrlLabels") != null) {
-String buf;
-buf = fields.get("connectUrlLabels");
-long ibuf = Long.parseLong(buf);
-			returnVal.setConnectUrlLabels(ibuf);
+			returnVal.setConnectUrlLabels((String) fields.get("connectUrlLabels"));
 }
 
 		if(fields.get("connectTimeout") != null) {
@@ -121,17 +115,11 @@ long ibuf = Long.parseLong(buf);
 }
 
 		if(fields.get("accessUserId") != null) {
-String buf;
-buf = fields.get("accessUserId");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAccessUserId(ibuf);
+			returnVal.setAccessUserId((String) fields.get("accessUserId"));
 }
 
 		if(fields.get("accessPassword") != null) {
-String buf;
-buf = fields.get("accessPassword");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAccessPassword(ibuf);
+			returnVal.setAccessPassword((String) fields.get("accessPassword"));
 }
 
 		if(fields.get("maxEstimateWeight") != null) {
@@ -152,11 +140,11 @@ long ibuf = Long.parseLong(buf);
 
 ShipmentGatewayUsps returnVal = new ShipmentGatewayUsps();
 		returnVal.setShipmentGatewayConfigId(val.getString("shipmentGatewayConfigId"));
-		returnVal.setConnectUrl(val.getLong("connectUrl"));
-		returnVal.setConnectUrlLabels(val.getLong("connectUrlLabels"));
+		returnVal.setConnectUrl(val.getString("connectUrl"));
+		returnVal.setConnectUrlLabels(val.getString("connectUrlLabels"));
 		returnVal.setConnectTimeout(val.getLong("connectTimeout"));
-		returnVal.setAccessUserId(val.getLong("accessUserId"));
-		returnVal.setAccessPassword(val.getLong("accessPassword"));
+		returnVal.setAccessUserId(val.getString("accessUserId"));
+		returnVal.setAccessPassword(val.getString("accessPassword"));
 		returnVal.setMaxEstimateWeight(val.getLong("maxEstimateWeight"));
 		returnVal.setTest(val.getString("test"));
 
@@ -176,14 +164,10 @@ returnVal.setShipmentGatewayConfigId(request.getParameter("shipmentGatewayConfig
 }
 
 		if(paramMap.containsKey("connectUrl"))  {
-String buf = request.getParameter("connectUrl");
-Long ibuf = Long.parseLong(buf);
-returnVal.setConnectUrl(ibuf);
+returnVal.setConnectUrl(request.getParameter("connectUrl"));
 }
 		if(paramMap.containsKey("connectUrlLabels"))  {
-String buf = request.getParameter("connectUrlLabels");
-Long ibuf = Long.parseLong(buf);
-returnVal.setConnectUrlLabels(ibuf);
+returnVal.setConnectUrlLabels(request.getParameter("connectUrlLabels"));
 }
 		if(paramMap.containsKey("connectTimeout"))  {
 String buf = request.getParameter("connectTimeout");
@@ -191,14 +175,10 @@ Long ibuf = Long.parseLong(buf);
 returnVal.setConnectTimeout(ibuf);
 }
 		if(paramMap.containsKey("accessUserId"))  {
-String buf = request.getParameter("accessUserId");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAccessUserId(ibuf);
+returnVal.setAccessUserId(request.getParameter("accessUserId"));
 }
 		if(paramMap.containsKey("accessPassword"))  {
-String buf = request.getParameter("accessPassword");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAccessPassword(ibuf);
+returnVal.setAccessPassword(request.getParameter("accessPassword"));
 }
 		if(paramMap.containsKey("maxEstimateWeight"))  {
 String buf = request.getParameter("maxEstimateWeight");

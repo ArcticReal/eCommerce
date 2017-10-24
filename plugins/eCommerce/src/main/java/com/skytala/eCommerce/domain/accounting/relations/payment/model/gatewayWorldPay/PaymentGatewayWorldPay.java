@@ -11,8 +11,8 @@ public class PaymentGatewayWorldPay implements Serializable{
 
 private static final long serialVersionUID = 1L;
 private String paymentGatewayConfigId;
-private Long redirectUrl;
-private Long instId;
+private String redirectUrl;
+private String instId;
 private Boolean authMode;
 private Boolean fixContact;
 private Boolean hideContact;
@@ -30,19 +30,19 @@ public void setPaymentGatewayConfigId(String  paymentGatewayConfigId) {
 this.paymentGatewayConfigId = paymentGatewayConfigId;
 }
 
-public Long getRedirectUrl() {
+public String getRedirectUrl() {
 return redirectUrl;
 }
 
-public void setRedirectUrl(Long  redirectUrl) {
+public void setRedirectUrl(String  redirectUrl) {
 this.redirectUrl = redirectUrl;
 }
 
-public Long getInstId() {
+public String getInstId() {
 return instId;
 }
 
-public void setInstId(Long  instId) {
+public void setInstId(String  instId) {
 this.instId = instId;
 }
 

@@ -57,7 +57,7 @@ public class InvoiceItemAttributeMapper  {
 }
 
 		if(fields.get("attrValue") != null) {
-			returnVal.setAttrValue((long) fields.get("attrValue"));
+			returnVal.setAttrValue((String) fields.get("attrValue"));
 }
 
 		if(fields.get("attrDescription") != null) {
@@ -84,10 +84,7 @@ public class InvoiceItemAttributeMapper  {
 }
 
 		if(fields.get("attrValue") != null) {
-String buf;
-buf = fields.get("attrValue");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAttrValue(ibuf);
+			returnVal.setAttrValue((String) fields.get("attrValue"));
 }
 
 		if(fields.get("attrDescription") != null) {
@@ -103,7 +100,7 @@ InvoiceItemAttribute returnVal = new InvoiceItemAttribute();
 		returnVal.setInvoiceId(val.getString("invoiceId"));
 		returnVal.setInvoiceItemSeqId(val.getString("invoiceItemSeqId"));
 		returnVal.setAttrName(val.getString("attrName"));
-		returnVal.setAttrValue(val.getLong("attrValue"));
+		returnVal.setAttrValue(val.getString("attrValue"));
 		returnVal.setAttrDescription(val.getString("attrDescription"));
 
 
@@ -128,9 +125,7 @@ returnVal.setInvoiceItemSeqId(request.getParameter("invoiceItemSeqId"));
 returnVal.setAttrName(request.getParameter("attrName"));
 }
 		if(paramMap.containsKey("attrValue"))  {
-String buf = request.getParameter("attrValue");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAttrValue(ibuf);
+returnVal.setAttrValue(request.getParameter("attrValue"));
 }
 		if(paramMap.containsKey("attrDescription"))  {
 returnVal.setAttrDescription(request.getParameter("attrDescription"));

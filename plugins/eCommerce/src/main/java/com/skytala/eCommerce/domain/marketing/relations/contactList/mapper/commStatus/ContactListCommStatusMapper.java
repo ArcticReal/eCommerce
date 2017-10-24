@@ -69,7 +69,7 @@ public class ContactListCommStatusMapper  {
 }
 
 		if(fields.get("messageId") != null) {
-			returnVal.setMessageId((long) fields.get("messageId"));
+			returnVal.setMessageId((String) fields.get("messageId"));
 }
 
 		if(fields.get("statusId") != null) {
@@ -104,10 +104,7 @@ public class ContactListCommStatusMapper  {
 }
 
 		if(fields.get("messageId") != null) {
-String buf;
-buf = fields.get("messageId");
-long ibuf = Long.parseLong(buf);
-			returnVal.setMessageId(ibuf);
+			returnVal.setMessageId((String) fields.get("messageId"));
 }
 
 		if(fields.get("statusId") != null) {
@@ -128,7 +125,7 @@ ContactListCommStatus returnVal = new ContactListCommStatus();
 		returnVal.setCommunicationEventId(val.getString("communicationEventId"));
 		returnVal.setContactMechId(val.getString("contactMechId"));
 		returnVal.setPartyId(val.getString("partyId"));
-		returnVal.setMessageId(val.getLong("messageId"));
+		returnVal.setMessageId(val.getString("messageId"));
 		returnVal.setStatusId(val.getString("statusId"));
 		returnVal.setChangeByUserLoginId(val.getString("changeByUserLoginId"));
 
@@ -157,9 +154,7 @@ returnVal.setContactMechId(request.getParameter("contactMechId"));
 returnVal.setPartyId(request.getParameter("partyId"));
 }
 		if(paramMap.containsKey("messageId"))  {
-String buf = request.getParameter("messageId");
-Long ibuf = Long.parseLong(buf);
-returnVal.setMessageId(ibuf);
+returnVal.setMessageId(request.getParameter("messageId"));
 }
 		if(paramMap.containsKey("statusId"))  {
 returnVal.setStatusId(request.getParameter("statusId"));

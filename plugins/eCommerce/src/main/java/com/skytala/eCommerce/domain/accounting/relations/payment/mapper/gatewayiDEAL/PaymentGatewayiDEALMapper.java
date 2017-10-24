@@ -77,47 +77,47 @@ public class PaymentGatewayiDEALMapper  {
 }
 
 		if(fields.get("merchantId") != null) {
-			returnVal.setMerchantId((long) fields.get("merchantId"));
+			returnVal.setMerchantId((String) fields.get("merchantId"));
 }
 
 		if(fields.get("merchantSubId") != null) {
-			returnVal.setMerchantSubId((long) fields.get("merchantSubId"));
+			returnVal.setMerchantSubId((String) fields.get("merchantSubId"));
 }
 
 		if(fields.get("merchantReturnURL") != null) {
-			returnVal.setMerchantReturnURL((long) fields.get("merchantReturnURL"));
+			returnVal.setMerchantReturnURL((String) fields.get("merchantReturnURL"));
 }
 
 		if(fields.get("acquirerURL") != null) {
-			returnVal.setAcquirerURL((long) fields.get("acquirerURL"));
+			returnVal.setAcquirerURL((String) fields.get("acquirerURL"));
 }
 
 		if(fields.get("acquirerTimeout") != null) {
-			returnVal.setAcquirerTimeout((long) fields.get("acquirerTimeout"));
+			returnVal.setAcquirerTimeout((String) fields.get("acquirerTimeout"));
 }
 
 		if(fields.get("privateCert") != null) {
-			returnVal.setPrivateCert((long) fields.get("privateCert"));
+			returnVal.setPrivateCert((String) fields.get("privateCert"));
 }
 
 		if(fields.get("acquirerKeyStoreFilename") != null) {
-			returnVal.setAcquirerKeyStoreFilename((long) fields.get("acquirerKeyStoreFilename"));
+			returnVal.setAcquirerKeyStoreFilename((String) fields.get("acquirerKeyStoreFilename"));
 }
 
 		if(fields.get("acquirerKeyStorePassword") != null) {
-			returnVal.setAcquirerKeyStorePassword((long) fields.get("acquirerKeyStorePassword"));
+			returnVal.setAcquirerKeyStorePassword((String) fields.get("acquirerKeyStorePassword"));
 }
 
 		if(fields.get("merchantKeyStoreFilename") != null) {
-			returnVal.setMerchantKeyStoreFilename((long) fields.get("merchantKeyStoreFilename"));
+			returnVal.setMerchantKeyStoreFilename((String) fields.get("merchantKeyStoreFilename"));
 }
 
 		if(fields.get("merchantKeyStorePassword") != null) {
-			returnVal.setMerchantKeyStorePassword((long) fields.get("merchantKeyStorePassword"));
+			returnVal.setMerchantKeyStorePassword((String) fields.get("merchantKeyStorePassword"));
 }
 
 		if(fields.get("expirationPeriod") != null) {
-			returnVal.setExpirationPeriod((long) fields.get("expirationPeriod"));
+			returnVal.setExpirationPeriod((String) fields.get("expirationPeriod"));
 }
 
 
@@ -132,80 +132,47 @@ public class PaymentGatewayiDEALMapper  {
 }
 
 		if(fields.get("merchantId") != null) {
-String buf;
-buf = fields.get("merchantId");
-long ibuf = Long.parseLong(buf);
-			returnVal.setMerchantId(ibuf);
+			returnVal.setMerchantId((String) fields.get("merchantId"));
 }
 
 		if(fields.get("merchantSubId") != null) {
-String buf;
-buf = fields.get("merchantSubId");
-long ibuf = Long.parseLong(buf);
-			returnVal.setMerchantSubId(ibuf);
+			returnVal.setMerchantSubId((String) fields.get("merchantSubId"));
 }
 
 		if(fields.get("merchantReturnURL") != null) {
-String buf;
-buf = fields.get("merchantReturnURL");
-long ibuf = Long.parseLong(buf);
-			returnVal.setMerchantReturnURL(ibuf);
+			returnVal.setMerchantReturnURL((String) fields.get("merchantReturnURL"));
 }
 
 		if(fields.get("acquirerURL") != null) {
-String buf;
-buf = fields.get("acquirerURL");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAcquirerURL(ibuf);
+			returnVal.setAcquirerURL((String) fields.get("acquirerURL"));
 }
 
 		if(fields.get("acquirerTimeout") != null) {
-String buf;
-buf = fields.get("acquirerTimeout");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAcquirerTimeout(ibuf);
+			returnVal.setAcquirerTimeout((String) fields.get("acquirerTimeout"));
 }
 
 		if(fields.get("privateCert") != null) {
-String buf;
-buf = fields.get("privateCert");
-long ibuf = Long.parseLong(buf);
-			returnVal.setPrivateCert(ibuf);
+			returnVal.setPrivateCert((String) fields.get("privateCert"));
 }
 
 		if(fields.get("acquirerKeyStoreFilename") != null) {
-String buf;
-buf = fields.get("acquirerKeyStoreFilename");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAcquirerKeyStoreFilename(ibuf);
+			returnVal.setAcquirerKeyStoreFilename((String) fields.get("acquirerKeyStoreFilename"));
 }
 
 		if(fields.get("acquirerKeyStorePassword") != null) {
-String buf;
-buf = fields.get("acquirerKeyStorePassword");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAcquirerKeyStorePassword(ibuf);
+			returnVal.setAcquirerKeyStorePassword((String) fields.get("acquirerKeyStorePassword"));
 }
 
 		if(fields.get("merchantKeyStoreFilename") != null) {
-String buf;
-buf = fields.get("merchantKeyStoreFilename");
-long ibuf = Long.parseLong(buf);
-			returnVal.setMerchantKeyStoreFilename(ibuf);
+			returnVal.setMerchantKeyStoreFilename((String) fields.get("merchantKeyStoreFilename"));
 }
 
 		if(fields.get("merchantKeyStorePassword") != null) {
-String buf;
-buf = fields.get("merchantKeyStorePassword");
-long ibuf = Long.parseLong(buf);
-			returnVal.setMerchantKeyStorePassword(ibuf);
+			returnVal.setMerchantKeyStorePassword((String) fields.get("merchantKeyStorePassword"));
 }
 
 		if(fields.get("expirationPeriod") != null) {
-String buf;
-buf = fields.get("expirationPeriod");
-long ibuf = Long.parseLong(buf);
-			returnVal.setExpirationPeriod(ibuf);
+			returnVal.setExpirationPeriod((String) fields.get("expirationPeriod"));
 }
 
 
@@ -215,17 +182,17 @@ long ibuf = Long.parseLong(buf);
 
 PaymentGatewayiDEAL returnVal = new PaymentGatewayiDEAL();
 		returnVal.setPaymentGatewayConfigId(val.getString("paymentGatewayConfigId"));
-		returnVal.setMerchantId(val.getLong("merchantId"));
-		returnVal.setMerchantSubId(val.getLong("merchantSubId"));
-		returnVal.setMerchantReturnURL(val.getLong("merchantReturnURL"));
-		returnVal.setAcquirerURL(val.getLong("acquirerURL"));
-		returnVal.setAcquirerTimeout(val.getLong("acquirerTimeout"));
-		returnVal.setPrivateCert(val.getLong("privateCert"));
-		returnVal.setAcquirerKeyStoreFilename(val.getLong("acquirerKeyStoreFilename"));
-		returnVal.setAcquirerKeyStorePassword(val.getLong("acquirerKeyStorePassword"));
-		returnVal.setMerchantKeyStoreFilename(val.getLong("merchantKeyStoreFilename"));
-		returnVal.setMerchantKeyStorePassword(val.getLong("merchantKeyStorePassword"));
-		returnVal.setExpirationPeriod(val.getLong("expirationPeriod"));
+		returnVal.setMerchantId(val.getString("merchantId"));
+		returnVal.setMerchantSubId(val.getString("merchantSubId"));
+		returnVal.setMerchantReturnURL(val.getString("merchantReturnURL"));
+		returnVal.setAcquirerURL(val.getString("acquirerURL"));
+		returnVal.setAcquirerTimeout(val.getString("acquirerTimeout"));
+		returnVal.setPrivateCert(val.getString("privateCert"));
+		returnVal.setAcquirerKeyStoreFilename(val.getString("acquirerKeyStoreFilename"));
+		returnVal.setAcquirerKeyStorePassword(val.getString("acquirerKeyStorePassword"));
+		returnVal.setMerchantKeyStoreFilename(val.getString("merchantKeyStoreFilename"));
+		returnVal.setMerchantKeyStorePassword(val.getString("merchantKeyStorePassword"));
+		returnVal.setExpirationPeriod(val.getString("expirationPeriod"));
 
 
 return returnVal;
@@ -243,59 +210,37 @@ returnVal.setPaymentGatewayConfigId(request.getParameter("paymentGatewayConfigId
 }
 
 		if(paramMap.containsKey("merchantId"))  {
-String buf = request.getParameter("merchantId");
-Long ibuf = Long.parseLong(buf);
-returnVal.setMerchantId(ibuf);
+returnVal.setMerchantId(request.getParameter("merchantId"));
 }
 		if(paramMap.containsKey("merchantSubId"))  {
-String buf = request.getParameter("merchantSubId");
-Long ibuf = Long.parseLong(buf);
-returnVal.setMerchantSubId(ibuf);
+returnVal.setMerchantSubId(request.getParameter("merchantSubId"));
 }
 		if(paramMap.containsKey("merchantReturnURL"))  {
-String buf = request.getParameter("merchantReturnURL");
-Long ibuf = Long.parseLong(buf);
-returnVal.setMerchantReturnURL(ibuf);
+returnVal.setMerchantReturnURL(request.getParameter("merchantReturnURL"));
 }
 		if(paramMap.containsKey("acquirerURL"))  {
-String buf = request.getParameter("acquirerURL");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAcquirerURL(ibuf);
+returnVal.setAcquirerURL(request.getParameter("acquirerURL"));
 }
 		if(paramMap.containsKey("acquirerTimeout"))  {
-String buf = request.getParameter("acquirerTimeout");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAcquirerTimeout(ibuf);
+returnVal.setAcquirerTimeout(request.getParameter("acquirerTimeout"));
 }
 		if(paramMap.containsKey("privateCert"))  {
-String buf = request.getParameter("privateCert");
-Long ibuf = Long.parseLong(buf);
-returnVal.setPrivateCert(ibuf);
+returnVal.setPrivateCert(request.getParameter("privateCert"));
 }
 		if(paramMap.containsKey("acquirerKeyStoreFilename"))  {
-String buf = request.getParameter("acquirerKeyStoreFilename");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAcquirerKeyStoreFilename(ibuf);
+returnVal.setAcquirerKeyStoreFilename(request.getParameter("acquirerKeyStoreFilename"));
 }
 		if(paramMap.containsKey("acquirerKeyStorePassword"))  {
-String buf = request.getParameter("acquirerKeyStorePassword");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAcquirerKeyStorePassword(ibuf);
+returnVal.setAcquirerKeyStorePassword(request.getParameter("acquirerKeyStorePassword"));
 }
 		if(paramMap.containsKey("merchantKeyStoreFilename"))  {
-String buf = request.getParameter("merchantKeyStoreFilename");
-Long ibuf = Long.parseLong(buf);
-returnVal.setMerchantKeyStoreFilename(ibuf);
+returnVal.setMerchantKeyStoreFilename(request.getParameter("merchantKeyStoreFilename"));
 }
 		if(paramMap.containsKey("merchantKeyStorePassword"))  {
-String buf = request.getParameter("merchantKeyStorePassword");
-Long ibuf = Long.parseLong(buf);
-returnVal.setMerchantKeyStorePassword(ibuf);
+returnVal.setMerchantKeyStorePassword(request.getParameter("merchantKeyStorePassword"));
 }
 		if(paramMap.containsKey("expirationPeriod"))  {
-String buf = request.getParameter("expirationPeriod");
-Long ibuf = Long.parseLong(buf);
-returnVal.setExpirationPeriod(ibuf);
+returnVal.setExpirationPeriod(request.getParameter("expirationPeriod"));
 }
 return returnVal;
 

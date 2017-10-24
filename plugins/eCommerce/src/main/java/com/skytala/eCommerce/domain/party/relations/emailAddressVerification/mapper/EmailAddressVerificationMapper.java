@@ -41,7 +41,7 @@ public class EmailAddressVerificationMapper  {
 }
 
 		if(fields.get("verifyHash") != null) {
-			returnVal.setVerifyHash((long) fields.get("verifyHash"));
+			returnVal.setVerifyHash((String) fields.get("verifyHash"));
 }
 
 		if(fields.get("expireDate") != null) {
@@ -60,10 +60,7 @@ public class EmailAddressVerificationMapper  {
 }
 
 		if(fields.get("verifyHash") != null) {
-String buf;
-buf = fields.get("verifyHash");
-long ibuf = Long.parseLong(buf);
-			returnVal.setVerifyHash(ibuf);
+			returnVal.setVerifyHash((String) fields.get("verifyHash"));
 }
 
 		if(fields.get("expireDate") != null) {
@@ -79,7 +76,7 @@ Timestamp ibuf = Timestamp.valueOf(buf);
 
 EmailAddressVerification returnVal = new EmailAddressVerification();
 		returnVal.setEmailAddress(val.getString("emailAddress"));
-		returnVal.setVerifyHash(val.getLong("verifyHash"));
+		returnVal.setVerifyHash(val.getString("verifyHash"));
 		returnVal.setExpireDate(val.getTimestamp("expireDate"));
 
 
@@ -98,9 +95,7 @@ returnVal.setEmailAddress(request.getParameter("emailAddress"));
 }
 
 		if(paramMap.containsKey("verifyHash"))  {
-String buf = request.getParameter("verifyHash");
-Long ibuf = Long.parseLong(buf);
-returnVal.setVerifyHash(ibuf);
+returnVal.setVerifyHash(request.getParameter("verifyHash"));
 }
 		if(paramMap.containsKey("expireDate"))  {
 String buf = request.getParameter("expireDate");

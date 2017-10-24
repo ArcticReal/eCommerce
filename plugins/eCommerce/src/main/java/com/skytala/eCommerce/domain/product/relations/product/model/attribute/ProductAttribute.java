@@ -12,8 +12,8 @@ public class ProductAttribute implements Serializable{
 private static final long serialVersionUID = 1L;
 private String productId;
 private String attrName;
-private Long attrValue;
-private Long attrType;
+private String attrValue;
+private String attrType;
 private String attrDescription;
 
 public String getProductId() {
@@ -32,19 +32,19 @@ public void setAttrName(String  attrName) {
 this.attrName = attrName;
 }
 
-public Long getAttrValue() {
+public String getAttrValue() {
 return attrValue;
 }
 
-public void setAttrValue(Long  attrValue) {
+public void setAttrValue(String  attrValue) {
 this.attrValue = attrValue;
 }
 
-public Long getAttrType() {
+public String getAttrType() {
 return attrType;
 }
 
-public void setAttrType(Long  attrType) {
+public void setAttrType(String  attrType) {
 this.attrType = attrType;
 }
 

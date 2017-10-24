@@ -101,7 +101,7 @@ public class PaymentGatewayCyberSourceMapper  {
 }
 
 		if(fields.get("merchantId") != null) {
-			returnVal.setMerchantId((long) fields.get("merchantId"));
+			returnVal.setMerchantId((String) fields.get("merchantId"));
 }
 
 		if(fields.get("apiVersion") != null) {
@@ -113,11 +113,11 @@ public class PaymentGatewayCyberSourceMapper  {
 }
 
 		if(fields.get("keysDir") != null) {
-			returnVal.setKeysDir((long) fields.get("keysDir"));
+			returnVal.setKeysDir((String) fields.get("keysDir"));
 }
 
 		if(fields.get("keysFile") != null) {
-			returnVal.setKeysFile((long) fields.get("keysFile"));
+			returnVal.setKeysFile((String) fields.get("keysFile"));
 }
 
 		if(fields.get("logEnabled") != null) {
@@ -125,11 +125,11 @@ public class PaymentGatewayCyberSourceMapper  {
 }
 
 		if(fields.get("logDir") != null) {
-			returnVal.setLogDir((long) fields.get("logDir"));
+			returnVal.setLogDir((String) fields.get("logDir"));
 }
 
 		if(fields.get("logFile") != null) {
-			returnVal.setLogFile((long) fields.get("logFile"));
+			returnVal.setLogFile((String) fields.get("logFile"));
 }
 
 		if(fields.get("logSize") != null) {
@@ -137,11 +137,11 @@ public class PaymentGatewayCyberSourceMapper  {
 }
 
 		if(fields.get("merchantDescr") != null) {
-			returnVal.setMerchantDescr((long) fields.get("merchantDescr"));
+			returnVal.setMerchantDescr((String) fields.get("merchantDescr"));
 }
 
 		if(fields.get("merchantContact") != null) {
-			returnVal.setMerchantContact((long) fields.get("merchantContact"));
+			returnVal.setMerchantContact((String) fields.get("merchantContact"));
 }
 
 		if(fields.get("autoBill") != null) {
@@ -165,7 +165,7 @@ public class PaymentGatewayCyberSourceMapper  {
 }
 
 		if(fields.get("avsDeclineCodes") != null) {
-			returnVal.setAvsDeclineCodes((long) fields.get("avsDeclineCodes"));
+			returnVal.setAvsDeclineCodes((String) fields.get("avsDeclineCodes"));
 }
 
 
@@ -180,10 +180,7 @@ public class PaymentGatewayCyberSourceMapper  {
 }
 
 		if(fields.get("merchantId") != null) {
-String buf;
-buf = fields.get("merchantId");
-long ibuf = Long.parseLong(buf);
-			returnVal.setMerchantId(ibuf);
+			returnVal.setMerchantId((String) fields.get("merchantId"));
 }
 
 		if(fields.get("apiVersion") != null) {
@@ -195,17 +192,11 @@ long ibuf = Long.parseLong(buf);
 }
 
 		if(fields.get("keysDir") != null) {
-String buf;
-buf = fields.get("keysDir");
-long ibuf = Long.parseLong(buf);
-			returnVal.setKeysDir(ibuf);
+			returnVal.setKeysDir((String) fields.get("keysDir"));
 }
 
 		if(fields.get("keysFile") != null) {
-String buf;
-buf = fields.get("keysFile");
-long ibuf = Long.parseLong(buf);
-			returnVal.setKeysFile(ibuf);
+			returnVal.setKeysFile((String) fields.get("keysFile"));
 }
 
 		if(fields.get("logEnabled") != null) {
@@ -213,17 +204,11 @@ long ibuf = Long.parseLong(buf);
 }
 
 		if(fields.get("logDir") != null) {
-String buf;
-buf = fields.get("logDir");
-long ibuf = Long.parseLong(buf);
-			returnVal.setLogDir(ibuf);
+			returnVal.setLogDir((String) fields.get("logDir"));
 }
 
 		if(fields.get("logFile") != null) {
-String buf;
-buf = fields.get("logFile");
-long ibuf = Long.parseLong(buf);
-			returnVal.setLogFile(ibuf);
+			returnVal.setLogFile((String) fields.get("logFile"));
 }
 
 		if(fields.get("logSize") != null) {
@@ -234,17 +219,11 @@ long ibuf = Long.parseLong(buf);
 }
 
 		if(fields.get("merchantDescr") != null) {
-String buf;
-buf = fields.get("merchantDescr");
-long ibuf = Long.parseLong(buf);
-			returnVal.setMerchantDescr(ibuf);
+			returnVal.setMerchantDescr((String) fields.get("merchantDescr"));
 }
 
 		if(fields.get("merchantContact") != null) {
-String buf;
-buf = fields.get("merchantContact");
-long ibuf = Long.parseLong(buf);
-			returnVal.setMerchantContact(ibuf);
+			returnVal.setMerchantContact((String) fields.get("merchantContact"));
 }
 
 		if(fields.get("autoBill") != null) {
@@ -277,10 +256,7 @@ Boolean ibuf = Boolean.parseBoolean(buf);
 }
 
 		if(fields.get("avsDeclineCodes") != null) {
-String buf;
-buf = fields.get("avsDeclineCodes");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAvsDeclineCodes(ibuf);
+			returnVal.setAvsDeclineCodes((String) fields.get("avsDeclineCodes"));
 }
 
 
@@ -290,23 +266,23 @@ long ibuf = Long.parseLong(buf);
 
 PaymentGatewayCyberSource returnVal = new PaymentGatewayCyberSource();
 		returnVal.setPaymentGatewayConfigId(val.getString("paymentGatewayConfigId"));
-		returnVal.setMerchantId(val.getLong("merchantId"));
+		returnVal.setMerchantId(val.getString("merchantId"));
 		returnVal.setApiVersion(val.getString("apiVersion"));
 		returnVal.setProduction(val.getString("production"));
-		returnVal.setKeysDir(val.getLong("keysDir"));
-		returnVal.setKeysFile(val.getLong("keysFile"));
+		returnVal.setKeysDir(val.getString("keysDir"));
+		returnVal.setKeysFile(val.getString("keysFile"));
 		returnVal.setLogEnabled(val.getString("logEnabled"));
-		returnVal.setLogDir(val.getLong("logDir"));
-		returnVal.setLogFile(val.getLong("logFile"));
+		returnVal.setLogDir(val.getString("logDir"));
+		returnVal.setLogFile(val.getString("logFile"));
 		returnVal.setLogSize(val.getLong("logSize"));
-		returnVal.setMerchantDescr(val.getLong("merchantDescr"));
-		returnVal.setMerchantContact(val.getLong("merchantContact"));
+		returnVal.setMerchantDescr(val.getString("merchantDescr"));
+		returnVal.setMerchantContact(val.getString("merchantContact"));
 		returnVal.setAutoBill(val.getString("autoBill"));
 		returnVal.setEnableDav(val.getBoolean("enableDav"));
 		returnVal.setFraudScore(val.getBoolean("fraudScore"));
 		returnVal.setIgnoreAvs(val.getString("ignoreAvs"));
 		returnVal.setDisableBillAvs(val.getBoolean("disableBillAvs"));
-		returnVal.setAvsDeclineCodes(val.getLong("avsDeclineCodes"));
+		returnVal.setAvsDeclineCodes(val.getString("avsDeclineCodes"));
 
 
 return returnVal;
@@ -324,9 +300,7 @@ returnVal.setPaymentGatewayConfigId(request.getParameter("paymentGatewayConfigId
 }
 
 		if(paramMap.containsKey("merchantId"))  {
-String buf = request.getParameter("merchantId");
-Long ibuf = Long.parseLong(buf);
-returnVal.setMerchantId(ibuf);
+returnVal.setMerchantId(request.getParameter("merchantId"));
 }
 		if(paramMap.containsKey("apiVersion"))  {
 returnVal.setApiVersion(request.getParameter("apiVersion"));
@@ -335,27 +309,19 @@ returnVal.setApiVersion(request.getParameter("apiVersion"));
 returnVal.setProduction(request.getParameter("production"));
 }
 		if(paramMap.containsKey("keysDir"))  {
-String buf = request.getParameter("keysDir");
-Long ibuf = Long.parseLong(buf);
-returnVal.setKeysDir(ibuf);
+returnVal.setKeysDir(request.getParameter("keysDir"));
 }
 		if(paramMap.containsKey("keysFile"))  {
-String buf = request.getParameter("keysFile");
-Long ibuf = Long.parseLong(buf);
-returnVal.setKeysFile(ibuf);
+returnVal.setKeysFile(request.getParameter("keysFile"));
 }
 		if(paramMap.containsKey("logEnabled"))  {
 returnVal.setLogEnabled(request.getParameter("logEnabled"));
 }
 		if(paramMap.containsKey("logDir"))  {
-String buf = request.getParameter("logDir");
-Long ibuf = Long.parseLong(buf);
-returnVal.setLogDir(ibuf);
+returnVal.setLogDir(request.getParameter("logDir"));
 }
 		if(paramMap.containsKey("logFile"))  {
-String buf = request.getParameter("logFile");
-Long ibuf = Long.parseLong(buf);
-returnVal.setLogFile(ibuf);
+returnVal.setLogFile(request.getParameter("logFile"));
 }
 		if(paramMap.containsKey("logSize"))  {
 String buf = request.getParameter("logSize");
@@ -363,14 +329,10 @@ Long ibuf = Long.parseLong(buf);
 returnVal.setLogSize(ibuf);
 }
 		if(paramMap.containsKey("merchantDescr"))  {
-String buf = request.getParameter("merchantDescr");
-Long ibuf = Long.parseLong(buf);
-returnVal.setMerchantDescr(ibuf);
+returnVal.setMerchantDescr(request.getParameter("merchantDescr"));
 }
 		if(paramMap.containsKey("merchantContact"))  {
-String buf = request.getParameter("merchantContact");
-Long ibuf = Long.parseLong(buf);
-returnVal.setMerchantContact(ibuf);
+returnVal.setMerchantContact(request.getParameter("merchantContact"));
 }
 		if(paramMap.containsKey("autoBill"))  {
 returnVal.setAutoBill(request.getParameter("autoBill"));
@@ -394,9 +356,7 @@ Boolean ibuf = Boolean.parseBoolean(buf);
 returnVal.setDisableBillAvs(ibuf);
 }
 		if(paramMap.containsKey("avsDeclineCodes"))  {
-String buf = request.getParameter("avsDeclineCodes");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAvsDeclineCodes(ibuf);
+returnVal.setAvsDeclineCodes(request.getParameter("avsDeclineCodes"));
 }
 return returnVal;
 

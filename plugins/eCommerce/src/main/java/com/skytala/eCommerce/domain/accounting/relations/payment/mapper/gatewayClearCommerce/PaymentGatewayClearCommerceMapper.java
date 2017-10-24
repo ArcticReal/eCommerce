@@ -89,7 +89,7 @@ public class PaymentGatewayClearCommerceMapper  {
 }
 
 		if(fields.get("pwd") != null) {
-			returnVal.setPwd((long) fields.get("pwd"));
+			returnVal.setPwd((String) fields.get("pwd"));
 }
 
 		if(fields.get("userAlias") != null) {
@@ -105,7 +105,7 @@ public class PaymentGatewayClearCommerceMapper  {
 }
 
 		if(fields.get("serverURL") != null) {
-			returnVal.setServerURL((long) fields.get("serverURL"));
+			returnVal.setServerURL((String) fields.get("serverURL"));
 }
 
 		if(fields.get("enableCVM") != null) {
@@ -140,10 +140,7 @@ public class PaymentGatewayClearCommerceMapper  {
 }
 
 		if(fields.get("pwd") != null) {
-String buf;
-buf = fields.get("pwd");
-long ibuf = Long.parseLong(buf);
-			returnVal.setPwd(ibuf);
+			returnVal.setPwd((String) fields.get("pwd"));
 }
 
 		if(fields.get("userAlias") != null) {
@@ -162,10 +159,7 @@ Boolean ibuf = Boolean.parseBoolean(buf);
 }
 
 		if(fields.get("serverURL") != null) {
-String buf;
-buf = fields.get("serverURL");
-long ibuf = Long.parseLong(buf);
-			returnVal.setServerURL(ibuf);
+			returnVal.setServerURL((String) fields.get("serverURL"));
 }
 
 		if(fields.get("enableCVM") != null) {
@@ -186,11 +180,11 @@ PaymentGatewayClearCommerce returnVal = new PaymentGatewayClearCommerce();
 		returnVal.setGroupId(val.getString("groupId"));
 		returnVal.setClientId(val.getString("clientId"));
 		returnVal.setUsername(val.getString("username"));
-		returnVal.setPwd(val.getLong("pwd"));
+		returnVal.setPwd(val.getString("pwd"));
 		returnVal.setUserAlias(val.getString("userAlias"));
 		returnVal.setEffectiveAlias(val.getString("effectiveAlias"));
 		returnVal.setProcessMode(val.getBoolean("processMode"));
-		returnVal.setServerURL(val.getLong("serverURL"));
+		returnVal.setServerURL(val.getString("serverURL"));
 		returnVal.setEnableCVM(val.getBoolean("enableCVM"));
 
 
@@ -221,9 +215,7 @@ returnVal.setClientId(request.getParameter("clientId"));
 returnVal.setUsername(request.getParameter("username"));
 }
 		if(paramMap.containsKey("pwd"))  {
-String buf = request.getParameter("pwd");
-Long ibuf = Long.parseLong(buf);
-returnVal.setPwd(ibuf);
+returnVal.setPwd(request.getParameter("pwd"));
 }
 		if(paramMap.containsKey("userAlias"))  {
 returnVal.setUserAlias(request.getParameter("userAlias"));
@@ -237,9 +229,7 @@ Boolean ibuf = Boolean.parseBoolean(buf);
 returnVal.setProcessMode(ibuf);
 }
 		if(paramMap.containsKey("serverURL"))  {
-String buf = request.getParameter("serverURL");
-Long ibuf = Long.parseLong(buf);
-returnVal.setServerURL(ibuf);
+returnVal.setServerURL(request.getParameter("serverURL"));
 }
 		if(paramMap.containsKey("enableCVM"))  {
 String buf = request.getParameter("enableCVM");

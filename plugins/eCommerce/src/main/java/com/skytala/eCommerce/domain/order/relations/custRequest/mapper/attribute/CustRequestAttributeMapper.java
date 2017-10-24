@@ -49,7 +49,7 @@ public class CustRequestAttributeMapper  {
 }
 
 		if(fields.get("attrValue") != null) {
-			returnVal.setAttrValue((long) fields.get("attrValue"));
+			returnVal.setAttrValue((String) fields.get("attrValue"));
 }
 
 		if(fields.get("attrDescription") != null) {
@@ -72,10 +72,7 @@ public class CustRequestAttributeMapper  {
 }
 
 		if(fields.get("attrValue") != null) {
-String buf;
-buf = fields.get("attrValue");
-long ibuf = Long.parseLong(buf);
-			returnVal.setAttrValue(ibuf);
+			returnVal.setAttrValue((String) fields.get("attrValue"));
 }
 
 		if(fields.get("attrDescription") != null) {
@@ -90,7 +87,7 @@ long ibuf = Long.parseLong(buf);
 CustRequestAttribute returnVal = new CustRequestAttribute();
 		returnVal.setCustRequestId(val.getString("custRequestId"));
 		returnVal.setAttrName(val.getString("attrName"));
-		returnVal.setAttrValue(val.getLong("attrValue"));
+		returnVal.setAttrValue(val.getString("attrValue"));
 		returnVal.setAttrDescription(val.getString("attrDescription"));
 
 
@@ -112,9 +109,7 @@ returnVal.setCustRequestId(request.getParameter("custRequestId"));
 returnVal.setAttrName(request.getParameter("attrName"));
 }
 		if(paramMap.containsKey("attrValue"))  {
-String buf = request.getParameter("attrValue");
-Long ibuf = Long.parseLong(buf);
-returnVal.setAttrValue(ibuf);
+returnVal.setAttrValue(request.getParameter("attrValue"));
 }
 		if(paramMap.containsKey("attrDescription"))  {
 returnVal.setAttrDescription(request.getParameter("attrDescription"));

@@ -69,7 +69,7 @@ public class ProductStorePaymentSettingMapper  {
 }
 
 		if(fields.get("paymentService") != null) {
-			returnVal.setPaymentService((long) fields.get("paymentService"));
+			returnVal.setPaymentService((String) fields.get("paymentService"));
 }
 
 		if(fields.get("paymentCustomMethodId") != null) {
@@ -81,7 +81,7 @@ public class ProductStorePaymentSettingMapper  {
 }
 
 		if(fields.get("paymentPropertiesPath") != null) {
-			returnVal.setPaymentPropertiesPath((long) fields.get("paymentPropertiesPath"));
+			returnVal.setPaymentPropertiesPath((String) fields.get("paymentPropertiesPath"));
 }
 
 		if(fields.get("applyToAllProducts") != null) {
@@ -108,10 +108,7 @@ public class ProductStorePaymentSettingMapper  {
 }
 
 		if(fields.get("paymentService") != null) {
-String buf;
-buf = fields.get("paymentService");
-long ibuf = Long.parseLong(buf);
-			returnVal.setPaymentService(ibuf);
+			returnVal.setPaymentService((String) fields.get("paymentService"));
 }
 
 		if(fields.get("paymentCustomMethodId") != null) {
@@ -123,10 +120,7 @@ long ibuf = Long.parseLong(buf);
 }
 
 		if(fields.get("paymentPropertiesPath") != null) {
-String buf;
-buf = fields.get("paymentPropertiesPath");
-long ibuf = Long.parseLong(buf);
-			returnVal.setPaymentPropertiesPath(ibuf);
+			returnVal.setPaymentPropertiesPath((String) fields.get("paymentPropertiesPath"));
 }
 
 		if(fields.get("applyToAllProducts") != null) {
@@ -145,10 +139,10 @@ ProductStorePaymentSetting returnVal = new ProductStorePaymentSetting();
 		returnVal.setProductStoreId(val.getString("productStoreId"));
 		returnVal.setPaymentMethodTypeId(val.getString("paymentMethodTypeId"));
 		returnVal.setPaymentServiceTypeEnumId(val.getString("paymentServiceTypeEnumId"));
-		returnVal.setPaymentService(val.getLong("paymentService"));
+		returnVal.setPaymentService(val.getString("paymentService"));
 		returnVal.setPaymentCustomMethodId(val.getString("paymentCustomMethodId"));
 		returnVal.setPaymentGatewayConfigId(val.getString("paymentGatewayConfigId"));
-		returnVal.setPaymentPropertiesPath(val.getLong("paymentPropertiesPath"));
+		returnVal.setPaymentPropertiesPath(val.getString("paymentPropertiesPath"));
 		returnVal.setApplyToAllProducts(val.getBoolean("applyToAllProducts"));
 
 
@@ -173,9 +167,7 @@ returnVal.setPaymentMethodTypeId(request.getParameter("paymentMethodTypeId"));
 returnVal.setPaymentServiceTypeEnumId(request.getParameter("paymentServiceTypeEnumId"));
 }
 		if(paramMap.containsKey("paymentService"))  {
-String buf = request.getParameter("paymentService");
-Long ibuf = Long.parseLong(buf);
-returnVal.setPaymentService(ibuf);
+returnVal.setPaymentService(request.getParameter("paymentService"));
 }
 		if(paramMap.containsKey("paymentCustomMethodId"))  {
 returnVal.setPaymentCustomMethodId(request.getParameter("paymentCustomMethodId"));
@@ -184,9 +176,7 @@ returnVal.setPaymentCustomMethodId(request.getParameter("paymentCustomMethodId")
 returnVal.setPaymentGatewayConfigId(request.getParameter("paymentGatewayConfigId"));
 }
 		if(paramMap.containsKey("paymentPropertiesPath"))  {
-String buf = request.getParameter("paymentPropertiesPath");
-Long ibuf = Long.parseLong(buf);
-returnVal.setPaymentPropertiesPath(ibuf);
+returnVal.setPaymentPropertiesPath(request.getParameter("paymentPropertiesPath"));
 }
 		if(paramMap.containsKey("applyToAllProducts"))  {
 String buf = request.getParameter("applyToAllProducts");

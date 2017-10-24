@@ -11,19 +11,19 @@ public class ShipmentGatewayFedex implements Serializable{
 
 private static final long serialVersionUID = 1L;
 private String shipmentGatewayConfigId;
-private Long connectUrl;
-private Long connectSoapUrl;
+private String connectUrl;
+private String connectSoapUrl;
 private Long connectTimeout;
-private Long accessAccountNbr;
-private Long accessMeterNumber;
-private Long accessUserKey;
-private Long accessUserPwd;
+private String accessAccountNbr;
+private String accessMeterNumber;
+private String accessUserKey;
+private String accessUserPwd;
 private String labelImageType;
-private Long defaultDropoffType;
-private Long defaultPackagingType;
-private Long templateShipment;
-private Long templateSubscription;
-private Long rateEstimateTemplate;
+private String defaultDropoffType;
+private String defaultPackagingType;
+private String templateShipment;
+private String templateSubscription;
+private String rateEstimateTemplate;
 
 public String getShipmentGatewayConfigId() {
 return shipmentGatewayConfigId;
@@ -33,19 +33,19 @@ public void setShipmentGatewayConfigId(String  shipmentGatewayConfigId) {
 this.shipmentGatewayConfigId = shipmentGatewayConfigId;
 }
 
-public Long getConnectUrl() {
+public String getConnectUrl() {
 return connectUrl;
 }
 
-public void setConnectUrl(Long  connectUrl) {
+public void setConnectUrl(String  connectUrl) {
 this.connectUrl = connectUrl;
 }
 
-public Long getConnectSoapUrl() {
+public String getConnectSoapUrl() {
 return connectSoapUrl;
 }
 
-public void setConnectSoapUrl(Long  connectSoapUrl) {
+public void setConnectSoapUrl(String  connectSoapUrl) {
 this.connectSoapUrl = connectSoapUrl;
 }
 
@@ -57,35 +57,35 @@ public void setConnectTimeout(Long  connectTimeout) {
 this.connectTimeout = connectTimeout;
 }
 
-public Long getAccessAccountNbr() {
+public String getAccessAccountNbr() {
 return accessAccountNbr;
 }
 
-public void setAccessAccountNbr(Long  accessAccountNbr) {
+public void setAccessAccountNbr(String  accessAccountNbr) {
 this.accessAccountNbr = accessAccountNbr;
 }
 
-public Long getAccessMeterNumber() {
+public String getAccessMeterNumber() {
 return accessMeterNumber;
 }
 
-public void setAccessMeterNumber(Long  accessMeterNumber) {
+public void setAccessMeterNumber(String  accessMeterNumber) {
 this.accessMeterNumber = accessMeterNumber;
 }
 
-public Long getAccessUserKey() {
+public String getAccessUserKey() {
 return accessUserKey;
 }
 
-public void setAccessUserKey(Long  accessUserKey) {
+public void setAccessUserKey(String  accessUserKey) {
 this.accessUserKey = accessUserKey;
 }
 
-public Long getAccessUserPwd() {
+public String getAccessUserPwd() {
 return accessUserPwd;
 }
 
-public void setAccessUserPwd(Long  accessUserPwd) {
+public void setAccessUserPwd(String  accessUserPwd) {
 this.accessUserPwd = accessUserPwd;
 }
 
@@ -97,43 +97,43 @@ public void setLabelImageType(String  labelImageType) {
 this.labelImageType = labelImageType;
 }
 
-public Long getDefaultDropoffType() {
+public String getDefaultDropoffType() {
 return defaultDropoffType;
 }
 
-public void setDefaultDropoffType(Long  defaultDropoffType) {
+public void setDefaultDropoffType(String  defaultDropoffType) {
 this.defaultDropoffType = defaultDropoffType;
 }
 
-public Long getDefaultPackagingType() {
+public String getDefaultPackagingType() {
 return defaultPackagingType;
 }
 
-public void setDefaultPackagingType(Long  defaultPackagingType) {
+public void setDefaultPackagingType(String  defaultPackagingType) {
 this.defaultPackagingType = defaultPackagingType;
 }
 
-public Long getTemplateShipment() {
+public String getTemplateShipment() {
 return templateShipment;
 }
 
-public void setTemplateShipment(Long  templateShipment) {
+public void setTemplateShipment(String  templateShipment) {
 this.templateShipment = templateShipment;
 }
 
-public Long getTemplateSubscription() {
+public String getTemplateSubscription() {
 return templateSubscription;
 }
 
-public void setTemplateSubscription(Long  templateSubscription) {
+public void setTemplateSubscription(String  templateSubscription) {
 this.templateSubscription = templateSubscription;
 }
 
-public Long getRateEstimateTemplate() {
+public String getRateEstimateTemplate() {
 return rateEstimateTemplate;
 }
 
-public void setRateEstimateTemplate(Long  rateEstimateTemplate) {
+public void setRateEstimateTemplate(String  rateEstimateTemplate) {
 this.rateEstimateTemplate = rateEstimateTemplate;
 }
 

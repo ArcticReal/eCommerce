@@ -11,9 +11,9 @@ public class PaymentGatewaySecurePay implements Serializable{
 
 private static final long serialVersionUID = 1L;
 private String paymentGatewayConfigId;
-private Long merchantId;
-private Long pwd;
-private Long serverURL;
+private String merchantId;
+private String pwd;
+private String serverURL;
 private Long processTimeout;
 private Boolean enableAmountRound;
 
@@ -25,27 +25,27 @@ public void setPaymentGatewayConfigId(String  paymentGatewayConfigId) {
 this.paymentGatewayConfigId = paymentGatewayConfigId;
 }
 
-public Long getMerchantId() {
+public String getMerchantId() {
 return merchantId;
 }
 
-public void setMerchantId(Long  merchantId) {
+public void setMerchantId(String  merchantId) {
 this.merchantId = merchantId;
 }
 
-public Long getPwd() {
+public String getPwd() {
 return pwd;
 }
 
-public void setPwd(Long  pwd) {
+public void setPwd(String  pwd) {
 this.pwd = pwd;
 }
 
-public Long getServerURL() {
+public String getServerURL() {
 return serverURL;
 }
 
-public void setServerURL(Long  serverURL) {
+public void setServerURL(String  serverURL) {
 this.serverURL = serverURL;
 }
 

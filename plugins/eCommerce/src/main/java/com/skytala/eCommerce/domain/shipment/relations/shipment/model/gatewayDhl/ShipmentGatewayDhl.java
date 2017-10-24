@@ -11,16 +11,16 @@ public class ShipmentGatewayDhl implements Serializable{
 
 private static final long serialVersionUID = 1L;
 private String shipmentGatewayConfigId;
-private Long connectUrl;
+private String connectUrl;
 private Long connectTimeout;
 private String headVersion;
-private Long headAction;
-private Long accessUserId;
-private Long accessPassword;
-private Long accessAccountNbr;
-private Long accessShippingKey;
+private String headAction;
+private String accessUserId;
+private String accessPassword;
+private String accessAccountNbr;
+private String accessShippingKey;
 private String labelImageFormat;
-private Long rateEstimateTemplate;
+private String rateEstimateTemplate;
 
 public String getShipmentGatewayConfigId() {
 return shipmentGatewayConfigId;
@@ -30,11 +30,11 @@ public void setShipmentGatewayConfigId(String  shipmentGatewayConfigId) {
 this.shipmentGatewayConfigId = shipmentGatewayConfigId;
 }
 
-public Long getConnectUrl() {
+public String getConnectUrl() {
 return connectUrl;
 }
 
-public void setConnectUrl(Long  connectUrl) {
+public void setConnectUrl(String  connectUrl) {
 this.connectUrl = connectUrl;
 }
 
@@ -54,43 +54,43 @@ public void setHeadVersion(String  headVersion) {
 this.headVersion = headVersion;
 }
 
-public Long getHeadAction() {
+public String getHeadAction() {
 return headAction;
 }
 
-public void setHeadAction(Long  headAction) {
+public void setHeadAction(String  headAction) {
 this.headAction = headAction;
 }
 
-public Long getAccessUserId() {
+public String getAccessUserId() {
 return accessUserId;
 }
 
-public void setAccessUserId(Long  accessUserId) {
+public void setAccessUserId(String  accessUserId) {
 this.accessUserId = accessUserId;
 }
 
-public Long getAccessPassword() {
+public String getAccessPassword() {
 return accessPassword;
 }
 
-public void setAccessPassword(Long  accessPassword) {
+public void setAccessPassword(String  accessPassword) {
 this.accessPassword = accessPassword;
 }
 
-public Long getAccessAccountNbr() {
+public String getAccessAccountNbr() {
 return accessAccountNbr;
 }
 
-public void setAccessAccountNbr(Long  accessAccountNbr) {
+public void setAccessAccountNbr(String  accessAccountNbr) {
 this.accessAccountNbr = accessAccountNbr;
 }
 
-public Long getAccessShippingKey() {
+public String getAccessShippingKey() {
 return accessShippingKey;
 }
 
-public void setAccessShippingKey(Long  accessShippingKey) {
+public void setAccessShippingKey(String  accessShippingKey) {
 this.accessShippingKey = accessShippingKey;
 }
 
@@ -102,11 +102,11 @@ public void setLabelImageFormat(String  labelImageFormat) {
 this.labelImageFormat = labelImageFormat;
 }
 
-public Long getRateEstimateTemplate() {
+public String getRateEstimateTemplate() {
 return rateEstimateTemplate;
 }
 
-public void setRateEstimateTemplate(Long  rateEstimateTemplate) {
+public void setRateEstimateTemplate(String  rateEstimateTemplate) {
 this.rateEstimateTemplate = rateEstimateTemplate;
 }
 

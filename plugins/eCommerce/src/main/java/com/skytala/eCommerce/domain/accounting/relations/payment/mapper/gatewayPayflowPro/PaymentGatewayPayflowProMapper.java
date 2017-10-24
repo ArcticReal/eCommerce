@@ -125,11 +125,11 @@ public class PaymentGatewayPayflowProMapper  {
 }
 
 		if(fields.get("certsPath") != null) {
-			returnVal.setCertsPath((long) fields.get("certsPath"));
+			returnVal.setCertsPath((String) fields.get("certsPath"));
 }
 
 		if(fields.get("hostAddress") != null) {
-			returnVal.setHostAddress((long) fields.get("hostAddress"));
+			returnVal.setHostAddress((String) fields.get("hostAddress"));
 }
 
 		if(fields.get("hostPort") != null) {
@@ -141,7 +141,7 @@ public class PaymentGatewayPayflowProMapper  {
 }
 
 		if(fields.get("proxyAddress") != null) {
-			returnVal.setProxyAddress((long) fields.get("proxyAddress"));
+			returnVal.setProxyAddress((String) fields.get("proxyAddress"));
 }
 
 		if(fields.get("proxyPort") != null) {
@@ -149,11 +149,11 @@ public class PaymentGatewayPayflowProMapper  {
 }
 
 		if(fields.get("proxyLogon") != null) {
-			returnVal.setProxyLogon((long) fields.get("proxyLogon"));
+			returnVal.setProxyLogon((String) fields.get("proxyLogon"));
 }
 
 		if(fields.get("proxyPassword") != null) {
-			returnVal.setProxyPassword((long) fields.get("proxyPassword"));
+			returnVal.setProxyPassword((String) fields.get("proxyPassword"));
 }
 
 		if(fields.get("vendor") != null) {
@@ -165,7 +165,7 @@ public class PaymentGatewayPayflowProMapper  {
 }
 
 		if(fields.get("pwd") != null) {
-			returnVal.setPwd((long) fields.get("pwd"));
+			returnVal.setPwd((String) fields.get("pwd"));
 }
 
 		if(fields.get("partner") != null) {
@@ -185,11 +185,11 @@ public class PaymentGatewayPayflowProMapper  {
 }
 
 		if(fields.get("enableTransmit") != null) {
-			returnVal.setEnableTransmit((long) fields.get("enableTransmit"));
+			returnVal.setEnableTransmit((String) fields.get("enableTransmit"));
 }
 
 		if(fields.get("logFileName") != null) {
-			returnVal.setLogFileName((long) fields.get("logFileName"));
+			returnVal.setLogFileName((String) fields.get("logFileName"));
 }
 
 		if(fields.get("loggingLevel") != null) {
@@ -205,15 +205,15 @@ public class PaymentGatewayPayflowProMapper  {
 }
 
 		if(fields.get("redirectUrl") != null) {
-			returnVal.setRedirectUrl((long) fields.get("redirectUrl"));
+			returnVal.setRedirectUrl((String) fields.get("redirectUrl"));
 }
 
 		if(fields.get("returnUrl") != null) {
-			returnVal.setReturnUrl((long) fields.get("returnUrl"));
+			returnVal.setReturnUrl((String) fields.get("returnUrl"));
 }
 
 		if(fields.get("cancelReturnUrl") != null) {
-			returnVal.setCancelReturnUrl((long) fields.get("cancelReturnUrl"));
+			returnVal.setCancelReturnUrl((String) fields.get("cancelReturnUrl"));
 }
 
 
@@ -228,17 +228,11 @@ public class PaymentGatewayPayflowProMapper  {
 }
 
 		if(fields.get("certsPath") != null) {
-String buf;
-buf = fields.get("certsPath");
-long ibuf = Long.parseLong(buf);
-			returnVal.setCertsPath(ibuf);
+			returnVal.setCertsPath((String) fields.get("certsPath"));
 }
 
 		if(fields.get("hostAddress") != null) {
-String buf;
-buf = fields.get("hostAddress");
-long ibuf = Long.parseLong(buf);
-			returnVal.setHostAddress(ibuf);
+			returnVal.setHostAddress((String) fields.get("hostAddress"));
 }
 
 		if(fields.get("hostPort") != null) {
@@ -256,10 +250,7 @@ long ibuf = Long.parseLong(buf);
 }
 
 		if(fields.get("proxyAddress") != null) {
-String buf;
-buf = fields.get("proxyAddress");
-long ibuf = Long.parseLong(buf);
-			returnVal.setProxyAddress(ibuf);
+			returnVal.setProxyAddress((String) fields.get("proxyAddress"));
 }
 
 		if(fields.get("proxyPort") != null) {
@@ -270,17 +261,11 @@ long ibuf = Long.parseLong(buf);
 }
 
 		if(fields.get("proxyLogon") != null) {
-String buf;
-buf = fields.get("proxyLogon");
-long ibuf = Long.parseLong(buf);
-			returnVal.setProxyLogon(ibuf);
+			returnVal.setProxyLogon((String) fields.get("proxyLogon"));
 }
 
 		if(fields.get("proxyPassword") != null) {
-String buf;
-buf = fields.get("proxyPassword");
-long ibuf = Long.parseLong(buf);
-			returnVal.setProxyPassword(ibuf);
+			returnVal.setProxyPassword((String) fields.get("proxyPassword"));
 }
 
 		if(fields.get("vendor") != null) {
@@ -292,10 +277,7 @@ long ibuf = Long.parseLong(buf);
 }
 
 		if(fields.get("pwd") != null) {
-String buf;
-buf = fields.get("pwd");
-long ibuf = Long.parseLong(buf);
-			returnVal.setPwd(ibuf);
+			returnVal.setPwd((String) fields.get("pwd"));
 }
 
 		if(fields.get("partner") != null) {
@@ -324,17 +306,11 @@ Boolean ibuf = Boolean.parseBoolean(buf);
 }
 
 		if(fields.get("enableTransmit") != null) {
-String buf;
-buf = fields.get("enableTransmit");
-long ibuf = Long.parseLong(buf);
-			returnVal.setEnableTransmit(ibuf);
+			returnVal.setEnableTransmit((String) fields.get("enableTransmit"));
 }
 
 		if(fields.get("logFileName") != null) {
-String buf;
-buf = fields.get("logFileName");
-long ibuf = Long.parseLong(buf);
-			returnVal.setLogFileName(ibuf);
+			returnVal.setLogFileName((String) fields.get("logFileName"));
 }
 
 		if(fields.get("loggingLevel") != null) {
@@ -359,24 +335,15 @@ Boolean ibuf = Boolean.parseBoolean(buf);
 }
 
 		if(fields.get("redirectUrl") != null) {
-String buf;
-buf = fields.get("redirectUrl");
-long ibuf = Long.parseLong(buf);
-			returnVal.setRedirectUrl(ibuf);
+			returnVal.setRedirectUrl((String) fields.get("redirectUrl"));
 }
 
 		if(fields.get("returnUrl") != null) {
-String buf;
-buf = fields.get("returnUrl");
-long ibuf = Long.parseLong(buf);
-			returnVal.setReturnUrl(ibuf);
+			returnVal.setReturnUrl((String) fields.get("returnUrl"));
 }
 
 		if(fields.get("cancelReturnUrl") != null) {
-String buf;
-buf = fields.get("cancelReturnUrl");
-long ibuf = Long.parseLong(buf);
-			returnVal.setCancelReturnUrl(ibuf);
+			returnVal.setCancelReturnUrl((String) fields.get("cancelReturnUrl"));
 }
 
 
@@ -386,29 +353,29 @@ long ibuf = Long.parseLong(buf);
 
 PaymentGatewayPayflowPro returnVal = new PaymentGatewayPayflowPro();
 		returnVal.setPaymentGatewayConfigId(val.getString("paymentGatewayConfigId"));
-		returnVal.setCertsPath(val.getLong("certsPath"));
-		returnVal.setHostAddress(val.getLong("hostAddress"));
+		returnVal.setCertsPath(val.getString("certsPath"));
+		returnVal.setHostAddress(val.getString("hostAddress"));
 		returnVal.setHostPort(val.getLong("hostPort"));
 		returnVal.setTimeout(val.getLong("timeout"));
-		returnVal.setProxyAddress(val.getLong("proxyAddress"));
+		returnVal.setProxyAddress(val.getString("proxyAddress"));
 		returnVal.setProxyPort(val.getLong("proxyPort"));
-		returnVal.setProxyLogon(val.getLong("proxyLogon"));
-		returnVal.setProxyPassword(val.getLong("proxyPassword"));
+		returnVal.setProxyLogon(val.getString("proxyLogon"));
+		returnVal.setProxyPassword(val.getString("proxyPassword"));
 		returnVal.setVendor(val.getString("vendor"));
 		returnVal.setUserId(val.getString("userId"));
-		returnVal.setPwd(val.getLong("pwd"));
+		returnVal.setPwd(val.getString("pwd"));
 		returnVal.setPartner(val.getString("partner"));
 		returnVal.setCheckAvs(val.getBoolean("checkAvs"));
 		returnVal.setCheckCvv2(val.getBoolean("checkCvv2"));
 		returnVal.setPreAuth(val.getBoolean("preAuth"));
-		returnVal.setEnableTransmit(val.getLong("enableTransmit"));
-		returnVal.setLogFileName(val.getLong("logFileName"));
+		returnVal.setEnableTransmit(val.getString("enableTransmit"));
+		returnVal.setLogFileName(val.getString("logFileName"));
 		returnVal.setLoggingLevel(val.getLong("loggingLevel"));
 		returnVal.setMaxLogFileSize(val.getLong("maxLogFileSize"));
 		returnVal.setStackTraceOn(val.getBoolean("stackTraceOn"));
-		returnVal.setRedirectUrl(val.getLong("redirectUrl"));
-		returnVal.setReturnUrl(val.getLong("returnUrl"));
-		returnVal.setCancelReturnUrl(val.getLong("cancelReturnUrl"));
+		returnVal.setRedirectUrl(val.getString("redirectUrl"));
+		returnVal.setReturnUrl(val.getString("returnUrl"));
+		returnVal.setCancelReturnUrl(val.getString("cancelReturnUrl"));
 
 
 return returnVal;
@@ -426,14 +393,10 @@ returnVal.setPaymentGatewayConfigId(request.getParameter("paymentGatewayConfigId
 }
 
 		if(paramMap.containsKey("certsPath"))  {
-String buf = request.getParameter("certsPath");
-Long ibuf = Long.parseLong(buf);
-returnVal.setCertsPath(ibuf);
+returnVal.setCertsPath(request.getParameter("certsPath"));
 }
 		if(paramMap.containsKey("hostAddress"))  {
-String buf = request.getParameter("hostAddress");
-Long ibuf = Long.parseLong(buf);
-returnVal.setHostAddress(ibuf);
+returnVal.setHostAddress(request.getParameter("hostAddress"));
 }
 		if(paramMap.containsKey("hostPort"))  {
 String buf = request.getParameter("hostPort");
@@ -446,9 +409,7 @@ Long ibuf = Long.parseLong(buf);
 returnVal.setTimeout(ibuf);
 }
 		if(paramMap.containsKey("proxyAddress"))  {
-String buf = request.getParameter("proxyAddress");
-Long ibuf = Long.parseLong(buf);
-returnVal.setProxyAddress(ibuf);
+returnVal.setProxyAddress(request.getParameter("proxyAddress"));
 }
 		if(paramMap.containsKey("proxyPort"))  {
 String buf = request.getParameter("proxyPort");
@@ -456,14 +417,10 @@ Long ibuf = Long.parseLong(buf);
 returnVal.setProxyPort(ibuf);
 }
 		if(paramMap.containsKey("proxyLogon"))  {
-String buf = request.getParameter("proxyLogon");
-Long ibuf = Long.parseLong(buf);
-returnVal.setProxyLogon(ibuf);
+returnVal.setProxyLogon(request.getParameter("proxyLogon"));
 }
 		if(paramMap.containsKey("proxyPassword"))  {
-String buf = request.getParameter("proxyPassword");
-Long ibuf = Long.parseLong(buf);
-returnVal.setProxyPassword(ibuf);
+returnVal.setProxyPassword(request.getParameter("proxyPassword"));
 }
 		if(paramMap.containsKey("vendor"))  {
 returnVal.setVendor(request.getParameter("vendor"));
@@ -472,9 +429,7 @@ returnVal.setVendor(request.getParameter("vendor"));
 returnVal.setUserId(request.getParameter("userId"));
 }
 		if(paramMap.containsKey("pwd"))  {
-String buf = request.getParameter("pwd");
-Long ibuf = Long.parseLong(buf);
-returnVal.setPwd(ibuf);
+returnVal.setPwd(request.getParameter("pwd"));
 }
 		if(paramMap.containsKey("partner"))  {
 returnVal.setPartner(request.getParameter("partner"));
@@ -495,14 +450,10 @@ Boolean ibuf = Boolean.parseBoolean(buf);
 returnVal.setPreAuth(ibuf);
 }
 		if(paramMap.containsKey("enableTransmit"))  {
-String buf = request.getParameter("enableTransmit");
-Long ibuf = Long.parseLong(buf);
-returnVal.setEnableTransmit(ibuf);
+returnVal.setEnableTransmit(request.getParameter("enableTransmit"));
 }
 		if(paramMap.containsKey("logFileName"))  {
-String buf = request.getParameter("logFileName");
-Long ibuf = Long.parseLong(buf);
-returnVal.setLogFileName(ibuf);
+returnVal.setLogFileName(request.getParameter("logFileName"));
 }
 		if(paramMap.containsKey("loggingLevel"))  {
 String buf = request.getParameter("loggingLevel");
@@ -520,19 +471,13 @@ Boolean ibuf = Boolean.parseBoolean(buf);
 returnVal.setStackTraceOn(ibuf);
 }
 		if(paramMap.containsKey("redirectUrl"))  {
-String buf = request.getParameter("redirectUrl");
-Long ibuf = Long.parseLong(buf);
-returnVal.setRedirectUrl(ibuf);
+returnVal.setRedirectUrl(request.getParameter("redirectUrl"));
 }
 		if(paramMap.containsKey("returnUrl"))  {
-String buf = request.getParameter("returnUrl");
-Long ibuf = Long.parseLong(buf);
-returnVal.setReturnUrl(ibuf);
+returnVal.setReturnUrl(request.getParameter("returnUrl"));
 }
 		if(paramMap.containsKey("cancelReturnUrl"))  {
-String buf = request.getParameter("cancelReturnUrl");
-Long ibuf = Long.parseLong(buf);
-returnVal.setCancelReturnUrl(ibuf);
+returnVal.setCancelReturnUrl(request.getParameter("cancelReturnUrl"));
 }
 return returnVal;
 

@@ -49,7 +49,7 @@ public class ContentMetaDataMapper  {
 }
 
 		if(fields.get("metaDataValue") != null) {
-			returnVal.setMetaDataValue((long) fields.get("metaDataValue"));
+			returnVal.setMetaDataValue((String) fields.get("metaDataValue"));
 }
 
 		if(fields.get("dataSourceId") != null) {
@@ -72,10 +72,7 @@ public class ContentMetaDataMapper  {
 }
 
 		if(fields.get("metaDataValue") != null) {
-String buf;
-buf = fields.get("metaDataValue");
-long ibuf = Long.parseLong(buf);
-			returnVal.setMetaDataValue(ibuf);
+			returnVal.setMetaDataValue((String) fields.get("metaDataValue"));
 }
 
 		if(fields.get("dataSourceId") != null) {
@@ -90,7 +87,7 @@ long ibuf = Long.parseLong(buf);
 ContentMetaData returnVal = new ContentMetaData();
 		returnVal.setContentId(val.getString("contentId"));
 		returnVal.setMetaDataPredicateId(val.getString("metaDataPredicateId"));
-		returnVal.setMetaDataValue(val.getLong("metaDataValue"));
+		returnVal.setMetaDataValue(val.getString("metaDataValue"));
 		returnVal.setDataSourceId(val.getString("dataSourceId"));
 
 
@@ -112,9 +109,7 @@ returnVal.setContentId(request.getParameter("contentId"));
 returnVal.setMetaDataPredicateId(request.getParameter("metaDataPredicateId"));
 }
 		if(paramMap.containsKey("metaDataValue"))  {
-String buf = request.getParameter("metaDataValue");
-Long ibuf = Long.parseLong(buf);
-returnVal.setMetaDataValue(ibuf);
+returnVal.setMetaDataValue(request.getParameter("metaDataValue"));
 }
 		if(paramMap.containsKey("dataSourceId"))  {
 returnVal.setDataSourceId(request.getParameter("dataSourceId"));
