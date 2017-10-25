@@ -14,7 +14,8 @@ public class LoginController {
     @RequestMapping("/login")
     public void doLoginForwarded(HttpServletRequest request, HttpServletResponse response) throws Exception{
 
-        response.setHeader("Access-Control-Allow-Origin", "192.*");//TODO look for origins to allow access from
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");//TODO look for origins to allow access from
+        response.setHeader("Access-Control-Allow-Credentials", "true");
         RequestDispatcher rd = request.getRequestDispatcher("/control/login");
         rd.forward(request, response);
     }

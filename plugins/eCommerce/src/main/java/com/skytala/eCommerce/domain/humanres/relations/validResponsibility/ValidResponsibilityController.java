@@ -37,7 +37,6 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/validResponsibilitys")
 public class ValidResponsibilityController {
 

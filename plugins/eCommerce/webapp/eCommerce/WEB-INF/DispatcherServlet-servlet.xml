@@ -24,6 +24,10 @@
 	
 	<bean id="databaseInitializer" class="com.skytala.eCommerce.config.DatabaseInitializer">
 	</bean>
+
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+       <property name="maxUploadSize" value="1000000" />
+    </bean>
 	
 
  </beans>

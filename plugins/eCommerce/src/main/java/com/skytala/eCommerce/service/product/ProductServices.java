@@ -1,6 +1,8 @@
 package com.skytala.eCommerce.service.product;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.ByteBuffer;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.HashMap;
@@ -8,6 +10,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import com.skytala.eCommerce.domain.party.model.Party;
+import com.skytala.eCommerce.domain.product.relations.prodCatalog.model.ProdCatalog;
 import org.apache.ofbiz.service.GenericServiceException;
 import org.apache.ofbiz.service.LocalDispatcher;
 import org.apache.ofbiz.entity.GenericValue;
@@ -21,15 +25,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/service/Products")
 public class ProductServices{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteWebAnalyticsType")
 	public ResponseEntity<Object> deleteWebAnalyticsType(HttpSession session, @RequestParam(value="webAnalyticsTypeId") String webAnalyticsTypeId) {
-		
+
+
+
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("webAnalyticsTypeId",webAnalyticsTypeId);
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -56,9 +62,16 @@ public class ProductServices{
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
+
 	@RequestMapping(method = RequestMethod.POST, value = "/addProdCatalogToParty")
-	public ResponseEntity<Object> addProdCatalogToParty(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="prodCatalogId") String prodCatalogId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
-		
+	public ResponseEntity addProdCatalogToParty(HttpSession session,
+												@RequestParam(value="roleTypeId") String roleTypeId,
+												@RequestParam(value="partyId") String partyId,
+												@RequestParam(value="prodCatalogId") String prodCatalogId,
+												@RequestParam(value="fromDate", required=false) Timestamp fromDate,
+												@RequestParam(value="sequenceNum", required=false) Long sequenceNum,
+												@RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("roleTypeId",roleTypeId);
 		paramMap.put("partyId",partyId);
@@ -283,41 +296,114 @@ public class ProductServices{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/multipleUploadProductImages")
-	public ResponseEntity<Object> multipleUploadProductImages(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="additionalImageFour", required=false) java.nio.ByteBuffer additionalImageFour, @RequestParam(value="_additionalImageSix_contentType", required=false) String _additionalImageSix_contentType, @RequestParam(value="_additionalImageSeven_contentType", required=false) String _additionalImageSeven_contentType, @RequestParam(value="_additionalImageOne_fileName", required=false) String _additionalImageOne_fileName, @RequestParam(value="_additionalImageSeven_fileName", required=false) String _additionalImageSeven_fileName, @RequestParam(value="_additionalImageThree_fileName", required=false) String _additionalImageThree_fileName, @RequestParam(value="_additionalImageSix_fileName", required=false) String _additionalImageSix_fileName, @RequestParam(value="additionalImageTwo", required=false) java.nio.ByteBuffer additionalImageTwo, @RequestParam(value="imageResize", required=false) String imageResize, @RequestParam(value="_additionalImageTwo_contentType", required=false) String _additionalImageTwo_contentType, @RequestParam(value="_additionalImageEight_contentType", required=false) String _additionalImageEight_contentType, @RequestParam(value="_additionalImageFive_fileName", required=false) String _additionalImageFive_fileName, @RequestParam(value="_additionalImageTwo_fileName", required=false) String _additionalImageTwo_fileName, @RequestParam(value="additionalImageThree", required=false) java.nio.ByteBuffer additionalImageThree, @RequestParam(value="_additionalImageFive_contentType", required=false) String _additionalImageFive_contentType, @RequestParam(value="additionalImageOne", required=false) java.nio.ByteBuffer additionalImageOne, @RequestParam(value="_additionalImageNine_fileName", required=false) String _additionalImageNine_fileName, @RequestParam(value="_additionalImageTen_fileName", required=false) String _additionalImageTen_fileName, @RequestParam(value="_additionalImageFour_fileName", required=false) String _additionalImageFour_fileName, @RequestParam(value="_additionalImageTen_contentType", required=false) String _additionalImageTen_contentType, @RequestParam(value="_additionalImageOne_contentType", required=false) String _additionalImageOne_contentType, @RequestParam(value="_additionalImageThree_contentType", required=false) String _additionalImageThree_contentType, @RequestParam(value="additionalImageEight", required=false) java.nio.ByteBuffer additionalImageEight, @RequestParam(value="additionalImageTen", required=false) java.nio.ByteBuffer additionalImageTen, @RequestParam(value="additionalImageNine", required=false) java.nio.ByteBuffer additionalImageNine, @RequestParam(value="_additionalImageFour_contentType", required=false) String _additionalImageFour_contentType, @RequestParam(value="additionalImageFive", required=false) java.nio.ByteBuffer additionalImageFive, @RequestParam(value="additionalImageSeven", required=false) java.nio.ByteBuffer additionalImageSeven, @RequestParam(value="additionalImageSix", required=false) java.nio.ByteBuffer additionalImageSix, @RequestParam(value="_additionalImageNine_contentType", required=false) String _additionalImageNine_contentType, @RequestParam(value="_additionalImageEight_fileName", required=false) String _additionalImageEight_fileName) {
-		
+	public ResponseEntity<Object> multipleUploadProductImages(HttpSession session, @RequestParam(value="productId", required = false) String productId, @RequestParam(value="additionalImageFour", required=false) MultipartFile additionalImageFour, @RequestParam(value="_additionalImageOne_fileName", required=false) String _additionalImageOne_fileName, @RequestParam(value="_additionalImageSeven_fileName", required=false) String _additionalImageSeven_fileName, @RequestParam(value="_additionalImageThree_fileName", required=false) String _additionalImageThree_fileName, @RequestParam(value="_additionalImageSix_fileName", required=false) String _additionalImageSix_fileName, @RequestParam(value="additionalImageTwo", required=false) MultipartFile additionalImageTwo, @RequestParam(value="imageResize", required=false) String imageResize, @RequestParam(value="_additionalImageFive_fileName", required=false) String _additionalImageFive_fileName, @RequestParam(value="_additionalImageTwo_fileName", required=false) String _additionalImageTwo_fileName, @RequestParam(value="additionalImageThree", required=false) MultipartFile additionalImageThree, @RequestParam(value="additionalImageOne", required=false) MultipartFile additionalImageOne, @RequestParam(value="_additionalImageNine_fileName", required=false) String _additionalImageNine_fileName, @RequestParam(value="_additionalImageTen_fileName", required=false) String _additionalImageTen_fileName, @RequestParam(value="_additionalImageFour_fileName", required=false) String _additionalImageFour_fileName, @RequestParam(value="additionalImageEight", required=false) MultipartFile additionalImageEight, @RequestParam(value="additionalImageTen", required=false) MultipartFile additionalImageTen, @RequestParam(value="additionalImageNine", required=false) MultipartFile additionalImageNine, @RequestParam(value="additionalImageFive", required=false) MultipartFile additionalImageFive, @RequestParam(value="additionalImageSeven", required=false) MultipartFile additionalImageSeven, @RequestParam(value="additionalImageSix", required=false) MultipartFile additionalImageSix, @RequestParam(value="_additionalImageEight_fileName", required=false) String _additionalImageEight_fileName) throws IOException {
+
+
+
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
-		paramMap.put("additionalImageFour",additionalImageFour);
-		paramMap.put("_additionalImageSix_contentType",_additionalImageSix_contentType);
-		paramMap.put("_additionalImageSeven_contentType",_additionalImageSeven_contentType);
-		paramMap.put("_additionalImageOne_fileName",_additionalImageOne_fileName);
-		paramMap.put("_additionalImageSeven_fileName",_additionalImageSeven_fileName);
-		paramMap.put("_additionalImageThree_fileName",_additionalImageThree_fileName);
-		paramMap.put("_additionalImageSix_fileName",_additionalImageSix_fileName);
-		paramMap.put("additionalImageTwo",additionalImageTwo);
+		if(additionalImageOne!=null){
+			if(_additionalImageOne_fileName == null){
+				String[] fileName = additionalImageOne.getOriginalFilename().split("/");
+				paramMap.put("_additionalImageOne_fileName",fileName[fileName.length-1]);
+			}else{
+				paramMap.put("_additionalImageOne_fileName",_additionalImageOne_fileName);
+			}
+			paramMap.put("_additionalImageOne_contentType",additionalImageOne.getContentType());
+			paramMap.put("additionalImageOne", ByteBuffer.wrap(additionalImageOne.getBytes()));
+		}
+		if(additionalImageTwo!=null){
+			if(_additionalImageTwo_fileName == null){
+				String[] fileName = additionalImageTwo.getOriginalFilename().split("/");
+				paramMap.put("_additionalImageTwo_fileName",fileName[fileName.length-1]);
+			}else{
+				paramMap.put("_additionalImageTwo_fileName",_additionalImageTwo_fileName);
+			}
+			paramMap.put("_additionalImageTwo_contentType",additionalImageTwo.getContentType());
+			paramMap.put("additionalImageTwo",ByteBuffer.wrap(additionalImageTwo.getBytes()));
+		}
+		if(additionalImageThree!=null){
+			if(_additionalImageThree_fileName == null){
+				String[] fileName = additionalImageThree.getOriginalFilename().split("/");
+				paramMap.put("_additionalImageThree_fileName",fileName[fileName.length-1]);
+			}else{
+				paramMap.put("_additionalImageThree_fileName",_additionalImageThree_fileName);
+			}
+			paramMap.put("_additionalImageThree_contentType",additionalImageThree.getContentType());
+			paramMap.put("additionalImageThree",ByteBuffer.wrap(additionalImageThree.getBytes()));
+		}
+		if(additionalImageFour!=null){
+			if(_additionalImageFour_fileName == null){
+				String[] fileName = additionalImageFour.getOriginalFilename().split("/");
+				paramMap.put("_additionalImageFour_fileName",fileName[fileName.length-1]);
+			}else{
+				paramMap.put("_additionalImageFour_fileName",_additionalImageFour_fileName);
+			}
+			paramMap.put("_additionalImageFour_contentType",additionalImageFour.getContentType());
+			paramMap.put("additionalImageFour",ByteBuffer.wrap(additionalImageFour.getBytes()));
+		}
+		if(additionalImageFive!=null){
+			if(_additionalImageFive_fileName == null){
+				String[] fileName = additionalImageFive.getOriginalFilename().split("/");
+				paramMap.put("_additionalImageFive_fileName",fileName[fileName.length-1]);
+			}else{
+				paramMap.put("_additionalImageFive_fileName",_additionalImageFive_fileName);
+			}
+			paramMap.put("_additionalImageFive_contentType",additionalImageFive.getContentType());
+			paramMap.put("additionalImageFive",ByteBuffer.wrap(additionalImageFive.getBytes()));
+		}
+		if(additionalImageSix!=null){
+			if(_additionalImageSix_fileName == null){
+				String[] fileName = additionalImageSix.getOriginalFilename().split("/");
+				paramMap.put("_additionalImageSix_fileName",fileName[fileName.length-1]);
+			}else{
+				paramMap.put("_additionalImageSix_fileName",_additionalImageSix_fileName);
+			}
+			paramMap.put("_additionalImageSix_contentType",additionalImageSix.getContentType());
+			paramMap.put("additionalImageSix",ByteBuffer.wrap(additionalImageSix.getBytes()));
+		}
+		if(additionalImageSeven!=null){
+			if(_additionalImageSeven_fileName == null){
+				String[] fileName = additionalImageSeven.getOriginalFilename().split("/");
+				paramMap.put("_additionalImageSeven_fileName",fileName[fileName.length-1]);
+			}else{
+				paramMap.put("_additionalImageSeven_fileName",_additionalImageSeven_fileName);
+			}
+			paramMap.put("_additionalImageSeven_contentType",additionalImageSeven.getContentType());
+			paramMap.put("additionalImageSeven",ByteBuffer.wrap(additionalImageSeven.getBytes()));
+		}
+		if(additionalImageEight!=null){
+			if(_additionalImageEight_fileName == null){
+				String[] fileName = additionalImageEight.getOriginalFilename().split("/");
+				paramMap.put("_additionalImageEight_fileName",fileName[fileName.length-1]);
+			}else{
+				paramMap.put("_additionalImageEight_fileName",_additionalImageEight_fileName);
+			}
+			paramMap.put("_additionalImageEight_contentType",additionalImageEight.getContentType());
+			paramMap.put("additionalImageEight",ByteBuffer.wrap(additionalImageEight.getBytes()));
+		}
+		if(additionalImageNine!=null){
+			if(_additionalImageNine_fileName == null){
+				String[] fileName = additionalImageNine.getOriginalFilename().split("/");
+				paramMap.put("_additionalImageNine_fileName",fileName[fileName.length-1]);
+			}else{
+				paramMap.put("_additionalImageNine_fileName",_additionalImageNine_fileName);
+			}
+			paramMap.put("_additionalImageNine_contentType",additionalImageNine.getContentType());
+			paramMap.put("additionalImageNine",ByteBuffer.wrap(additionalImageNine.getBytes()));
+		}
+		if(additionalImageTen!=null){
+			if(_additionalImageTen_fileName == null){
+				String[] fileName = additionalImageTen.getOriginalFilename().split("/");
+				paramMap.put("_additionalImageTen_fileName",fileName[fileName.length-1]);
+			}else{
+				paramMap.put("_additionalImageTen_fileName",_additionalImageTen_fileName);
+			}
+			paramMap.put("_additionalImageTen_contentType",additionalImageTen.getContentType());
+			paramMap.put("additionalImageTen",ByteBuffer.wrap(additionalImageTen.getBytes()));
+		}
+
 		paramMap.put("imageResize",imageResize);
-		paramMap.put("_additionalImageTwo_contentType",_additionalImageTwo_contentType);
-		paramMap.put("_additionalImageEight_contentType",_additionalImageEight_contentType);
-		paramMap.put("_additionalImageFive_fileName",_additionalImageFive_fileName);
-		paramMap.put("_additionalImageTwo_fileName",_additionalImageTwo_fileName);
-		paramMap.put("additionalImageThree",additionalImageThree);
-		paramMap.put("_additionalImageFive_contentType",_additionalImageFive_contentType);
-		paramMap.put("additionalImageOne",additionalImageOne);
-		paramMap.put("_additionalImageNine_fileName",_additionalImageNine_fileName);
-		paramMap.put("_additionalImageTen_fileName",_additionalImageTen_fileName);
-		paramMap.put("_additionalImageFour_fileName",_additionalImageFour_fileName);
-		paramMap.put("_additionalImageTen_contentType",_additionalImageTen_contentType);
-		paramMap.put("_additionalImageOne_contentType",_additionalImageOne_contentType);
-		paramMap.put("_additionalImageThree_contentType",_additionalImageThree_contentType);
-		paramMap.put("additionalImageEight",additionalImageEight);
-		paramMap.put("additionalImageTen",additionalImageTen);
-		paramMap.put("additionalImageNine",additionalImageNine);
-		paramMap.put("_additionalImageFour_contentType",_additionalImageFour_contentType);
-		paramMap.put("additionalImageFive",additionalImageFive);
-		paramMap.put("additionalImageSeven",additionalImageSeven);
-		paramMap.put("additionalImageSix",additionalImageSix);
-		paramMap.put("_additionalImageNine_contentType",_additionalImageNine_contentType);
-		paramMap.put("_additionalImageEight_fileName",_additionalImageEight_fileName);
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
 
 		Map<String, Object> result = new HashMap<>();
@@ -3592,21 +3678,23 @@ public class ProductServices{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/uploadProductAdditionalViewImages")
-	public ResponseEntity<Object> uploadProductAdditionalViewImages(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="additionalImageFour", required=false) java.nio.ByteBuffer additionalImageFour, @RequestParam(value="additionalImageOne", required=false) java.nio.ByteBuffer additionalImageOne, @RequestParam(value="_additionalImageOne_fileName", required=false) String _additionalImageOne_fileName, @RequestParam(value="_additionalImageOne_contentType", required=false) String _additionalImageOne_contentType, @RequestParam(value="_additionalImageThree_contentType", required=false) String _additionalImageThree_contentType, @RequestParam(value="_additionalImageThree_fileName", required=false) String _additionalImageThree_fileName, @RequestParam(value="additionalImageTwo", required=false) java.nio.ByteBuffer additionalImageTwo, @RequestParam(value="_additionalImageFour_fileName", required=false) String _additionalImageFour_fileName, @RequestParam(value="_additionalImageFour_contentType", required=false) String _additionalImageFour_contentType, @RequestParam(value="_additionalImageTwo_fileName", required=false) String _additionalImageTwo_fileName, @RequestParam(value="additionalImageThree", required=false) java.nio.ByteBuffer additionalImageThree, @RequestParam(value="_additionalImageTwo_contentType", required=false) String _additionalImageTwo_contentType) {
-		
+	public ResponseEntity<Object> uploadProductAdditionalViewImages(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="additionalImageFour", required=false) MultipartFile additionalImageFour, @RequestParam(value="additionalImageOne", required=false) MultipartFile additionalImageOne, @RequestParam(value="_additionalImageOne_fileName", required=false) String _additionalImageOne_fileName, @RequestParam(value="_additionalImageOne_contentType", required=false) String _additionalImageOne_contentType, @RequestParam(value="_additionalImageThree_contentType", required=false) String _additionalImageThree_contentType, @RequestParam(value="_additionalImageThree_fileName", required=false) String _additionalImageThree_fileName, @RequestParam(value="additionalImageTwo", required=false) MultipartFile additionalImageTwo, @RequestParam(value="_additionalImageFour_fileName", required=false) String _additionalImageFour_fileName, @RequestParam(value="_additionalImageFour_contentType", required=false) String _additionalImageFour_contentType, @RequestParam(value="_additionalImageTwo_fileName", required=false) String _additionalImageTwo_fileName, @RequestParam(value="additionalImageThree", required=false) MultipartFile additionalImageThree, @RequestParam(value="_additionalImageTwo_contentType", required=false) String _additionalImageTwo_contentType) throws IOException {
+
+
+
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
-		paramMap.put("additionalImageFour",additionalImageFour);
-		paramMap.put("additionalImageOne",additionalImageOne);
+		paramMap.put("additionalImageFour", ByteBuffer.wrap(additionalImageFour.getBytes()));
+		paramMap.put("additionalImageOne",ByteBuffer.wrap(additionalImageOne.getBytes()));
 		paramMap.put("_additionalImageOne_fileName",_additionalImageOne_fileName);
 		paramMap.put("_additionalImageOne_contentType",_additionalImageOne_contentType);
 		paramMap.put("_additionalImageThree_contentType",_additionalImageThree_contentType);
 		paramMap.put("_additionalImageThree_fileName",_additionalImageThree_fileName);
-		paramMap.put("additionalImageTwo",additionalImageTwo);
+		paramMap.put("additionalImageTwo",ByteBuffer.wrap(additionalImageTwo.getBytes()));
 		paramMap.put("_additionalImageFour_fileName",_additionalImageFour_fileName);
 		paramMap.put("_additionalImageFour_contentType",_additionalImageFour_contentType);
 		paramMap.put("_additionalImageTwo_fileName",_additionalImageTwo_fileName);
-		paramMap.put("additionalImageThree",additionalImageThree);
+		paramMap.put("additionalImageThree",ByteBuffer.wrap(additionalImageThree.getBytes()));
 		paramMap.put("_additionalImageTwo_contentType",_additionalImageTwo_contentType);
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
 
