@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/PartyCommunicationController")
+@RequestMapping("/service/partyCommunication")
 public class PartyCommunicationController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCommunicationEventType")

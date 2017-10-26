@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/WorkeffortUpgradeController")
+@RequestMapping("/service/workeffortUpgrade")
 public class WorkeffortUpgradeController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/migrateWorkEffortContactMech")

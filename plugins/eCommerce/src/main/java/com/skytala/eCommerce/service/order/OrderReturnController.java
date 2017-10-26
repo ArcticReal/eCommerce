@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/OrderReturnController")
+@RequestMapping("/service/orderReturn")
 public class OrderReturnController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getReturnAmountByOrder")

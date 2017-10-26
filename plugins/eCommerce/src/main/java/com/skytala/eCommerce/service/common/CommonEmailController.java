@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/CommonEmailController")
+@RequestMapping("/service/commonEmail")
 public class CommonEmailController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteEmailTemplateSetting")

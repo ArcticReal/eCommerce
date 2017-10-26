@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/AccountingAgreementController")
+@RequestMapping("/service/accountingAgreement")
 public class AccountingAgreementController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateAgreementItemAttribute")

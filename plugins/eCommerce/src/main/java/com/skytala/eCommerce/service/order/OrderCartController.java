@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/OrderCartController")
+@RequestMapping("/service/orderCart")
 public class OrderCartController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/setCartOtherOptions")

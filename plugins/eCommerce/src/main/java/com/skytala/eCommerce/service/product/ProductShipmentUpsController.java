@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/ProductShipmentUpsController")
+@RequestMapping("/service/productShipmentUps")
 public class ProductShipmentUpsController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/upsShipmentAccept")

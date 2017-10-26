@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/ProductUpgradeController")
+@RequestMapping("/service/productUpgrade")
 public class ProductUpgradeController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/migrateFacilityRole")

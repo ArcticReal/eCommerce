@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/WorkeffortTimesheetController")
+@RequestMapping("/service/workeffortTimesheet")
 public class WorkeffortTimesheetController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createTimeEntry")

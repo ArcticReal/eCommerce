@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/CommonQrcodeController")
+@RequestMapping("/service/commonQrcode")
 public class CommonQrcodeController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/generateQRCodeImage")

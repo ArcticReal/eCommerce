@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/CommonMethodController")
+@RequestMapping("/service/commonMethod")
 public class CommonMethodController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCustomMethodType")

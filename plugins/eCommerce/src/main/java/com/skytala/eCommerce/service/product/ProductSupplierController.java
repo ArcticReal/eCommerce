@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/ProductSupplierController")
+@RequestMapping("/service/productSupplier")
 public class ProductSupplierController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteSupplierRatingType")

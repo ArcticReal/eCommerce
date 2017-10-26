@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/OrderCheckoutController")
+@RequestMapping("/service/orderCheckout")
 public class OrderCheckoutController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createUpdateBillingAddressAndPaymentMethod")

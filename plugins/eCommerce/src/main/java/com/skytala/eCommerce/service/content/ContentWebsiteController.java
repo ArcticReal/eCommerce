@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/ContentWebsiteController")
+@RequestMapping("/service/contentWebsite")
 public class ContentWebsiteController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeWebSitePathAlias")

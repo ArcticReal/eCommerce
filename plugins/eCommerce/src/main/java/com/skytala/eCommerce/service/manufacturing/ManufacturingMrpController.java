@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/ManufacturingMrpController")
+@RequestMapping("/service/manufacturingMrp")
 public class ManufacturingMrpController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/executeMrp")

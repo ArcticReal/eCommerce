@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/ContentOutputController")
+@RequestMapping("/service/contentOutput")
 public class ContentOutputController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/sendPrintFromScreen")

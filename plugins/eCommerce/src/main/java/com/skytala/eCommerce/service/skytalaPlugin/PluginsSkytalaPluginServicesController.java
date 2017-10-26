@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/PluginsSkytalaPluginsController")
+@RequestMapping("/service/pluginsSkytalaPlugins")
 public class PluginsSkytalaPluginServicesController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/simplesoap")

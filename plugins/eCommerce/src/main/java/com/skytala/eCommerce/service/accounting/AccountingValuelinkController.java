@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/AccountingValuelinkController")
+@RequestMapping("/service/accountingValuelink")
 public class AccountingValuelinkController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/disableGiftCardPin")

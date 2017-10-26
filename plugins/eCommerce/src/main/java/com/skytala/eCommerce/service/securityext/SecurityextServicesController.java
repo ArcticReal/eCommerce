@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/SecurityextsController")
+@RequestMapping("/service/securityexts")
 public class SecurityextServicesController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/importIssuerProvision")

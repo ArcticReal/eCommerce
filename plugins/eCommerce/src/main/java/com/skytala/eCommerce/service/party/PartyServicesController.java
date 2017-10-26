@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/PartysController")
+@RequestMapping("/service/partys")
 public class PartyServicesController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/sendContactUsEmailToCompany")

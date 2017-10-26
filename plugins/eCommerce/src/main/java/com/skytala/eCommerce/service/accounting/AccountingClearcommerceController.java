@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/AccountingClearcommerceController")
+@RequestMapping("/service/accountingClearcommerce")
 public class AccountingClearcommerceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/clearCommerceCCCredit")

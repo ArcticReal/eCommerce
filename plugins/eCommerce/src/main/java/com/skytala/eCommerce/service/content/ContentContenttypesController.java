@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/ContentContenttypesController")
+@RequestMapping("/service/contentContenttypes")
 public class ContentContenttypesController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeContentPurposeType")

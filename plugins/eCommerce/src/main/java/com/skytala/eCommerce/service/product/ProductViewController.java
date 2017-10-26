@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/ProductViewController")
+@RequestMapping("/service/productView")
 public class ProductViewController{
 
 	private FindProductCategorysBy getFindProductCategorysQuery(String categoryId){

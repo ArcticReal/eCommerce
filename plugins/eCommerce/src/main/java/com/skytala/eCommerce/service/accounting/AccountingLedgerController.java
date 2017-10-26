@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/AccountingLedgerController")
+@RequestMapping("/service/accountingLedger")
 public class AccountingLedgerController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteAcctgTransAttribute")

@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/AccountingFixedassetController")
+@RequestMapping("/service/accountingFixedasset")
 public class AccountingFixedassetController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateFixedAssetGeoPoint")

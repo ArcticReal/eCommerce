@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/WebtoolssController")
+@RequestMapping("/service/webtoolss")
 public class WebtoolsServicesController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/entityImportDir")

@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/AccountingSecurepayController")
+@RequestMapping("/service/accountingSecurepay")
 public class AccountingSecurepayController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/ofbScCCCredit")

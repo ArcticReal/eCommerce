@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/HumanresUpgradeController")
+@RequestMapping("/service/humanresUpgrade")
 public class HumanresUpgradeController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/migrateSalaryStep")

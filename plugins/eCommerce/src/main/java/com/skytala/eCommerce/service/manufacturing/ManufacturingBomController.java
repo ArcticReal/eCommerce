@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/ManufacturingBomController")
+@RequestMapping("/service/manufacturingBom")
 public class ManufacturingBomController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/initLowLevelCode")

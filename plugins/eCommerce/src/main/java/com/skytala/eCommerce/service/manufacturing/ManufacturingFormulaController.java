@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/ManufacturingFormulaController")
+@RequestMapping("/service/manufacturingFormula")
 public class ManufacturingFormulaController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/exampleTaskFormula")

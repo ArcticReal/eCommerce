@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/ProductInventoryController")
+@RequestMapping("/service/productInventory")
 public class ProductInventoryController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteInventoryItemTempRes")

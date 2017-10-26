@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/ProductSubscriptionController")
+@RequestMapping("/service/productSubscription")
 public class ProductSubscriptionController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteSubscriptionTypeAttr")

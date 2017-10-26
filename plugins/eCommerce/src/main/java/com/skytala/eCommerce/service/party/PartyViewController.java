@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/PartyViewController")
+@RequestMapping("/service/partyView")
 public class PartyViewController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getPartyFromUserLogin")

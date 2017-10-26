@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/ProductFeatureController")
+@RequestMapping("/service/productFeature")
 public class ProductFeatureController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeProductFeatureCatGrpAppl")

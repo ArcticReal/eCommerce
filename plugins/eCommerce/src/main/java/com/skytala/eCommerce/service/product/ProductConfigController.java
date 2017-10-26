@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/ProductConfigController")
+@RequestMapping("/service/productConfig")
 public class ProductConfigController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProdConfItemContentType")

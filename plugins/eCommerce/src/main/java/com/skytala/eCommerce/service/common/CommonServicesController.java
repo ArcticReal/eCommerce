@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/CommonsController")
+@RequestMapping("/service/commons")
 public class CommonServicesController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateNote")

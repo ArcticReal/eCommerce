@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/ContentContentController")
+@RequestMapping("/service/contentContent")
 public class ContentContentController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateContentAssoc")

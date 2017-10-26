@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/sController")
+@RequestMapping("/service/s")
 public class ServiceServicesController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCatalinaSession")

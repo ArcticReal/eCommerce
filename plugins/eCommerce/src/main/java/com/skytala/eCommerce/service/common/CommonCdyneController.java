@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/CommonCdyneController")
+@RequestMapping("/service/commonCdyne")
 public class CommonCdyneController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/cdynePostalAddressFillInCounty")

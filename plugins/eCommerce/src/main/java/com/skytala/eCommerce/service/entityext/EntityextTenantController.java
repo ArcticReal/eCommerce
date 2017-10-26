@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/EntityextTenantController")
+@RequestMapping("/service/entityextTenant")
 public class EntityextTenantController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createComponent")

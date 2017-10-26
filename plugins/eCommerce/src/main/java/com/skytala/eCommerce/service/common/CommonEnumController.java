@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/CommonEnumController")
+@RequestMapping("/service/commonEnum")
 public class CommonEnumController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateEnumerationType")

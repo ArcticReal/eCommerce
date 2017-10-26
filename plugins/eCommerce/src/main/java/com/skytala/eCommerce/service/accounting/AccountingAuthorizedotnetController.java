@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/AccountingAuthorizedotnetController")
+@RequestMapping("/service/accountingAuthorizedotnet")
 public class AccountingAuthorizedotnetController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/aimCCRelease")

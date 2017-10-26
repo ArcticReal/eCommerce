@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/HumanresPositionController")
+@RequestMapping("/service/humanresPosition")
 public class HumanresPositionController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createEmplPositionClassType")

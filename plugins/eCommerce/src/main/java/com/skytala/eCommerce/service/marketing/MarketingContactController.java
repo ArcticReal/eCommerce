@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/MarketingContactController")
+@RequestMapping("/service/marketingContact")
 public class MarketingContactController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createContactListType")

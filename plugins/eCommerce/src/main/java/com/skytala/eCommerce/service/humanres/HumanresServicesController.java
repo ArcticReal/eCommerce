@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/HumanressController")
+@RequestMapping("/service/humanress")
 public class HumanresServicesController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createAgreementEmploymentAppl")

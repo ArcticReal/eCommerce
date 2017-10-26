@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/CommonSecurityController")
+@RequestMapping("/service/commonSecurity")
 public class CommonSecurityController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeUserLoginToSecurityGroup")

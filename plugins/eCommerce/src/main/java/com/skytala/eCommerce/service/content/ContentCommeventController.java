@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/ContentCommeventController")
+@RequestMapping("/service/contentCommevent")
 public class ContentCommeventController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCommContentDataResource")

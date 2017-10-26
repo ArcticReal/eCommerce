@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/ProductShipmentFedexController")
+@RequestMapping("/service/productShipmentFedex")
 public class ProductShipmentFedexController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/fedexSubscriptionRequest")

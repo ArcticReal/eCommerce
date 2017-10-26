@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/EntityextGroupController")
+@RequestMapping("/service/entityextGroup")
 public class EntityextGroupController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createEntityGroup")

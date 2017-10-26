@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/PartyAgreementController")
+@RequestMapping("/service/partyAgreement")
 public class PartyAgreementController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createAgreementItemType")

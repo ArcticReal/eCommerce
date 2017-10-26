@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/CommonextsController")
+@RequestMapping("/service/commonexts")
 public class CommonextServicesController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteSystemInfoNote")

@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/ManufacturingRoutingController")
+@RequestMapping("/service/manufacturingRouting")
 public class ManufacturingRoutingController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/checkRoutingTaskAssoc")

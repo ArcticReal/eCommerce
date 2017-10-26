@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/ProductPricepromoController")
+@RequestMapping("/service/productPricepromo")
 public class ProductPricepromoController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductPromoCode")

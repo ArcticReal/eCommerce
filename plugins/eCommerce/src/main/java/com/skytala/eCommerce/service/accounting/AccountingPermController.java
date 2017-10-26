@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/AccountingPermController")
+@RequestMapping("/service/accountingPerm")
 public class AccountingPermController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/acctgBasePermissionCheck")

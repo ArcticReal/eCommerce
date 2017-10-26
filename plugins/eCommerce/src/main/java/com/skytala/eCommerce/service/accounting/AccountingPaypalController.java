@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/AccountingPaypalController")
+@RequestMapping("/service/accountingPaypal")
 public class AccountingPaypalController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/payPalCapture")

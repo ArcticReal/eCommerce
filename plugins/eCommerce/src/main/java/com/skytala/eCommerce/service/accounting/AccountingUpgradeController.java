@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/AccountingUpgradeController")
+@RequestMapping("/service/accountingUpgrade")
 public class AccountingUpgradeController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/migrateAgreementWorkEffortAppl")

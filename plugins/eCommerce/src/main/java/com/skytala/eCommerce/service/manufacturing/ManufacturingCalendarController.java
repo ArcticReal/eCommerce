@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/ManufacturingCalendarController")
+@RequestMapping("/service/manufacturingCalendar")
 public class ManufacturingCalendarController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCalendarExceptionDay")

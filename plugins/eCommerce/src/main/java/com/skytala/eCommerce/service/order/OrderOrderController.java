@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/OrderOrderController")
+@RequestMapping("/service/orderOrder")
 public class OrderOrderController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createOrderBlacklist")

@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/AccountingSagepayController")
+@RequestMapping("/service/accountingSagepay")
 public class AccountingSagepayController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/sagepayCCCapture")

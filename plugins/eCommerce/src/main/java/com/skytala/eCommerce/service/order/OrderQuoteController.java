@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/OrderQuoteController")
+@RequestMapping("/service/orderQuote")
 public class OrderQuoteController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteQuoteWorkEffort")

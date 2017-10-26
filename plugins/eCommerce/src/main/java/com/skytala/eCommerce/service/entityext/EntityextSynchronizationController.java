@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/EntityextSynchronizationController")
+@RequestMapping("/service/entityextSynchronization")
 public class EntityextSynchronizationController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteEntitySyncIncludeGroup")

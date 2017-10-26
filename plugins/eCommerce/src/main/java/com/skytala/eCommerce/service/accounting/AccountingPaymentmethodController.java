@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/AccountingPaymentmethodController")
+@RequestMapping("/service/accountingPaymentmethod")
 public class AccountingPaymentmethodController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deletePaymentMethod")

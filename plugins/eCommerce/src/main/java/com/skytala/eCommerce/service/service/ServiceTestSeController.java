@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/TestSeController")
+@RequestMapping("/service/testSe")
 public class ServiceTestSeController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testEntityAutoUpdateTestingStatus")

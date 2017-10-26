@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/service/AccountingFinaccountController")
+@RequestMapping("/service/accountingFinaccount")
 public class AccountingFinaccountController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getFinAccountTransRunningTotalAndBalances")
