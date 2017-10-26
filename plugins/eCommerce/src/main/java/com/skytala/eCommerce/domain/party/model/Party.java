@@ -77,18 +77,18 @@ public class Party implements Serializable {
     }
 
     public String getPartyTypeId() {
-        lazyLoad();
+        reload();
         return partyTypeId;
     }
 
 
     public void setPartyTypeId(String  partyTypeId) {
-        lazyLoad();
+        reload();
     this.partyTypeId = partyTypeId;
     }
 
     public String getExternalId() {
-        lazyLoad();
+        reload();
         return externalId;
     }
 
@@ -97,7 +97,7 @@ public class Party implements Serializable {
     }
 
     public String getPreferredCurrencyUomId() {
-        lazyLoad();
+        reload();
         return preferredCurrencyUomId;
     }
 
@@ -106,7 +106,7 @@ public class Party implements Serializable {
     }
 
     public String getDescription() {
-        lazyLoad();
+        reload();
         return description;
     }
 
@@ -115,7 +115,7 @@ public class Party implements Serializable {
     }
 
     public String getStatusId() {
-        lazyLoad();
+        reload();
         return statusId;
     }
 
@@ -124,7 +124,7 @@ public class Party implements Serializable {
     }
 
     public Timestamp getCreatedDate() {
-        lazyLoad();
+        reload();
         return createdDate;
     }
 
@@ -133,7 +133,7 @@ public class Party implements Serializable {
     }
 
     public String getCreatedByUserLogin() {
-        lazyLoad();
+        reload();
         return createdByUserLogin;
     }
 
@@ -142,7 +142,7 @@ public class Party implements Serializable {
     }
 
     public Timestamp getLastModifiedDate() {
-        lazyLoad();
+        reload();
         return lastModifiedDate;
     }
 
@@ -151,7 +151,7 @@ public class Party implements Serializable {
     }
 
     public String getLastModifiedByUserLogin() {
-        lazyLoad();
+        reload();
         return lastModifiedByUserLogin;
     }
 
@@ -160,7 +160,7 @@ public class Party implements Serializable {
     }
 
     public String getDataSourceId() {
-        lazyLoad();
+        reload();
         return dataSourceId;
     }
 
@@ -169,7 +169,7 @@ public class Party implements Serializable {
     }
 
     public Boolean getIsUnread() {
-        lazyLoad();
+        reload();
         return isUnread;
     }
 
@@ -183,7 +183,7 @@ public class Party implements Serializable {
 
      */
 
-    private void lazyLoad() {
+    private void reload() {
         if(!equalsDatabaseRecord) {
             try {
                 this.fill(queryToGetData);

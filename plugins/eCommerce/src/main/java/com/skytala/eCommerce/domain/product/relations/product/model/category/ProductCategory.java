@@ -6,9 +6,14 @@ import java.sql.Timestamp;
 import java.util.Map;
 import java.io.Serializable;
 
+import com.skytala.eCommerce.domain.product.mapper.ProductMapper;
 import com.skytala.eCommerce.domain.product.model.Product;
+import com.skytala.eCommerce.domain.product.relations.product.event.category.ProductCategoryFound;
 import com.skytala.eCommerce.domain.product.relations.product.mapper.category.ProductCategoryMapper;
 import com.skytala.eCommerce.framework.pubsub.Query;
+import com.skytala.eCommerce.framework.pubsub.Scheduler;
+import org.apache.ofbiz.entity.GenericEntity;
+import org.apache.ofbiz.service.GenericServiceException;
 import org.apache.ofbiz.service.LocalDispatcher;
 
 import javax.servlet.http.HttpSession;
@@ -42,8 +47,8 @@ public class ProductCategory implements Serializable{
 
      */
     public ProductCategory(){
-        equalsDatabaseRecord = true;
         queryToGetData = null;
+        equalsDatabaseRecord = true;
     }
 
     /*
@@ -147,13 +152,34 @@ public class ProductCategory implements Serializable{
     }
 
 
+    private void fill(Query queryToGetData) throws Exception {
+        List<ProductCategory> categorys = ((ProductCategoryFound) Scheduler.execute(queryToGetData).data()).getProductCategorys();
+        ProductCategory category = new ProductCategory();
+
+        if(categorys != null && categorys.size()==1){
+            category = categorys.get(0);
+        }else{
+            throw new Exception("No specific party found");
+        }
+
+        this.setProductCategoryId(category.getProductCategoryId());
+        this.setProductCategoryTypeId(category.getProductCategoryTypeId());
+        this.setPrimaryParentCategoryId(category.getPrimaryParentCategoryId());
+        this.setCategoryName(category.getCategoryName());
+        this.setDescription(category.getDescription());
+        this.setLongDescription(category.getLongDescription());
+        this.setCategoryImageUrl(category.getCategoryImageUrl());
+        this.setLinkOneImageUrl(category.getLinkOneImageUrl());
+
+    }
+
     public Map<String, Object> mapAttributeField() {
     return ProductCategoryMapper.map(this);
     }
 
 
 
-    public List<Product> getProductCategoryMembers(HttpSession session) {
+    public List<Product> getProductCategoryMembers(HttpSession session) throws GenericServiceException {
 
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("categoryId", this.getProductCategoryId());
@@ -162,11 +188,21 @@ public class ProductCategory implements Serializable{
 		Map<String, Object> result = new HashMap<>();
 		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
 
+        result = dispatcher.runSync("getProductCategoryMembers", paramMap);
+
 		if(result.get("responseMessage").equals("error"))
 			throw new IllegalArgumentException("Ofbiz was not able to process the data");
 
+        Collection<GenericEntity> genericEntities = (Collection<GenericEntity>) result.get("categoryMembers");
         List<Product> productCategoryMembers = new LinkedList<>();
 
-        return null;
+        for (GenericEntity e : genericEntities){
+            productCategoryMembers.add(ProductMapper.map(e));
+        }
+
+
+
+
+        return productCategoryMembers;
     }
 }
