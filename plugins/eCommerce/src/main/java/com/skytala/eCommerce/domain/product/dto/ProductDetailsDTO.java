@@ -3,6 +3,7 @@ package com.skytala.eCommerce.domain.product.dto;
 import com.skytala.eCommerce.domain.product.model.Product;
 import com.skytala.eCommerce.domain.product.relations.product.model.attribute.ProductAttribute;
 import com.skytala.eCommerce.domain.product.relations.product.model.price.ProductPrice;
+import com.skytala.eCommerce.domain.product.util.ProductAttributes;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,10 +29,30 @@ public class ProductDetailsDTO {
                                            List<ProductPrice> prices,
                                            List<ProductAttribute> attributes){
 
-        
+        ProductDetailsDTO dto = new ProductDetailsDTO(product);
 
+        for(ProductPrice productPrice : prices)
+            if(productPrice.getProductId().equals(product.getProductId()))
+                dto.setPrice(productPrice.getPrice());
 
-        return null;//TODO
+        for(ProductAttribute attribute : attributes)
+            if(attribute.getProductId().equals(product.getProductId())){
+                switch (attribute.getAttrName()){
+                    case ProductAttributes.AUTHOR:
+                        dto.setAuthor(attribute.getAttrValue());
+                        break;
+                    case ProductAttributes.ISBN:
+                        dto.setISBN(attribute.getAttrValue());
+                        break;
+                    case ProductAttributes.PUBLISHER:
+                        dto.setPublisher(attribute.getAttrValue());
+
+                }
+
+            }
+
+        return dto;
+
 
     }
 

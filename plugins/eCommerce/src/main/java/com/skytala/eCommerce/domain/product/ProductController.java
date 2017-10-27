@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.common.base.Function;
+import com.skytala.eCommerce.domain.product.dto.ProductDetailsDTO;
 import com.skytala.eCommerce.domain.product.dto.ProductListItemDTO;
 import com.skytala.eCommerce.domain.product.relations.product.control.attribute.ProductAttributeController;
 import com.skytala.eCommerce.domain.product.relations.product.control.price.ProductPriceController;
@@ -205,13 +206,13 @@ public class ProductController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{productId}")
-	public ResponseEntity<Object> findById(@PathVariable String productId) throws Exception {
+	public ResponseEntity<List<Product>> findById(@PathVariable String productId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productId", productId);
 		try {
 
-			Object foundProduct = findProductsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProduct);
+			List<Product> foundProducts = findProductsBy(requestParams).getBody();
+			return ResponseEntity.status(HttpStatus.OK).body(foundProducts);
 		} catch (RecordNotFoundException e) {
 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -235,18 +236,34 @@ public class ProductController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{productId}/details")
-	public ResponseEntity<Object> findByIdWithDetails(@PathVariable String productId) throws Exception {
-		HashMap<String, String> requestParams = new HashMap<String, String>();
-		requestParams.put("productId", productId);
-		try {
+	public ResponseEntity<List<ProductDetailsDTO>> findByIdWithDetails(@PathVariable String productId) throws Exception {
 
-			Object foundProduct = findProductsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProduct);
-		} catch (RecordNotFoundException e) {
-
+		ResponseEntity<List<Product>> response = findById(productId);
+		if(response.getStatusCode().equals(HttpStatus.NOT_FOUND))
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-		}
 
+		List<Product> products = response.getBody();
+
+		Map<String, String> filter = UtilMisc.toMap("productPricePurposeId", "PURCHASE",
+													"productPriceTypeId", "DEFAULT_PRICE");
+
+		final List<ProductPrice> productPrices = priceController.findProductPricesBy(filter)
+															    .getBody();
+
+		filter.clear();
+
+
+		final List<ProductAttribute> attributes = attributeController.findProductAttributesBy(filter)
+																  .getBody();
+
+		List<ProductDetailsDTO> results = new LinkedList<>();
+
+
+		results = products.stream()
+						  .map((Product prod) -> ProductDetailsDTO.create(prod, productPrices, attributes))
+						  .collect(Collectors.toList());
+
+		return successful(results);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/productList")
@@ -270,7 +287,6 @@ public class ProductController {
 
 		results = products.stream()
 						  .map((Product prod) -> ProductListItemDTO.create(prod, productPrices, authors))
-						  .limit(10)
 						  .collect(Collectors.toList());
 
 		return successful(results);
