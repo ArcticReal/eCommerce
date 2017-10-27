@@ -23,7 +23,9 @@ public class ProductListItemDTO {
 
         for(ProductPrice productPrice : prices)
             if(productPrice.getProductId().equals(product.getProductId()))
-                dto.setPrice(productPrice.getPrice());
+                if(productPrice.getCurrencyUomId().equals("EUR"))
+                    dto.setPrice(productPrice.getPrice());
+
 
         for(ProductAttribute author : authors)
             if(author.getProductId().equals(product.getProductId()))

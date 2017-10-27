@@ -21,4 +21,5 @@ public class ResponseUtil {
 
     public static ResponseEntity unauthorized(){return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);}
 
+    public static ResponseEntity notFound(){return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);}
 }

@@ -206,13 +206,15 @@ public class ProductController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{productId}")
-	public ResponseEntity<List<Product>> findById(@PathVariable String productId) throws Exception {
+	public ResponseEntity<Product> findById(@PathVariable String productId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productId", productId);
 		try {
 
 			List<Product> foundProducts = findProductsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProducts);
+			if(foundProducts.size()!=1)
+				return notFound();
+			return ResponseEntity.status(HttpStatus.OK).body(foundProducts.get(0));
 		} catch (RecordNotFoundException e) {
 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -236,13 +238,13 @@ public class ProductController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{productId}/details")
-	public ResponseEntity<List<ProductDetailsDTO>> findByIdWithDetails(@PathVariable String productId) throws Exception {
+	public ResponseEntity<ProductDetailsDTO> findByIdWithDetails(@PathVariable String productId) throws Exception {
 
-		ResponseEntity<List<Product>> response = findById(productId);
+		ResponseEntity<Product> response = findById(productId);
 		if(response.getStatusCode().equals(HttpStatus.NOT_FOUND))
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 
-		List<Product> products = response.getBody();
+		Product product = response.getBody();
 
 		Map<String, String> filter = UtilMisc.toMap("productPricePurposeId", "PURCHASE",
 													"productPriceTypeId", "DEFAULT_PRICE");
@@ -254,16 +256,9 @@ public class ProductController {
 
 
 		final List<ProductAttribute> attributes = attributeController.findProductAttributesBy(filter)
-																  .getBody();
+																     .getBody();
 
-		List<ProductDetailsDTO> results = new LinkedList<>();
-
-
-		results = products.stream()
-						  .map((Product prod) -> ProductDetailsDTO.create(prod, productPrices, attributes))
-						  .collect(Collectors.toList());
-
-		return successful(results);
+		return successful(ProductDetailsDTO.create(product, productPrices, attributes));
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/productList")
