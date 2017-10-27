@@ -58,7 +58,7 @@ public class ProductPriceController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findProductPricesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductPrice>> findProductPricesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductPricesBy query = new FindProductPricesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -67,9 +67,6 @@ public class ProductPriceController {
 
 		List<ProductPrice> productPrices =((ProductPriceFound) Scheduler.execute(query).data()).getProductPrices();
 
-		if (productPrices.size() == 1) {
-			return ResponseEntity.ok().body(productPrices.get(0));
-		}
 
 		return ResponseEntity.ok().body(productPrices);
 
@@ -193,13 +190,16 @@ public class ProductPriceController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{productPriceId}")
-	public ResponseEntity<Object> findById(@PathVariable String productPriceId) throws Exception {
+	public ResponseEntity<ProductPrice> findById(@PathVariable String productPriceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productPriceId", productPriceId);
 		try {
 
-			Object foundProductPrice = findProductPricesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductPrice);
+			List<ProductPrice> foundProductPrices = findProductPricesBy(requestParams).getBody();
+			if(foundProductPrices.size()!=1)
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+			return ResponseEntity.status(HttpStatus.OK).body(foundProductPrices.get(0));
 		} catch (RecordNotFoundException e) {
 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

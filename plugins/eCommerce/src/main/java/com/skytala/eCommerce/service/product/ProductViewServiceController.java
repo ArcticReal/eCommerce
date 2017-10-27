@@ -472,7 +472,10 @@ public class ProductViewServiceController{
 
 	@RequestMapping(value="/createProductTomsTestThingy")
 	public List<ProductListItemDTO> getAll() {
-		return new LinkedList<Product>().stream().map(ProductListItemDTO::new).collect(Collectors.toList());
+		return new LinkedList<Product>()
+				.stream()
+				.map(ProductListItemDTO::new)
+				.collect(Collectors.toList());
 	}
 
 }

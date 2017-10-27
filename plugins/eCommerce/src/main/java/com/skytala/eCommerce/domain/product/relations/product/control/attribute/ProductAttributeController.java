@@ -58,7 +58,7 @@ public class ProductAttributeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findProductAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductAttribute>> findProductAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductAttributesBy query = new FindProductAttributesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -66,10 +66,6 @@ public class ProductAttributeController {
 		}
 
 		List<ProductAttribute> productAttributes =((ProductAttributeFound) Scheduler.execute(query).data()).getProductAttributes();
-
-		if (productAttributes.size() == 1) {
-			return ResponseEntity.ok().body(productAttributes.get(0));
-		}
 
 		return ResponseEntity.ok().body(productAttributes);
 
@@ -193,13 +189,15 @@ public class ProductAttributeController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{productAttributeId}")
-	public ResponseEntity<Object> findById(@PathVariable String productAttributeId) throws Exception {
+	public ResponseEntity<List<ProductAttribute>> findById(@PathVariable String productAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productAttributeId", productAttributeId);
 		try {
 
-			Object foundProductAttribute = findProductAttributesBy(requestParams).getBody();
+			List<ProductAttribute> foundProductAttribute = findProductAttributesBy(requestParams).getBody();
+
 			return ResponseEntity.status(HttpStatus.OK).body(foundProductAttribute);
+
 		} catch (RecordNotFoundException e) {
 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

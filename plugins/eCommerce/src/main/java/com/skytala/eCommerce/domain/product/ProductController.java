@@ -3,14 +3,21 @@ package com.skytala.eCommerce.domain.product;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import javax.annotation.Nullable;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import com.google.common.base.Function;
+import com.skytala.eCommerce.domain.product.dto.ProductListItemDTO;
+import com.skytala.eCommerce.domain.product.relations.product.control.attribute.ProductAttributeController;
+import com.skytala.eCommerce.domain.product.relations.product.control.price.ProductPriceController;
+import com.skytala.eCommerce.domain.product.relations.product.model.attribute.ProductAttribute;
+import com.skytala.eCommerce.domain.product.relations.product.model.price.ProductPrice;
+import com.skytala.eCommerce.domain.product.util.ProductAttributes;
+import org.apache.ofbiz.base.util.UtilMisc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,11 +43,19 @@ import com.skytala.eCommerce.domain.product.query.FindProductsBy;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/products")
 public class ProductController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();
+
+	@Resource
+	ProductPriceController priceController;
+
+	@Resource
+	ProductAttributeController attributeController;
 
 	public ProductController() {
 
@@ -58,7 +73,7 @@ public class ProductController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findProductsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<Product>> findProductsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductsBy query = new FindProductsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -67,9 +82,6 @@ public class ProductController {
 
 		List<Product> products =((ProductFound) Scheduler.execute(query).data()).getProducts();
 
-		if (products.size() == 1) {
-			return ResponseEntity.ok().body(products.get(0));
-		}
 
 		return ResponseEntity.ok().body(products);
 
@@ -219,6 +231,49 @@ public class ProductController {
 		}
 
 		return ResponseEntity.status(HttpStatus.CONFLICT).body("Product could not be deleted");
+
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/{productId}/details")
+	public ResponseEntity<Object> findByIdWithDetails(@PathVariable String productId) throws Exception {
+		HashMap<String, String> requestParams = new HashMap<String, String>();
+		requestParams.put("productId", productId);
+		try {
+
+			Object foundProduct = findProductsBy(requestParams).getBody();
+			return ResponseEntity.status(HttpStatus.OK).body(foundProduct);
+		} catch (RecordNotFoundException e) {
+
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/productList")
+	public ResponseEntity getAllProductListItems() throws Exception {
+
+		List<Product> products = findProductsBy(new HashMap<>()).getBody();
+
+		Map<String, String> filter = UtilMisc.toMap("productPricePurposeId", "PURCHASE",
+													"productPriceTypeId", "DEFAULT_PRICE");
+
+		final List<ProductPrice> productPrices = priceController.findProductPricesBy(filter)
+				                                                .getBody();
+
+		filter.clear();
+		filter.put("attrName", ProductAttributes.AUTHOR);
+
+		final List<ProductAttribute> authors = attributeController.findProductAttributesBy(filter)
+																			.getBody();
+
+		List<ProductListItemDTO> results = new LinkedList<>();
+
+		results = products.stream()
+						  .map((Product prod) -> ProductListItemDTO.create(prod, productPrices, authors))
+						  .limit(10)
+						  .collect(Collectors.toList());
+
+		return successful(results);
 
 	}
 
