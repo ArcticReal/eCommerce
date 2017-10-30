@@ -75,7 +75,6 @@ public class ShoppingCartController {
 	@RequestMapping(method = RequestMethod.POST, value = "/add")
 	public ResponseEntity addToCart(HttpSession session, @RequestParam Map<String, String> allRequestParams) {
 
-		Map<String, String> find = new HashMap<String, String>();
 		ProductController pc = new ProductController();
 
 		// Debug Message for Windows Forms should be removed later
@@ -89,15 +88,14 @@ public class ShoppingCartController {
 		ShoppingCart sc = (ShoppingCart) session.getAttribute("cart");
 		Product pro = new Product();
 
-		if (allRequestParams.get("productId") != null) {
-			find.put("productId", allRequestParams.get("productId"));
-			System.out.println(allRequestParams.get("productId"));
-		} else {
-			return ResponseEntity.badRequest().body(null);
-		}
+		
 		try{
-			pro = (Product)pc.findProductsBy(find).getBody();
-
+			if(allRequestParams.get("productId") != null){				
+			pro = (Product)pc.findById(allRequestParams.get("productId")).getBody();
+			}
+			else{
+				return ResponseEntity.badRequest().body(null);
+			}
 		}catch (Exception e){
 			// do smthg
 		}
