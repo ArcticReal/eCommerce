@@ -20,7 +20,7 @@ public class HeaderModifier implements ResponseBodyAdvice{
                                   Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
 
         // allow content loading by cross origin javascript calls
-        response.getHeaders().add("Access-Control-Allow-Origin","http://192.168.49.60:3000"); //TODO allow only specific pages to load contents cross origin
+        response.getHeaders().add("Access-Control-Allow-Origin","http://localhost:3000"); //TODO allow only specific pages to load contents cross origin
         response.getHeaders().add("Access-Control-Allow-Credentials", "true");
         response.getHeaders().add("fuu?", "fuu!");//TODO: definitely needs to be removed later
         return body;

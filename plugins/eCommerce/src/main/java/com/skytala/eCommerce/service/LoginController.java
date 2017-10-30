@@ -23,7 +23,7 @@ public class LoginController {
     @RequestMapping("/login")
     public void doLoginForwarded(HttpServletRequest request, HttpServletResponse response) throws Exception{
 
-        response.setHeader("Access-Control-Allow-Origin", "http://192.168.49.60:3000");//TODO look for origins to allow access from
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");//TODO look for origins to allow access from
         response.setHeader("Access-Control-Allow-Credentials", "true");
         RequestDispatcher rd = request.getRequestDispatcher("/control/login");
         rd.forward(request, response);
@@ -32,7 +32,7 @@ public class LoginController {
     @RequestMapping("/logout")
     public void doLogoutForwarded(HttpServletRequest request, HttpServletResponse response) throws Exception{
 
-        response.setHeader("Access-Control-Allow-Origin", "http://192.168.49.60:3000");//TODO look for origins to allow access from
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");//TODO look for origins to allow access from
         response.setHeader("Access-Control-Allow-Credentials", "true");
         RequestDispatcher rd = request.getRequestDispatcher("/control/logout");
         rd.forward(request, response);

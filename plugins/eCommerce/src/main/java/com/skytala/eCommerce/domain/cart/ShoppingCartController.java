@@ -6,8 +6,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
+import com.skytala.eCommerce.domain.product.relations.product.model.content.ProductContent;
 import org.apache.ofbiz.base.util.UtilMisc;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,9 +24,15 @@ import com.skytala.eCommerce.domain.product.relations.product.model.price.Produc
 import com.skytala.eCommerce.domain.product.relations.product.control.price.ProductPriceController;
 import com.skytala.eCommerce.domain.cart.ShoppingCart;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.badRequest;
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.successful;
+
 @RestController
 @RequestMapping("/cart")
 public class ShoppingCartController {
+
+	@Resource
+	ProductController pc;
 
 	@RequestMapping(method = RequestMethod.GET, value = "/show")
 	public ResponseEntity show(HttpSession session) {
@@ -36,7 +44,7 @@ public class ShoppingCartController {
 		if (session.getAttribute("cart") != null) {
 			ShoppingCart sc = new ShoppingCart();
 			sc = (ShoppingCart) session.getAttribute("cart");
-			return ResponseEntity.ok(sc.getPositions());
+			return successful(sc.getPositions());
 		}
 		return null;
 	}
@@ -55,7 +63,7 @@ public class ShoppingCartController {
 				mylist.add(sc.getPositions().get(i).getProduct().getProductId());
 			}
 		}
-		return ResponseEntity.ok(mylist);
+		return successful(mylist);
 
 	}
 
@@ -69,13 +77,12 @@ public class ShoppingCartController {
 			grandTotal = sc.getGrandTotal();
 		}
 
-		return ResponseEntity.ok().body(grandTotal);
+		return successful(grandTotal);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/add")
 	public ResponseEntity addToCart(HttpSession session, @RequestParam Map<String, String> allRequestParams) {
 
-		ProductController pc = new ProductController();
 
 		// Debug Message for Windows Forms should be removed later
 		System.out.println(session.getCreationTime());
@@ -91,10 +98,10 @@ public class ShoppingCartController {
 		
 		try{
 			if(allRequestParams.get("productId") != null){				
-			pro = (Product)pc.findById(allRequestParams.get("productId")).getBody();
+			pro = pc.findById(allRequestParams.get("productId")).getBody();
 			}
 			else{
-				return ResponseEntity.badRequest().body(null);
+				return badRequest();
 			}
 		}catch (Exception e){
 			// do smthg
@@ -103,7 +110,7 @@ public class ShoppingCartController {
 		BigDecimal anz = new BigDecimal(1);
 
 		if (!pro.getProductId().equals(allRequestParams.get("productId"))) {
-			return ResponseEntity.badRequest().body(null);
+			return badRequest();
 		}
 
 		if (allRequestParams.get("count") != null) {
@@ -116,7 +123,7 @@ public class ShoppingCartController {
 				BigDecimal ibuf = sc.getPositions().get(i).getNumberProducts();
 				sc.getPositions().get(i).setNumberProducts(ibuf.add(anz));
 				session.setAttribute("cart", sc);
-				return ResponseEntity.ok(null);
+				return successful();
 
 			}
 
@@ -132,7 +139,7 @@ public class ShoppingCartController {
 		}
 		
 		session.setAttribute("cart", sc);
-		return ResponseEntity.ok().body(null);
+		return successful();
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/remove")
@@ -156,13 +163,13 @@ public class ShoppingCartController {
 						System.out.println(e.getMessage());
 					}
 					session.setAttribute("cart", sc);
-					return ResponseEntity.ok(null);
+					return successful();
 				}
 			}
 
 		}
 
-		return ResponseEntity.badRequest().body(null);
+		return badRequest();
 	}
 
 	public ResponseEntity<BigDecimal> calculateGrandTotal(ShoppingCart sc) throws Exception {
@@ -187,6 +194,6 @@ public class ShoppingCartController {
 
 		}
 
-		return ResponseEntity.ok().body(returnVal);
+		return successful(returnVal);
 	}
 }
