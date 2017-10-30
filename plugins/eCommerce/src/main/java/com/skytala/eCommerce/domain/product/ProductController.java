@@ -19,6 +19,7 @@ import com.skytala.eCommerce.domain.product.relations.product.model.attribute.Pr
 import com.skytala.eCommerce.domain.product.relations.product.model.price.ProductPrice;
 import com.skytala.eCommerce.domain.product.util.ProductAttributes;
 import org.apache.ofbiz.base.util.UtilMisc;
+import org.apache.regexp.RE;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -97,7 +98,7 @@ public class ProductController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProduct(HttpServletRequest request) throws Exception {
+	public ResponseEntity<Product> createProduct(HttpServletRequest request) throws Exception {
 
 		Product productToBeAdded = new Product();
 		try {
@@ -105,7 +106,7 @@ public class ProductController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 		}
 
 		return this.createProduct(productToBeAdded);
@@ -120,17 +121,17 @@ public class ProductController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProduct(@RequestBody Product productToBeAdded) throws Exception {
+	public ResponseEntity<Product> createProduct(@RequestBody Product productToBeAdded) throws Exception {
 
 		AddProduct command = new AddProduct(productToBeAdded);
 		Product product = ((ProductAdded) Scheduler.execute(command).data()).getAddedProduct();
 		
-		if (product != null) 
+		if (product != null)
 			return ResponseEntity.status(HttpStatus.CREATED)
 					             .body(product);
-		else 
+		else
 			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("Product could not be created.");
+					             .body(null);
 	}
 
 	/**
@@ -285,6 +286,34 @@ public class ProductController {
 						  .collect(Collectors.toList());
 
 		return successful(results);
+
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/addDetailed")
+	public ResponseEntity addProductWithDetails(ProductDetailsDTO dto) throws Exception {
+
+		ResponseEntity<Product> productResponse;
+		ResponseEntity<ProductPrice> priceResponse;
+		ResponseEntity<ProductAttribute> attributeResponse;
+
+		if((productResponse = createProduct(dto.extractProduct())).getStatusCode().equals(HttpStatus.CREATED)){
+			dto.setProductId(productResponse.getBody().getProductId());
+
+			if(!(priceResponse = priceController.createProductPrice(dto.extractProductPrice())).getStatusCode().equals(HttpStatus.CREATED))
+				return priceResponse;
+
+			for(ProductAttribute attribute : dto.extractAllAttributes()){
+				if(!(attributeResponse = attributeController.createProductAttribute(attribute)).getStatusCode().equals(HttpStatus.CREATED))
+					return attributeResponse;
+			}
+
+		}else
+			return productResponse;
+
+		return created(dto);
+
+
+
 
 	}
 

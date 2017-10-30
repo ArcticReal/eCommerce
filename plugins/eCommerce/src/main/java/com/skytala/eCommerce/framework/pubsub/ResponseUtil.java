@@ -17,6 +17,9 @@ public class ResponseUtil {
     public static ResponseEntity serverError(){return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);}
     public static ResponseEntity serverError(Object responseObject){return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseObject);}
 
+    public static ResponseEntity created(){return ResponseEntity.status(HttpStatus.CREATED).body(null);}
+    public static ResponseEntity created(Object responseObject){return ResponseEntity.status(HttpStatus.CREATED).body(responseObject);}
+
     public static ResponseEntity noContent(){return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);}
 
     public static ResponseEntity unauthorized(){return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);}

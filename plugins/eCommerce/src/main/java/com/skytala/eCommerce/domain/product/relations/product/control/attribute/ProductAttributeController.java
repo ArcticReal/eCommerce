@@ -80,7 +80,7 @@ public class ProductAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductAttribute(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductAttribute> createProductAttribute(HttpServletRequest request) throws Exception {
 
 		ProductAttribute productAttributeToBeAdded = new ProductAttribute();
 		try {
@@ -88,7 +88,7 @@ public class ProductAttributeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 		}
 
 		return this.createProductAttribute(productAttributeToBeAdded);
@@ -103,7 +103,7 @@ public class ProductAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductAttribute(@RequestBody ProductAttribute productAttributeToBeAdded) throws Exception {
+	public ResponseEntity<ProductAttribute> createProductAttribute(@RequestBody ProductAttribute productAttributeToBeAdded) throws Exception {
 
 		AddProductAttribute command = new AddProductAttribute(productAttributeToBeAdded);
 		ProductAttribute productAttribute = ((ProductAttributeAdded) Scheduler.execute(command).data()).getAddedProductAttribute();
@@ -113,7 +113,7 @@ public class ProductAttributeController {
 					             .body(productAttribute);
 		else 
 			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductAttribute could not be created.");
+					             .body(null);
 	}
 
 	/**

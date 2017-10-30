@@ -5,7 +5,10 @@ import com.skytala.eCommerce.domain.product.relations.product.model.attribute.Pr
 import com.skytala.eCommerce.domain.product.relations.product.model.price.ProductPrice;
 import com.skytala.eCommerce.domain.product.util.ProductAttributes;
 
+
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ProductDetailsDTO {
@@ -64,6 +67,10 @@ public class ProductDetailsDTO {
         this.description = product.getDescription();
         this.longDescription = product.getLongDescription();
         this.mediumImageUrl = product.getMediumImageUrl();
+    }
+
+    public ProductDetailsDTO(){
+
     }
 
     public String getProductId() {
@@ -136,5 +143,56 @@ public class ProductDetailsDTO {
 
     public void setPublisher(String publisher) {
         this.publisher = publisher;
+    }
+
+    public Product extractProduct(){
+        Product p = new Product();
+
+        p.setProductId(productId);
+        p.setProductName(productName);
+        p.setDescription(description);
+        p.setLongDescription(longDescription);
+        p.setMediumImageUrl(mediumImageUrl);
+
+        return p;
+    }
+
+    public ProductPrice extractProductPrice(){
+        ProductPrice pp = new ProductPrice();
+        Timestamp currentDate = new Timestamp(System.currentTimeMillis());
+        currentDate.setNanos(0);
+
+        pp.setProductId(productId);
+        pp.setPrice(price);
+        pp.setCurrencyUomId("EUR");
+        pp.setFromDate(currentDate);
+        pp.setProductPriceTypeId("DEFAULT_PRICE");
+        pp.setProductPricePurposeId("PURCHASE");
+        pp.setProductStoreGroupId("SKYTALA_GROUP");
+        return pp;
+    }
+
+    public List<ProductAttribute> extractAllAttributes(){
+        List<ProductAttribute> attributes = new LinkedList<>();
+
+        ProductAttribute author = new ProductAttribute();
+        author.setProductId(getProductId());
+        author.setAttrName(ProductAttributes.AUTHOR);
+        author.setAttrValue(getAuthor());
+        attributes.add(author);
+
+        ProductAttribute ISBN = new ProductAttribute();
+        ISBN.setProductId(getProductId());
+        ISBN.setAttrName(ProductAttributes.ISBN);
+        ISBN.setAttrValue(getISBN());
+        attributes.add(ISBN);
+
+        ProductAttribute publisher = new ProductAttribute();
+        publisher.setProductId(getProductId());
+        publisher.setAttrName(ProductAttributes.PUBLISHER);
+        publisher.setAttrValue(getPublisher());
+        attributes.add(publisher);
+
+        return attributes;
     }
 }

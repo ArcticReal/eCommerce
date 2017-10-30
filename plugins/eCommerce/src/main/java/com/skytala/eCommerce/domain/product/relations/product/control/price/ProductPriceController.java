@@ -81,7 +81,7 @@ public class ProductPriceController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductPrice(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductPrice> createProductPrice(HttpServletRequest request) throws Exception {
 
 		ProductPrice productPriceToBeAdded = new ProductPrice();
 		try {
@@ -89,7 +89,7 @@ public class ProductPriceController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 		}
 
 		return this.createProductPrice(productPriceToBeAdded);
@@ -104,7 +104,7 @@ public class ProductPriceController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductPrice(@RequestBody ProductPrice productPriceToBeAdded) throws Exception {
+	public ResponseEntity<ProductPrice> createProductPrice(@RequestBody ProductPrice productPriceToBeAdded) throws Exception {
 
 		AddProductPrice command = new AddProductPrice(productPriceToBeAdded);
 		ProductPrice productPrice = ((ProductPriceAdded) Scheduler.execute(command).data()).getAddedProductPrice();
@@ -114,7 +114,7 @@ public class ProductPriceController {
 					             .body(productPrice);
 		else 
 			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductPrice could not be created.");
+					             .body(null);
 	}
 
 	/**
