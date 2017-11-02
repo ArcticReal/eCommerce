@@ -58,7 +58,7 @@ public class PartyContactMechController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findPartyContactMechsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PartyContactMech>> findPartyContactMechsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyContactMechsBy query = new FindPartyContactMechsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -67,9 +67,7 @@ public class PartyContactMechController {
 
 		List<PartyContactMech> partyContactMechs =((PartyContactMechFound) Scheduler.execute(query).data()).getPartyContactMechs();
 
-		if (partyContactMechs.size() == 1) {
-			return ResponseEntity.ok().body(partyContactMechs.get(0));
-		}
+
 
 		return ResponseEntity.ok().body(partyContactMechs);
 
@@ -193,13 +191,13 @@ public class PartyContactMechController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{partyContactMechId}")
-	public ResponseEntity<Object> findById(@PathVariable String partyContactMechId) throws Exception {
+	public ResponseEntity<PartyContactMech> findById(@PathVariable String partyContactMechId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyContactMechId", partyContactMechId);
 		try {
 
-			Object foundPartyContactMech = findPartyContactMechsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPartyContactMech);
+			List<PartyContactMech> foundPartyContactMech = findPartyContactMechsBy(requestParams).getBody();
+			return ResponseEntity.status(HttpStatus.OK).body(foundPartyContactMech.get(0));
 		} catch (RecordNotFoundException e) {
 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

@@ -58,7 +58,7 @@ public class OrderHeaderController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findOrderHeadersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OrderHeader>> findOrderHeadersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderHeadersBy query = new FindOrderHeadersBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -67,9 +67,7 @@ public class OrderHeaderController {
 
 		List<OrderHeader> orderHeaders =((OrderHeaderFound) Scheduler.execute(query).data()).getOrderHeaders();
 
-		if (orderHeaders.size() == 1) {
-			return ResponseEntity.ok().body(orderHeaders.get(0));
-		}
+
 
 		return ResponseEntity.ok().body(orderHeaders);
 
@@ -84,7 +82,7 @@ public class OrderHeaderController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOrderHeader(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OrderHeader> createOrderHeader(HttpServletRequest request) throws Exception {
 
 		OrderHeader orderHeaderToBeAdded = new OrderHeader();
 		try {
@@ -92,7 +90,7 @@ public class OrderHeaderController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 		}
 
 		return this.createOrderHeader(orderHeaderToBeAdded);
@@ -107,7 +105,7 @@ public class OrderHeaderController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOrderHeader(@RequestBody OrderHeader orderHeaderToBeAdded) throws Exception {
+	public ResponseEntity<OrderHeader> createOrderHeader(@RequestBody OrderHeader orderHeaderToBeAdded) throws Exception {
 
 		AddOrderHeader command = new AddOrderHeader(orderHeaderToBeAdded);
 		OrderHeader orderHeader = ((OrderHeaderAdded) Scheduler.execute(command).data()).getAddedOrderHeader();
@@ -117,7 +115,7 @@ public class OrderHeaderController {
 					             .body(orderHeader);
 		else 
 			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OrderHeader could not be created.");
+					             .body(null);
 	}
 
 	/**
@@ -193,13 +191,19 @@ public class OrderHeaderController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{orderHeaderId}")
-	public ResponseEntity<Object> findById(@PathVariable String orderHeaderId) throws Exception {
+	public ResponseEntity<OrderHeader> findById(@PathVariable String orderHeaderId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
-		requestParams.put("orderHeaderId", orderHeaderId);
+		requestParams.put("orderId", orderHeaderId);
 		try {
 
-			Object foundOrderHeader = findOrderHeadersBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOrderHeader);
+			List<OrderHeader> foundOrderHeader = findOrderHeadersBy(requestParams).getBody();
+
+			if(foundOrderHeader.size()==1)
+				return ResponseEntity.status(HttpStatus.OK).body(foundOrderHeader.get(0));
+			else
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+
 		} catch (RecordNotFoundException e) {
 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

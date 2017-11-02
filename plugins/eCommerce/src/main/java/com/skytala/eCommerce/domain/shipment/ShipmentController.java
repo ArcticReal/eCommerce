@@ -36,6 +36,8 @@ import com.skytala.eCommerce.domain.shipment.query.FindShipmentsBy;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.notFound;
+
 @RestController
 @RequestMapping("/shipments")
 public class ShipmentController {
@@ -58,7 +60,7 @@ public class ShipmentController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findShipmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<Shipment>> findShipmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentsBy query = new FindShipmentsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -67,9 +69,7 @@ public class ShipmentController {
 
 		List<Shipment> shipments =((ShipmentFound) Scheduler.execute(query).data()).getShipments();
 
-		if (shipments.size() == 1) {
-			return ResponseEntity.ok().body(shipments.get(0));
-		}
+
 
 		return ResponseEntity.ok().body(shipments);
 
@@ -193,13 +193,17 @@ public class ShipmentController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{shipmentId}")
-	public ResponseEntity<Object> findById(@PathVariable String shipmentId) throws Exception {
+	public ResponseEntity<Shipment> findById(@PathVariable String shipmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentId", shipmentId);
 		try {
 
-			Object foundShipment = findShipmentsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundShipment);
+			List<Shipment> foundShipment = findShipmentsBy(requestParams).getBody();
+
+			if(foundShipment.size()==1)
+				return ResponseEntity.status(HttpStatus.OK).body(foundShipment.get(0));
+			else
+				return notFound();
 		} catch (RecordNotFoundException e) {
 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

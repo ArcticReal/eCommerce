@@ -452,8 +452,10 @@ Boolean ibuf = Boolean.parseBoolean(buf);
 		return returnVal;
  } 
 	public static Person map(GenericValue val) {
+		if(val == null)
+			return null;
 
-Person returnVal = new Person();
+		Person returnVal = new Person();
 		returnVal.setPartyId(val.getString("partyId"));
 		returnVal.setSalutation(val.getString("salutation"));
 		returnVal.setFirstName(val.getString("firstName"));

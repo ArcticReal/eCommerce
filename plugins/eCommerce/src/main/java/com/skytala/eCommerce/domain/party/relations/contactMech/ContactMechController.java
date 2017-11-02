@@ -58,7 +58,7 @@ public class ContactMechController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findContactMechsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ContactMech>> findContactMechsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContactMechsBy query = new FindContactMechsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -67,9 +67,7 @@ public class ContactMechController {
 
 		List<ContactMech> contactMechs =((ContactMechFound) Scheduler.execute(query).data()).getContactMechs();
 
-		if (contactMechs.size() == 1) {
-			return ResponseEntity.ok().body(contactMechs.get(0));
-		}
+
 
 		return ResponseEntity.ok().body(contactMechs);
 
@@ -84,7 +82,7 @@ public class ContactMechController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createContactMech(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ContactMech> createContactMech(HttpServletRequest request) throws Exception {
 
 		ContactMech contactMechToBeAdded = new ContactMech();
 		try {
@@ -92,7 +90,7 @@ public class ContactMechController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 		}
 
 		return this.createContactMech(contactMechToBeAdded);
@@ -107,7 +105,7 @@ public class ContactMechController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createContactMech(@RequestBody ContactMech contactMechToBeAdded) throws Exception {
+	public ResponseEntity<ContactMech> createContactMech(@RequestBody ContactMech contactMechToBeAdded) throws Exception {
 
 		AddContactMech command = new AddContactMech(contactMechToBeAdded);
 		ContactMech contactMech = ((ContactMechAdded) Scheduler.execute(command).data()).getAddedContactMech();
@@ -117,7 +115,7 @@ public class ContactMechController {
 					             .body(contactMech);
 		else 
 			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ContactMech could not be created.");
+					             .body(null);
 	}
 
 	/**
@@ -193,13 +191,13 @@ public class ContactMechController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{contactMechId}")
-	public ResponseEntity<Object> findById(@PathVariable String contactMechId) throws Exception {
+	public ResponseEntity<ContactMech> findById(@PathVariable String contactMechId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contactMechId", contactMechId);
 		try {
 
-			Object foundContactMech = findContactMechsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundContactMech);
+			List<ContactMech> foundContactMech = findContactMechsBy(requestParams).getBody();
+			return ResponseEntity.status(HttpStatus.OK).body(foundContactMech.get(0));
 		} catch (RecordNotFoundException e) {
 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

@@ -58,7 +58,7 @@ public class PostalAddressController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findPostalAddresssBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PostalAddress>> findPostalAddresssBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPostalAddresssBy query = new FindPostalAddresssBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -66,10 +66,6 @@ public class PostalAddressController {
 		}
 
 		List<PostalAddress> postalAddresss =((PostalAddressFound) Scheduler.execute(query).data()).getPostalAddresss();
-
-		if (postalAddresss.size() == 1) {
-			return ResponseEntity.ok().body(postalAddresss.get(0));
-		}
 
 		return ResponseEntity.ok().body(postalAddresss);
 
@@ -84,7 +80,7 @@ public class PostalAddressController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPostalAddress(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PostalAddress> createPostalAddress(HttpServletRequest request) throws Exception {
 
 		PostalAddress postalAddressToBeAdded = new PostalAddress();
 		try {
@@ -92,7 +88,7 @@ public class PostalAddressController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 		}
 
 		return this.createPostalAddress(postalAddressToBeAdded);
@@ -107,7 +103,7 @@ public class PostalAddressController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPostalAddress(@RequestBody PostalAddress postalAddressToBeAdded) throws Exception {
+	public ResponseEntity<PostalAddress> createPostalAddress(@RequestBody PostalAddress postalAddressToBeAdded) throws Exception {
 
 		AddPostalAddress command = new AddPostalAddress(postalAddressToBeAdded);
 		PostalAddress postalAddress = ((PostalAddressAdded) Scheduler.execute(command).data()).getAddedPostalAddress();
@@ -117,7 +113,7 @@ public class PostalAddressController {
 					             .body(postalAddress);
 		else 
 			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PostalAddress could not be created.");
+					             .body(null);
 	}
 
 	/**
@@ -193,13 +189,13 @@ public class PostalAddressController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{postalAddressId}")
-	public ResponseEntity<Object> findById(@PathVariable String postalAddressId) throws Exception {
+	public ResponseEntity<PostalAddress> findById(@PathVariable String postalAddressId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
-		requestParams.put("postalAddressId", postalAddressId);
+		requestParams.put("contactMechId", postalAddressId);
 		try {
 
-			Object foundPostalAddress = findPostalAddresssBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPostalAddress);
+			List<PostalAddress> foundPostalAddress = findPostalAddresssBy(requestParams).getBody();
+			return ResponseEntity.status(HttpStatus.OK).body(foundPostalAddress.get(0));
 		} catch (RecordNotFoundException e) {
 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

@@ -58,7 +58,7 @@ public class PartyController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findPartysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<Party>> findPartysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartysBy query = new FindPartysBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -67,9 +67,7 @@ public class PartyController {
 
 		List<Party> partys =((PartyFound) Scheduler.execute(query).data()).getPartys();
 
-		if (partys.size() == 1) {
-			return ResponseEntity.ok().body(partys.get(0));
-		}
+
 
 		return ResponseEntity.ok().body(partys);
 
@@ -193,13 +191,17 @@ public class PartyController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{partyId}")
-	public ResponseEntity<Object> findById(@PathVariable String partyId) throws Exception {
+	public ResponseEntity<Party> findById(@PathVariable String partyId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyId", partyId);
 		try {
 
-			Object foundParty = findPartysBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundParty);
+			List<Party> foundParty = findPartysBy(requestParams).getBody();
+			if(foundParty.size()==1)
+				return ResponseEntity.status(HttpStatus.OK).body(foundParty.get(0));
+
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
 		} catch (RecordNotFoundException e) {
 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

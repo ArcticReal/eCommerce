@@ -2,10 +2,11 @@ package com.skytala.eCommerce.domain.cart;
 
 import java.math.BigDecimal;
 import java.util.LinkedList;
+import java.util.List;
 
 public class ShoppingCart {
 
-	private LinkedList<Position> positions = new LinkedList<>();
+	private List<Position> positions = new LinkedList<>();
 	private BigDecimal grandTotal;
 
 	public ShoppingCart() {
@@ -20,11 +21,11 @@ public class ShoppingCart {
 		this.grandTotal = grandTotal;
 	}
 
-	public LinkedList<Position> getPositions() {
+	public List<Position> getPositions() {
 		return positions;
 	}
 
-	public void setPositions(LinkedList<Position> positions) {
+	public void setPositions(List<Position> positions) {
 		this.positions = positions;
 	}
 

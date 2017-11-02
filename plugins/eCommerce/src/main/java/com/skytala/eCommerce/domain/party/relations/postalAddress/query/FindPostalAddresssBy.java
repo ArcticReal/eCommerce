@@ -33,7 +33,7 @@ List<PostalAddress> foundPostalAddresss = new ArrayList<PostalAddress>();
 
 try{
 List<GenericValue> buf = new LinkedList<>();
-if(filter.size()==1&&filter.containsKey("postalAddressId")) { 
+if(filter.size()==1&&filter.containsKey("contactMechId")) {
  GenericValue foundElement = delegator.findOne("PostalAddress", false, filter);
 if(foundElement != null) { 
 buf.add(foundElement);

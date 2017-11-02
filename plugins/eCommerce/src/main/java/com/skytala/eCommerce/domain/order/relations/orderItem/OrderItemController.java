@@ -58,7 +58,7 @@ public class OrderItemController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findOrderItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OrderItem>> findOrderItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderItemsBy query = new FindOrderItemsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -66,10 +66,6 @@ public class OrderItemController {
 		}
 
 		List<OrderItem> orderItems =((OrderItemFound) Scheduler.execute(query).data()).getOrderItems();
-
-		if (orderItems.size() == 1) {
-			return ResponseEntity.ok().body(orderItems.get(0));
-		}
 
 		return ResponseEntity.ok().body(orderItems);
 
@@ -193,13 +189,13 @@ public class OrderItemController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{orderItemId}")
-	public ResponseEntity<Object> findById(@PathVariable String orderItemId) throws Exception {
+	public ResponseEntity<OrderItem> findById(@PathVariable String orderItemId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderItemId", orderItemId);
 		try {
 
-			Object foundOrderItem = findOrderItemsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOrderItem);
+			List<OrderItem> foundOrderItem = findOrderItemsBy(requestParams).getBody();
+			return ResponseEntity.status(HttpStatus.OK).body(foundOrderItem.get(0));
 		} catch (RecordNotFoundException e) {
 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

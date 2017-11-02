@@ -32,7 +32,10 @@ import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.successful;
 public class ShoppingCartController {
 
 	@Resource
-	ProductController pc;
+	ProductController productController;
+
+	@Resource
+	ProductPriceController priceController;
 
 	@RequestMapping(method = RequestMethod.GET, value = "/show")
 	public ResponseEntity show(HttpSession session) {
@@ -98,7 +101,7 @@ public class ShoppingCartController {
 		
 		try{
 			if(allRequestParams.get("productId") != null){				
-			pro = pc.findById(allRequestParams.get("productId")).getBody();
+			pro = productController.findById(allRequestParams.get("productId")).getBody();
 			}
 			else{
 				return badRequest();
@@ -174,19 +177,18 @@ public class ShoppingCartController {
 
 	public ResponseEntity<BigDecimal> calculateGrandTotal(ShoppingCart sc) throws Exception {
 
-		ProductPriceController pc = new ProductPriceController();
 
-		LinkedList<Position> positions = sc.getPositions();
+		List<Position> positions = sc.getPositions();
 		List<ProductPrice> prices;
 		BigDecimal returnVal = new BigDecimal(0);
 
 		for (int i = 0; i < positions.size(); i++) {
 			String productId = positions.get(i).getProduct().getProductId();
 			Map<String, String> filter = UtilMisc.toMap("productId",productId,"productPriceTypeId","DEFAULT_PRICE");
-			Object responseVal = pc.findProductPricesBy(filter).getBody();
+			List<ProductPrice> responseVal = priceController.findProductPricesBy(filter).getBody();
 
-			if(responseVal.getClass().equals(ProductPrice.class)){
-				returnVal = returnVal.add(((ProductPrice)responseVal).getPrice().multiply(positions.get(i).getNumberProducts()));
+			if(responseVal.size()==1){
+				returnVal = returnVal.add(responseVal.get(0).getPrice().multiply(positions.get(i).getNumberProducts()));
 			} else {
 				throw new Exception("No default price, or multiple default prices");
 			}

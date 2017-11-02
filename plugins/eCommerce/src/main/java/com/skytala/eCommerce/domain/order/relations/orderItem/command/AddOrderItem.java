@@ -13,31 +13,31 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class AddOrderItem extends Command {
 
-private OrderItem elementToBeAdded;
-public AddOrderItem(OrderItem elementToBeAdded){
-this.elementToBeAdded = elementToBeAdded;
-}
+ private OrderItem elementToBeAdded;
+ public AddOrderItem(OrderItem elementToBeAdded){
+ this.elementToBeAdded = elementToBeAdded;
+ }
 
-@Override
-public Event execute(){
+ @Override
+  public Event execute(){
 
 
-Delegator delegator = DelegatorFactory.getDelegator("default");
+  Delegator delegator = DelegatorFactory.getDelegator("default");
 
-OrderItem addedElement = null;
-boolean success = false;
-try {
-elementToBeAdded.setOrderItemSeqId(delegator.getNextSeqId("OrderItem"));
-GenericValue newValue = delegator.makeValue("OrderItem", elementToBeAdded.mapAttributeField());
-addedElement = OrderItemMapper.map(delegator.create(newValue));
-success = true;
-} catch(GenericEntityException e) {
- e.printStackTrace(); 
-addedElement = null;
-}
+  OrderItem addedElement = null;
+  boolean success = false;
+  try {
+   elementToBeAdded.setOrderItemSeqId(delegator.getNextSeqId("OrderItem"));
+   GenericValue newValue = delegator.makeValue("OrderItem", elementToBeAdded.mapAttributeField());
+   addedElement = OrderItemMapper.map(delegator.create(newValue));
+   success = true;
+  } catch(GenericEntityException e) {
+    e.printStackTrace();
+   addedElement = null;
+  }
 
-Event resultingEvent = new OrderItemAdded(addedElement, success);
-Broker.instance().publish(resultingEvent);
-return resultingEvent;
-}
+  Event resultingEvent = new OrderItemAdded(addedElement, success);
+  Broker.instance().publish(resultingEvent);
+  return resultingEvent;
+ }
 }
