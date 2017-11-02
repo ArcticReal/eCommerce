@@ -18,25 +18,26 @@ public AddPostalAddress(PostalAddress elementToBeAdded){
 this.elementToBeAdded = elementToBeAdded;
 }
 
-@Override
-public Event execute(){
+    @Override
+    public Event execute(){
 
 
-Delegator delegator = DelegatorFactory.getDelegator("default");
 
-PostalAddress addedElement = null;
-boolean success = false;
-try {
-GenericValue newValue = delegator.makeValue("PostalAddress", elementToBeAdded.mapAttributeField());
-addedElement = PostalAddressMapper.map(delegator.create(newValue));
-success = true;
-} catch(GenericEntityException e) {
- e.printStackTrace(); 
-addedElement = null;
-}
+         Delegator delegator = DelegatorFactory.getDelegator("default");
 
-Event resultingEvent = new PostalAddressAdded(addedElement, success);
-Broker.instance().publish(resultingEvent);
-return resultingEvent;
-}
+         PostalAddress addedElement = null;
+         boolean success = false;
+         try {
+         GenericValue newValue = delegator.makeValue("PostalAddress", elementToBeAdded.mapAttributeField());
+         addedElement = PostalAddressMapper.map(delegator.create(newValue));
+         success = true;
+         } catch(GenericEntityException e) {
+          e.printStackTrace();
+         addedElement = null;
+         }
+
+         Event resultingEvent = new PostalAddressAdded(addedElement, success);
+         Broker.instance().publish(resultingEvent);
+         return resultingEvent;
+     }
 }

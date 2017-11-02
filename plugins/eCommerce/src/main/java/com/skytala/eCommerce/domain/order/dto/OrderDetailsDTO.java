@@ -15,6 +15,7 @@ public class OrderDetailsDTO {
 
     private String orderId;
     private Timestamp orderDate;
+    private String statusId;
 
     // postal Address
     private String toName;
@@ -56,9 +57,17 @@ public class OrderDetailsDTO {
 
         this.orderId = header.getOrderId();
         this.orderDate = header.getOrderDate();
+        this.statusId = header.getStatusId();
     }
 
 
+    public String getStatusId() {
+        return statusId;
+    }
+
+    public void setStatusId(String statusId) {
+        this.statusId = statusId;
+    }
 
     public String getOrderId() {
         return orderId;

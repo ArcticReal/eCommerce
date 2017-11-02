@@ -255,7 +255,7 @@ long ibuf = Long.parseLong(buf);
  } 
 	public static PostalAddress map(GenericValue val) {
 
-PostalAddress returnVal = new PostalAddress();
+		PostalAddress returnVal = new PostalAddress();
 		returnVal.setContactMechId(val.getString("contactMechId"));
 		returnVal.setToName(val.getString("toName"));
 		returnVal.setAttnName(val.getString("attnName"));

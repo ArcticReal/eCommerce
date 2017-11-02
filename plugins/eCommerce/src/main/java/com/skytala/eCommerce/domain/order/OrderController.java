@@ -22,6 +22,8 @@ import com.skytala.eCommerce.domain.party.relations.postalAddress.PostalAddressC
 import com.skytala.eCommerce.domain.party.relations.postalAddress.model.PostalAddress;
 import com.skytala.eCommerce.domain.product.ProductController;
 import com.skytala.eCommerce.domain.product.dto.ProductListItemDTO;
+import com.skytala.eCommerce.domain.product.model.Product;
+import com.skytala.eCommerce.domain.product.relations.product.model.price.ProductPrice;
 import com.skytala.eCommerce.domain.shipment.ShipmentController;
 import com.skytala.eCommerce.domain.shipment.model.Shipment;
 import net.sf.ehcache.util.TimeUtil;
@@ -136,7 +138,7 @@ public class OrderController {
             party = partyController.findById(shipments.get(0).getPartyIdTo()).getBody();
 
             Person person = PersonMapper.map((GenericValue)session.getAttribute("person"));
-            if(!shipments.get(0).getPartyIdTo().equals(person.getPartyId()))
+            if(person == null || !party.getPartyId().equals(person.getPartyId()))
                 return unauthorized();
 
         }else
@@ -144,8 +146,9 @@ public class OrderController {
 
 
         List<ContactMech> contactMechs = new LinkedList<>();
+        PostalAddress address = null;
 
-        if(party!=null) {
+        if(party!=null && shipments.get(0).getDestinationContactMechId()==null) {
 
 
             List<PartyContactMech> partyContactMechs = partyContactMechController.findPartyContactMechsBy(UtilMisc.toMap("partyId", party.getPartyId()))
@@ -175,9 +178,15 @@ public class OrderController {
             if(contactMechs.size()<1)
                 return badRequest();
 
+            address = postalAddressController.findById(contactMechs.get(0).getContactMechId()).getBody();
+        }else{
+            String contactMechId = shipments.get(0).getDestinationContactMechId();
+            if(contactMechId != null)
+                address = postalAddressController.findById(contactMechId).getBody();
+            else
+                return badRequest();
         }
 
-        PostalAddress address = postalAddressController.findById(contactMechs.get(0).getContactMechId()).getBody();
 
         List<OrderItem> items = orderItemController.findOrderItemsBy(UtilMisc.toMap("orderId", header.getOrderId()))
                                                    .getBody();
@@ -187,8 +196,9 @@ public class OrderController {
         List<ShoppingCartItemDTO> products = new LinkedList<>();
 
         for(OrderItem t : items){
-            products.add(new ShoppingCartItemDTO(productController.findById(t.getProductId()).getBody(),
-                     t.getQuantity()));
+
+            products.add(ShoppingCartItemDTO.create(productController.findByIdWithDetails(t.getProductId()).getBody(),
+                                                    t.getQuantity()));
         }
         
 
@@ -216,6 +226,7 @@ public class OrderController {
         headerToBeAdded.setOrderTypeId("SALES_ORDER");
         headerToBeAdded.setProductStoreId("SKYTALA_DIETMANNSR.");
         headerToBeAdded.setStatusId("ORDER_PROCESSING");
+        headerToBeAdded.setSalesChannelEnumId("WEB_SALES_CHANNEL");
 
         OrderHeader addedHeader = orderHeaderController.createOrderHeader(headerToBeAdded).getBody();
         if(addedHeader == null)
@@ -233,10 +244,25 @@ public class OrderController {
             itemToBeCreated.setProductId(p.getProduct().getProductId());
             itemToBeCreated.setQuantity(p.getNumberProducts());
             orderItemController.createOrderItem(itemToBeCreated);
-            products.add(new ShoppingCartItemDTO(p));
+            ShoppingCartItemDTO dto = ShoppingCartItemDTO
+                    .create(productController.findByIdWithDetails(p.getProduct()
+                                                                   .getProductId())
+                                                                   .getBody(),
+                            p.getNumberProducts());
+            products.add(dto);
         }
 
         PostalAddress addedAddress = address;
+        if(person == null){
+
+            ContactMech mechToBeAdded = new ContactMech();
+            mechToBeAdded.setContactMechTypeId("POSTAL_ADDRESS");
+            ContactMech addedMech = contactMechController.createContactMech(mechToBeAdded).getBody();
+
+            address.setContactMechId(addedMech.getContactMechId());
+            addedAddress = postalAddressController.createPostalAddress(address).getBody();
+            person = new Person();
+        }
         if(address.getContactMechId()==null) {
 
 
@@ -256,6 +282,8 @@ public class OrderController {
             address.setContactMechId(addedMech.getContactMechId());
             addedAddress = postalAddressController.createPostalAddress(address).getBody();
 
+        }else{
+            addedAddress = postalAddressController.findById(address.getContactMechId()).getBody();
         }
         Shipment shipmentToBeAdded = new Shipment();
         shipmentToBeAdded.setPrimaryOrderId(orderId);

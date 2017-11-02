@@ -9,13 +9,23 @@ public class OrderListItemDTO {
 
     private String orderId;
     private Timestamp orderDate;
+    private String statusId;
 
     private BigDecimal grandTotal;
 
     public OrderListItemDTO(OrderHeader header) {
         this.setOrderId(header.getOrderId());
         this.setOrderDate(header.getOrderDate());
+        this.statusId = header.getStatusId();
         this.setGrandTotal(header.getGrandTotal());
+    }
+
+    public String getStatusId() {
+        return statusId;
+    }
+
+    public void setStatusId(String statusId) {
+        this.statusId = statusId;
     }
 
     public String getOrderId() {
