@@ -172,11 +172,11 @@ public class OrderHeaderController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOrderHeader(@RequestBody OrderHeader orderHeaderToBeUpdated,
-			@PathVariable String nullVal) throws Exception {
+	@RequestMapping(method = RequestMethod.PUT, value = "/{orderId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<OrderHeader> updateOrderHeader(@RequestBody OrderHeader orderHeaderToBeUpdated,
+			@PathVariable String orderId) throws Exception {
 
-//		orderHeaderToBeUpdated.setnull(null);
+		orderHeaderToBeUpdated.setOrderId(orderId);
 
 		UpdateOrderHeader command = new UpdateOrderHeader(orderHeaderToBeUpdated);
 

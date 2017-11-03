@@ -3,6 +3,7 @@ package com.skytala.eCommerce.domain.product;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,6 +19,9 @@ import com.skytala.eCommerce.domain.product.relations.product.control.price.Prod
 import com.skytala.eCommerce.domain.product.relations.product.model.attribute.ProductAttribute;
 import com.skytala.eCommerce.domain.product.relations.product.model.price.ProductPrice;
 import com.skytala.eCommerce.domain.product.util.ProductAttributes;
+import com.skytala.eCommerce.domain.product.util.ProductDTOValidation;
+import com.sun.org.apache.bcel.internal.generic.RETURN;
+import org.apache.commons.validator.routines.ISBNValidator;
 import org.apache.ofbiz.base.util.UtilMisc;
 import org.apache.regexp.RE;
 import org.springframework.http.HttpStatus;
@@ -188,7 +192,7 @@ public class ProductController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/{productId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(method = RequestMethod.PUT, value = "/{productId}")
 	public ResponseEntity<Object> updateProduct(@RequestBody Product productToBeUpdated,
 			@PathVariable String productId) throws Exception {
 
@@ -247,19 +251,23 @@ public class ProductController {
 
 		Product product = response.getBody();
 
-		Map<String, String> filter = UtilMisc.toMap("productPricePurposeId", "PURCHASE",
+		Map<String, String> filter = UtilMisc.toMap("productId", productId,
+													"productPricePurposeId", "PURCHASE",
 													"productPriceTypeId", "DEFAULT_PRICE");
 
-		final List<ProductPrice> productPrices = priceController.findProductPricesBy(filter)
+		final List<ProductPrice> foundProductPrices = priceController.findProductPricesBy(filter)
 															    .getBody();
 
+		List<ProductPrice> price = new LinkedList<>();
+
+		price.add(priceController.getNewestPrice(foundProductPrices));
 		filter.clear();
 
 
 		final List<ProductAttribute> attributes = attributeController.findProductAttributesBy(filter)
 																     .getBody();
 
-		return successful(ProductDetailsDTO.create(product, productPrices, attributes));
+		return successful(ProductDetailsDTO.create(product, price, attributes));
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/productList")
@@ -292,6 +300,10 @@ public class ProductController {
 	@RequestMapping(method = RequestMethod.POST, value = "/addDetailed")
 	public ResponseEntity addProductWithDetails(ProductDetailsDTO dto) throws Exception {
 
+		String valid = null;
+		if(!(valid = validate(dto)).equals(ProductDTOValidation.VALID))
+			return badRequest(valid);
+
 		ResponseEntity<Product> productResponse;
 		ResponseEntity<ProductPrice> priceResponse;
 		ResponseEntity<ProductAttribute> attributeResponse;
@@ -312,10 +324,67 @@ public class ProductController {
 
 		return created(dto);
 
+	}
+
+	private String validate(ProductDetailsDTO dto) {
+
+		if(dto.getProductName()==null||dto.getProductName().equals(""))
+			return ProductDTOValidation.INVALID_NAME;
+
+		if(dto.getAuthor()==null||dto.getAuthor().equals(""))
+			return ProductDTOValidation.INVALID_AUTHOR;
+
+		if(dto.getPrice()==null||dto.getPrice().compareTo(BigDecimal.ZERO) < 0)
+			return ProductDTOValidation.INVALID_PRICE;
+
+		if(dto.getPublisher()==null||dto.getPublisher().equals(""))
+			return ProductDTOValidation.INVALID_PUBLISHER;
+
+		if(dto.getProductRating().compareTo(BigDecimal.ZERO) < 0 || dto.getProductRating().compareTo(new BigDecimal(5)) > 0)
+			return ProductDTOValidation.INVALID_RATING;
 
 
+		String ISBN = dto.getISBN();
+		ISBN = ISBNValidator.getInstance().validate(ISBN);
+		if(ISBN == null)
+			return ProductDTOValidation.INVALID_ISBN;
+
+
+
+		return ProductDTOValidation.VALID;
 
 	}
+
+
+	@RequestMapping(method = RequestMethod.PUT, value = "/{productId}/details", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity updateProductWithDetails(@PathVariable String productId, @RequestBody ProductDetailsDTO dto) throws Exception {
+
+		dto.setProductId(productId);
+
+		String valid = null;
+		if(!(valid = validate(dto)).equals(ProductDTOValidation.VALID))
+			return badRequest(valid);
+
+		ResponseEntity response;
+
+
+		if(!(response = updateProduct(dto.extractProduct(), productId)).getStatusCode().equals(HttpStatus.NO_CONTENT))
+			return response;
+
+
+		if(dto.getPrice()!=null)
+			if(!(response = priceController.updateProductPrice(dto.extractProductPrice(), productId)).getStatusCode().equals(HttpStatus.NO_CONTENT))
+				return response;
+
+
+		for(ProductAttribute attribute : dto.extractAllAttributes()){
+			if(!(response = attributeController.updateProductAttribute(attribute, productId)).getStatusCode().equals(HttpStatus.NO_CONTENT))
+				return response;
+		}
+
+		return successful();
+	}
+
 
 	@RequestMapping(value = (" ** "))
 	public ResponseEntity<Object> returnErrorPage(HttpServletRequest request) {

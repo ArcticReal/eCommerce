@@ -3,6 +3,7 @@ package com.skytala.eCommerce.domain.product.relations.product.control.price;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -196,8 +197,8 @@ public class ProductPriceController {
 		try {
 
 			List<ProductPrice> foundProductPrices = findProductPricesBy(requestParams).getBody();
-			if(foundProductPrices.size()!=1)
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+			getNewestPrice(foundProductPrices);
 
 			return ResponseEntity.status(HttpStatus.OK).body(foundProductPrices.get(0));
 		} catch (RecordNotFoundException e) {
@@ -254,4 +255,23 @@ public class ProductPriceController {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(returnVal);
 
 	}
+
+	public ProductPrice getNewestPrice(List<ProductPrice> prices) throws RecordNotFoundException{
+		ProductPrice newestPrice = null;
+		Timestamp currentDate = new Timestamp(System.currentTimeMillis());
+		currentDate.setNanos(0);
+
+		for (ProductPrice currentPrice : prices){
+			if(newestPrice==null||currentPrice.getFromDate().after(newestPrice.getFromDate()))
+				if(currentPrice.getThruDate()==null||currentPrice.getThruDate().after(currentDate))
+					newestPrice = currentPrice;
+
+		}
+
+		if (newestPrice == null)
+			throw new RecordNotFoundException(ProductPrice.class);
+
+		return newestPrice;
+	}
+
 }

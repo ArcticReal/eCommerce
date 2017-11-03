@@ -4,12 +4,14 @@ package com.skytala.eCommerce.domain.order;
 import com.skytala.eCommerce.domain.cart.Position;
 import com.skytala.eCommerce.domain.cart.ShoppingCart;
 import com.skytala.eCommerce.domain.cart.dto.ShoppingCartItemDTO;
+import com.skytala.eCommerce.domain.order.dto.ContactDTO;
 import com.skytala.eCommerce.domain.order.dto.OrderDetailsDTO;
 import com.skytala.eCommerce.domain.order.dto.OrderListItemDTO;
 import com.skytala.eCommerce.domain.order.relations.orderHeader.OrderHeaderController;
 import com.skytala.eCommerce.domain.order.relations.orderHeader.model.OrderHeader;
 import com.skytala.eCommerce.domain.order.relations.orderItem.OrderItemController;
 import com.skytala.eCommerce.domain.order.relations.orderItem.model.OrderItem;
+import com.skytala.eCommerce.domain.order.util.OrderStatusUtil;
 import com.skytala.eCommerce.domain.party.PartyController;
 import com.skytala.eCommerce.domain.party.model.Party;
 import com.skytala.eCommerce.domain.party.relations.contactMech.ContactMechController;
@@ -26,6 +28,7 @@ import com.skytala.eCommerce.domain.product.model.Product;
 import com.skytala.eCommerce.domain.product.relations.product.model.price.ProductPrice;
 import com.skytala.eCommerce.domain.shipment.ShipmentController;
 import com.skytala.eCommerce.domain.shipment.model.Shipment;
+import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import net.sf.ehcache.util.TimeUtil;
 import org.apache.commons.net.ntp.TimeStamp;
 import org.apache.ofbiz.base.util.UtilMisc;
@@ -80,11 +83,6 @@ public class OrderController {
     PostalAddressController postalAddressController;
 
 
-    @RequestMapping("/geos")
-    public Object listGeos() throws GenericEntityException {
-        return DelegatorFactory.getDelegator("default").findAll("Geo", false);
-    }
-
     @RequestMapping("/orderList")
     public ResponseEntity<List<OrderListItemDTO>> getOrderList(HttpSession session) throws Exception {
 
@@ -127,28 +125,30 @@ public class OrderController {
                                                            @PathVariable("orderHeaderId") String orderHeaderId) throws Exception {
 
 
+        try{
+            if(!checkOrderForAuthorisation(session, orderHeaderId))
+                return unauthorized();
+        }catch(RecordNotFoundException e){
+            return serverError();
+        }
+
 
         OrderHeader header = orderHeaderController.findById(orderHeaderId).getBody();
 
         List<Shipment> shipments = shipmentController.findShipmentsBy(UtilMisc.toMap("primaryOrderId", orderHeaderId)).getBody();
         Party party = null;
 
-        if(shipments.size()==1){
-
+        if(shipments.size()==1)
             party = partyController.findById(shipments.get(0).getPartyIdTo()).getBody();
-
-            Person person = PersonMapper.map((GenericValue)session.getAttribute("person"));
-            if(person == null || !party.getPartyId().equals(person.getPartyId()))
-                return unauthorized();
-
-        }else
+        else
             return serverError();
 
 
         List<ContactMech> contactMechs = new LinkedList<>();
         PostalAddress address = null;
+        ContactMech eMail = new ContactMech();
 
-        if(party!=null && shipments.get(0).getDestinationContactMechId()==null) {
+        if(party!=null) {
 
 
             List<PartyContactMech> partyContactMechs = partyContactMechController.findPartyContactMechsBy(UtilMisc.toMap("partyId", party.getPartyId()))
@@ -163,7 +163,7 @@ public class OrderController {
             contactMechs = contactMechIds.stream().map(contactMechId -> {
                 try {
                     ContactMech contactMech = contactMechController.findById(contactMechId).getBody();
-                    if (contactMech.getContactMechTypeId().equals("POSTAL_ADDRESS"))
+                    if (contactMech.getContactMechTypeId().equals("POSTAL_ADDRESS")||contactMech.getContactMechTypeId().equals("EMAIL_ADDRESS"))
                         return contactMech;
                     else
                         return null;
@@ -178,7 +178,31 @@ public class OrderController {
             if(contactMechs.size()<1)
                 return badRequest();
 
-            address = postalAddressController.findById(contactMechs.get(0).getContactMechId()).getBody();
+
+            for(ContactMech mech : contactMechs){
+                if(mech.getContactMechTypeId().equals("EMAIL_ADDRESS")){
+
+                    eMail = mech;
+                    mech = null;
+                }
+            }
+
+            while (contactMechs.remove(null));
+
+
+
+            if(shipments.get(0).getDestinationContactMechId()==null)
+                address = postalAddressController.findById(contactMechs.get(0).getContactMechId()).getBody();
+            else{
+
+                String contactMechId = shipments.get(0).getDestinationContactMechId();
+                if(contactMechId != null)
+                    address = postalAddressController.findById(contactMechId).getBody();
+                else
+                    return badRequest();
+
+            }
+
         }else{
             String contactMechId = shipments.get(0).getDestinationContactMechId();
             if(contactMechId != null)
@@ -202,12 +226,12 @@ public class OrderController {
         }
         
 
-        return successful(OrderDetailsDTO.create(header, address, products, header.getGrandTotal()));
+        return successful(OrderDetailsDTO.create(header, address, eMail, products, header.getGrandTotal()));
     }
 
 
     @RequestMapping("/finish")
-    public ResponseEntity<OrderDetailsDTO> finishOrder(HttpSession session, PostalAddress address) throws Exception {
+    public ResponseEntity<OrderDetailsDTO> finishOrder(HttpSession session, ContactDTO contact) throws Exception {
         ShoppingCart cart = (ShoppingCart) session.getAttribute("cart");
         if(cart == null)
             return badRequest();
@@ -215,6 +239,9 @@ public class OrderController {
         //person can be null after this operation a null person indicates the user is not logged in
         Person person = PersonMapper.map((GenericValue)session.getAttribute("person"));
 
+        PostalAddress address = contact.extractPostalAddress();
+
+        ContactMech eMailContactMech = contact.extractEMailAddress();
 
         //set general orderheader attributes
         OrderHeader headerToBeAdded = new OrderHeader();
@@ -261,41 +288,100 @@ public class OrderController {
 
             address.setContactMechId(addedMech.getContactMechId());
             addedAddress = postalAddressController.createPostalAddress(address).getBody();
-            person = new Person();
-        }
-        if(address.getContactMechId()==null) {
 
-
-            ContactMech mechToBeAdded = new ContactMech();
-            mechToBeAdded.setContactMechTypeId("POSTAL_ADDRESS");
-            ContactMech addedMech = contactMechController.createContactMech(mechToBeAdded).getBody();
-
-            PartyContactMech partyContactMech = new PartyContactMech();
-            partyContactMech.setPartyId(person.getPartyId());
-            partyContactMech.setContactMechId(addedMech.getContactMechId());
-
-            Timestamp currentDate = new Timestamp(System.currentTimeMillis());
-            currentDate.setNanos(0);
-            partyContactMech.setFromDate(currentDate);
-            partyContactMechController.createPartyContactMech(partyContactMech);
-
-            address.setContactMechId(addedMech.getContactMechId());
-            addedAddress = postalAddressController.createPostalAddress(address).getBody();
-
+            //TODO: directly send E-Mail
         }else{
-            addedAddress = postalAddressController.findById(address.getContactMechId()).getBody();
+            if(address.getContactMechId()==null) {
+
+
+                ContactMech mechToBeAdded = new ContactMech();
+                mechToBeAdded.setContactMechTypeId("POSTAL_ADDRESS");
+                ContactMech addedMech = contactMechController.createContactMech(mechToBeAdded).getBody();
+
+                PartyContactMech partyContactMech = new PartyContactMech();
+                partyContactMech.setPartyId(person.getPartyId());
+                partyContactMech.setContactMechId(addedMech.getContactMechId());
+
+                Timestamp currentDate = new Timestamp(System.currentTimeMillis());
+                currentDate.setNanos(0);
+                partyContactMech.setFromDate(currentDate);
+                partyContactMechController.createPartyContactMech(partyContactMech);
+
+                address.setContactMechId(addedMech.getContactMechId());
+                addedAddress = postalAddressController.createPostalAddress(address).getBody();
+
+            }else{
+                addedAddress = postalAddressController.findById(address.getContactMechId()).getBody();
+            }
+
+            if(eMailContactMech.getContactMechId()==null) {
+
+                eMailContactMech = contactMechController.createContactMech(eMailContactMech).getBody();
+
+                PartyContactMech partyContactMechToBeAdded = new PartyContactMech();
+                partyContactMechToBeAdded.setPartyId(person.getPartyId());
+                partyContactMechToBeAdded.setContactMechId(eMailContactMech.getContactMechId());
+
+                Timestamp currentDate = new Timestamp(System.currentTimeMillis());
+                currentDate.setNanos(0);
+                partyContactMechToBeAdded.setFromDate(currentDate);
+                partyContactMechController.createPartyContactMech(partyContactMechToBeAdded);
+            }
         }
+
         Shipment shipmentToBeAdded = new Shipment();
         shipmentToBeAdded.setPrimaryOrderId(orderId);
         shipmentToBeAdded.setCurrencyUomId("EUR");
-        shipmentToBeAdded.setPartyIdTo(person.getPartyId());
+        if(person!=null)
+            shipmentToBeAdded.setPartyIdTo(person.getPartyId());
         shipmentToBeAdded.setDestinationContactMechId(addedAddress.getContactMechId());
         shipmentController.createShipment(shipmentToBeAdded);
 
 
 
-        return successful(OrderDetailsDTO.create(addedHeader, addedAddress, products, cart.getGrandTotal()));
+        return successful(OrderDetailsDTO.create(addedHeader, addedAddress, eMailContactMech, products, cart.getGrandTotal()));
     }
 
+    @RequestMapping("/{orderId}/cancel")
+    public ResponseEntity cancelOrder(HttpSession session, @PathVariable("orderId") String orderId) throws Exception {
 
+        try {
+            if(!checkOrderForAuthorisation(session, orderId))
+                return unauthorized();
+        }catch(RecordNotFoundException e){
+            return serverError();
+        }
+
+        OrderHeader header = orderHeaderController.findById(orderId).getBody();
+
+        String status = header.getStatusId();
+        if(status.equals(OrderStatusUtil.COMPLETED)||status.equals(OrderStatusUtil.CANCELLED)
+                ||status.equals(OrderStatusUtil.REJECTED)||status.equals(OrderStatusUtil.SENT)
+                ||status.equals(OrderStatusUtil.CREATED)){
+            return badRequest();
+        }
+
+        header.setStatusId("ORDER_CANCELLED");
+
+        return orderHeaderController.updateOrderHeader(header, header.getOrderId());
+    }
+
+    private boolean checkOrderForAuthorisation(HttpSession session, String orderId) throws Exception {
+
+        List<Shipment> shipments = shipmentController.findShipmentsBy(UtilMisc.toMap("primaryOrderId", orderId)).getBody();
+        Party party = null;
+
+        if(shipments.size()==1){
+
+            party = partyController.findById(shipments.get(0).getPartyIdTo()).getBody();
+
+            Person person = PersonMapper.map((GenericValue)session.getAttribute("person"));
+            if(person == null || !party.getPartyId().equals(person.getPartyId()))
+                return false;
+
+        }else
+            throw new RecordNotFoundException(Shipment.class);
+
+        return true;
+    }
 }

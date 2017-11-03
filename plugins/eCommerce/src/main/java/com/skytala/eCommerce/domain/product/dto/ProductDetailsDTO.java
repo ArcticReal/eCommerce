@@ -18,6 +18,7 @@ public class ProductDetailsDTO {
     private String description;
     private String longDescription;
     private String mediumImageUrl;
+    private BigDecimal productRating;
 
     //non-product Attributes
     private BigDecimal price;
@@ -35,8 +36,9 @@ public class ProductDetailsDTO {
         ProductDetailsDTO dto = new ProductDetailsDTO(product);
 
         for(ProductPrice productPrice : prices)
-            if(productPrice.getProductId().equals(product.getProductId()))
+            if(productPrice.getProductId().equals(product.getProductId())){
                 dto.setPrice(productPrice.getPrice());
+            }
 
         for(ProductAttribute attribute : attributes)
             if(attribute.getProductId().equals(product.getProductId())){
@@ -67,10 +69,19 @@ public class ProductDetailsDTO {
         this.description = product.getDescription();
         this.longDescription = product.getLongDescription();
         this.mediumImageUrl = product.getMediumImageUrl();
+        this.productRating = product.getProductRating();
     }
 
     public ProductDetailsDTO(){
 
+    }
+
+    public BigDecimal getProductRating() {
+        return productRating;
+    }
+
+    public void setProductRating(BigDecimal productRating) {
+        this.productRating = productRating;
     }
 
     public String getProductId() {
@@ -159,13 +170,15 @@ public class ProductDetailsDTO {
 
     public ProductPrice extractProductPrice(){
         ProductPrice pp = new ProductPrice();
-        Timestamp currentDate = new Timestamp(System.currentTimeMillis());
-        currentDate.setNanos(0);
 
         pp.setProductId(productId);
         pp.setPrice(price);
-        pp.setCurrencyUomId("EUR");
+
+        Timestamp currentDate = new Timestamp(System.currentTimeMillis());
+        currentDate.setNanos(0);
         pp.setFromDate(currentDate);
+
+        pp.setCurrencyUomId("EUR");
         pp.setProductPriceTypeId("DEFAULT_PRICE");
         pp.setProductPricePurposeId("PURCHASE");
         pp.setProductStoreGroupId("SKYTALA_GROUP");

@@ -4,6 +4,7 @@ import com.skytala.eCommerce.domain.cart.Position;
 import com.skytala.eCommerce.domain.cart.dto.ShoppingCartItemDTO;
 import com.skytala.eCommerce.domain.order.relations.orderHeader.model.OrderHeader;
 import com.skytala.eCommerce.domain.order.relations.orderItem.model.OrderItem;
+import com.skytala.eCommerce.domain.party.relations.contactMech.model.ContactMech;
 import com.skytala.eCommerce.domain.party.relations.postalAddress.model.PostalAddress;
 import com.skytala.eCommerce.domain.product.dto.ProductListItemDTO;
 
@@ -25,6 +26,8 @@ public class OrderDetailsDTO {
     private String countryGeoId;
     private String stateProvinceGeoId;
 
+    private String eMailAddress;
+
     private List<ShoppingCartItemDTO> products;
     private BigDecimal grandTotal;
 
@@ -34,10 +37,12 @@ public class OrderDetailsDTO {
      */
     public static OrderDetailsDTO create(OrderHeader header,
                                   PostalAddress address,
+                                  ContactMech eMailAddress,
                                   List<ShoppingCartItemDTO> products,
                                   BigDecimal grandTotal){
 
         OrderDetailsDTO dto = new OrderDetailsDTO(header);
+
 
         dto.setToName(address.getToName());
         dto.setAddress1(address.getAddress1());
@@ -45,6 +50,8 @@ public class OrderDetailsDTO {
         dto.setPostalCode(address.getPostalCode());
         dto.setCountryGeoId(address.getCountryGeoId());
         dto.setStateProvinceGeoId(address.getStateProvinceGeoId());
+
+        dto.seteMailAddress(eMailAddress.getInfoString());
 
         dto.setProducts(products);
         dto.setGrandTotal(grandTotal);
@@ -60,6 +67,14 @@ public class OrderDetailsDTO {
         this.statusId = header.getStatusId();
     }
 
+
+    public String geteMailAddress() {
+        return eMailAddress;
+    }
+
+    public void seteMailAddress(String eMailAddress) {
+        this.eMailAddress = eMailAddress;
+    }
 
     public String getStatusId() {
         return statusId;

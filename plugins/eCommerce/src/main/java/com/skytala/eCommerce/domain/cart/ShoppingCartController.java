@@ -40,10 +40,6 @@ public class ShoppingCartController {
 	@RequestMapping(method = RequestMethod.GET, value = "/show")
 	public ResponseEntity show(HttpSession session) {
 
-		// Debug Message for Windows Forms should be removed later
-		System.out.println(session.getCreationTime());
-		System.out.println(session.getId());
-
 		if (session.getAttribute("cart") != null) {
 			ShoppingCart sc = new ShoppingCart();
 			sc = (ShoppingCart) session.getAttribute("cart");
@@ -54,9 +50,6 @@ public class ShoppingCartController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/showId")
 	public ResponseEntity showId(HttpSession session) {
-		// Debug Message for Windows Forms should be removed later
-		System.out.println(session.getCreationTime());
-		System.out.println(session.getId());
 
 		LinkedList<String> mylist = new LinkedList<String>();
 		if (session.getAttribute("cart") != null) {
@@ -85,11 +78,6 @@ public class ShoppingCartController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/add")
 	public ResponseEntity addToCart(HttpSession session, @RequestParam Map<String, String> allRequestParams) {
-
-
-		// Debug Message for Windows Forms should be removed later
-		System.out.println(session.getCreationTime());
-		System.out.println(session.getId());
 
 		if (session.getAttribute("cart") == null) {
 			ShoppingCart sc = new ShoppingCart();
@@ -187,8 +175,10 @@ public class ShoppingCartController {
 			Map<String, String> filter = UtilMisc.toMap("productId",productId,"productPriceTypeId","DEFAULT_PRICE");
 			List<ProductPrice> responseVal = priceController.findProductPricesBy(filter).getBody();
 
-			if(responseVal.size()==1){
-				returnVal = returnVal.add(responseVal.get(0).getPrice().multiply(positions.get(i).getNumberProducts()));
+			ProductPrice newestPrice = priceController.getNewestPrice(responseVal);
+
+			if(newestPrice!=null) {
+				returnVal = returnVal.add(newestPrice.getPrice().multiply(positions.get(i).getNumberProducts()));
 			} else {
 				throw new Exception("No default price, or multiple default prices");
 			}
