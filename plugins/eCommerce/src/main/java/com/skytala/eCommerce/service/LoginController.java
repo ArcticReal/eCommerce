@@ -20,6 +20,8 @@ import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.unauthorized;
 @RestController
 public class LoginController {
 
+
+    /*
     @RequestMapping("/login")
     public void doLoginForwarded(HttpServletRequest request, HttpServletResponse response) throws Exception{
 
@@ -28,6 +30,7 @@ public class LoginController {
         RequestDispatcher rd = request.getRequestDispatcher("/control/login");
         rd.forward(request, response);
     }
+    */
 
     @RequestMapping("/logout")
     public void doLogoutForwarded(HttpServletRequest request, HttpServletResponse response) throws Exception{
