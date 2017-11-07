@@ -7,6 +7,8 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+import java.util.List;
+
 @ControllerAdvice
 public class HeaderModifier implements ResponseBodyAdvice{
 
@@ -22,6 +24,9 @@ public class HeaderModifier implements ResponseBodyAdvice{
         // allow content loading by cross origin javascript calls
         response.getHeaders().add("Access-Control-Allow-Origin",request.getHeaders().getOrigin()); //TODO allow only specific pages to load contents cross origin
         response.getHeaders().add("Access-Control-Allow-Credentials", "true");
+
+
+
         return body;
     }
 }

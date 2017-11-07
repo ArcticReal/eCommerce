@@ -1,6 +1,7 @@
 package com.skytala.eCommerce.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -27,5 +28,7 @@ public class WebAppConfig extends WebMvcConfigurerAdapter{
 	    registry.addResourceHandler("/webjars/**")
 	      .addResourceLocations("classpath:/META-INF/resources/webjars/");
 	}
+
+
 
 }

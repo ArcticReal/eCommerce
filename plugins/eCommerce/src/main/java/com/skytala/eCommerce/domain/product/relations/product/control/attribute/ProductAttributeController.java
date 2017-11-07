@@ -171,7 +171,7 @@ public class ProductAttributeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductAttribute(@RequestBody ProductAttribute productAttributeToBeUpdated,
+	public ResponseEntity<ProductAttribute> updateProductAttribute(@RequestBody ProductAttribute productAttributeToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		productAttributeToBeUpdated.setnull(null);
@@ -182,7 +182,7 @@ public class ProductAttributeController {
 			if(((ProductAttributeUpdated) Scheduler.execute(command).data()).isSuccess()) 
 				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return createProductAttribute(productAttributeToBeUpdated);
 		}
 
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);

@@ -4,11 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -274,4 +270,27 @@ public class ProductPriceController {
 		return newestPrice;
 	}
 
+    public List<ProductPrice> getNewestPrices(List<ProductPrice> productPrices) {
+
+		List<ProductPrice> pricesSameProduct = new LinkedList<>();
+		List<ProductPrice> newestPrices = new LinkedList<>();
+		while (productPrices.size()!=0){
+
+			Iterator<ProductPrice> it = productPrices.iterator();
+			while (it.hasNext()){
+
+				ProductPrice price = it.next();
+				if(pricesSameProduct.size()==0||pricesSameProduct.get(0).getProductId().equals(price.getProductId()))
+					pricesSameProduct.add(price);
+
+
+
+			}
+			newestPrices.add(getNewestPrice(pricesSameProduct));
+			productPrices.removeAll(pricesSameProduct);
+			pricesSameProduct.clear();
+		}
+
+		return newestPrices;
+    }
 }

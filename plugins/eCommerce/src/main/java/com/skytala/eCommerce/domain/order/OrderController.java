@@ -35,6 +35,7 @@ import org.apache.ofbiz.base.util.UtilMisc;
 import org.apache.ofbiz.entity.DelegatorFactory;
 import org.apache.ofbiz.entity.GenericEntityException;
 import org.apache.ofbiz.entity.GenericValue;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -239,6 +240,10 @@ public class OrderController {
         //person can be null after this operation a null person indicates the user is not logged in
         Person person = PersonMapper.map((GenericValue)session.getAttribute("person"));
 
+        if(person == null){
+            return unauthorized();
+        }
+
         PostalAddress address = contact.extractPostalAddress();
 
         ContactMech eMailContactMech = contact.extractEMailAddress();
@@ -259,6 +264,7 @@ public class OrderController {
         if(addedHeader == null)
             return conflict();
         String orderId = addedHeader.getOrderId();
+
 
         //Set general orderItem attributes
         OrderItem itemToBeCreated = new OrderItem();
@@ -338,6 +344,7 @@ public class OrderController {
         shipmentController.createShipment(shipmentToBeAdded);
 
 
+        session.setAttribute("cart", null);
 
         return successful(OrderDetailsDTO.create(addedHeader, addedAddress, eMailContactMech, products, cart.getGrandTotal()));
     }

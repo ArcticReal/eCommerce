@@ -20,7 +20,6 @@ import com.skytala.eCommerce.domain.product.relations.product.model.attribute.Pr
 import com.skytala.eCommerce.domain.product.relations.product.model.price.ProductPrice;
 import com.skytala.eCommerce.domain.product.util.ProductAttributes;
 import com.skytala.eCommerce.domain.product.util.ProductDTOValidation;
-import com.sun.org.apache.bcel.internal.generic.RETURN;
 import org.apache.commons.validator.routines.ISBNValidator;
 import org.apache.ofbiz.base.util.UtilMisc;
 import org.apache.regexp.RE;
@@ -278,8 +277,11 @@ public class ProductController {
 		Map<String, String> filter = UtilMisc.toMap("productPricePurposeId", "PURCHASE",
 													"productPriceTypeId", "DEFAULT_PRICE");
 
-		final List<ProductPrice> productPrices = priceController.findProductPricesBy(filter)
-				                                                .getBody();
+		final List<ProductPrice> productPrices = priceController.getNewestPrices(priceController.findProductPricesBy(filter)
+																								.getBody());
+
+
+
 
 		filter.clear();
 		filter.put("attrName", ProductAttributes.AUTHOR);
@@ -293,6 +295,14 @@ public class ProductController {
 						  .map((Product prod) -> ProductListItemDTO.create(prod, productPrices, authors))
 						  .collect(Collectors.toList());
 
+		results = results.stream().map(dto -> {if (dto.getPrice()==null)
+													return null;
+												else
+													return dto;})
+								  .collect(Collectors.toList());
+
+		while (results.remove(null));
+
 		return successful(results);
 
 	}
@@ -300,8 +310,8 @@ public class ProductController {
 	@RequestMapping(method = RequestMethod.POST, value = "/addDetailed")
 	public ResponseEntity addProductWithDetails(ProductDetailsDTO dto) throws Exception {
 
-		String valid = null;
-		if(!(valid = validate(dto)).equals(ProductDTOValidation.VALID))
+		String valid = validate(dto);
+		if(!valid.equals(ProductDTOValidation.VALID))
 			return badRequest(valid);
 
 		ResponseEntity<Product> productResponse;
@@ -328,31 +338,72 @@ public class ProductController {
 
 	private String validate(ProductDetailsDTO dto) {
 
+		//no rating should be
+		dto.setProductRating(BigDecimal.ZERO);
+
 		if(dto.getProductName()==null||dto.getProductName().equals(""))
 			return ProductDTOValidation.INVALID_NAME;
 
 		if(dto.getAuthor()==null||dto.getAuthor().equals(""))
 			return ProductDTOValidation.INVALID_AUTHOR;
 
-		if(dto.getPrice()==null||dto.getPrice().compareTo(BigDecimal.ZERO) < 0)
+		if(dto.getPrice()==null)
 			return ProductDTOValidation.INVALID_PRICE;
 
 		if(dto.getPublisher()==null||dto.getPublisher().equals(""))
 			return ProductDTOValidation.INVALID_PUBLISHER;
 
-		if(dto.getProductRating().compareTo(BigDecimal.ZERO) < 0 || dto.getProductRating().compareTo(new BigDecimal(5)) > 0)
-			return ProductDTOValidation.INVALID_RATING;
-
-
-		String ISBN = dto.getISBN();
-		ISBN = ISBNValidator.getInstance().validate(ISBN);
-		if(ISBN == null)
+		if (dto.getISBN()==null)
 			return ProductDTOValidation.INVALID_ISBN;
 
 
+		return validateSyntax(dto);
+
+	}
+
+	private String validateSyntax(ProductDetailsDTO dto){
+
+
+
+		/*TODO validate ratings of costumers
+		if(dto.getProductRating()!=null){
+			BigDecimal rating = dto.getProductRating();
+			if(rating.compareTo(BigDecimal.ZERO) < 0 || rating.compareTo(new BigDecimal(5)) > 0)
+				return ProductDTOValidation.INVALID_RATING;
+		}*/
+
+
+		if(dto.getPrice()!=null){
+
+			if(dto.getPrice().compareTo(BigDecimal.ZERO) < 0)
+				return ProductDTOValidation.INVALID_PRICE;
+
+			if(dto.getPrice().scale()>2)
+				return ProductDTOValidation.INVALID_PRICE;
+			else
+				dto.setPrice(dto.getPrice().setScale(2));
+
+		}
+
+		String ISBN = dto.getISBN();
+		if(ISBN!=null&&ISBN.equals(""))
+			ISBN = null;
+
+		if(ISBN!=null){
+
+			ISBN = ISBN.replace("-", "");
+			ISBN = ISBN.replace(" ", "");
+
+			ISBN = ISBNValidator.getInstance().validate(ISBN);
+			if(ISBN == null)
+				return ProductDTOValidation.INVALID_ISBN;
+			else
+				dto.setISBN(ISBN);
+
+
+		}
 
 		return ProductDTOValidation.VALID;
-
 	}
 
 
@@ -360,9 +411,11 @@ public class ProductController {
 	public ResponseEntity updateProductWithDetails(@PathVariable String productId, @RequestBody ProductDetailsDTO dto) throws Exception {
 
 		dto.setProductId(productId);
+		if(dto.getProductId()==null)
+			return badRequest();
 
-		String valid = null;
-		if(!(valid = validate(dto)).equals(ProductDTOValidation.VALID))
+		String valid = validateSyntax(dto);
+		if(!valid.equals(ProductDTOValidation.VALID))
 			return badRequest(valid);
 
 		ResponseEntity response;

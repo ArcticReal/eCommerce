@@ -1513,7 +1513,7 @@ public class ProductsServiceController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addProductToCategories")
 	public ResponseEntity<Object> addProductToCategories(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="categories") Object categories, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
-		
+
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
 		paramMap.put("categories",categories);
