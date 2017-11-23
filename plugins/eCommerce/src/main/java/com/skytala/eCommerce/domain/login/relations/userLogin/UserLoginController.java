@@ -36,6 +36,8 @@ import com.skytala.eCommerce.domain.login.relations.userLogin.query.FindUserLogi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/userLogins")
 public class UserLoginController {
@@ -58,7 +60,7 @@ public class UserLoginController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findUserLoginsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<UserLogin>> findUserLoginsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindUserLoginsBy query = new FindUserLoginsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -66,10 +68,6 @@ public class UserLoginController {
 		}
 
 		List<UserLogin> userLogins =((UserLoginFound) Scheduler.execute(query).data()).getUserLogins();
-
-		if (userLogins.size() == 1) {
-			return ResponseEntity.ok().body(userLogins.get(0));
-		}
 
 		return ResponseEntity.ok().body(userLogins);
 
@@ -84,7 +82,7 @@ public class UserLoginController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createUserLogin(HttpServletRequest request) throws Exception {
+	public ResponseEntity<UserLogin> createUserLogin(HttpServletRequest request) throws Exception {
 
 		UserLogin userLoginToBeAdded = new UserLogin();
 		try {
@@ -92,7 +90,7 @@ public class UserLoginController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 		}
 
 		return this.createUserLogin(userLoginToBeAdded);
@@ -107,7 +105,7 @@ public class UserLoginController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createUserLogin(@RequestBody UserLogin userLoginToBeAdded) throws Exception {
+	public ResponseEntity<UserLogin> createUserLogin(@RequestBody UserLogin userLoginToBeAdded) throws Exception {
 
 		AddUserLogin command = new AddUserLogin(userLoginToBeAdded);
 		UserLogin userLogin = ((UserLoginAdded) Scheduler.execute(command).data()).getAddedUserLogin();
@@ -117,7 +115,7 @@ public class UserLoginController {
 					             .body(userLogin);
 		else 
 			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("UserLogin could not be created.");
+					             .body(null);
 	}
 
 	/**
@@ -193,16 +191,20 @@ public class UserLoginController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{userLoginId}")
-	public ResponseEntity<Object> findById(@PathVariable String userLoginId) throws Exception {
+	public ResponseEntity<UserLogin> findById(@PathVariable String userLoginId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("userLoginId", userLoginId);
 		try {
 
-			Object foundUserLogin = findUserLoginsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundUserLogin);
+			List<UserLogin> foundUserLogins = findUserLoginsBy(requestParams).getBody();
+			if(foundUserLogins.size()==1)
+				return successful(foundUserLogins.get(0));
+			else
+				return notFound();
+
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}

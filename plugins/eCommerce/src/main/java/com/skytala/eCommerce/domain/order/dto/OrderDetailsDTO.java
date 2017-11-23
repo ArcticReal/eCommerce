@@ -25,6 +25,7 @@ public class OrderDetailsDTO {
     private String postalCode;
     private String countryGeoId;
     private String stateProvinceGeoId;
+    private String houseNumberExt;
 
     private String eMailAddress;
 
@@ -50,6 +51,7 @@ public class OrderDetailsDTO {
         dto.setPostalCode(address.getPostalCode());
         dto.setCountryGeoId(address.getCountryGeoId());
         dto.setStateProvinceGeoId(address.getStateProvinceGeoId());
+        dto.setHouseNumberExt(address.getHouseNumberExt());
 
         dto.seteMailAddress(eMailAddress.getInfoString());
 
@@ -67,6 +69,13 @@ public class OrderDetailsDTO {
         this.statusId = header.getStatusId();
     }
 
+    public String getHouseNumberExt() {
+        return houseNumberExt;
+    }
+
+    public void setHouseNumberExt(String houseNumberExt) {
+        this.houseNumberExt = houseNumberExt;
+    }
 
     public String geteMailAddress() {
         return eMailAddress;

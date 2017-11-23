@@ -1,6 +1,7 @@
 package com.skytala.eCommerce.domain.party.relations.person.mapper;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
@@ -209,7 +210,7 @@ public class PersonMapper  {
 }
 
 		if(fields.get("birthDate") != null) {
-			returnVal.setBirthDate((Timestamp) fields.get("birthDate"));
+			returnVal.setBirthDate((Date) fields.get("birthDate"));
 }
 
 		if(fields.get("deceasedDate") != null) {
@@ -348,7 +349,7 @@ Boolean ibuf = Boolean.parseBoolean(buf);
 
 		if(fields.get("birthDate") != null) {
 String buf = fields.get("birthDate");
-Timestamp ibuf = Timestamp.valueOf(buf);
+Date ibuf = Date.valueOf(buf);
 			returnVal.setBirthDate(ibuf);
 }
 
@@ -470,7 +471,7 @@ Boolean ibuf = Boolean.parseBoolean(buf);
 		returnVal.setOtherLocal(val.getString("otherLocal"));
 		returnVal.setMemberId(val.getString("memberId"));
 		returnVal.setGender(val.getBoolean("gender"));
-		returnVal.setBirthDate(val.getTimestamp("birthDate"));
+		returnVal.setBirthDate(val.getDate("birthDate"));
 		returnVal.setDeceasedDate(val.getTimestamp("deceasedDate"));
 		returnVal.setHeight(val.getBigDecimal("height"));
 		returnVal.setWeight(val.getBigDecimal("weight"));
@@ -547,7 +548,7 @@ returnVal.setGender(ibuf);
 }
 		if(paramMap.containsKey("birthDate"))  {
 String buf = request.getParameter("birthDate");
-Timestamp ibuf = Timestamp.valueOf(buf);
+Date ibuf = Date.valueOf(buf);
 returnVal.setBirthDate(ibuf);
 }
 		if(paramMap.containsKey("deceasedDate"))  {

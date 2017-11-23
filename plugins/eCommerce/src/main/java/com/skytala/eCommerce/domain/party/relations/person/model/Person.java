@@ -1,5 +1,6 @@
 package com.skytala.eCommerce.domain.party.relations.person.model;
 
+import java.sql.Date;
 import java.util.Map;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -24,7 +25,7 @@ private String lastNameLocal;
 private String otherLocal;
 private String memberId;
 private Boolean gender;
-private Timestamp birthDate;
+private Date birthDate;
 private Timestamp deceasedDate;
 private BigDecimal height;
 private BigDecimal weight;
@@ -155,11 +156,11 @@ public void setGender(Boolean  gender) {
 this.gender = gender;
 }
 
-public Timestamp getBirthDate() {
+public Date getBirthDate() {
 return birthDate;
 }
 
-public void setBirthDate(Timestamp  birthDate) {
+public void setBirthDate(Date  birthDate) {
 this.birthDate = birthDate;
 }
 

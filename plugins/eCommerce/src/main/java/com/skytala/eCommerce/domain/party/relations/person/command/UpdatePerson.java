@@ -13,41 +13,43 @@ import com.skytala.eCommerce.framework.pubsub.Event;
 
 public class UpdatePerson extends Command {
 
-private Person elementToBeUpdated;
+    private Person elementToBeUpdated;
 
-public UpdatePerson(Person elementToBeUpdated){
-this.elementToBeUpdated = elementToBeUpdated;
-}
-public Person getElementToBeUpdated() {
-return elementToBeUpdated;
-}
-public void setElementToBeUpdated(Person elementToBeUpdated){
-this.elementToBeUpdated = elementToBeUpdated;
-}
+    public UpdatePerson(Person elementToBeUpdated){
+        this.elementToBeUpdated = elementToBeUpdated;
+    }
+    public Person getElementToBeUpdated() {
+        return elementToBeUpdated;
+    }
+    public void setElementToBeUpdated(Person elementToBeUpdated){
+        this.elementToBeUpdated = elementToBeUpdated;
+    }
 
-@Override
-public Event execute() throws RecordNotFoundException{
+    @Override
+    public Event execute() throws RecordNotFoundException{
 
 
-Delegator delegator = DelegatorFactory.getDelegator("default");
+        Delegator delegator = DelegatorFactory.getDelegator("default");
 
-boolean success;
-try{
-GenericValue newValue = delegator.makeValue("Person", elementToBeUpdated.mapAttributeField());
-delegator.store(newValue);
-if(delegator.store(newValue) == 0) { 
-throw new RecordNotFoundException(Person.class); 
-}
-success = true;
-} catch (GenericEntityException e) {
-e.printStackTrace();
-if(e.getCause().getClass().equals(GenericEntityNotFoundException.class)) {
-throw new RecordNotFoundException(Person.class);
-}
-success = false;
-}
-Event resultingEvent = new PersonUpdated(success);
-Broker.instance().publish(resultingEvent);
-return resultingEvent;
-}
+
+        boolean success;
+        try{
+
+            GenericValue newValue = delegator.makeValue("Person", elementToBeUpdated.mapAttributeField());
+            delegator.store(newValue);
+            if(delegator.store(newValue) == 0) {
+                throw new RecordNotFoundException(Person.class);
+            }
+            success = true;
+        } catch (GenericEntityException e) {
+            e.printStackTrace();
+            if(e.getCause().getClass().equals(GenericEntityNotFoundException.class)) {
+                throw new RecordNotFoundException(Person.class);
+            }
+            success = false;
+        }
+        Event resultingEvent = new PersonUpdated(success);
+        Broker.instance().publish(resultingEvent);
+        return resultingEvent;
+    }
 }

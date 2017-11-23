@@ -1,9 +1,5 @@
 package com.skytala.eCommerce.domain.product.query;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.LinkedList;
+import java.util.*;
 
 import org.apache.ofbiz.entity.Delegator;
 import org.apache.ofbiz.entity.DelegatorFactory;
@@ -20,65 +16,69 @@ import com.skytala.eCommerce.domain.product.model.Product;
 public class FindProductsBy extends Query {
 
 
-Map<String, String> filter;
-public FindProductsBy(Map<String, String> filter) {
-this.filter = filter;
-}
+    Map<String, String> filter;
+    public FindProductsBy(Map<String, String> filter) {
+        if(filter!=null)
+            this.filter = filter;
+        else
+            this.filter = new HashMap<>();
+    }
 
-@Override
-public Event execute(){
-
-Delegator delegator = DelegatorFactory.getDelegator("default");
-List<Product> foundProducts = new ArrayList<Product>();
-
-try{
-List<GenericValue> buf = new LinkedList<>();
-if(filter.size()==1&&filter.containsKey("productId")) { 
- GenericValue foundElement = delegator.findOne("Product", false, filter);
-if(foundElement != null) { 
-buf.add(foundElement);
-}else { 
-throw new RecordNotFoundException(Product.class); 
- } 
-}else { 
- buf = delegator.findAll("Product", false); 
- }
-
-for (int i = 0; i < buf.size(); i++) {
-if(applysToFilter(buf.get(i))) {
-foundProducts.add(ProductMapper.map(buf.get(i)));
-}
-}
+    @Override
+    public Event execute(){
 
 
-}catch(GenericEntityException e) {
-e.printStackTrace();
-}
-Event resultingEvent = new ProductFound(foundProducts);
-Broker.instance().publish(resultingEvent);
-return resultingEvent;
+        Delegator delegator = DelegatorFactory.getDelegator("default");
+        List<Product> foundProducts = new ArrayList<Product>();
 
-}
-public boolean applysToFilter(GenericValue val) {
+        try{
+            List<GenericValue> buf = new LinkedList<>();
+            if(filter.size()==1&&filter.containsKey("productId")) {
+                GenericValue foundElement = delegator.findOne("Product", false, filter);
+                if(foundElement != null) {
+                    buf.add(foundElement);
+                }else {
+                    throw new RecordNotFoundException(Product.class);
+                }
+            }else {
+                buf = delegator.findAll("Product", false);
+            }
 
-Iterator<String> iterator = filter.keySet().iterator();
+            for (int i = 0; i < buf.size(); i++) {
+                if(applysToFilter(buf.get(i))) {
+                    foundProducts.add(ProductMapper.map(buf.get(i)));
+                }
+            }
 
-while(iterator.hasNext()) {
 
-String key = iterator.next();
+        }catch(GenericEntityException e) {
+            e.printStackTrace();
+        }
+        Event resultingEvent = new ProductFound(foundProducts);
+        Broker.instance().publish(resultingEvent);
+        return resultingEvent;
 
-if(val.get(key) == null) {
-return false;
-}
+    }
+    public boolean applysToFilter(GenericValue val) {
 
-if((val.get(key).toString()).contains(filter.get(key))) {
-}else {
-return false;
-}
-}
-return true;
-}
-public void setFilter(Map<String, String> newFilter) {
-this.filter = newFilter;
-}
+        Iterator<String> iterator = filter.keySet().iterator();
+
+        while(iterator.hasNext()) {
+
+            String key = iterator.next();
+
+            if(val.get(key) == null) {
+                return false;
+            }
+
+            if((val.get(key).toString()).contains(filter.get(key))) {
+            }else {
+                return false;
+            }
+        }
+        return true;
+    }
+    public void setFilter(Map<String, String> newFilter) {
+        this.filter = newFilter;
+    }
 }

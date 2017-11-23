@@ -82,7 +82,7 @@ public class PartyController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createParty(HttpServletRequest request) throws Exception {
+	public ResponseEntity<Party> createParty(HttpServletRequest request) throws Exception {
 
 		Party partyToBeAdded = new Party();
 		try {
@@ -90,7 +90,7 @@ public class PartyController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 		}
 
 		return this.createParty(partyToBeAdded);
@@ -105,7 +105,7 @@ public class PartyController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createParty(@RequestBody Party partyToBeAdded) throws Exception {
+	public ResponseEntity<Party> createParty(@RequestBody Party partyToBeAdded) throws Exception {
 
 		AddParty command = new AddParty(partyToBeAdded);
 		Party party = ((PartyAdded) Scheduler.execute(command).data()).getAddedParty();
@@ -115,7 +115,7 @@ public class PartyController {
 					             .body(party);
 		else 
 			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("Party could not be created.");
+					             .body(null);
 	}
 
 	/**

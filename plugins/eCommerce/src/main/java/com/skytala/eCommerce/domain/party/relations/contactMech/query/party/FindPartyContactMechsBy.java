@@ -20,65 +20,59 @@ import com.skytala.eCommerce.domain.party.relations.contactMech.model.party.Part
 public class FindPartyContactMechsBy extends Query {
 
 
-Map<String, String> filter;
-public FindPartyContactMechsBy(Map<String, String> filter) {
-this.filter = filter;
-}
+    Map<String, String> filter;
+    public FindPartyContactMechsBy(Map<String, String> filter) {
+        this.filter = filter;
+    }
 
-@Override
-public Event execute(){
+    @Override
+    public Event execute(){
 
-Delegator delegator = DelegatorFactory.getDelegator("default");
-List<PartyContactMech> foundPartyContactMechs = new ArrayList<PartyContactMech>();
+        Delegator delegator = DelegatorFactory.getDelegator("default");
+        List<PartyContactMech> foundPartyContactMechs = new ArrayList<PartyContactMech>();
 
-try{
-List<GenericValue> buf = new LinkedList<>();
-if(filter.size()==1&&filter.containsKey("partyContactMechId")) { 
- GenericValue foundElement = delegator.findOne("PartyContactMech", false, filter);
-if(foundElement != null) { 
-buf.add(foundElement);
-}else { 
-throw new RecordNotFoundException(PartyContactMech.class); 
- } 
-}else { 
- buf = delegator.findAll("PartyContactMech", false); 
- }
+        try{
 
-for (int i = 0; i < buf.size(); i++) {
-if(applysToFilter(buf.get(i))) {
-foundPartyContactMechs.add(PartyContactMechMapper.map(buf.get(i)));
-}
-}
+            List<GenericValue> buf = new LinkedList<>();
+
+            buf = delegator.findAll("PartyContactMech", false);
 
 
-}catch(GenericEntityException e) {
-e.printStackTrace();
-}
-Event resultingEvent = new PartyContactMechFound(foundPartyContactMechs);
-Broker.instance().publish(resultingEvent);
-return resultingEvent;
+            for (int i = 0; i < buf.size(); i++) {
+                if(applysToFilter(buf.get(i))) {
+                    foundPartyContactMechs.add(PartyContactMechMapper.map(buf.get(i)));
+                }
+            }
 
-}
-public boolean applysToFilter(GenericValue val) {
 
-Iterator<String> iterator = filter.keySet().iterator();
+        }catch(GenericEntityException e) {
+            e.printStackTrace();
+        }
+        Event resultingEvent = new PartyContactMechFound(foundPartyContactMechs);
+        Broker.instance().publish(resultingEvent);
+        return resultingEvent;
 
-while(iterator.hasNext()) {
+    }
+    public boolean applysToFilter(GenericValue val) {
 
-String key = iterator.next();
+        Iterator<String> iterator = filter.keySet().iterator();
 
-if(val.get(key) == null) {
-return false;
-}
+        while(iterator.hasNext()) {
 
-if((val.get(key).toString()).contains(filter.get(key))) {
-}else {
-return false;
-}
-}
-return true;
-}
-public void setFilter(Map<String, String> newFilter) {
-this.filter = newFilter;
-}
+            String key = iterator.next();
+
+            if(val.get(key) == null) {
+                return false;
+            }
+
+            if((val.get(key).toString()).contains(filter.get(key))) {
+            }else {
+                return false;
+            }
+        }
+        return true;
+    }
+    public void setFilter(Map<String, String> newFilter) {
+        this.filter = newFilter;
+    }
 }

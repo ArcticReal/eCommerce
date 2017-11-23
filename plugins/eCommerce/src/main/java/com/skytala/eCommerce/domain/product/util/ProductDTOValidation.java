@@ -7,6 +7,7 @@ public class ProductDTOValidation {
     public static final String INVALID_ISBN = "invalid isbn";
     public static final String INVALID_PUBLISHER = "invalid publisher";
     public static final String INVALID_RATING = "invalid rating";
+    public static final String INVALID_PUBLISHING_DATE = "invalid publishing date";
     public static final String VALID = "valid";
 
 }

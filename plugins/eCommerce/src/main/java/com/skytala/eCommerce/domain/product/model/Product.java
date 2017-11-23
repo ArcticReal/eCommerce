@@ -1,11 +1,31 @@
 package com.skytala.eCommerce.domain.product.model;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Map;
 import java.io.Serializable;
+
+import com.skytala.eCommerce.domain.product.event.ProductFound;
 import com.skytala.eCommerce.domain.product.mapper.ProductMapper;
+import com.skytala.eCommerce.domain.product.query.FindProductsBy;
+import com.skytala.eCommerce.domain.product.relations.product.model.category.ProductCategory;
+import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
+import com.skytala.eCommerce.framework.pubsub.Query;
+import com.skytala.eCommerce.framework.pubsub.Scheduler;
+import com.skytala.eCommerce.framework.util.TimestampUtil;
+import org.apache.ofbiz.base.util.Debug;
+import org.apache.ofbiz.service.GenericServiceException;
+import org.apache.ofbiz.service.LocalDispatcher;
+import org.apache.ofbiz.service.ServiceAuthException;
+import org.apache.ofbiz.service.ServiceValidationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.servlet.http.HttpSession;
 
 public class Product implements Serializable{
 
@@ -83,9 +103,60 @@ public class Product implements Serializable{
 
     private Boolean orderDecimalQuantity;
 
+    private Boolean equalsDatabaseRecord;
+    private final FindProductsBy queryToLoadRest;
 
+    public Product(String productId, FindProductsBy queryToLoadRest) {
+        this.productId = productId;
+        this.queryToLoadRest = queryToLoadRest;
+        equalsDatabaseRecord = false;
+    }
+
+    public Product() {
+        queryToLoadRest = null;
+        equalsDatabaseRecord = true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Product product = (Product) o;
+
+        if (productId != null ? !productId.equals(product.productId) : product.productId != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return productId != null ? productId.hashCode() : 0;
+    }
+
+    public Boolean getVirtual() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
+
+        return isVirtual;
+    }
+
+    public void setVirtual(Boolean virtual) {
+        isVirtual = virtual;
+    }
+
+    public Boolean getVariant() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
+        return isVariant;
+    }
+
+    public void setVariant(Boolean variant) {
+        isVariant = variant;
+    }
 
     public String getProductId() {
+
         return productId;
     }
 
@@ -94,6 +165,8 @@ public class Product implements Serializable{
     }
 
     public String getProductTypeId() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return productTypeId;
     }
 
@@ -102,6 +175,8 @@ public class Product implements Serializable{
     }
 
     public String getPrimaryProductCategoryId() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return primaryProductCategoryId;
     }
 
@@ -110,6 +185,8 @@ public class Product implements Serializable{
     }
 
     public String getManufacturerPartyId() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return manufacturerPartyId;
     }
 
@@ -118,6 +195,8 @@ public class Product implements Serializable{
     }
 
     public String getFacilityId() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return facilityId;
     }
 
@@ -126,6 +205,8 @@ public class Product implements Serializable{
     }
 
     public Timestamp getIntroductionDate() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return introductionDate;
     }
 
@@ -134,6 +215,8 @@ public class Product implements Serializable{
     }
 
     public Timestamp getReleaseDate() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return releaseDate;
     }
 
@@ -142,6 +225,8 @@ public class Product implements Serializable{
     }
 
     public Timestamp getSupportDiscontinuationDate() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return supportDiscontinuationDate;
     }
 
@@ -150,6 +235,8 @@ public class Product implements Serializable{
     }
 
     public Timestamp getSalesDiscontinuationDate() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return salesDiscontinuationDate;
     }
 
@@ -158,6 +245,8 @@ public class Product implements Serializable{
     }
 
     public Boolean getSalesDiscWhenNotAvail() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return salesDiscWhenNotAvail;
     }
 
@@ -166,6 +255,8 @@ public class Product implements Serializable{
     }
 
     public String getInternalName() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return internalName;
     }
 
@@ -174,6 +265,8 @@ public class Product implements Serializable{
     }
 
     public String getBrandName() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return brandName;
     }
 
@@ -182,6 +275,8 @@ public class Product implements Serializable{
     }
 
     public String getComments() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return comments;
     }
 
@@ -190,6 +285,8 @@ public class Product implements Serializable{
     }
 
     public String getProductName() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return productName;
     }
 
@@ -198,6 +295,8 @@ public class Product implements Serializable{
     }
 
     public String getDescription() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return description;
     }
 
@@ -206,6 +305,8 @@ public class Product implements Serializable{
     }
 
     public String getLongDescription() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return longDescription;
     }
 
@@ -214,6 +315,8 @@ public class Product implements Serializable{
     }
 
     public String getPriceDetailText() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return priceDetailText;
     }
 
@@ -222,6 +325,8 @@ public class Product implements Serializable{
     }
 
     public String getSmallImageUrl() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return smallImageUrl;
     }
 
@@ -230,6 +335,8 @@ public class Product implements Serializable{
     }
 
     public String getMediumImageUrl() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return mediumImageUrl;
     }
 
@@ -238,6 +345,8 @@ public class Product implements Serializable{
     }
 
     public String getLargeImageUrl() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return largeImageUrl;
     }
 
@@ -246,6 +355,8 @@ public class Product implements Serializable{
     }
 
     public String getDetailImageUrl() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return detailImageUrl;
     }
 
@@ -254,6 +365,8 @@ public class Product implements Serializable{
     }
 
     public String getOriginalImageUrl() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return originalImageUrl;
     }
 
@@ -262,6 +375,8 @@ public class Product implements Serializable{
     }
 
     public String getDetailScreen() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return detailScreen;
     }
 
@@ -270,6 +385,8 @@ public class Product implements Serializable{
     }
 
     public String getInventoryMessage() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return inventoryMessage;
     }
 
@@ -278,6 +395,8 @@ public class Product implements Serializable{
     }
 
     public String getInventoryItemTypeId() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return inventoryItemTypeId;
     }
 
@@ -286,6 +405,8 @@ public class Product implements Serializable{
     }
 
     public Boolean getRequireInventory() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return requireInventory;
     }
 
@@ -294,6 +415,8 @@ public class Product implements Serializable{
     }
 
     public String getQuantityUomId() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return quantityUomId;
     }
 
@@ -302,6 +425,8 @@ public class Product implements Serializable{
     }
 
     public BigDecimal getQuantityIncluded() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return quantityIncluded;
     }
 
@@ -310,6 +435,8 @@ public class Product implements Serializable{
     }
 
     public Long getPiecesIncluded() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return piecesIncluded;
     }
 
@@ -318,6 +445,8 @@ public class Product implements Serializable{
     }
 
     public Boolean getRequireAmount() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return requireAmount;
     }
 
@@ -326,6 +455,8 @@ public class Product implements Serializable{
     }
 
     public BigDecimal getFixedAmount() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return fixedAmount;
     }
 
@@ -334,6 +465,8 @@ public class Product implements Serializable{
     }
 
     public String getAmountUomTypeId() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return amountUomTypeId;
     }
 
@@ -342,6 +475,8 @@ public class Product implements Serializable{
     }
 
     public String getWeightUomId() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return weightUomId;
     }
 
@@ -350,6 +485,8 @@ public class Product implements Serializable{
     }
 
     public BigDecimal getShippingWeight() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return shippingWeight;
     }
 
@@ -358,6 +495,8 @@ public class Product implements Serializable{
     }
 
     public BigDecimal getProductWeight() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return productWeight;
     }
 
@@ -366,6 +505,8 @@ public class Product implements Serializable{
     }
 
     public String getHeightUomId() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return heightUomId;
     }
 
@@ -374,6 +515,8 @@ public class Product implements Serializable{
     }
 
     public BigDecimal getProductHeight() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return productHeight;
     }
 
@@ -382,6 +525,8 @@ public class Product implements Serializable{
     }
 
     public BigDecimal getShippingHeight() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return shippingHeight;
     }
 
@@ -390,6 +535,8 @@ public class Product implements Serializable{
     }
 
     public String getWidthUomId() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return widthUomId;
     }
 
@@ -398,6 +545,8 @@ public class Product implements Serializable{
     }
 
     public BigDecimal getProductWidth() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return productWidth;
     }
 
@@ -406,6 +555,8 @@ public class Product implements Serializable{
     }
 
     public BigDecimal getShippingWidth() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return shippingWidth;
     }
 
@@ -414,6 +565,8 @@ public class Product implements Serializable{
     }
 
     public String getDepthUomId() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return depthUomId;
     }
 
@@ -422,6 +575,8 @@ public class Product implements Serializable{
     }
 
     public BigDecimal getProductDepth() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return productDepth;
     }
 
@@ -430,6 +585,8 @@ public class Product implements Serializable{
     }
 
     public BigDecimal getShippingDepth() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return shippingDepth;
     }
 
@@ -438,6 +595,8 @@ public class Product implements Serializable{
     }
 
     public String getDiameterUomId() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return diameterUomId;
     }
 
@@ -446,6 +605,8 @@ public class Product implements Serializable{
     }
 
     public BigDecimal getProductDiameter() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return productDiameter;
     }
 
@@ -454,6 +615,8 @@ public class Product implements Serializable{
     }
 
     public BigDecimal getProductRating() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return productRating;
     }
 
@@ -462,6 +625,8 @@ public class Product implements Serializable{
     }
 
     public String getRatingTypeEnum() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return ratingTypeEnum;
     }
 
@@ -470,6 +635,9 @@ public class Product implements Serializable{
     }
 
     public Boolean getReturnable() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
+
         return returnable;
     }
 
@@ -478,6 +646,8 @@ public class Product implements Serializable{
     }
 
     public Boolean getTaxable() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return taxable;
     }
 
@@ -486,6 +656,8 @@ public class Product implements Serializable{
     }
 
     public Boolean getChargeShipping() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return chargeShipping;
     }
 
@@ -494,6 +666,8 @@ public class Product implements Serializable{
     }
 
     public Boolean getAutoCreateKeywords() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return autoCreateKeywords;
     }
 
@@ -502,6 +676,8 @@ public class Product implements Serializable{
     }
 
     public Boolean getIncludeInPromotions() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return includeInPromotions;
     }
 
@@ -510,6 +686,8 @@ public class Product implements Serializable{
     }
 
     public Boolean getIsVirtual() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return isVirtual;
     }
 
@@ -518,6 +696,8 @@ public class Product implements Serializable{
     }
 
     public Boolean getIsVariant() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return isVariant;
     }
 
@@ -526,6 +706,8 @@ public class Product implements Serializable{
     }
 
     public String getVirtualVariantMethodEnum() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return virtualVariantMethodEnum;
     }
 
@@ -534,6 +716,8 @@ public class Product implements Serializable{
     }
 
     public String getOriginGeoId() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return originGeoId;
     }
 
@@ -542,6 +726,8 @@ public class Product implements Serializable{
     }
 
     public String getRequirementMethodEnumId() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return requirementMethodEnumId;
     }
 
@@ -550,6 +736,8 @@ public class Product implements Serializable{
     }
 
     public Long getBillOfMaterialLevel() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return billOfMaterialLevel;
     }
 
@@ -558,6 +746,8 @@ public class Product implements Serializable{
     }
 
     public BigDecimal getReservMaxPersons() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return reservMaxPersons;
     }
 
@@ -566,6 +756,8 @@ public class Product implements Serializable{
     }
 
     public BigDecimal getReserv2ndPPPerc() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return reserv2ndPPPerc;
     }
 
@@ -574,6 +766,8 @@ public class Product implements Serializable{
     }
 
     public BigDecimal getReservNthPPPerc() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return reservNthPPPerc;
     }
 
@@ -582,6 +776,8 @@ public class Product implements Serializable{
     }
 
     public String getConfigId() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return configId;
     }
 
@@ -590,6 +786,8 @@ public class Product implements Serializable{
     }
 
     public Timestamp getCreatedDate() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return createdDate;
     }
 
@@ -598,6 +796,8 @@ public class Product implements Serializable{
     }
 
     public String getCreatedByUserLogin() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return createdByUserLogin;
     }
 
@@ -606,6 +806,8 @@ public class Product implements Serializable{
     }
 
     public Timestamp getLastModifiedDate() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return lastModifiedDate;
     }
 
@@ -614,6 +816,8 @@ public class Product implements Serializable{
     }
 
     public String getLastModifiedByUserLogin() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return lastModifiedByUserLogin;
     }
 
@@ -622,6 +826,8 @@ public class Product implements Serializable{
     }
 
     public Boolean getInShippingBox() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return inShippingBox;
     }
 
@@ -630,6 +836,8 @@ public class Product implements Serializable{
     }
 
     public String getDefaultShipmentBoxTypeId() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return defaultShipmentBoxTypeId;
     }
 
@@ -638,6 +846,8 @@ public class Product implements Serializable{
     }
 
     public String getLotIdFilledIn() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return lotIdFilledIn;
     }
 
@@ -646,6 +856,8 @@ public class Product implements Serializable{
     }
 
     public Boolean getOrderDecimalQuantity() {
+        if(!equalsDatabaseRecord)
+            lazyLoad();
         return orderDecimalQuantity;
     }
 
@@ -654,7 +866,75 @@ public class Product implements Serializable{
     }
 
 
+    private void lazyLoad(){
+        Product product = null;
+        try {
+            List<Product> products = ((ProductFound)Scheduler.execute(queryToLoadRest).data()).getProducts();
+            if(products.size()==1)
+                product = products.get(0);
+            else
+                throw new RecordNotFoundException(Product.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        //TODO: set all thingies
+        Debug.log("Lazy load not yet implemented");
+        equalsDatabaseRecord = false;
+    }
+
     public Map<String, Object> mapAttributeField() {
         return ProductMapper.map(this);
     }
+
+
+    public void addToCategory(HttpSession session, ProductCategory category) throws GenericServiceException {
+
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("productCategoryId",category.getProductCategoryId());
+        paramMap.put("productId",productId);
+        paramMap.put("fromDate", TimestampUtil.currentTime());
+        paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+        Map<String, Object> result = new HashMap<>();
+        LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+
+
+        result = dispatcher.runSync("addProductToCategory", paramMap);
+
+        if(result.get("responseMessage").equals("error"))
+            throw new IllegalArgumentException("Ofbiz was not able to process the data");
+
+
+    }
+
+    public void addToCategories(HttpSession session, List<ProductCategory> categories) throws GenericServiceException {
+
+        for (int i = 0;i < categories.size(); i++){
+
+            addToCategory(session, categories.get(i));
+        }
+
+
+    }
+
+    public void removeFromCategory(HttpSession session, ProductCategory category, Timestamp fromDate) throws GenericServiceException {
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("fromDate", fromDate);
+        paramMap.put("productCategoryId", category.getProductCategoryId());
+        paramMap.put("productId",productId);
+        paramMap.put("userLogin", session.getAttribute("userLogin"));
+
+        Map<String, Object> result = new HashMap<>();
+        LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+
+        result = dispatcher.runSync("removeProductFromCategory", paramMap);
+
+        if(result.get("responseMessage").equals("error")) {
+            throw new IllegalArgumentException("Ofbiz was not able to process the data");
+        }
+
+    }
+
 }

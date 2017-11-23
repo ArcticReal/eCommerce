@@ -51,15 +51,15 @@ public class TaxwareServices {
         try {
             TaxwareUTL utl = new TaxwareUTL();
 
-            utl.setShipping(shipping != null ? shipping : BigDecimal.ZERO);
-            utl.setShipAddress(address);
-            for (int i = 0; i < items.size(); i++) {
-                GenericValue p = (GenericValue) items.get(i);
-                BigDecimal amount = (BigDecimal) amnts.get(i);
-                BigDecimal ishp = ishpn != null ? (BigDecimal) ishpn.get(i) : BigDecimal.ZERO;
-
-                utl.addItem(p, amount, ishp);
-            }
+//            utl.setShipping(shipping != null ? shipping : BigDecimal.ZERO);
+//            utl.setShipAddress(address);
+//            for (int i = 0; i < items.size(); i++) {
+//                GenericValue p = (GenericValue) items.get(i);
+//                BigDecimal amount = (BigDecimal) amnts.get(i);
+//                BigDecimal ishp = ishpn != null ? (BigDecimal) ishpn.get(i) : BigDecimal.ZERO;
+//
+//                utl.addItem(p, amount, ishp);
+//            }
 
             int resp = utl.process();
 

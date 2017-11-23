@@ -187,6 +187,7 @@ access. For a detailed description see the core/docs/entityconfig.html file.
                 pool-jdbc-test-stmt="values 1"
                 soft-min-evictable-idle-time-millis="600000"
                 time-between-eviction-runs-millis="600000"/>
+                <!--jdbc-driver="com.mysql.jdbc.Driver"-->
         <!-- <jndi-jdbc jndi-server-name="localjndi" jndi-name="java:/DerbyDataSource" isolation-level="ReadCommitted"/> -->
     </datasource>
     <datasource name="localderbyodbc"

@@ -27,7 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 boolean success = false;
 
 try{
-int countRemoved = delegator.removeByAnd("ProductCategoryMember", UtilMisc.toMap("productCategoryMemberId", toBeDeletedId));
+int countRemoved = delegator.removeByAnd("ProductCategoryMember", UtilMisc.toMap("productCategoryId", toBeDeletedId));
 if(countRemoved > 0) {
 success = true;
 }

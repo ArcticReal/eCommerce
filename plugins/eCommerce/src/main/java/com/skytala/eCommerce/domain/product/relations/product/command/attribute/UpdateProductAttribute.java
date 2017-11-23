@@ -34,8 +34,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 boolean success;
 try{
 GenericValue newValue = delegator.makeValue("ProductAttribute", elementToBeUpdated.mapAttributeField());
-delegator.store(newValue);
-if(delegator.store(newValue) == 0) { 
+if(delegator.store(newValue) == 0) {
 throw new RecordNotFoundException(ProductAttribute.class); 
 }
 success = true;

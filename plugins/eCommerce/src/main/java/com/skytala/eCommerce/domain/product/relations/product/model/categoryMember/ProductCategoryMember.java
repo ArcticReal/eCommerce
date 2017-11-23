@@ -9,73 +9,73 @@ import com.skytala.eCommerce.domain.product.relations.product.mapper.categoryMem
 
 public class ProductCategoryMember implements Serializable{
 
-private static final long serialVersionUID = 1L;
-private String productCategoryId;
-private String productId;
-private Timestamp fromDate;
-private Timestamp thruDate;
-private String comments;
-private Long sequenceNum;
-private BigDecimal quantity;
+    private static final long serialVersionUID = 1L;
+    private String productCategoryId;
+    private String productId;
+    private Timestamp fromDate;
+    private Timestamp thruDate;
+    private String comments;
+    private Long sequenceNum;
+    private BigDecimal quantity;
 
-public String getProductCategoryId() {
-return productCategoryId;
-}
+    public String getProductCategoryId() {
+        return productCategoryId;
+    }
 
-public void setProductCategoryId(String  productCategoryId) {
-this.productCategoryId = productCategoryId;
-}
+    public void setProductCategoryId(String  productCategoryId) {
+        this.productCategoryId = productCategoryId;
+    }
 
-public String getProductId() {
-return productId;
-}
+    public String getProductId() {
+        return productId;
+    }
 
-public void setProductId(String  productId) {
-this.productId = productId;
-}
+    public void setProductId(String  productId) {
+        this.productId = productId;
+    }
 
-public Timestamp getFromDate() {
-return fromDate;
-}
+    public Timestamp getFromDate() {
+        return fromDate;
+    }
 
-public void setFromDate(Timestamp  fromDate) {
-this.fromDate = fromDate;
-}
+    public void setFromDate(Timestamp  fromDate) {
+        this.fromDate = fromDate;
+    }
 
-public Timestamp getThruDate() {
-return thruDate;
-}
+    public Timestamp getThruDate() {
+        return thruDate;
+    }
 
-public void setThruDate(Timestamp  thruDate) {
-this.thruDate = thruDate;
-}
+    public void setThruDate(Timestamp  thruDate) {
+        this.thruDate = thruDate;
+    }
 
-public String getComments() {
-return comments;
-}
+    public String getComments() {
+        return comments;
+    }
 
-public void setComments(String  comments) {
-this.comments = comments;
-}
+    public void setComments(String  comments) {
+        this.comments = comments;
+    }
 
-public Long getSequenceNum() {
-return sequenceNum;
-}
+    public Long getSequenceNum() {
+        return sequenceNum;
+    }
 
-public void setSequenceNum(Long  sequenceNum) {
-this.sequenceNum = sequenceNum;
-}
+    public void setSequenceNum(Long  sequenceNum) {
+        this.sequenceNum = sequenceNum;
+    }
 
-public BigDecimal getQuantity() {
-return quantity;
-}
+    public BigDecimal getQuantity() {
+        return quantity;
+    }
 
-public void setQuantity(BigDecimal  quantity) {
-this.quantity = quantity;
-}
+    public void setQuantity(BigDecimal  quantity) {
+        this.quantity = quantity;
+    }
 
 
-public Map<String, Object> mapAttributeField() {
-return ProductCategoryMemberMapper.map(this);
-}
+    public Map<String, Object> mapAttributeField() {
+        return ProductCategoryMemberMapper.map(this);
+    }
 }

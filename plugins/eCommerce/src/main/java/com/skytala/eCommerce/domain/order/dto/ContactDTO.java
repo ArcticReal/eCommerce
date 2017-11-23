@@ -9,6 +9,8 @@ public class ContactDTO {
     private String addressContactMechId;
     private String toName;
     private String address1;
+    private Long houseNumber;
+    private String houseNumberExt;
     private String city;
     private String postalCode;
     private String countryGeoId;
@@ -28,6 +30,7 @@ public class ContactDTO {
         address.setContactMechId(addressContactMechId);
         address.setToName(toName);
         address.setAddress1(address1);
+        address.setHouseNumberExt(houseNumberExt);
         address.setCity(city);
         address.setPostalCode(postalCode);
         address.setCountryGeoId(countryGeoId);
@@ -36,6 +39,13 @@ public class ContactDTO {
         return address;
     }
 
+    public String getHouseNumberExt() {
+        return houseNumberExt;
+    }
+
+    public void setHouseNumberExt(String houseNumberExt) {
+        this.houseNumberExt = houseNumberExt;
+    }
 
     public String getAddressContactMechId() {
         return addressContactMechId;

@@ -4,35 +4,39 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import com.google.common.base.Function;
 import com.skytala.eCommerce.domain.product.dto.ProductDetailsDTO;
 import com.skytala.eCommerce.domain.product.dto.ProductListItemDTO;
 import com.skytala.eCommerce.domain.product.relations.product.control.attribute.ProductAttributeController;
+import com.skytala.eCommerce.domain.product.relations.product.control.categoryMember.ProductCategoryMemberController;
 import com.skytala.eCommerce.domain.product.relations.product.control.price.ProductPriceController;
 import com.skytala.eCommerce.domain.product.relations.product.model.attribute.ProductAttribute;
+import com.skytala.eCommerce.domain.product.relations.product.model.category.ProductCategory;
+import com.skytala.eCommerce.domain.product.relations.product.model.categoryMember.ProductCategoryMember;
 import com.skytala.eCommerce.domain.product.relations.product.model.price.ProductPrice;
+import com.skytala.eCommerce.domain.product.relations.product.query.category.FindProductCategorysBy;
 import com.skytala.eCommerce.domain.product.util.ProductAttributes;
 import com.skytala.eCommerce.domain.product.util.ProductDTOValidation;
+import com.skytala.eCommerce.service.login.util.SecurityGroups;
+import com.skytala.eCommerce.service.product.ProductViewServiceController;
+import org.apache.commons.validator.routines.DateValidator;
 import org.apache.commons.validator.routines.ISBNValidator;
 import org.apache.ofbiz.base.util.UtilMisc;
 import org.apache.regexp.RE;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import com.google.common.base.Splitter;
 import com.skytala.eCommerce.domain.product.command.AddProduct;
@@ -49,6 +53,11 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+import static com.skytala.eCommerce.framework.util.AuthorizeMethods.AUTHENTICATED;
+import static com.skytala.eCommerce.framework.util.AuthorizeMethods.HAS_ADMIN_AUTHORITY;
+import static com.skytala.eCommerce.framework.util.AuthorizeMethods.PERMIT_ALL;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
 @RequestMapping("/products")
@@ -61,6 +70,10 @@ public class ProductController {
 
 	@Resource
 	ProductAttributeController attributeController;
+
+	@Resource
+	ProductCategoryMemberController productCategoryMemberController;
+
 
 	public ProductController() {
 
@@ -78,6 +91,7 @@ public class ProductController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@PreAuthorize(PERMIT_ALL)
 	public ResponseEntity<List<Product>> findProductsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductsBy query = new FindProductsBy(allRequestParams);
@@ -93,30 +107,6 @@ public class ProductController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Product> createProduct(HttpServletRequest request) throws Exception {
-
-		Product productToBeAdded = new Product();
-		try {
-			productToBeAdded = ProductMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-		}
-
-		return this.createProduct(productToBeAdded);
-
-	}
-
-	/**
 	 * creates a new Product entry in the ofbiz database
 	 * 
 	 * @param productToBeAdded
@@ -124,64 +114,16 @@ public class ProductController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PreAuthorize(HAS_ADMIN_AUTHORITY)
 	public ResponseEntity<Product> createProduct(@RequestBody Product productToBeAdded) throws Exception {
 
 		AddProduct command = new AddProduct(productToBeAdded);
 		Product product = ((ProductAdded) Scheduler.execute(command).data()).getAddedProduct();
 		
-		if (product != null)
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(product);
-		else
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body(null);
+		return product != null ?  created(product)
+				               :  conflict();
 	}
 
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProduct(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		Product productToBeUpdated = new Product();
-
-		try {
-			productToBeUpdated = ProductMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProduct(productToBeUpdated, productToBeUpdated.getProductId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
-	}
 
 	/**
 	 * Updates the Product with the specific Id
@@ -192,6 +134,7 @@ public class ProductController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{productId}")
+	@PreAuthorize(HAS_ADMIN_AUTHORITY)
 	public ResponseEntity<Object> updateProduct(@RequestBody Product productToBeUpdated,
 			@PathVariable String productId) throws Exception {
 
@@ -206,10 +149,11 @@ public class ProductController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return ResponseEntity.status(CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productId}")
+	@GetMapping("/{productId}")
+	@PreAuthorize(PERMIT_ALL)
 	public ResponseEntity<Product> findById(@PathVariable String productId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productId", productId);
@@ -226,7 +170,8 @@ public class ProductController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productId}")
+	@DeleteMapping("/{productId}")
+	@PreAuthorize(HAS_ADMIN_AUTHORITY)
 	public ResponseEntity<Object> deleteProductByIdUpdated(@PathVariable String productId) throws Exception {
 		DeleteProduct command = new DeleteProduct(productId);
 
@@ -237,11 +182,12 @@ public class ProductController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("Product could not be deleted");
+		return ResponseEntity.status(CONFLICT).body("Product could not be deleted");
 
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productId}/details")
+	@GetMapping("/{productId}/details")
+	@PreAuthorize(PERMIT_ALL)
 	public ResponseEntity<ProductDetailsDTO> findByIdWithDetails(@PathVariable String productId) throws Exception {
 
 		ResponseEntity<Product> response = findById(productId);
@@ -266,49 +212,106 @@ public class ProductController {
 		final List<ProductAttribute> attributes = attributeController.findProductAttributesBy(filter)
 																     .getBody();
 
-		return successful(ProductDetailsDTO.create(product, price, attributes));
+
+		List<String> categoryIds = getAllCategoriesFromProduct(productId);
+
+		return successful(ProductDetailsDTO.create(product, price, attributes, categoryIds));
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/productList")
-	public ResponseEntity getAllProductListItems() throws Exception {
+	private List<String> getAllCategoriesFromProduct(String productId) throws Exception {
+
+		return productCategoryMemberController
+				.findProductCategoryMembersBy(UtilMisc.toMap("productId", productId))
+				.getBody()
+				.stream()
+				.map(productCategoryMember -> {return productCategoryMember.getProductCategoryId();})
+				.collect(Collectors.toList())
+				.stream()
+				.distinct()
+				.collect(Collectors.toList());
+
+	}
+
+	@GetMapping("/productList")
+	@PreAuthorize(PERMIT_ALL)
+	public ResponseEntity<List<ProductListItemDTO>> getAllProductListItems() throws Exception {
 
 		List<Product> products = findProductsBy(new HashMap<>()).getBody();
+
+
+
+		return successful(generateListItemsFromProducts(products));
+
+	}
+
+	private List<ProductListItemDTO> generateListItemsFromProducts(List<Product> products) throws Exception {
 
 		Map<String, String> filter = UtilMisc.toMap("productPricePurposeId", "PURCHASE",
 													"productPriceTypeId", "DEFAULT_PRICE");
 
 		final List<ProductPrice> productPrices = priceController.getNewestPrices(priceController.findProductPricesBy(filter)
-																								.getBody());
-
-
-
+				.getBody());
 
 		filter.clear();
-		filter.put("attrName", ProductAttributes.AUTHOR);
 
-		final List<ProductAttribute> authors = attributeController.findProductAttributesBy(filter)
-																			.getBody();
+		final List<ProductAttribute> attributes = attributeController.findProductAttributesBy(filter)
+				.getBody();
 
 		List<ProductListItemDTO> results = new LinkedList<>();
 
 		results = products.stream()
-						  .map((Product prod) -> ProductListItemDTO.create(prod, productPrices, authors))
-						  .collect(Collectors.toList());
+				.map((Product prod) -> ProductListItemDTO.create(prod, productPrices, attributes))
+				.filter(dto -> {
+					if (dto.getPrice()==null)
+						return false;
+					else
+						return true;})
+				.collect(Collectors.toList());
 
-		results = results.stream().map(dto -> {if (dto.getPrice()==null)
-													return null;
-												else
-													return dto;})
-								  .collect(Collectors.toList());
 
-		while (results.remove(null));
-
-		return successful(results);
+		return results;
 
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/addDetailed")
-	public ResponseEntity addProductWithDetails(ProductDetailsDTO dto) throws Exception {
+	@GetMapping("/productListFromCategory/{categoryId}")
+	@PreAuthorize(PERMIT_ALL)
+	public ResponseEntity<List<ProductListItemDTO>> getAllProductListItemsFromCategory(HttpSession session,
+																					   @PathVariable("categoryId") String categoryId) throws Exception {
+		ProductCategory category =
+				new ProductCategory(categoryId,
+									new FindProductCategorysBy(UtilMisc.toMap("productCategoryId", categoryId)));
+
+		List<Product> products = category.getProductCategoryMembers(session)
+				.stream()
+				.map(this::getProductFromCategoryMember)
+				.filter(product -> {
+					if(product == null)
+						return false;
+					else
+						return true;
+				})
+				.distinct()
+				.collect(Collectors.toList());
+
+		return successful(generateListItemsFromProducts(products));
+
+	}
+
+	private Product getProductFromCategoryMember(ProductCategoryMember member) {
+		String productId = member.getProductId();
+		try{
+			Product product = findById(productId).getBody();
+			return product;
+		}catch(Exception e){
+			return null;
+		}
+
+	}
+
+	@PostMapping("/addDetailed")
+	@PreAuthorize(HAS_ADMIN_AUTHORITY)
+	public ResponseEntity addProductWithDetails(@RequestBody ProductDetailsDTO dto) throws Exception {
+
 
 		String valid = validate(dto);
 		if(!valid.equals(ProductDTOValidation.VALID))
@@ -318,14 +321,14 @@ public class ProductController {
 		ResponseEntity<ProductPrice> priceResponse;
 		ResponseEntity<ProductAttribute> attributeResponse;
 
-		if((productResponse = createProduct(dto.extractProduct())).getStatusCode().equals(HttpStatus.CREATED)){
+		if((productResponse = createProduct(dto.extractProduct())).getStatusCode().equals(CREATED)){
 			dto.setProductId(productResponse.getBody().getProductId());
 
-			if(!(priceResponse = priceController.createProductPrice(dto.extractProductPrice())).getStatusCode().equals(HttpStatus.CREATED))
+			if(!(priceResponse = priceController.createProductPrice(dto.extractProductPrice())).getStatusCode().equals(CREATED))
 				return priceResponse;
 
 			for(ProductAttribute attribute : dto.extractAllAttributes()){
-				if(!(attributeResponse = attributeController.createProductAttribute(attribute)).getStatusCode().equals(HttpStatus.CREATED))
+				if(!(attributeResponse = attributeController.createProductAttribute(attribute)).getStatusCode().equals(CREATED))
 					return attributeResponse;
 			}
 
@@ -353,7 +356,7 @@ public class ProductController {
 		if(dto.getPublisher()==null||dto.getPublisher().equals(""))
 			return ProductDTOValidation.INVALID_PUBLISHER;
 
-		if (dto.getISBN()==null)
+		if (dto.getIsbn()==null)
 			return ProductDTOValidation.INVALID_ISBN;
 
 
@@ -363,14 +366,6 @@ public class ProductController {
 
 	private String validateSyntax(ProductDetailsDTO dto){
 
-
-
-		/*TODO validate ratings of costumers
-		if(dto.getProductRating()!=null){
-			BigDecimal rating = dto.getProductRating();
-			if(rating.compareTo(BigDecimal.ZERO) < 0 || rating.compareTo(new BigDecimal(5)) > 0)
-				return ProductDTOValidation.INVALID_RATING;
-		}*/
 
 
 		if(dto.getPrice()!=null){
@@ -385,7 +380,7 @@ public class ProductController {
 
 		}
 
-		String ISBN = dto.getISBN();
+		String ISBN = dto.getIsbn();
 		if(ISBN!=null&&ISBN.equals(""))
 			ISBN = null;
 
@@ -398,16 +393,22 @@ public class ProductController {
 			if(ISBN == null)
 				return ProductDTOValidation.INVALID_ISBN;
 			else
-				dto.setISBN(ISBN);
+				dto.setIsbn(ISBN);
 
 
 		}
 
+		if(dto.getPublishingDate()!=null) {
+			dto.setPublishingDate(dto.getPublishingDate().split("T")[0]);
+			if (!DateValidator.getInstance().isValid(dto.getPublishingDate(), "yyyy-mm-dd"))
+				return ProductDTOValidation.INVALID_PUBLISHING_DATE;
+		}
 		return ProductDTOValidation.VALID;
 	}
 
 
-	@RequestMapping(method = RequestMethod.PUT, value = "/{productId}/details", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PutMapping("/{productId}/details")
+	@PreAuthorize(HAS_ADMIN_AUTHORITY)
 	public ResponseEntity updateProductWithDetails(@PathVariable String productId, @RequestBody ProductDetailsDTO dto) throws Exception {
 
 		dto.setProductId(productId);
@@ -438,37 +439,52 @@ public class ProductController {
 		return successful();
 	}
 
+	@PutMapping("/{productId}/updateCategories")
+	@PreAuthorize(HAS_ADMIN_AUTHORITY)
+	public ResponseEntity updateCategories(HttpSession session,
+										   @PathVariable("productId") String productId,
+										   @RequestBody List<String> newCategoryIds) throws Exception {
 
-	@RequestMapping(value = (" ** "))
-	public ResponseEntity<Object> returnErrorPage(HttpServletRequest request) {
 
-		String usedUri = request.getRequestURI();
-		String[] splittedString = usedUri.split("/");
+		List<String> oldCategoryIds = getAllCategoriesFromProduct(productId);
 
-		String usedRequest = splittedString[splittedString.length - 1];
+		List<String> filteredOldIds = oldCategoryIds.stream()
+				.filter(oldId -> {return !newCategoryIds.contains(oldId);})
+				.collect(Collectors.toList());
 
-		if (validRequests.containsKey(usedRequest)) {
-			String returnVal = "Error: request method " + request.getMethod() + " not allowed for \"" + usedUri
-					+ "\"!\n" + "Please use " + validRequests.get(usedRequest) + "!";
+		List<String> filteredNewIds = newCategoryIds.stream()
+				.filter(newId -> {return !oldCategoryIds.contains(newId);})
+				.collect(Collectors.toList());
 
-			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(returnVal);
+		Product product = new Product(productId, new FindProductsBy(UtilMisc.toMap("productId", productId)));
+
+		for(String categoryId : filteredOldIds){
+			Map<String, String> filter = UtilMisc.toMap("productId", productId,
+														"productCategoryId", categoryId);
+
+			List<ProductCategoryMember> members = productCategoryMemberController.findProductCategoryMembersBy(filter).getBody();
+
+			for(ProductCategoryMember member : members){
+
+				ProductCategory category = getProductCategoryFromId(member.getProductCategoryId());
+				product.removeFromCategory(session, category, member.getFromDate());
+
+			}
+
 		}
 
-		String returnVal = "Error 404: Page not found! Valid pages are: \"eCommerce/api/product/\" plus one of the following: "
-				+ "";
+		List<ProductCategory> categories = filteredNewIds.stream().map(categoryId -> {
+			return getProductCategoryFromId(categoryId);
+		}).collect(Collectors.toList());
 
-		Set<String> keySet = validRequests.keySet();
-		Iterator<String> it = keySet.iterator();
+		product.addToCategories(session, categories);
 
-		while (it.hasNext()) {
-			returnVal += "\"" + it.next() + "\"";
-			if (it.hasNext())
-				returnVal += ", ";
-		}
+		return successful();
+	}
 
-		returnVal += "!";
-
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(returnVal);
+	private ProductCategory getProductCategoryFromId(String categoryId){
+		return new ProductCategory(categoryId, new FindProductCategorysBy(UtilMisc.toMap("productCategoryId", categoryId)));
 
 	}
+
 }

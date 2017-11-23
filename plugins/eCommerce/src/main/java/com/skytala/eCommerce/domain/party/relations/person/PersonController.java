@@ -36,6 +36,9 @@ import com.skytala.eCommerce.domain.party.relations.person.query.FindPersonsBy;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.notFound;
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.successful;
+
 @RestController
 @RequestMapping("/persons")
 public class PersonController {
@@ -58,7 +61,7 @@ public class PersonController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findPersonsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<Person>> findPersonsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPersonsBy query = new FindPersonsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -67,9 +70,7 @@ public class PersonController {
 
 		List<Person> persons =((PersonFound) Scheduler.execute(query).data()).getPersons();
 
-		if (persons.size() == 1) {
-			return ResponseEntity.ok().body(persons.get(0));
-		}
+
 
 		return ResponseEntity.ok().body(persons);
 
@@ -84,7 +85,7 @@ public class PersonController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPerson(HttpServletRequest request) throws Exception {
+	public ResponseEntity<Person> createPerson(HttpServletRequest request) throws Exception {
 
 		Person personToBeAdded = new Person();
 		try {
@@ -92,7 +93,7 @@ public class PersonController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 		}
 
 		return this.createPerson(personToBeAdded);
@@ -107,7 +108,7 @@ public class PersonController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPerson(@RequestBody Person personToBeAdded) throws Exception {
+	public ResponseEntity<Person> createPerson(@RequestBody Person personToBeAdded) throws Exception {
 
 		AddPerson command = new AddPerson(personToBeAdded);
 		Person person = ((PersonAdded) Scheduler.execute(command).data()).getAddedPerson();
@@ -117,7 +118,7 @@ public class PersonController {
 					             .body(person);
 		else 
 			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("Person could not be created.");
+					             .body(null);
 	}
 
 	/**
@@ -192,14 +193,17 @@ public class PersonController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{personId}")
-	public ResponseEntity<Object> findById(@PathVariable String personId) throws Exception {
+	@RequestMapping(method = RequestMethod.GET, value = "/{partyId}")
+	public ResponseEntity<Person> findById(@PathVariable String partyId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
-		requestParams.put("personId", personId);
+		requestParams.put("partyId", partyId);
 		try {
 
-			Object foundPerson = findPersonsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPerson);
+			List<Person> foundPerson = findPersonsBy(requestParams).getBody();
+			if(foundPerson.size()==1)
+				return successful(foundPerson.get(0));
+			else
+				return notFound();
 		} catch (RecordNotFoundException e) {
 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

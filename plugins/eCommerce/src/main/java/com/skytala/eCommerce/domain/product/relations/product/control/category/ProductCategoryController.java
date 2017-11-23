@@ -8,12 +8,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import com.skytala.eCommerce.domain.product.model.Product;
+import com.skytala.eCommerce.domain.product.relations.product.control.categoryMember.ProductCategoryMemberController;
+import com.skytala.eCommerce.domain.product.relations.product.dto.category.CategoryListItemDTO;
+import com.skytala.eCommerce.domain.product.relations.product.util.ProductCategoryTypes;
+import com.skytala.eCommerce.framework.util.AuthorizeMethods;
+import com.skytala.eCommerce.service.login.util.SecurityGroups;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,11 +45,21 @@ import com.skytala.eCommerce.domain.product.relations.product.query.category.Fin
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.notFound;
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.successful;
+import static com.skytala.eCommerce.framework.util.AuthorizeMethods.HAS_ADMIN_AUTHORITY;
+import static com.skytala.eCommerce.framework.util.AuthorizeMethods.HAS_USER_AUTHORITY;
+import static com.skytala.eCommerce.framework.util.AuthorizeMethods.PERMIT_ALL;
+
 @RestController
 @RequestMapping("/productCategorys")
+@PreAuthorize(HAS_ADMIN_AUTHORITY)
 public class ProductCategoryController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();
+
+	@Resource
+	private ProductCategoryMemberController categoryMemberController;
 
 	public ProductCategoryController() {
 
@@ -50,6 +69,8 @@ public class ProductCategoryController {
 		validRequests.put("removeById", RequestMethod.DELETE);
 	}
 
+
+
 	/**
 	 * 
 	 * @param allRequestParams
@@ -58,7 +79,8 @@ public class ProductCategoryController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findProductCategorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	@PreAuthorize(PERMIT_ALL)
+	public ResponseEntity<List<ProductCategory>> findProductCategorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductCategorysBy query = new FindProductCategorysBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -66,10 +88,6 @@ public class ProductCategoryController {
 		}
 
 		List<ProductCategory> productCategorys =((ProductCategoryFound) Scheduler.execute(query).data()).getProductCategorys();
-
-		if (productCategorys.size() == 1) {
-			return ResponseEntity.ok().body(productCategorys.get(0));
-		}
 
 		return ResponseEntity.ok().body(productCategorys);
 
@@ -84,7 +102,7 @@ public class ProductCategoryController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductCategory(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductCategory> createProductCategory(HttpServletRequest request) throws Exception {
 
 		ProductCategory productCategoryToBeAdded = new ProductCategory();
 		try {
@@ -92,7 +110,7 @@ public class ProductCategoryController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 		}
 
 		return this.createProductCategory(productCategoryToBeAdded);
@@ -107,8 +125,10 @@ public class ProductCategoryController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductCategory(@RequestBody ProductCategory productCategoryToBeAdded) throws Exception {
+	@PreAuthorize("hasAuthority('"+SecurityGroups.ADMIN+"')")
+	public ResponseEntity<ProductCategory> createProductCategory(@RequestBody ProductCategory productCategoryToBeAdded) throws Exception {
 
+		productCategoryToBeAdded.setProductCategoryTypeId(ProductCategoryTypes.USAGE_CATEGORY);
 		AddProductCategory command = new AddProductCategory(productCategoryToBeAdded);
 		ProductCategory productCategory = ((ProductCategoryAdded) Scheduler.execute(command).data()).getAddedProductCategory();
 		
@@ -117,7 +137,7 @@ public class ProductCategoryController {
 					             .body(productCategory);
 		else 
 			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductCategory could not be created.");
+					             .body(null);
 	}
 
 	/**
@@ -175,7 +195,7 @@ public class ProductCategoryController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{productCategoryId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductCategory(@RequestBody ProductCategory productCategoryToBeUpdated,
+	public ResponseEntity<ProductCategory> updateProductCategory(@RequestBody ProductCategory productCategoryToBeUpdated,
 			@PathVariable String productCategoryId) throws Exception {
 
 		productCategoryToBeUpdated.setProductCategoryId(productCategoryId);
@@ -193,22 +213,28 @@ public class ProductCategoryController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{productCategoryId}")
-	public ResponseEntity<Object> findById(@PathVariable String productCategoryId) throws Exception {
+	@PreAuthorize(HAS_USER_AUTHORITY)
+	public ResponseEntity<ProductCategory> findById(@PathVariable String productCategoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productCategoryId", productCategoryId);
 		try {
 
-			Object foundProductCategory = findProductCategorysBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductCategory);
+			List<ProductCategory> foundProductCategory = findProductCategorysBy(requestParams).getBody();
+			if(foundProductCategory.size()==1)
+				return ResponseEntity.status(HttpStatus.OK).body(foundProductCategory.get(0));
+			else
+				return notFound();
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{productCategoryId}")
-	public ResponseEntity<Object> deleteProductCategoryByIdUpdated(@PathVariable String productCategoryId) throws Exception {
+	public ResponseEntity<Object> deleteProductCategoryById(@PathVariable String productCategoryId) throws Exception {
+
+		categoryMemberController.deleteProductCategoryMemberByCategoryId(productCategoryId);
 		DeleteProductCategory command = new DeleteProductCategory(productCategoryId);
 
 		try {
@@ -222,36 +248,16 @@ public class ProductCategoryController {
 
 	}
 
-	@RequestMapping(value = (" ** "))
-	public ResponseEntity<Object> returnErrorPage(HttpServletRequest request) {
+	@RequestMapping("/listAll")
+	@PreAuthorize(PERMIT_ALL)
+	public ResponseEntity<List<CategoryListItemDTO>> listAllProductCategories() throws Exception {
+		List<ProductCategory> categories = findProductCategorysBy(new HashMap<>()).getBody();
 
-		String usedUri = request.getRequestURI();
-		String[] splittedString = usedUri.split("/");
-
-		String usedRequest = splittedString[splittedString.length - 1];
-
-		if (validRequests.containsKey(usedRequest)) {
-			String returnVal = "Error: request method " + request.getMethod() + " not allowed for \"" + usedUri
-					+ "\"!\n" + "Please use " + validRequests.get(usedRequest) + "!";
-
-			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(returnVal);
-		}
-
-		String returnVal = "Error 404: Page not found! Valid pages are: \"eCommerce/api/productCategory/\" plus one of the following: "
-				+ "";
-
-		Set<String> keySet = validRequests.keySet();
-		Iterator<String> it = keySet.iterator();
-
-		while (it.hasNext()) {
-			returnVal += "\"" + it.next() + "\"";
-			if (it.hasNext())
-				returnVal += ", ";
-		}
-
-		returnVal += "!";
-
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(returnVal);
+		return successful(categories.stream()
+				  					.map(CategoryListItemDTO::new)
+				  					.collect(Collectors.toList()));
 
 	}
+
+
 }

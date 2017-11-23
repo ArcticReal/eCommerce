@@ -8,9 +8,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import com.skytala.eCommerce.domain.party.relations.contactMech.control.party.PartyContactMechController;
+import com.skytala.eCommerce.domain.party.relations.contactMech.model.party.PartyContactMech;
+import com.skytala.eCommerce.domain.party.relations.contactMech.util.ContactMechTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +41,15 @@ import com.skytala.eCommerce.domain.party.relations.contactMech.query.FindContac
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.notFound;
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.successful;
+
 @RestController
 @RequestMapping("/contactMechs")
 public class ContactMechController {
+
+    @Resource
+    PartyContactMechController partyContactMechController;
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();
 
@@ -197,10 +208,13 @@ public class ContactMechController {
 		try {
 
 			List<ContactMech> foundContactMech = findContactMechsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundContactMech.get(0));
+			if(foundContactMech.size()==1)
+    			return successful(foundContactMech.get(0));
+			else
+			    return notFound();
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
@@ -219,6 +233,66 @@ public class ContactMechController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body("ContactMech could not be deleted");
 
 	}
+
+
+    public ContactMech getEmailAddressFor(String partyId) throws Exception {
+        List<PartyContactMech> partyContactMechs = partyContactMechController.findByPartyId(partyId).getBody();
+
+        List<ContactMech> mechs = partyContactMechs
+                .stream()
+				.distinct()
+                .map(partyContactMech -> {
+                    try {
+                        ContactMech mech = findById(partyContactMech.getContactMechId()).getBody();
+                        if(mech != null && mech.getContactMechTypeId().equals(ContactMechTypes.EMAIL_ADDRESS)){
+                            return mech;
+						}
+                        else
+                            return null;
+                    } catch (Exception e) {
+                        return null;
+                    }
+                })
+                .collect(Collectors.toList());
+
+        while(mechs.remove(null));
+
+        if(mechs.size()==1)
+            return mechs.get(0);
+        else
+            return null;
+
+    }
+
+    public ContactMech getPostalAddressFor(String partyId) throws Exception {
+        List<PartyContactMech> partyContactMechs = partyContactMechController.findByPartyId(partyId).getBody();
+
+        List<ContactMech> mechs = partyContactMechs
+                .stream()
+				.distinct()
+                .map(partyContactMech -> {
+                    try {
+                        ContactMech mech = findById(partyContactMech.getContactMechId()).getBody();
+                        if(mech != null && mech.getContactMechTypeId().equals(ContactMechTypes.POSTAL_ADDRESS))
+                            return mech;
+                        else
+                            return null;
+                    } catch (Exception e) {
+                        return null;
+                    }
+                })
+                .collect(Collectors.toList());
+
+        while(mechs.remove(null));
+
+        if(mechs.size()==1)
+            return mechs.get(0);
+        else
+            return null;
+
+    }
+
+
 
 	@RequestMapping(value = (" ** "))
 	public ResponseEntity<Object> returnErrorPage(HttpServletRequest request) {

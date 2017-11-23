@@ -174,7 +174,7 @@ public class PostalAddressController {
 	public ResponseEntity<Object> updatePostalAddress(@RequestBody PostalAddress postalAddressToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
-//		postalAddressToBeUpdated.setnull(null);
+		postalAddressToBeUpdated.setContactMechId(nullVal);
 
 		UpdatePostalAddress command = new UpdatePostalAddress(postalAddressToBeUpdated);
 

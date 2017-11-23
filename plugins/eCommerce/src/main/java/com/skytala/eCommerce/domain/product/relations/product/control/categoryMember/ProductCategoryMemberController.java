@@ -11,6 +11,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.ofbiz.base.util.UtilMisc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -58,7 +59,7 @@ public class ProductCategoryMemberController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findProductCategoryMembersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductCategoryMember>> findProductCategoryMembersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductCategoryMembersBy query = new FindProductCategoryMembersBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -67,9 +68,6 @@ public class ProductCategoryMemberController {
 
 		List<ProductCategoryMember> productCategoryMembers =((ProductCategoryMemberFound) Scheduler.execute(query).data()).getProductCategoryMembers();
 
-		if (productCategoryMembers.size() == 1) {
-			return ResponseEntity.ok().body(productCategoryMembers.get(0));
-		}
 
 		return ResponseEntity.ok().body(productCategoryMembers);
 
@@ -193,13 +191,16 @@ public class ProductCategoryMemberController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{productCategoryMemberId}")
-	public ResponseEntity<Object> findById(@PathVariable String productCategoryMemberId) throws Exception {
+	public ResponseEntity<ProductCategoryMember> findById(@PathVariable String productCategoryMemberId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productCategoryMemberId", productCategoryMemberId);
 		try {
 
-			Object foundProductCategoryMember = findProductCategoryMembersBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductCategoryMember);
+			List<ProductCategoryMember> foundProductCategoryMember = findProductCategoryMembersBy(requestParams).getBody();
+			if(foundProductCategoryMember.size()==1)
+				return ResponseEntity.status(HttpStatus.OK).body(foundProductCategoryMember.get(0));
+			else
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		} catch (RecordNotFoundException e) {
 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -207,9 +208,9 @@ public class ProductCategoryMemberController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productCategoryMemberId}")
-	public ResponseEntity<Object> deleteProductCategoryMemberByIdUpdated(@PathVariable String productCategoryMemberId) throws Exception {
-		DeleteProductCategoryMember command = new DeleteProductCategoryMember(productCategoryMemberId);
+	@RequestMapping(method = RequestMethod.DELETE, value = "/{productCategoryId}")
+	public ResponseEntity<Object> deleteProductCategoryMemberByCategoryId(@PathVariable String productCategoryId) throws Exception {
+		DeleteProductCategoryMember command = new DeleteProductCategoryMember(productCategoryId);
 
 		try {
 			if (((ProductCategoryMemberDeleted) Scheduler.execute(command).data()).isSuccess())
@@ -254,4 +255,6 @@ public class ProductCategoryMemberController {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(returnVal);
 
 	}
+
+
 }

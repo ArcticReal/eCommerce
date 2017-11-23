@@ -3,6 +3,7 @@ package com.skytala.eCommerce.domain.product.dto;
 import com.skytala.eCommerce.domain.product.model.Product;
 import com.skytala.eCommerce.domain.product.relations.product.model.attribute.ProductAttribute;
 import com.skytala.eCommerce.domain.product.relations.product.model.price.ProductPrice;
+import com.skytala.eCommerce.domain.product.util.ProductAttributes;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -13,11 +14,12 @@ public class ProductListItemDTO {
     private String productName;
     private String mediumImageUrl;
     private String author;
+    private String publishingDate;
     private BigDecimal price;
 
     public static ProductListItemDTO create(Product product,
                                             List<ProductPrice> prices,
-                                            List<ProductAttribute> authors) {
+                                            List<ProductAttribute> attributes) {
 
         ProductListItemDTO dto = new ProductListItemDTO(product);
 
@@ -27,9 +29,14 @@ public class ProductListItemDTO {
                     dto.setPrice(productPrice.getPrice());
 
 
-        for(ProductAttribute author : authors)
-            if(author.getProductId().equals(product.getProductId()))
-                dto.setAuthor(author.getAttrValue());
+        for(ProductAttribute attribute : attributes)
+            if(attribute.getProductId().equals(product.getProductId())){
+                if(attribute.getAttrName().equals(ProductAttributes.AUTHOR))
+                    dto.setAuthor(attribute.getAttrValue());
+                if(attribute.getAttrName().equals(ProductAttributes.PUBLISHING_DATE))
+                    dto.setPublishingDate(attribute.getAttrValue());
+
+            }
 
         return dto;
     }
@@ -38,6 +45,14 @@ public class ProductListItemDTO {
         this.productName = p.getProductName();
         this.productId = p.getProductId();
         this.mediumImageUrl = p.getMediumImageUrl();
+    }
+
+    public String getPublishingDate() {
+        return publishingDate;
+    }
+
+    public void setPublishingDate(String publishingDate) {
+        this.publishingDate = publishingDate;
     }
 
     public String getProductName() {

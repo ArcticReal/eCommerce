@@ -33,7 +33,7 @@ List<Person> foundPersons = new ArrayList<Person>();
 
 try{
 List<GenericValue> buf = new LinkedList<>();
-if(filter.size()==1&&filter.containsKey("personId")) { 
+if(filter.size()==1&&filter.containsKey("partyId")) {
  GenericValue foundElement = delegator.findOne("Person", false, filter);
 if(foundElement != null) { 
 buf.add(foundElement);

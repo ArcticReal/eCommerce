@@ -88,7 +88,7 @@ public class TaxwareUTL {
         }
 
         // create a shipping item
-        if (shippingAmount > 0) {
+        if (shippingAmount.compareTo(BigDecimal.ZERO) > 0) {
             Record shipping = outItem.makeRecord("outItem");
 
             shipping = makeItemData(shipping);
@@ -251,7 +251,9 @@ public class TaxwareUTL {
 
     private int callTaxware(String inString, StringBuilder outBuffer) throws TaxwareException {
         try {
-            return taxcommon.CalculateTax(inString, outBuffer);
+            //return taxcommon.CalculateTax(inString, outBuffer);
+            throw new TaxwareException("Problems running JNI wrapper.", new Exception());
+
         } catch (Exception e) {
             throw new TaxwareException("Problems running JNI wrapper.", e);
         }
@@ -291,165 +293,165 @@ public class TaxwareUTL {
             // make the adjustment lists
             if (itemAdjustments.size() < records.size()) {
                 List currentItem = new ArrayList();
-
-                if (rec.getBigDecimal("TAX_AMT_COUNTRY").compareTo(BigDecimal.ZERO) > 0) {
-                    if (Debug.verboseOn()) Debug.logVerbose("Country Tax Amount: " + rec.getBigDecimal("TAX_AMT_COUNTRY"), module);
-                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_COUNTRY").movePointRight(2);
-                    String type = rec.getString("TAX_TYPE_COUNTRY").equals("S") ? "SALES TAX" : "USE TAX";
-                    String jur = rec.get("JUR_COUNTRY") != null ? rec.getString("JUR_COUNTRY").trim() : "";
-                    String comments = jur + "|" + type + "|" + rate.toString();
-
-                    currentItem.add(delegator.makeValue("OrderAdjustment",
-                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_COUNTRY"),
-                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
-                }
-
-                if (rec.getBigDecimal("TAX_AMT_STATE").compareTo(BigDecimal.ZERO) > 0) {
-                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_STATE").movePointRight(2);
-                    String type = rec.getString("TAX_TYPE_STATE").equals("S") ? "SALES TAX" : "USE TAX";
-                    String jur = rec.get("JUR_STATE") != null ? rec.getString("JUR_STATE").trim() : "";
-                    String comments = jur + "|" + type + "|" + rate.toString();
-
-                    currentItem.add(delegator.makeValue("OrderAdjustment",
-                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_STATE"),
-                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
-                }
-
-                if (rec.getBigDecimal("TAX_AMT_COUNTY").compareTo(BigDecimal.ZERO) > 0) {
-                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_COUNTY").movePointRight(2);
-                    String type = rec.getString("TAX_TYPE_COUNTY").equals("S") ? "SALES TAX" : "USE TAX";
-                    String jur = rec.get("JUR_COUNTY_CODE") != null ? rec.getString("JUR_COUNTY_CODE").trim() : "";
-                    String comments = jur + "|" + type + "|" + rate.toString();
-
-                    currentItem.add(delegator.makeValue("OrderAdjustment",
-                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_COUNTY"),
-                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
-                }
-
-                if (rec.getBigDecimal("TAX_AMT_CITY").compareTo(BigDecimal.ZERO) > 0) {
-                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_CITY").movePointRight(2);
-                    String type = rec.getString("TAX_TYPE_CITY").equals("S") ? "SALES TAX" : "USE TAX";
-                    String jur = rec.get("JUR_CITY") != null ? rec.getString("JUR_CITY").trim() : "";
-                    String comments = jur + "|" + type + "|" + rate.toString();
-
-                    currentItem.add(delegator.makeValue("OrderAdjustment",
-                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_CITY"),
-                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
-                }
-
-                if (rec.getBigDecimal("TAX_AMT_SEC_STATE").compareTo(BigDecimal.ZERO) > 0) {
-                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_SEC_STATE").movePointRight(2);
-                    String type = rec.getString("TAX_TYPE_SEC_STATE").equals("S") ? "SALES TAX" : "USE TAX";
-                    String jur = rec.get("JUR_SEC_STATE") != null ? rec.getString("JUR_SEC_STATE").trim() : "";
-                    String comments = jur + "|" + type + "|" + rate.toString();
-
-                    currentItem.add(delegator.makeValue("OrderAdjustment",
-                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_SEC_STATE"),
-                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
-                }
-
-                if (rec.getBigDecimal("TAX_AMT_SEC_COUNTY").compareTo(BigDecimal.ZERO) > 0) {
-                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_SEC_COUNTY").movePointRight(2);
-                    String type = rec.getString("TAX_TYPE_SEC_COUNTY").equals("S") ? "SALES TAX" : "USE TAX";
-                    String jur = rec.get("JUR_SEC_COUNTY_CODE") != null ? rec.getString("JUR_SEC_COUNTY_CODE").trim() : "";
-                    String comments = jur + "|" + type + "|" + rate.toString();
-
-                    currentItem.add(delegator.makeValue("OrderAdjustment",
-                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_SEC_COUNTY"),
-                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
-                }
-
-                if (rec.getBigDecimal("TAX_AMT_SEC_CITY").compareTo(BigDecimal.ZERO) > 0) {
-                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_SEC_CITY").movePointRight(2);
-                    String type = rec.getString("TAX_TYPE_SEC_CITY").equals("S") ? "SALES TAX" : "USE TAX";
-                    String jur = rec.get("JUR_SEC_CITY") != null ? rec.getString("JUR_SEC_CITY").trim() : "";
-                    String comments = jur + "|" + type + "|" + rate.toString();
-
-                    currentItem.add(delegator.makeValue("OrderAdjustment",
-                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_SEC_CITY"),
-                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
-                }
-
-                // add a list of adjustments to the adjustment list
-                itemAdjustments.add(currentItem);
-
-            } else if (orderAdjustments.size() == 0) {
-                if (rec.getBigDecimal("TAX_AMT_COUNTRY").compareTo(BigDecimal.ZERO) > 0) {
-                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_COUNTRY").movePointRight(2);
-                    String type = rec.getString("TAX_TYPE_COUNTRY").equals("S") ? "SALES TAX" : "USE TAX";
-                    String jur = rec.get("JUR_COUNTRY") != null ? rec.getString("JUR_COUNTRY").trim() : "";
-                    String comments = jur + "|" + type + "|" + rate.toString();
-
-                    orderAdjustments.add(delegator.makeValue("OrderAdjustment",
-                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_COUNTRY"),
-                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
-                }
-
-                if (rec.getBigDecimal("TAX_AMT_STATE").compareTo(BigDecimal.ZERO) > 0) {
-                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_STATE").movePointRight(2);
-                    String type = rec.getString("TAX_TYPE_STATE").equals("S") ? "SALES TAX" : "USE TAX";
-                    String jur = rec.get("JUR_STATE") != null ? rec.getString("JUR_STATE").trim() : "";
-                    String comments = jur + "|" + type + "|" + rate.toString();
-
-                    orderAdjustments.add(delegator.makeValue("OrderAdjustment",
-                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_STATE"),
-                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
-                }
-
-                if (rec.getBigDecimal("TAX_AMT_COUNTY").compareTo(BigDecimal.ZERO) > 0) {
-                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_COUNTY").movePointRight(2);
-                    String type = rec.getString("TAX_TYPE_COUNTY").equals("S") ? "SALES TAX" : "USE TAX";
-                    String jur = rec.get("JUR_COUNTY_CODE") != null ? rec.getString("JUR_COUNTY_CODE").trim() : "";
-                    String comments = jur + "|" + type + "|" + rate.toString();
-
-                    orderAdjustments.add(delegator.makeValue("OrderAdjustment",
-                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_COUNTY"),
-                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
-                }
-
-                if (rec.getBigDecimal("TAX_AMT_CITY").compareTo(BigDecimal.ZERO) > 0) {
-                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_CITY").movePointRight(2);
-                    String type = rec.getString("TAX_TYPE_CITY").equals("S") ? "SALES TAX" : "USE TAX";
-                    String jur = rec.get("JUR_CITY") != null ? rec.getString("JUR_CITY").trim() : "";
-                    String comments = jur + "|" + type + "|" + rate.toString();
-
-                    orderAdjustments.add(delegator.makeValue("OrderAdjustment",
-                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_CITY"),
-                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
-                }
-
-                if (rec.getBigDecimal("TAX_AMT_SEC_STATE").compareTo(BigDecimal.ZERO) > 0) {
-                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_SEC_STATE").movePointRight(2);
-                    String type = rec.getString("TAX_TYPE_SEC_STATE").equals("S") ? "SALES TAX" : "USE TAX";
-                    String jur = rec.get("JUR_SEC_STATE") != null ? rec.getString("JUR_SEC_STATE").trim() : "";
-                    String comments = jur + "|" + type + "|" + rate.toString();
-
-                    orderAdjustments.add(delegator.makeValue("OrderAdjustment",
-                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_SEC_STATE"),
-                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
-                }
-
-                if (rec.getBigDecimal("TAX_AMT_SEC_COUNTY").compareTo(BigDecimal.ZERO) > 0) {
-                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_SEC_COUNTY").movePointRight(2);
-                    String type = rec.getString("TAX_TYPE_SEC_COUNTY").equals("S") ? "SALES TAX" : "USE TAX";
-                    String jur = rec.get("JUR_SEC_COUNTY_CODE") != null ? rec.getString("JUR_SEC_COUNTY_CODE").trim() : "";
-                    String comments = jur + "|" + type + "|" + rate.toString();
-
-                    orderAdjustments.add(delegator.makeValue("OrderAdjustment",
-                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_SEC_COUNTY"),
-                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
-                }
-
-                if (rec.getBigDecimal("TAX_AMT_SEC_CITY").compareTo(BigDecimal.ZERO) > 0) {
-                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_SEC_CITY").movePointRight(2);
-                    String type = rec.getString("TAX_TYPE_SEC_CITY").equals("S") ? "SALES TAX" : "USE TAX";
-                    String jur = rec.get("JUR_SEC_CITY") != null ? rec.getString("JUR_SEC_CITY").trim() : "";
-                    String comments = jur + "|" + type + "|" + rate.toString();
-
-                    orderAdjustments.add(delegator.makeValue("OrderAdjustment",
-                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_SEC_CITY"),
-                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
-                }
+//
+//                if (rec.getBigDecimal("TAX_AMT_COUNTRY").compareTo(BigDecimal.ZERO) > 0) {
+//                    if (Debug.verboseOn()) Debug.logVerbose("Country Tax Amount: " + rec.getBigDecimal("TAX_AMT_COUNTRY"), module);
+//                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_COUNTRY").movePointRight(2);
+//                    String type = rec.getString("TAX_TYPE_COUNTRY").equals("S") ? "SALES TAX" : "USE TAX";
+//                    String jur = rec.get("JUR_COUNTRY") != null ? rec.getString("JUR_COUNTRY").trim() : "";
+//                    String comments = jur + "|" + type + "|" + rate.toString();
+//
+//                    currentItem.add(delegator.makeValue("OrderAdjustment",
+//                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_COUNTRY"),
+//                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
+//                }
+//
+//                if (rec.getBigDecimal("TAX_AMT_STATE").compareTo(BigDecimal.ZERO) > 0) {
+//                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_STATE").movePointRight(2);
+//                    String type = rec.getString("TAX_TYPE_STATE").equals("S") ? "SALES TAX" : "USE TAX";
+//                    String jur = rec.get("JUR_STATE") != null ? rec.getString("JUR_STATE").trim() : "";
+//                    String comments = jur + "|" + type + "|" + rate.toString();
+//
+//                    currentItem.add(delegator.makeValue("OrderAdjustment",
+//                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_STATE"),
+//                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
+//                }
+//
+//                if (rec.getBigDecimal("TAX_AMT_COUNTY").compareTo(BigDecimal.ZERO) > 0) {
+//                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_COUNTY").movePointRight(2);
+//                    String type = rec.getString("TAX_TYPE_COUNTY").equals("S") ? "SALES TAX" : "USE TAX";
+//                    String jur = rec.get("JUR_COUNTY_CODE") != null ? rec.getString("JUR_COUNTY_CODE").trim() : "";
+//                    String comments = jur + "|" + type + "|" + rate.toString();
+//
+//                    currentItem.add(delegator.makeValue("OrderAdjustment",
+//                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_COUNTY"),
+//                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
+//                }
+//
+//                if (rec.getBigDecimal("TAX_AMT_CITY").compareTo(BigDecimal.ZERO) > 0) {
+//                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_CITY").movePointRight(2);
+//                    String type = rec.getString("TAX_TYPE_CITY").equals("S") ? "SALES TAX" : "USE TAX";
+//                    String jur = rec.get("JUR_CITY") != null ? rec.getString("JUR_CITY").trim() : "";
+//                    String comments = jur + "|" + type + "|" + rate.toString();
+//
+//                    currentItem.add(delegator.makeValue("OrderAdjustment",
+//                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_CITY"),
+//                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
+//                }
+//
+//                if (rec.getBigDecimal("TAX_AMT_SEC_STATE").compareTo(BigDecimal.ZERO) > 0) {
+//                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_SEC_STATE").movePointRight(2);
+//                    String type = rec.getString("TAX_TYPE_SEC_STATE").equals("S") ? "SALES TAX" : "USE TAX";
+//                    String jur = rec.get("JUR_SEC_STATE") != null ? rec.getString("JUR_SEC_STATE").trim() : "";
+//                    String comments = jur + "|" + type + "|" + rate.toString();
+//
+//                    currentItem.add(delegator.makeValue("OrderAdjustment",
+//                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_SEC_STATE"),
+//                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
+//                }
+//
+//                if (rec.getBigDecimal("TAX_AMT_SEC_COUNTY").compareTo(BigDecimal.ZERO) > 0) {
+//                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_SEC_COUNTY").movePointRight(2);
+//                    String type = rec.getString("TAX_TYPE_SEC_COUNTY").equals("S") ? "SALES TAX" : "USE TAX";
+//                    String jur = rec.get("JUR_SEC_COUNTY_CODE") != null ? rec.getString("JUR_SEC_COUNTY_CODE").trim() : "";
+//                    String comments = jur + "|" + type + "|" + rate.toString();
+//
+//                    currentItem.add(delegator.makeValue("OrderAdjustment",
+//                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_SEC_COUNTY"),
+//                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
+//                }
+//
+//                if (rec.getBigDecimal("TAX_AMT_SEC_CITY").compareTo(BigDecimal.ZERO) > 0) {
+//                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_SEC_CITY").movePointRight(2);
+//                    String type = rec.getString("TAX_TYPE_SEC_CITY").equals("S") ? "SALES TAX" : "USE TAX";
+//                    String jur = rec.get("JUR_SEC_CITY") != null ? rec.getString("JUR_SEC_CITY").trim() : "";
+//                    String comments = jur + "|" + type + "|" + rate.toString();
+//
+//                    currentItem.add(delegator.makeValue("OrderAdjustment",
+//                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_SEC_CITY"),
+//                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
+//                }
+//
+//                // add a list of adjustments to the adjustment list
+//                itemAdjustments.add(currentItem);
+//
+//            } else if (orderAdjustments.size() == 0) {
+//                if (rec.getBigDecimal("TAX_AMT_COUNTRY").compareTo(BigDecimal.ZERO) > 0) {
+//                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_COUNTRY").movePointRight(2);
+//                    String type = rec.getString("TAX_TYPE_COUNTRY").equals("S") ? "SALES TAX" : "USE TAX";
+//                    String jur = rec.get("JUR_COUNTRY") != null ? rec.getString("JUR_COUNTRY").trim() : "";
+//                    String comments = jur + "|" + type + "|" + rate.toString();
+//
+//                    orderAdjustments.add(delegator.makeValue("OrderAdjustment",
+//                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_COUNTRY"),
+//                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
+//                }
+//
+//                if (rec.getBigDecimal("TAX_AMT_STATE").compareTo(BigDecimal.ZERO) > 0) {
+//                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_STATE").movePointRight(2);
+//                    String type = rec.getString("TAX_TYPE_STATE").equals("S") ? "SALES TAX" : "USE TAX";
+//                    String jur = rec.get("JUR_STATE") != null ? rec.getString("JUR_STATE").trim() : "";
+//                    String comments = jur + "|" + type + "|" + rate.toString();
+//
+//                    orderAdjustments.add(delegator.makeValue("OrderAdjustment",
+//                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_STATE"),
+//                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
+//                }
+//
+//                if (rec.getBigDecimal("TAX_AMT_COUNTY").compareTo(BigDecimal.ZERO) > 0) {
+//                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_COUNTY").movePointRight(2);
+//                    String type = rec.getString("TAX_TYPE_COUNTY").equals("S") ? "SALES TAX" : "USE TAX";
+//                    String jur = rec.get("JUR_COUNTY_CODE") != null ? rec.getString("JUR_COUNTY_CODE").trim() : "";
+//                    String comments = jur + "|" + type + "|" + rate.toString();
+//
+//                    orderAdjustments.add(delegator.makeValue("OrderAdjustment",
+//                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_COUNTY"),
+//                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
+//                }
+//
+//                if (rec.getBigDecimal("TAX_AMT_CITY").compareTo(BigDecimal.ZERO) > 0) {
+//                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_CITY").movePointRight(2);
+//                    String type = rec.getString("TAX_TYPE_CITY").equals("S") ? "SALES TAX" : "USE TAX";
+//                    String jur = rec.get("JUR_CITY") != null ? rec.getString("JUR_CITY").trim() : "";
+//                    String comments = jur + "|" + type + "|" + rate.toString();
+//
+//                    orderAdjustments.add(delegator.makeValue("OrderAdjustment",
+//                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_CITY"),
+//                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
+//                }
+//
+//                if (rec.getBigDecimal("TAX_AMT_SEC_STATE").compareTo(BigDecimal.ZERO) > 0) {
+//                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_SEC_STATE").movePointRight(2);
+//                    String type = rec.getString("TAX_TYPE_SEC_STATE").equals("S") ? "SALES TAX" : "USE TAX";
+//                    String jur = rec.get("JUR_SEC_STATE") != null ? rec.getString("JUR_SEC_STATE").trim() : "";
+//                    String comments = jur + "|" + type + "|" + rate.toString();
+//
+//                    orderAdjustments.add(delegator.makeValue("OrderAdjustment",
+//                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_SEC_STATE"),
+//                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
+//                }
+//
+//                if (rec.getBigDecimal("TAX_AMT_SEC_COUNTY").compareTo(BigDecimal.ZERO) > 0) {
+//                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_SEC_COUNTY").movePointRight(2);
+//                    String type = rec.getString("TAX_TYPE_SEC_COUNTY").equals("S") ? "SALES TAX" : "USE TAX";
+//                    String jur = rec.get("JUR_SEC_COUNTY_CODE") != null ? rec.getString("JUR_SEC_COUNTY_CODE").trim() : "";
+//                    String comments = jur + "|" + type + "|" + rate.toString();
+//
+//                    orderAdjustments.add(delegator.makeValue("OrderAdjustment",
+//                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_SEC_COUNTY"),
+//                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
+//                }
+//
+//                if (rec.getBigDecimal("TAX_AMT_SEC_CITY").compareTo(BigDecimal.ZERO) > 0) {
+//                    BigDecimal rate = rec.getBigDecimal("TAX_RATE_SEC_CITY").movePointRight(2);
+//                    String type = rec.getString("TAX_TYPE_SEC_CITY").equals("S") ? "SALES TAX" : "USE TAX";
+//                    String jur = rec.get("JUR_SEC_CITY") != null ? rec.getString("JUR_SEC_CITY").trim() : "";
+//                    String comments = jur + "|" + type + "|" + rate.toString();
+//
+//                    orderAdjustments.add(delegator.makeValue("OrderAdjustment",
+//                            UtilMisc.toMap("amount", rec.getBigDecimal("TAX_AMT_SEC_CITY"),
+//                                "orderAdjustmentTypeId", "SALES_TAX", "comments", comments)));
+//                }
 
             } else {
                 throw new TaxwareException("Invalid number of return adjustments.");

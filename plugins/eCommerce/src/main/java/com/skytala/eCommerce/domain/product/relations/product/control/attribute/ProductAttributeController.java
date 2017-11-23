@@ -170,11 +170,11 @@ public class ProductAttributeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(method = RequestMethod.PUT, value = "/{productId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<ProductAttribute> updateProductAttribute(@RequestBody ProductAttribute productAttributeToBeUpdated,
-			@PathVariable String nullVal) throws Exception {
+			@PathVariable String productId) throws Exception {
 
-//		productAttributeToBeUpdated.setnull(null);
+
 
 		UpdateProductAttribute command = new UpdateProductAttribute(productAttributeToBeUpdated);
 

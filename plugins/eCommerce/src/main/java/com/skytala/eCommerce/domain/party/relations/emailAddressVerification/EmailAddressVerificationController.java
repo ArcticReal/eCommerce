@@ -11,6 +11,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.ofbiz.base.util.UtilMisc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -58,7 +59,7 @@ public class EmailAddressVerificationController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<Object> findEmailAddressVerificationsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<EmailAddressVerification>> findEmailAddressVerificationsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindEmailAddressVerificationsBy query = new FindEmailAddressVerificationsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -66,10 +67,6 @@ public class EmailAddressVerificationController {
 		}
 
 		List<EmailAddressVerification> emailAddressVerifications =((EmailAddressVerificationFound) Scheduler.execute(query).data()).getEmailAddressVerifications();
-
-		if (emailAddressVerifications.size() == 1) {
-			return ResponseEntity.ok().body(emailAddressVerifications.get(0));
-		}
 
 		return ResponseEntity.ok().body(emailAddressVerifications);
 
@@ -84,7 +81,7 @@ public class EmailAddressVerificationController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createEmailAddressVerification(HttpServletRequest request) throws Exception {
+	public ResponseEntity<EmailAddressVerification> createEmailAddressVerification(HttpServletRequest request) throws Exception {
 
 		EmailAddressVerification emailAddressVerificationToBeAdded = new EmailAddressVerification();
 		try {
@@ -92,7 +89,7 @@ public class EmailAddressVerificationController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 		}
 
 		return this.createEmailAddressVerification(emailAddressVerificationToBeAdded);
@@ -107,7 +104,7 @@ public class EmailAddressVerificationController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createEmailAddressVerification(@RequestBody EmailAddressVerification emailAddressVerificationToBeAdded) throws Exception {
+	public ResponseEntity<EmailAddressVerification> createEmailAddressVerification(@RequestBody EmailAddressVerification emailAddressVerificationToBeAdded) throws Exception {
 
 		AddEmailAddressVerification command = new AddEmailAddressVerification(emailAddressVerificationToBeAdded);
 		EmailAddressVerification emailAddressVerification = ((EmailAddressVerificationAdded) Scheduler.execute(command).data()).getAddedEmailAddressVerification();
@@ -117,7 +114,7 @@ public class EmailAddressVerificationController {
 					             .body(emailAddressVerification);
 		else 
 			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("EmailAddressVerification could not be created.");
+					             .body(null);
 	}
 
 	/**
@@ -192,24 +189,9 @@ public class EmailAddressVerificationController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{emailAddressVerificationId}")
-	public ResponseEntity<Object> findById(@PathVariable String emailAddressVerificationId) throws Exception {
-		HashMap<String, String> requestParams = new HashMap<String, String>();
-		requestParams.put("emailAddressVerificationId", emailAddressVerificationId);
-		try {
-
-			Object foundEmailAddressVerification = findEmailAddressVerificationsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundEmailAddressVerification);
-		} catch (RecordNotFoundException e) {
-
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-		}
-
-	}
-
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{emailAddressVerificationId}")
-	public ResponseEntity<Object> deleteEmailAddressVerificationByIdUpdated(@PathVariable String emailAddressVerificationId) throws Exception {
-		DeleteEmailAddressVerification command = new DeleteEmailAddressVerification(emailAddressVerificationId);
+	@RequestMapping(method = RequestMethod.DELETE, value = "/{hash}")
+	public ResponseEntity<Object> deleteEmailAddressVerificationByHash(@PathVariable String hash) throws Exception {
+		DeleteEmailAddressVerification command = new DeleteEmailAddressVerification(hash);
 
 		try {
 			if (((EmailAddressVerificationDeleted) Scheduler.execute(command).data()).isSuccess())
@@ -221,6 +203,27 @@ public class EmailAddressVerificationController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body("EmailAddressVerification could not be deleted");
 
 	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/{verifyHash}")
+	public ResponseEntity<EmailAddressVerification> findByHash(@PathVariable String verifyHash) throws Exception {
+		HashMap<String, String> requestParams = new HashMap<String, String>();
+		requestParams.put("verifyHash", verifyHash);
+		try {
+
+			List<EmailAddressVerification> foundEmailAddressVerification = findEmailAddressVerificationsBy(requestParams).getBody();
+			if(foundEmailAddressVerification.size()==1)
+				return ResponseEntity.status(HttpStatus.OK).body(foundEmailAddressVerification.get(0));
+			else
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+		} catch (RecordNotFoundException e) {
+
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+
+	}
+
+
 
 	@RequestMapping(value = (" ** "))
 	public ResponseEntity<Object> returnErrorPage(HttpServletRequest request) {
@@ -254,4 +257,6 @@ public class EmailAddressVerificationController {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(returnVal);
 
 	}
+
+
 }

@@ -20,65 +20,60 @@ import com.skytala.eCommerce.domain.product.relations.product.model.attribute.Pr
 public class FindProductAttributesBy extends Query {
 
 
-Map<String, String> filter;
-public FindProductAttributesBy(Map<String, String> filter) {
-this.filter = filter;
-}
+    Map<String, String> filter;
+    public FindProductAttributesBy(Map<String, String> filter) {
+        this.filter = filter;
+    }
 
-@Override
-public Event execute(){
+    @Override
+    public Event execute(){
 
-Delegator delegator = DelegatorFactory.getDelegator("default");
-List<ProductAttribute> foundProductAttributes = new ArrayList<ProductAttribute>();
+        Delegator delegator = DelegatorFactory.getDelegator("default");
+        List<ProductAttribute> foundProductAttributes = new ArrayList<>();
 
-try{
-List<GenericValue> buf = new LinkedList<>();
-if(filter.size()==1&&filter.containsKey("productAttributeId")) { 
- GenericValue foundElement = delegator.findOne("ProductAttribute", false, filter);
-if(foundElement != null) { 
-buf.add(foundElement);
-}else { 
-throw new RecordNotFoundException(ProductAttribute.class); 
- } 
-}else { 
- buf = delegator.findAll("ProductAttribute", false); 
- }
-
-for (int i = 0; i < buf.size(); i++) {
-if(applysToFilter(buf.get(i))) {
-foundProductAttributes.add(ProductAttributeMapper.map(buf.get(i)));
-}
-}
+        try{
 
 
-}catch(GenericEntityException e) {
-e.printStackTrace();
-}
-Event resultingEvent = new ProductAttributeFound(foundProductAttributes);
-Broker.instance().publish(resultingEvent);
-return resultingEvent;
+            List<GenericValue> buf = new LinkedList<>();
 
-}
-public boolean applysToFilter(GenericValue val) {
+            buf = delegator.findAll("ProductAttribute", false);
 
-Iterator<String> iterator = filter.keySet().iterator();
 
-while(iterator.hasNext()) {
+            for (int i = 0; i < buf.size(); i++) {
+                if(applysToFilter(buf.get(i))) {
+                    foundProductAttributes.add(ProductAttributeMapper.map(buf.get(i)));
+                }
+            }
 
-String key = iterator.next();
 
-if(val.get(key) == null) {
-return false;
-}
+        }catch(GenericEntityException e) {
+            e.printStackTrace();
+        }
+        Event resultingEvent = new ProductAttributeFound(foundProductAttributes);
+        Broker.instance().publish(resultingEvent);
+        return resultingEvent;
 
-if((val.get(key).toString()).contains(filter.get(key))) {
-}else {
-return false;
-}
-}
-return true;
-}
-public void setFilter(Map<String, String> newFilter) {
-this.filter = newFilter;
-}
+    }
+    public boolean applysToFilter(GenericValue val) {
+
+        Iterator<String> iterator = filter.keySet().iterator();
+
+        while(iterator.hasNext()) {
+
+            String key = iterator.next();
+
+            if(val.get(key) == null) {
+                return false;
+            }
+
+            if((val.get(key).toString()).contains(filter.get(key))) {
+            }else {
+                return false;
+            }
+        }
+        return true;
+    }
+    public void setFilter(Map<String, String> newFilter) {
+        this.filter = newFilter;
+    }
 }

@@ -3,21 +3,33 @@ package com.skytala.eCommerce.service.product;
 import com.skytala.eCommerce.domain.party.PartyController;
 import com.skytala.eCommerce.domain.party.model.Party;
 import com.skytala.eCommerce.domain.party.query.FindPartysBy;
+import com.skytala.eCommerce.domain.product.model.Product;
+import com.skytala.eCommerce.domain.product.query.FindProductsBy;
 import com.skytala.eCommerce.domain.product.relations.prodCatalog.model.role.ProdCatalogRole;
+import com.skytala.eCommerce.domain.product.relations.product.control.categoryMember.ProductCategoryMemberController;
+import com.skytala.eCommerce.domain.product.relations.product.model.category.ProductCategory;
+import com.skytala.eCommerce.domain.product.relations.product.model.categoryMember.ProductCategoryMember;
+import com.skytala.eCommerce.domain.product.relations.product.query.category.FindProductCategorysBy;
+import com.skytala.eCommerce.service.login.util.SecurityGroups;
 import org.apache.ofbiz.base.util.UtilMisc;
+import org.apache.ofbiz.entity.Delegator;
+import org.apache.ofbiz.entity.DelegatorFactory;
+import org.apache.ofbiz.entity.GenericDelegator;
+import org.apache.ofbiz.entity.GenericValue;
 import org.apache.ofbiz.service.GenericServiceException;
 import org.apache.ofbiz.service.LocalDispatcher;
 import org.apache.ofbiz.service.ServiceAuthException;
 import org.apache.ofbiz.service.ServiceValidationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+import static com.skytala.eCommerce.framework.util.AuthorizeMethods.DENY_ALL;
+import static com.skytala.eCommerce.framework.util.AuthorizeMethods.HAS_ADMIN_AUTHORITY;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -25,12 +37,17 @@ import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/service/products")
+@PreAuthorize(DENY_ALL)
 public class ProductsServiceController {
+
+	@Autowired
+	private ProductCategoryMemberController productCategoryMemberController;
 
 	private FindPartysBy getFindPartiesQuery(String partyId) throws Exception {
 		return new FindPartysBy(UtilMisc.toMap("partyId", partyId));
@@ -330,6 +347,7 @@ public class ProductsServiceController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/multipleUploadProductImages")
+	@PreAuthorize(HAS_ADMIN_AUTHORITY)
 	public ResponseEntity<Object> multipleUploadProductImages(HttpSession session,
 															  @RequestParam(value="productId", required = false) String productId,
 															  @RequestParam(value="_additionalImageOne_fileName", required=false) String _additionalImageOne_fileName,
@@ -1512,38 +1530,31 @@ public class ProductsServiceController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addProductToCategories")
-	public ResponseEntity<Object> addProductToCategories(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="categories") Object categories, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+    @PreAuthorize(HAS_ADMIN_AUTHORITY)
+	public ResponseEntity<Object> addProductToCategories(HttpSession session,
+                                                         @RequestParam String productId,
+														 @RequestBody List<String> categoryIds){
 
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("productId",productId);
-		paramMap.put("categories",categories);
-		paramMap.put("fromDate",fromDate);
-		paramMap.put("comments",comments);
-		paramMap.put("quantity",quantity);
-		paramMap.put("sequenceNum",sequenceNum);
-		paramMap.put("thruDate",thruDate);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
 
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		List<ProductCategory> categories = new LinkedList<>();
+		for(int i = 0; i < categoryIds.size(); i++){
+			ProductCategory category = new ProductCategory();
+			category.setProductCategoryId(categoryIds.get(i));
+			categories.add(category);
+		}
+
 		try {
-			result = dispatcher.runSync("addProductToCategories", paramMap);
+			Product product = new Product(productId, new FindProductsBy(UtilMisc.toMap("productId", productId)));
+			product.addToCategories(session, categories);
 		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
+			return unauthorized();
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+            return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful();
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removePartyFromCategory")
@@ -3243,39 +3254,28 @@ public class ProductsServiceController {
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/addProductToCategory")
-	public ResponseEntity<Object> addProductToCategory(HttpSession session, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="productId") String productId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	@PostMapping("/addProductToCategory")
+    @PreAuthorize(HAS_ADMIN_AUTHORITY)
+	public ResponseEntity<Object> addProductToCategory(HttpSession session,
+                                                       @RequestParam String productId,
+                                                       @RequestParam String categoryId) throws GenericServiceException {
 		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("productCategoryId",productCategoryId);
-		paramMap.put("productId",productId);
-		paramMap.put("fromDate",fromDate);
-		paramMap.put("comments",comments);
-		paramMap.put("quantity",quantity);
-		paramMap.put("sequenceNum",sequenceNum);
-		paramMap.put("thruDate",thruDate);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
 
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
 		try {
-			result = dispatcher.runSync("addProductToCategory", paramMap);
+		    Product product = new Product();
+		    product.setProductId(productId);
+		    ProductCategory category = new ProductCategory();
+			category.setProductCategoryId(categoryId);
+	        product.addToCategory(session, category);
 		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
+			return unauthorized();
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
-		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+            return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+        return successful();
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductGlAccount")
@@ -5222,38 +5222,56 @@ public class ProductsServiceController {
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/removeProductFromCategory")
-	public ResponseEntity<Object> removeProductFromCategory(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="productId") String productId) {
+	@PostMapping("/removeProductFromCategory")
+	@PreAuthorize(HAS_ADMIN_AUTHORITY)
+	public ResponseEntity<Object> removeProductFromCategory(HttpSession session,
+															@RequestParam(value="productId") String productId,
+															@RequestParam(value="productCategoryId") String productCategoryId) throws Exception {
 		
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("fromDate",fromDate);
-		paramMap.put("productCategoryId",productCategoryId);
-		paramMap.put("productId",productId);
-		paramMap.put("userLogin", session.getAttribute("userLogin"));
+		Product product = new Product(productId, new FindProductsBy(UtilMisc.toMap("productId", productId)));
+		ProductCategory category = new ProductCategory(productCategoryId,
+													   new FindProductCategorysBy(UtilMisc.toMap("productCategoryId", productCategoryId)));
 
-		Map<String, Object> result = new HashMap<>();
-		LocalDispatcher dispatcher = (LocalDispatcher) session.getServletContext().getAttribute("dispatcher");
+		List<ProductCategoryMember> members =
+			productCategoryMemberController.findProductCategoryMembersBy(UtilMisc.toMap("productCategoryId", productCategoryId,
+																						"productId", productId)).getBody();
+
 		try {
-			result = dispatcher.runSync("removeProductFromCategory", paramMap);
+			for (ProductCategoryMember member : members){
+				product.removeFromCategory(session, category, member.getFromDate());
+			}
 		} catch (ServiceAuthException e) {
-
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-
+			return unauthorized();
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
-		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
-		}
-
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful();
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/updatePartyToCategory")
+	@PostMapping("/removeProductFromCategories")
+	@PreAuthorize(HAS_ADMIN_AUTHORITY)
+	public ResponseEntity removeProductFromCategories(HttpSession session,
+													  @RequestParam("productId") String productId,
+													  @RequestBody List<String> productCategoryIds) throws Exception {
+		try{
+
+			for(String categoryId : productCategoryIds)
+				removeProductFromCategory(session, productId, categoryId);
+
+		} catch (ServiceAuthException e) {
+			return unauthorized();
+		} catch (ServiceValidationException e) {
+			return serverError();
+		} catch (GenericServiceException e) {
+			return badRequest();
+		}
+		return successful();
+
+	}
+
+	@PostMapping("/updatePartyToCategory")
 	public ResponseEntity<Object> updatePartyToCategory(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="partyId") String partyId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();

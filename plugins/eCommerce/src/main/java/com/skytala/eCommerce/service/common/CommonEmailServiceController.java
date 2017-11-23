@@ -114,7 +114,31 @@ public class CommonEmailServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/sendMail")
-	public ResponseEntity<Object> sendMail(HttpSession session, @RequestParam(value="body") String body, @RequestParam(value="sendTo", required=false) String sendTo, @RequestParam(value="sendVia", required=false) String sendVia, @RequestParam(value="authPass", required=false) String authPass, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="sendFrom", required=false) String sendFrom, @RequestParam(value="socketFactoryFallback", required=false) String socketFactoryFallback, @RequestParam(value="subject", required=false) String subject, @RequestParam(value="sendCc", required=false) String sendCc, @RequestParam(value="messageId", required=false) String messageId, @RequestParam(value="socketFactoryPort", required=false) String socketFactoryPort, @RequestParam(value="authUser", required=false) String authUser, @RequestParam(value="startTLSEnabled", required=false) Boolean startTLSEnabled, @RequestParam(value="sendPartial", required=false) Boolean sendPartial, @RequestParam(value="port", required=false) String port, @RequestParam(value="emailType", required=false) String emailType, @RequestParam(value="socketFactoryClass", required=false) String socketFactoryClass, @RequestParam(value="sendBcc", required=false) String sendBcc, @RequestParam(value="sendType", required=false) String sendType, @RequestParam(value="custRequestId", required=false) String custRequestId, @RequestParam(value="communicationEventId", required=false) String communicationEventId, @RequestParam(value="sendFailureNotification", required=false) Boolean sendFailureNotification, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="contentType", required=false) String contentType) {
+	public ResponseEntity<Object> sendMail(HttpSession session,
+										   @RequestParam(value="body") String body,
+										   @RequestParam(value="subject", required=false) String subject,
+										   @RequestParam(value="sendTo", required=false) String sendTo,
+										   @RequestParam(value="sendBcc", required=false) String sendBcc,
+										   @RequestParam(value="sendCc", required=false) String sendCc,
+										   @RequestParam(value="sendFrom", required=false) String sendFrom,
+										   @RequestParam(value="partyId", required=false) String partyId,
+										   @RequestParam(value="orderId", required=false) String orderId,
+										   @RequestParam(value="sendVia", required=false) String sendVia,
+										   @RequestParam(value="authPass", required=false) String authPass,
+										   @RequestParam(value="socketFactoryFallback", required=false) String socketFactoryFallback,
+										   @RequestParam(value="messageId", required=false) String messageId,
+										   @RequestParam(value="socketFactoryPort", required=false) String socketFactoryPort,
+										   @RequestParam(value="authUser", required=false) String authUser,
+										   @RequestParam(value="startTLSEnabled", required=false) Boolean startTLSEnabled,
+										   @RequestParam(value="sendPartial", required=false) Boolean sendPartial,
+										   @RequestParam(value="port", required=false) String port,
+										   @RequestParam(value="emailType", required=false) String emailType,
+										   @RequestParam(value="socketFactoryClass", required=false) String socketFactoryClass,
+										   @RequestParam(value="sendType", required=false) String sendType,
+										   @RequestParam(value="custRequestId", required=false) String custRequestId,
+										   @RequestParam(value="communicationEventId", required=false) String communicationEventId,
+										   @RequestParam(value="sendFailureNotification", required=false) Boolean sendFailureNotification,
+										   @RequestParam(value="contentType", required=false) String contentType) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("body",body);

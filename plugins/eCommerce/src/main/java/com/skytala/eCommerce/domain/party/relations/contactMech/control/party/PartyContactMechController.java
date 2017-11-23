@@ -8,9 +8,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.skytala.eCommerce.framework.util.TimestampUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -190,14 +192,31 @@ public class PartyContactMechController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyContactMechId}")
-	public ResponseEntity<PartyContactMech> findById(@PathVariable String partyContactMechId) throws Exception {
+	@RequestMapping(method = RequestMethod.GET, value = "/{partyId}")
+	public ResponseEntity<List<PartyContactMech>> findByPartyId(@PathVariable String partyId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
-		requestParams.put("partyContactMechId", partyContactMechId);
+		requestParams.put("partyId", partyId);
+
 		try {
 
-			List<PartyContactMech> foundPartyContactMech = findPartyContactMechsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPartyContactMech.get(0));
+			List<PartyContactMech> foundPartyContactMechs = findPartyContactMechsBy(requestParams).getBody();
+
+			foundPartyContactMechs = foundPartyContactMechs
+                    .stream()
+                    .filter(partyContactMech -> {
+                        if(partyContactMech.getFromDate().before(TimestampUtil.currentTime())&&
+                                (partyContactMech.getThruDate()==null
+                                ||partyContactMech.getThruDate().after(TimestampUtil.currentTime()))
+							&&partyContactMech.getPartyId().equals(partyId))
+                            return true;
+                        else
+                            return false;
+                    })
+                    .collect(Collectors.toList());
+
+
+
+			return ResponseEntity.status(HttpStatus.OK).body(foundPartyContactMechs);
 		} catch (RecordNotFoundException e) {
 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

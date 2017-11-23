@@ -13,31 +13,34 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class AddUserLogin extends Command {
 
-private UserLogin elementToBeAdded;
-public AddUserLogin(UserLogin elementToBeAdded){
-this.elementToBeAdded = elementToBeAdded;
-}
+    private UserLogin elementToBeAdded;
+    public AddUserLogin(UserLogin elementToBeAdded){
+        this.elementToBeAdded = elementToBeAdded;
+    }
 
-@Override
-public Event execute(){
+    @Override
+    public Event execute(){
 
 
-Delegator delegator = DelegatorFactory.getDelegator("default");
+        Delegator delegator = DelegatorFactory.getDelegator("default");
 
-UserLogin addedElement = null;
-boolean success = false;
-try {
-elementToBeAdded.setUserLoginId(delegator.getNextSeqId("UserLogin"));
-GenericValue newValue = delegator.makeValue("UserLogin", elementToBeAdded.mapAttributeField());
-addedElement = UserLoginMapper.map(delegator.create(newValue));
-success = true;
-} catch(GenericEntityException e) {
- e.printStackTrace(); 
-addedElement = null;
-}
+        UserLogin addedElement = null;
+        boolean success = false;
+        try {
 
-Event resultingEvent = new UserLoginAdded(addedElement, success);
-Broker.instance().publish(resultingEvent);
-return resultingEvent;
-}
+            //LoginId should be the same as the one the user Enters
+
+
+            GenericValue newValue = delegator.makeValue("UserLogin", elementToBeAdded.mapAttributeField());
+            addedElement = UserLoginMapper.map(delegator.create(newValue));
+            success = true;
+        } catch(GenericEntityException e) {
+            e.printStackTrace();
+            addedElement = null;
+        }
+
+        Event resultingEvent = new UserLoginAdded(addedElement, success);
+        Broker.instance().publish(resultingEvent);
+        return resultingEvent;
+    }
 }

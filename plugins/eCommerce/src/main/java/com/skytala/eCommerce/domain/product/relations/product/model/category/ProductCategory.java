@@ -10,6 +10,8 @@ import com.skytala.eCommerce.domain.product.mapper.ProductMapper;
 import com.skytala.eCommerce.domain.product.model.Product;
 import com.skytala.eCommerce.domain.product.relations.product.event.category.ProductCategoryFound;
 import com.skytala.eCommerce.domain.product.relations.product.mapper.category.ProductCategoryMapper;
+import com.skytala.eCommerce.domain.product.relations.product.mapper.categoryMember.ProductCategoryMemberMapper;
+import com.skytala.eCommerce.domain.product.relations.product.model.categoryMember.ProductCategoryMember;
 import com.skytala.eCommerce.framework.pubsub.Query;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 import org.apache.ofbiz.entity.GenericEntity;
@@ -179,7 +181,7 @@ public class ProductCategory implements Serializable{
 
 
 
-    public List<Product> getProductCategoryMembers(HttpSession session) throws GenericServiceException {
+    public List<ProductCategoryMember> getProductCategoryMembers(HttpSession session) throws GenericServiceException {
 
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("categoryId", this.getProductCategoryId());
@@ -194,10 +196,10 @@ public class ProductCategory implements Serializable{
 			throw new IllegalArgumentException("Ofbiz was not able to process the data");
 
         Collection<GenericEntity> genericEntities = (Collection<GenericEntity>) result.get("categoryMembers");
-        List<Product> productCategoryMembers = new LinkedList<>();
+        List<ProductCategoryMember> productCategoryMembers = new LinkedList<>();
 
         for (GenericEntity e : genericEntities){
-            productCategoryMembers.add(ProductMapper.map(e));
+            productCategoryMembers.add(ProductCategoryMemberMapper.map(e));
         }
 
 

@@ -20,65 +20,66 @@ import com.skytala.eCommerce.domain.party.relations.emailAddressVerification.mod
 public class FindEmailAddressVerificationsBy extends Query {
 
 
-Map<String, String> filter;
-public FindEmailAddressVerificationsBy(Map<String, String> filter) {
-this.filter = filter;
-}
+    Map<String, String> filter;
+    public FindEmailAddressVerificationsBy(Map<String, String> filter) {
+        this.filter = filter;
+    }
 
-@Override
-public Event execute(){
-
-Delegator delegator = DelegatorFactory.getDelegator("default");
-List<EmailAddressVerification> foundEmailAddressVerifications = new ArrayList<EmailAddressVerification>();
-
-try{
-List<GenericValue> buf = new LinkedList<>();
-if(filter.size()==1&&filter.containsKey("emailAddressVerificationId")) { 
- GenericValue foundElement = delegator.findOne("EmailAddressVerification", false, filter);
-if(foundElement != null) { 
-buf.add(foundElement);
-}else { 
-throw new RecordNotFoundException(EmailAddressVerification.class); 
- } 
-}else { 
- buf = delegator.findAll("EmailAddressVerification", false); 
- }
-
-for (int i = 0; i < buf.size(); i++) {
-if(applysToFilter(buf.get(i))) {
-foundEmailAddressVerifications.add(EmailAddressVerificationMapper.map(buf.get(i)));
-}
-}
+    @Override
+    public Event execute(){
 
 
-}catch(GenericEntityException e) {
-e.printStackTrace();
-}
-Event resultingEvent = new EmailAddressVerificationFound(foundEmailAddressVerifications);
-Broker.instance().publish(resultingEvent);
-return resultingEvent;
+        Delegator delegator = DelegatorFactory.getDelegator("default");
+        List<EmailAddressVerification> foundEmailAddressVerifications = new ArrayList<EmailAddressVerification>();
 
-}
-public boolean applysToFilter(GenericValue val) {
+        try{
+            List<GenericValue> buf = new LinkedList<>();
+            if(filter.size()==1&&filter.containsKey("emailAddressVerificationId")) {
+                GenericValue foundElement = delegator.findOne("EmailAddressVerification", false, filter);
+                if(foundElement != null) {
+                    buf.add(foundElement);
+                }else {
+                    throw new RecordNotFoundException(EmailAddressVerification.class);
+                }
+            }else {
+                buf = delegator.findAll("EmailAddressVerification", false);
+            }
 
-Iterator<String> iterator = filter.keySet().iterator();
+            for (int i = 0; i < buf.size(); i++) {
+                if(applysToFilter(buf.get(i))) {
+                    foundEmailAddressVerifications.add(EmailAddressVerificationMapper.map(buf.get(i)));
+                }
+            }
 
-while(iterator.hasNext()) {
 
-String key = iterator.next();
+        }catch(GenericEntityException e) {
+            e.printStackTrace();
+        }
+        Event resultingEvent = new EmailAddressVerificationFound(foundEmailAddressVerifications);
+        Broker.instance().publish(resultingEvent);
+        return resultingEvent;
 
-if(val.get(key) == null) {
-return false;
-}
+    }
+    public boolean applysToFilter(GenericValue val) {
 
-if((val.get(key).toString()).contains(filter.get(key))) {
-}else {
-return false;
-}
-}
-return true;
-}
-public void setFilter(Map<String, String> newFilter) {
-this.filter = newFilter;
-}
+        Iterator<String> iterator = filter.keySet().iterator();
+
+        while(iterator.hasNext()) {
+
+            String key = iterator.next();
+
+            if(val.get(key) == null) {
+                return false;
+            }
+
+            if((val.get(key).toString()).contains(filter.get(key))) {
+            }else {
+                return false;
+            }
+        }
+        return true;
+    }
+    public void setFilter(Map<String, String> newFilter) {
+        this.filter = newFilter;
+    }
 }
