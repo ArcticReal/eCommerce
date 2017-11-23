@@ -3,6 +3,7 @@ build/
 out/
 applications/*/build
 framework/*/build
+framework/images/*
 hot-deploy/*/build
 plugins/*/build
 runtime/git-rebase/*
