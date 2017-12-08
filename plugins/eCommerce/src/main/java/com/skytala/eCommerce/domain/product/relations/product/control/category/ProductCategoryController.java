@@ -213,7 +213,7 @@ public class ProductCategoryController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{productCategoryId}")
-	@PreAuthorize(HAS_USER_AUTHORITY)
+	@PreAuthorize(PERMIT_ALL)
 	public ResponseEntity<ProductCategory> findById(@PathVariable String productCategoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productCategoryId", productCategoryId);

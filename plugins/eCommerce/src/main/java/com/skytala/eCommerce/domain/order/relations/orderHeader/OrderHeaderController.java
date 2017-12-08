@@ -3,24 +3,25 @@ package com.skytala.eCommerce.domain.order.relations.orderHeader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import com.skytala.eCommerce.domain.party.relations.person.model.Person;
+import com.skytala.eCommerce.framework.util.AuthorizeMethods;
+import com.skytala.eCommerce.service.login.LoginServicesController;
+import com.skytala.eCommerce.service.login.dto.UserDetailsDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import com.google.common.base.Splitter;
 import com.skytala.eCommerce.domain.order.relations.orderHeader.command.AddOrderHeader;
@@ -36,11 +37,17 @@ import com.skytala.eCommerce.domain.order.relations.orderHeader.query.FindOrderH
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.util.AuthorizeMethods.*;
+import static com.skytala.eCommerce.service.login.util.SecurityGroups.ADMIN;
+
 @RestController
 @RequestMapping("/orderHeaders")
+@PreAuthorize(HAS_ADMIN_AUTHORITY)
 public class OrderHeaderController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();
+	@Resource
+	private LoginServicesController loginServicesController;
 
 	public OrderHeaderController() {
 
@@ -57,8 +64,14 @@ public class OrderHeaderController {
 	 * @return a List with the OrderHeaders
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
-	public ResponseEntity<List<OrderHeader>> findOrderHeadersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	@GetMapping("/find")
+	@PreAuthorize(AUTHENTICATED)
+	public ResponseEntity<List<OrderHeader>> findOrderHeadersBy(@RequestParam(required = false) Map<String, String> allRequestParams,
+																Principal principal) throws Exception {
+
+		UserDetailsDTO userDetails = loginServicesController.getLoggedInPerson(principal).getBody();
+		if(!userDetails.getAuthorities().contains(ADMIN))
+			allRequestParams.put("partyIdTo", userDetails.getPartyId());
 
 		FindOrderHeadersBy query = new FindOrderHeadersBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -81,6 +94,7 @@ public class OrderHeaderController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
+	@PreAuthorize(HAS_USER_AUTHORITY)
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<OrderHeader> createOrderHeader(HttpServletRequest request) throws Exception {
 
@@ -104,7 +118,8 @@ public class OrderHeaderController {
 	 *            the OrderHeader thats to be added
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PreAuthorize(HAS_USER_AUTHORITY)
 	public ResponseEntity<OrderHeader> createOrderHeader(@RequestBody OrderHeader orderHeaderToBeAdded) throws Exception {
 
 		AddOrderHeader command = new AddOrderHeader(orderHeaderToBeAdded);
@@ -128,6 +143,7 @@ public class OrderHeaderController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PreAuthorize(AUTHENTICATED)
 	public boolean updateOrderHeader(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -172,7 +188,8 @@ public class OrderHeaderController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/{orderId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PutMapping(value = "/{orderId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PreAuthorize(AUTHENTICATED)
 	public ResponseEntity<OrderHeader> updateOrderHeader(@RequestBody OrderHeader orderHeaderToBeUpdated,
 			@PathVariable String orderId) throws Exception {
 
@@ -190,13 +207,14 @@ public class OrderHeaderController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderHeaderId}")
-	public ResponseEntity<OrderHeader> findById(@PathVariable String orderHeaderId) throws Exception {
+	@GetMapping("/{orderHeaderId}")
+	@PreAuthorize(AUTHENTICATED)
+	public ResponseEntity<OrderHeader> findById(@PathVariable String orderHeaderId, Principal principal) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderId", orderHeaderId);
 		try {
 
-			List<OrderHeader> foundOrderHeader = findOrderHeadersBy(requestParams).getBody();
+			List<OrderHeader> foundOrderHeader = findOrderHeadersBy(requestParams, principal).getBody();
 
 			if(foundOrderHeader.size()==1)
 				return ResponseEntity.status(HttpStatus.OK).body(foundOrderHeader.get(0));
@@ -211,7 +229,8 @@ public class OrderHeaderController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderHeaderId}")
+	@DeleteMapping("/{orderHeaderId}")
+	@PreAuthorize(DENY_ALL)
 	public ResponseEntity<Object> deleteOrderHeaderByIdUpdated(@PathVariable String orderHeaderId) throws Exception {
 		DeleteOrderHeader command = new DeleteOrderHeader(orderHeaderId);
 

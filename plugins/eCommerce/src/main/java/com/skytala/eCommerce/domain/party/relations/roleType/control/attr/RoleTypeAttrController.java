@@ -158,7 +158,7 @@ public class RoleTypeAttrController {
 			return false;
 		}
 
-		if (updateRoleTypeAttr(roleTypeAttrToBeUpdated, null).getStatusCode()
+		if (updateRoleTypeAttr(roleTypeAttrToBeUpdated, roleTypeAttrToBeUpdated.getAttrName()).getStatusCode()
 				.equals(HttpStatus.NO_CONTENT)) {
 			return true;
 		}
@@ -174,11 +174,11 @@ public class RoleTypeAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<Object> updateRoleTypeAttr(@RequestBody RoleTypeAttr roleTypeAttrToBeUpdated,
-			@PathVariable String nullVal) throws Exception {
+			@PathVariable String attrName) throws Exception {
 
-//		roleTypeAttrToBeUpdated.setnull(null);
+		roleTypeAttrToBeUpdated.setAttrName(attrName);
 
 		UpdateRoleTypeAttr command = new UpdateRoleTypeAttr(roleTypeAttrToBeUpdated);
 
@@ -222,36 +222,4 @@ public class RoleTypeAttrController {
 
 	}
 
-	@RequestMapping(value = (" ** "))
-	public ResponseEntity<Object> returnErrorPage(HttpServletRequest request) {
-
-		String usedUri = request.getRequestURI();
-		String[] splittedString = usedUri.split("/");
-
-		String usedRequest = splittedString[splittedString.length - 1];
-
-		if (validRequests.containsKey(usedRequest)) {
-			String returnVal = "Error: request method " + request.getMethod() + " not allowed for \"" + usedUri
-					+ "\"!\n" + "Please use " + validRequests.get(usedRequest) + "!";
-
-			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(returnVal);
-		}
-
-		String returnVal = "Error 404: Page not found! Valid pages are: \"eCommerce/api/roleTypeAttr/\" plus one of the following: "
-				+ "";
-
-		Set<String> keySet = validRequests.keySet();
-		Iterator<String> it = keySet.iterator();
-
-		while (it.hasNext()) {
-			returnVal += "\"" + it.next() + "\"";
-			if (it.hasNext())
-				returnVal += ", ";
-		}
-
-		returnVal += "!";
-
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(returnVal);
-
-	}
 }

@@ -62,6 +62,7 @@ public class SwaggerConfig{
 				.apis(RequestHandlerSelectors.any())
 				.paths(PathSelectors.any())
 				.build()
+				.forCodeGeneration(true)
 				.apiInfo(apiInfo())
 				.enable(enableSwagger);
 	}

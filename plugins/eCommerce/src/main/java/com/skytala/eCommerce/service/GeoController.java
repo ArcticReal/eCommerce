@@ -24,6 +24,14 @@ public class GeoController {
                                           .findByAnd("Geo", filter, null, false));
     }
 
+	@RequestMapping("/country/{geoId}")
+    public ResponseEntity getCountry(@PathVariable String geoId) throws GenericEntityException {
+        Map filter = UtilMisc.toMap("geoTypeId","COUNTRY", "geoId", geoId);
+		
+        return successful(DelegatorFactory.getDelegator("default")
+                                          .findByAnd("Geo", filter, null, false));
+    }
+
     @RequestMapping("/{countryGeoId}/regions")
     public ResponseEntity getAllRegionsForCountry(@PathVariable String countryGeoId) throws GenericEntityException {
         Map filter = UtilMisc.toMap("geoId", countryGeoId, "geoAssocTypeId", "REGIONS");

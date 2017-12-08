@@ -68,6 +68,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     protected void configure(HttpSecurity http) throws Exception {
         http
           .authorizeRequests()
+				.anyRequest()
+					.permitAll()		//TODO: remove!!!
                 .antMatchers((HttpMethod)null, "/api/products/**")
                     .permitAll()
                 .antMatchers((HttpMethod)null, "/api/service/products/**")
@@ -100,8 +102,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                     .permitAll()
                 .antMatchers((HttpMethod)null, "/api/queryyy")//TODO: remove!!!
                     .permitAll()
-                .anyRequest()
-                    .denyAll()
+                //.anyRequest()
+                //    .denyAll()
                 .and()
           .formLogin()
                 .loginProcessingUrl("/api/login")

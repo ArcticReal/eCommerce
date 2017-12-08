@@ -158,7 +158,7 @@ public class OrderItemRoleController {
 			return false;
 		}
 
-		if (updateOrderItemRole(orderItemRoleToBeUpdated, orderItemRoleToBeUpdated.getOrderItemSeqId()).getStatusCode()
+		if (updateOrderItemRole(orderItemRoleToBeUpdated, null).getStatusCode()
 				.equals(HttpStatus.NO_CONTENT)) {
 			return true;
 		}
@@ -174,11 +174,11 @@ public class OrderItemRoleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/{orderItemSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<Object> updateOrderItemRole(@RequestBody OrderItemRole orderItemRoleToBeUpdated,
-			@PathVariable String orderItemSeqId) throws Exception {
+			@PathVariable String nullVal) throws Exception {
 
-		orderItemRoleToBeUpdated.setOrderItemSeqId(orderItemSeqId);
+//		orderItemRoleToBeUpdated.setnull(null);
 
 		UpdateOrderItemRole command = new UpdateOrderItemRole(orderItemRoleToBeUpdated);
 
@@ -222,36 +222,4 @@ public class OrderItemRoleController {
 
 	}
 
-	@RequestMapping(value = (" ** "))
-	public ResponseEntity<Object> returnErrorPage(HttpServletRequest request) {
-
-		String usedUri = request.getRequestURI();
-		String[] splittedString = usedUri.split("/");
-
-		String usedRequest = splittedString[splittedString.length - 1];
-
-		if (validRequests.containsKey(usedRequest)) {
-			String returnVal = "Error: request method " + request.getMethod() + " not allowed for \"" + usedUri
-					+ "\"!\n" + "Please use " + validRequests.get(usedRequest) + "!";
-
-			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(returnVal);
-		}
-
-		String returnVal = "Error 404: Page not found! Valid pages are: \"eCommerce/api/orderItemRole/\" plus one of the following: "
-				+ "";
-
-		Set<String> keySet = validRequests.keySet();
-		Iterator<String> it = keySet.iterator();
-
-		while (it.hasNext()) {
-			returnVal += "\"" + it.next() + "\"";
-			if (it.hasNext())
-				returnVal += ", ";
-		}
-
-		returnVal += "!";
-
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(returnVal);
-
-	}
 }

@@ -222,36 +222,4 @@ public class ProductStoreFacilityController {
 
 	}
 
-	@RequestMapping(value = (" ** "))
-	public ResponseEntity<Object> returnErrorPage(HttpServletRequest request) {
-
-		String usedUri = request.getRequestURI();
-		String[] splittedString = usedUri.split("/");
-
-		String usedRequest = splittedString[splittedString.length - 1];
-
-		if (validRequests.containsKey(usedRequest)) {
-			String returnVal = "Error: request method " + request.getMethod() + " not allowed for \"" + usedUri
-					+ "\"!\n" + "Please use " + validRequests.get(usedRequest) + "!";
-
-			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(returnVal);
-		}
-
-		String returnVal = "Error 404: Page not found! Valid pages are: \"eCommerce/api/productStoreFacility/\" plus one of the following: "
-				+ "";
-
-		Set<String> keySet = validRequests.keySet();
-		Iterator<String> it = keySet.iterator();
-
-		while (it.hasNext()) {
-			returnVal += "\"" + it.next() + "\"";
-			if (it.hasNext())
-				returnVal += ", ";
-		}
-
-		returnVal += "!";
-
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(returnVal);
-
-	}
 }

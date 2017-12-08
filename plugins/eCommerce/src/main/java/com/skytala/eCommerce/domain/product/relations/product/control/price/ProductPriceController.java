@@ -65,7 +65,7 @@ public class ProductPriceController {
 		List<ProductPrice> productPrices =((ProductPriceFound) Scheduler.execute(query).data()).getProductPrices();
 
 
-		return ResponseEntity.ok().body(productPrices);
+		return ResponseEntity.ok().body(getNewestPrices(productPrices));
 
 	}
 

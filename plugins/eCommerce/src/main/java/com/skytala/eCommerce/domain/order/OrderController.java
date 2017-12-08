@@ -86,12 +86,11 @@ public class OrderController {
 
         Person person = loginServicesController.getLoggedInPerson(principal).getBody().extractPerson();
 
-
         Map<String, String> filter = UtilMisc.toMap("partyIdTo", person.getPartyId());
 
         List<Shipment> shipments = shipmentController.findShipmentsBy(filter).getBody();
 
-        List<OrderHeader> headers = getOrderHeaders(shipments);
+        List<OrderHeader> headers = getOrderHeaders(shipments, principal);
 
         List<OrderListItemDTO> result =
                 headers.stream()
@@ -104,10 +103,10 @@ public class OrderController {
 
     @GetMapping("/listAll")
     @PreAuthorize(HAS_ADMIN_AUTHORITY)
-    public ResponseEntity<List<OrderListItemDTO>> getAllOrdersAsList() throws Exception {
+    public ResponseEntity<List<OrderListItemDTO>> getAllOrdersAsList(Principal principal) throws Exception {
 
         List<Shipment> shipments = shipmentController.findShipmentsBy(null).getBody();
-        return successful(getOrderHeaders(shipments)
+        return successful(getOrderHeaders(shipments, principal)
                 .stream()
                 .sorted((header1, header2) -> header1.getOrderDate().compareTo(header2.getOrderDate()))
                 .map(OrderListItemDTO::new)
@@ -115,11 +114,11 @@ public class OrderController {
 
     }
 
-    private List<OrderHeader> getOrderHeaders(List<Shipment> shipments) {
+    private List<OrderHeader> getOrderHeaders(List<Shipment> shipments, Principal principal) {
 
         List<OrderHeader> headers = shipments.stream().map(shipment -> {
             try {
-                return orderHeaderController.findById(shipment.getPrimaryOrderId()).getBody();
+                return orderHeaderController.findById(shipment.getPrimaryOrderId(), principal).getBody();
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
@@ -146,7 +145,7 @@ public class OrderController {
             return serverError();
         }
 
-        OrderHeader header = orderHeaderController.findById(orderHeaderId).getBody();
+        OrderHeader header = orderHeaderController.findById(orderHeaderId, principal).getBody();
 
         List<Shipment> shipments = shipmentController.findShipmentsBy(UtilMisc.toMap("primaryOrderId", orderHeaderId)).getBody();
         Party party = null;
@@ -224,8 +223,11 @@ public class OrderController {
         List<ShoppingCartItemDTO> products = new LinkedList<>();
 
         for(OrderItem t : items){
-            products.add(ShoppingCartItemDTO.create(productController.findByIdWithDetails(t.getProductId()).getBody(),
-                                                    t.getQuantity()));
+            ShoppingCartItemDTO dto = ShoppingCartItemDTO
+                    .create(productController.findByIdWithDetails(t.getProductId()).getBody(),
+                            t.getQuantity());
+            dto.setPrice(t.getUnitPrice());
+            products.add(dto);
         }
 
         return successful(OrderDetailsDTO.create(header, address, eMail, products, header.getGrandTotal()));
@@ -270,14 +272,15 @@ public class OrderController {
         List<ShoppingCartItemDTO> products = new LinkedList<>();
 
         for(Position p : cart.getPositions()){
-            itemToBeCreated.setProductId(p.getProduct().getProductId());
-            itemToBeCreated.setQuantity(p.getNumberProducts());
-            orderItemController.createOrderItem(itemToBeCreated);
             ShoppingCartItemDTO dto = ShoppingCartItemDTO
                     .create(productController.findByIdWithDetails(p.getProduct()
                                                                    .getProductId())
-                                                                   .getBody(),
+                                             .getBody(),
                             p.getNumberProducts());
+            itemToBeCreated.setProductId(p.getProduct().getProductId());
+            itemToBeCreated.setQuantity(p.getNumberProducts());
+            itemToBeCreated.setUnitPrice(dto.getPrice());
+            orderItemController.createOrderItem(itemToBeCreated);
             products.add(dto);
         }
 
@@ -335,7 +338,7 @@ public class OrderController {
             return serverError();
         }
 
-        OrderHeader header = orderHeaderController.findById(orderId).getBody();
+        OrderHeader header = orderHeaderController.findById(orderId, principal).getBody();
 
         String status = header.getStatusId();
         if(!(status.equals(OrderStatusUtil.PROCESSING)||status.equals(OrderStatusUtil.HOLD)
@@ -353,7 +356,7 @@ public class OrderController {
     public ResponseEntity approveOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
 
 
-        OrderHeader header = orderHeaderController.findById(orderId).getBody();
+        OrderHeader header = orderHeaderController.findById(orderId, principal).getBody();
 
         String status = header.getStatusId();
         if(!(status.equals(OrderStatusUtil.PROCESSING)||status.equals(OrderStatusUtil.HOLD))){
@@ -371,7 +374,7 @@ public class OrderController {
     @PreAuthorize(HAS_ADMIN_AUTHORITY)
     public ResponseEntity rejectOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
 
-        OrderHeader header = orderHeaderController.findById(orderId).getBody();
+        OrderHeader header = orderHeaderController.findById(orderId, principal).getBody();
 
         String status = header.getStatusId();
         if(!(status.equals(OrderStatusUtil.PROCESSING)||status.equals(OrderStatusUtil.HOLD))){
@@ -388,7 +391,7 @@ public class OrderController {
     @PreAuthorize(HAS_ADMIN_AUTHORITY)
     public ResponseEntity holdOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
 
-        OrderHeader header = orderHeaderController.findById(orderId).getBody();
+        OrderHeader header = orderHeaderController.findById(orderId, principal).getBody();
 
         String status = header.getStatusId();
         if(!(status.equals(OrderStatusUtil.PROCESSING))){
@@ -406,7 +409,7 @@ public class OrderController {
     public ResponseEntity createOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
 
 
-        OrderHeader header = orderHeaderController.findById(orderId).getBody();
+        OrderHeader header = orderHeaderController.findById(orderId, principal).getBody();
 
         String status = header.getStatusId();
         if(!(status.equals(OrderStatusUtil.APPROVED))){
@@ -424,7 +427,7 @@ public class OrderController {
     public ResponseEntity sendOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
 
 
-        OrderHeader header = orderHeaderController.findById(orderId).getBody();
+        OrderHeader header = orderHeaderController.findById(orderId, principal).getBody();
 
         String status = header.getStatusId();
         if(!(status.equals(OrderStatusUtil.CREATED))){
@@ -442,7 +445,7 @@ public class OrderController {
     public ResponseEntity completeOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
 
 
-        OrderHeader header = orderHeaderController.findById(orderId).getBody();
+        OrderHeader header = orderHeaderController.findById(orderId, principal).getBody();
 
         String status = header.getStatusId();
         if(!(status.equals(OrderStatusUtil.SENT))){

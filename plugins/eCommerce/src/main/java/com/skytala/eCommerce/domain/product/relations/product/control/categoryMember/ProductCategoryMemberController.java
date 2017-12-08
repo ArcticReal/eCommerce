@@ -3,14 +3,12 @@ package com.skytala.eCommerce.domain.product.relations.product.control.categoryM
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.skytala.eCommerce.domain.product.relations.product.model.price.ProductPrice;
+import com.skytala.eCommerce.framework.util.TimestampUtil;
 import org.apache.ofbiz.base.util.UtilMisc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -68,8 +66,7 @@ public class ProductCategoryMemberController {
 
 		List<ProductCategoryMember> productCategoryMembers =((ProductCategoryMemberFound) Scheduler.execute(query).data()).getProductCategoryMembers();
 
-
-		return ResponseEntity.ok().body(productCategoryMembers);
+		return ResponseEntity.ok().body(getValidMembers(productCategoryMembers));
 
 	}
 
@@ -254,6 +251,17 @@ public class ProductCategoryMemberController {
 
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(returnVal);
 
+	}
+
+	public List<ProductCategoryMember> getValidMembers(List<ProductCategoryMember> members){
+		List<ProductCategoryMember> returnVal = new LinkedList<>();
+		for(ProductCategoryMember member : members){
+			if((member.getThruDate()==null||member.getThruDate().after(TimestampUtil.currentTime()))
+					&&member.getFromDate().before(TimestampUtil.currentTime())){
+				returnVal.add(member);
+			}
+		}
+		return returnVal;
 	}
 
 

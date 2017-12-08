@@ -102,7 +102,7 @@ public class ProductController {
 		List<Product> products =((ProductFound) Scheduler.execute(query).data()).getProducts();
 
 
-		return ResponseEntity.ok().body(products);
+		return successful(generateListItemsFromProducts(products));
 
 	}
 
@@ -234,7 +234,7 @@ public class ProductController {
 
 	@GetMapping("/productList")
 	@PreAuthorize(PERMIT_ALL)
-	public ResponseEntity<List<ProductListItemDTO>> getAllProductListItems() throws Exception {
+	public ResponseEntity<List<Product>> getAllProductListItems() throws Exception {
 
 		List<Product> products = findProductsBy(new HashMap<>()).getBody();
 
@@ -244,7 +244,7 @@ public class ProductController {
 
 	}
 
-	private List<ProductListItemDTO> generateListItemsFromProducts(List<Product> products) throws Exception {
+	private List<Product> generateListItemsFromProducts(List<Product> products) throws Exception {
 
 		Map<String, String> filter = UtilMisc.toMap("productPricePurposeId", "PURCHASE",
 													"productPriceTypeId", "DEFAULT_PRICE");
@@ -257,25 +257,34 @@ public class ProductController {
 		final List<ProductAttribute> attributes = attributeController.findProductAttributesBy(filter)
 				.getBody();
 
-		List<ProductListItemDTO> results = new LinkedList<>();
 
-		results = products.stream()
+
+		final List<String> results = products.stream()
 				.map((Product prod) -> ProductListItemDTO.create(prod, productPrices, attributes))
 				.filter(dto -> {
 					if (dto.getPrice()==null)
 						return false;
 					else
 						return true;})
+				.map(dto -> {
+					return dto.getProductId();
+				})
 				.collect(Collectors.toList());
 
 
-		return results;
+		return products.stream().filter(product -> {
+					if(results.contains(product.getProductId()))
+						return true;
+					else
+						return false;
+				})
+				.collect(Collectors.toList());
 
 	}
 
 	@GetMapping("/productListFromCategory/{categoryId}")
 	@PreAuthorize(PERMIT_ALL)
-	public ResponseEntity<List<ProductListItemDTO>> getAllProductListItemsFromCategory(HttpSession session,
+	public ResponseEntity<List<Product>> getAllProductListItemsFromCategory(HttpSession session,
 																					   @PathVariable("categoryId") String categoryId) throws Exception {
 		ProductCategory category =
 				new ProductCategory(categoryId,

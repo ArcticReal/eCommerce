@@ -158,7 +158,7 @@ public class ContactMechAttributeController {
 			return false;
 		}
 
-		if (updateContactMechAttribute(contactMechAttributeToBeUpdated, null).getStatusCode()
+		if (updateContactMechAttribute(contactMechAttributeToBeUpdated, contactMechAttributeToBeUpdated.getAttrName()).getStatusCode()
 				.equals(HttpStatus.NO_CONTENT)) {
 			return true;
 		}
@@ -174,11 +174,11 @@ public class ContactMechAttributeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<Object> updateContactMechAttribute(@RequestBody ContactMechAttribute contactMechAttributeToBeUpdated,
-			@PathVariable String nullVal) throws Exception {
+			@PathVariable String attrName) throws Exception {
 
-//		contactMechAttributeToBeUpdated.setnull(null);
+		contactMechAttributeToBeUpdated.setAttrName(attrName);
 
 		UpdateContactMechAttribute command = new UpdateContactMechAttribute(contactMechAttributeToBeUpdated);
 
@@ -222,36 +222,4 @@ public class ContactMechAttributeController {
 
 	}
 
-	@RequestMapping(value = (" ** "))
-	public ResponseEntity<Object> returnErrorPage(HttpServletRequest request) {
-
-		String usedUri = request.getRequestURI();
-		String[] splittedString = usedUri.split("/");
-
-		String usedRequest = splittedString[splittedString.length - 1];
-
-		if (validRequests.containsKey(usedRequest)) {
-			String returnVal = "Error: request method " + request.getMethod() + " not allowed for \"" + usedUri
-					+ "\"!\n" + "Please use " + validRequests.get(usedRequest) + "!";
-
-			return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(returnVal);
-		}
-
-		String returnVal = "Error 404: Page not found! Valid pages are: \"eCommerce/api/contactMechAttribute/\" plus one of the following: "
-				+ "";
-
-		Set<String> keySet = validRequests.keySet();
-		Iterator<String> it = keySet.iterator();
-
-		while (it.hasNext()) {
-			returnVal += "\"" + it.next() + "\"";
-			if (it.hasNext())
-				returnVal += ", ";
-		}
-
-		returnVal += "!";
-
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(returnVal);
-
-	}
 }
