@@ -57,7 +57,7 @@ public class DataTemplateTypeController {
 	 * @return a List with the DataTemplateTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findDataTemplateTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDataTemplateTypesBy query = new FindDataTemplateTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class DataTemplateTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createDataTemplateType(HttpServletRequest request) throws Exception {
 
 		DataTemplateType dataTemplateTypeToBeAdded = new DataTemplateType();
@@ -129,7 +129,7 @@ public class DataTemplateTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateDataTemplateType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class DataTemplateTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{dataTemplateTypeId}")
+	@GetMapping("/{dataTemplateTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String dataTemplateTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("dataTemplateTypeId", dataTemplateTypeId);
@@ -207,7 +207,7 @@ public class DataTemplateTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{dataTemplateTypeId}")
+	@DeleteMapping("/{dataTemplateTypeId}")
 	public ResponseEntity<Object> deleteDataTemplateTypeByIdUpdated(@PathVariable String dataTemplateTypeId) throws Exception {
 		DeleteDataTemplateType command = new DeleteDataTemplateType(dataTemplateTypeId);
 

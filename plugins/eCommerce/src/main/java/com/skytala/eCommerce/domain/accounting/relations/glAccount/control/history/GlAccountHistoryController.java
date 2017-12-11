@@ -57,7 +57,7 @@ public class GlAccountHistoryController {
 	 * @return a List with the GlAccountHistorys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findGlAccountHistorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGlAccountHistorysBy query = new FindGlAccountHistorysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class GlAccountHistoryController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createGlAccountHistory(HttpServletRequest request) throws Exception {
 
 		GlAccountHistory glAccountHistoryToBeAdded = new GlAccountHistory();
@@ -129,7 +129,7 @@ public class GlAccountHistoryController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateGlAccountHistory(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class GlAccountHistoryController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{glAccountHistoryId}")
+	@GetMapping("/{glAccountHistoryId}")
 	public ResponseEntity<Object> findById(@PathVariable String glAccountHistoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("glAccountHistoryId", glAccountHistoryId);
@@ -207,7 +207,7 @@ public class GlAccountHistoryController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{glAccountHistoryId}")
+	@DeleteMapping("/{glAccountHistoryId}")
 	public ResponseEntity<Object> deleteGlAccountHistoryByIdUpdated(@PathVariable String glAccountHistoryId) throws Exception {
 		DeleteGlAccountHistory command = new DeleteGlAccountHistory(glAccountHistoryId);
 

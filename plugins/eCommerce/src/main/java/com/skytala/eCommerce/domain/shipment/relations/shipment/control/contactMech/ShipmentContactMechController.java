@@ -57,7 +57,7 @@ public class ShipmentContactMechController {
 	 * @return a List with the ShipmentContactMechs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findShipmentContactMechsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentContactMechsBy query = new FindShipmentContactMechsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ShipmentContactMechController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createShipmentContactMech(HttpServletRequest request) throws Exception {
 
 		ShipmentContactMech shipmentContactMechToBeAdded = new ShipmentContactMech();
@@ -129,7 +129,7 @@ public class ShipmentContactMechController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateShipmentContactMech(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ShipmentContactMechController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{shipmentContactMechId}")
+	@GetMapping("/{shipmentContactMechId}")
 	public ResponseEntity<Object> findById(@PathVariable String shipmentContactMechId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentContactMechId", shipmentContactMechId);
@@ -207,7 +207,7 @@ public class ShipmentContactMechController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{shipmentContactMechId}")
+	@DeleteMapping("/{shipmentContactMechId}")
 	public ResponseEntity<Object> deleteShipmentContactMechByIdUpdated(@PathVariable String shipmentContactMechId) throws Exception {
 		DeleteShipmentContactMech command = new DeleteShipmentContactMech(shipmentContactMechId);
 

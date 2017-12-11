@@ -57,7 +57,7 @@ public class FinAccountTransTypeController {
 	 * @return a List with the FinAccountTransTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFinAccountTransTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFinAccountTransTypesBy query = new FindFinAccountTransTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FinAccountTransTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFinAccountTransType(HttpServletRequest request) throws Exception {
 
 		FinAccountTransType finAccountTransTypeToBeAdded = new FinAccountTransType();
@@ -129,7 +129,7 @@ public class FinAccountTransTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFinAccountTransType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FinAccountTransTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{finAccountTransTypeId}")
+	@GetMapping("/{finAccountTransTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String finAccountTransTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("finAccountTransTypeId", finAccountTransTypeId);
@@ -207,7 +207,7 @@ public class FinAccountTransTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{finAccountTransTypeId}")
+	@DeleteMapping("/{finAccountTransTypeId}")
 	public ResponseEntity<Object> deleteFinAccountTransTypeByIdUpdated(@PathVariable String finAccountTransTypeId) throws Exception {
 		DeleteFinAccountTransType command = new DeleteFinAccountTransType(finAccountTransTypeId);
 

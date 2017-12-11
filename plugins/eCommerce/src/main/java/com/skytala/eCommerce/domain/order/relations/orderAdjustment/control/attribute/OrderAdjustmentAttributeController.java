@@ -57,7 +57,7 @@ public class OrderAdjustmentAttributeController {
 	 * @return a List with the OrderAdjustmentAttributes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderAdjustmentAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderAdjustmentAttributesBy query = new FindOrderAdjustmentAttributesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderAdjustmentAttributeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderAdjustmentAttribute(HttpServletRequest request) throws Exception {
 
 		OrderAdjustmentAttribute orderAdjustmentAttributeToBeAdded = new OrderAdjustmentAttribute();
@@ -129,7 +129,7 @@ public class OrderAdjustmentAttributeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderAdjustmentAttribute(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderAdjustmentAttributeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderAdjustmentAttributeId}")
+	@GetMapping("/{orderAdjustmentAttributeId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderAdjustmentAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderAdjustmentAttributeId", orderAdjustmentAttributeId);
@@ -207,7 +207,7 @@ public class OrderAdjustmentAttributeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderAdjustmentAttributeId}")
+	@DeleteMapping("/{orderAdjustmentAttributeId}")
 	public ResponseEntity<Object> deleteOrderAdjustmentAttributeByIdUpdated(@PathVariable String orderAdjustmentAttributeId) throws Exception {
 		DeleteOrderAdjustmentAttribute command = new DeleteOrderAdjustmentAttribute(orderAdjustmentAttributeId);
 

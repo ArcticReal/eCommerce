@@ -57,7 +57,7 @@ public class OrderAdjustmentBillingController {
 	 * @return a List with the OrderAdjustmentBillings
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderAdjustmentBillingsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderAdjustmentBillingsBy query = new FindOrderAdjustmentBillingsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderAdjustmentBillingController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderAdjustmentBilling(HttpServletRequest request) throws Exception {
 
 		OrderAdjustmentBilling orderAdjustmentBillingToBeAdded = new OrderAdjustmentBilling();
@@ -129,7 +129,7 @@ public class OrderAdjustmentBillingController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderAdjustmentBilling(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderAdjustmentBillingController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderAdjustmentBillingId}")
+	@GetMapping("/{orderAdjustmentBillingId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderAdjustmentBillingId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderAdjustmentBillingId", orderAdjustmentBillingId);
@@ -207,7 +207,7 @@ public class OrderAdjustmentBillingController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderAdjustmentBillingId}")
+	@DeleteMapping("/{orderAdjustmentBillingId}")
 	public ResponseEntity<Object> deleteOrderAdjustmentBillingByIdUpdated(@PathVariable String orderAdjustmentBillingId) throws Exception {
 		DeleteOrderAdjustmentBilling command = new DeleteOrderAdjustmentBilling(orderAdjustmentBillingId);
 

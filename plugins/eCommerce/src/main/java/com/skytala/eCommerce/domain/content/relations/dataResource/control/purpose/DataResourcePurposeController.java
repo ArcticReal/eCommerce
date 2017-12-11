@@ -57,7 +57,7 @@ public class DataResourcePurposeController {
 	 * @return a List with the DataResourcePurposes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findDataResourcePurposesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDataResourcePurposesBy query = new FindDataResourcePurposesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class DataResourcePurposeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createDataResourcePurpose(HttpServletRequest request) throws Exception {
 
 		DataResourcePurpose dataResourcePurposeToBeAdded = new DataResourcePurpose();
@@ -129,7 +129,7 @@ public class DataResourcePurposeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateDataResourcePurpose(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class DataResourcePurposeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{dataResourcePurposeId}")
+	@GetMapping("/{dataResourcePurposeId}")
 	public ResponseEntity<Object> findById(@PathVariable String dataResourcePurposeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("dataResourcePurposeId", dataResourcePurposeId);
@@ -207,7 +207,7 @@ public class DataResourcePurposeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{dataResourcePurposeId}")
+	@DeleteMapping("/{dataResourcePurposeId}")
 	public ResponseEntity<Object> deleteDataResourcePurposeByIdUpdated(@PathVariable String dataResourcePurposeId) throws Exception {
 		DeleteDataResourcePurpose command = new DeleteDataResourcePurpose(dataResourcePurposeId);
 

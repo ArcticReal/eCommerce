@@ -57,7 +57,7 @@ public class GlAccountCategoryTypeController {
 	 * @return a List with the GlAccountCategoryTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findGlAccountCategoryTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGlAccountCategoryTypesBy query = new FindGlAccountCategoryTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class GlAccountCategoryTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createGlAccountCategoryType(HttpServletRequest request) throws Exception {
 
 		GlAccountCategoryType glAccountCategoryTypeToBeAdded = new GlAccountCategoryType();
@@ -129,7 +129,7 @@ public class GlAccountCategoryTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateGlAccountCategoryType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class GlAccountCategoryTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{glAccountCategoryTypeId}")
+	@GetMapping("/{glAccountCategoryTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String glAccountCategoryTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("glAccountCategoryTypeId", glAccountCategoryTypeId);
@@ -207,7 +207,7 @@ public class GlAccountCategoryTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{glAccountCategoryTypeId}")
+	@DeleteMapping("/{glAccountCategoryTypeId}")
 	public ResponseEntity<Object> deleteGlAccountCategoryTypeByIdUpdated(@PathVariable String glAccountCategoryTypeId) throws Exception {
 		DeleteGlAccountCategoryType command = new DeleteGlAccountCategoryType(glAccountCategoryTypeId);
 

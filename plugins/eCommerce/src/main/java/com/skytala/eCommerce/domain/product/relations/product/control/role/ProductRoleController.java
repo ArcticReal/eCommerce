@@ -57,7 +57,7 @@ public class ProductRoleController {
 	 * @return a List with the ProductRoles
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductRolesBy query = new FindProductRolesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductRoleController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductRole(HttpServletRequest request) throws Exception {
 
 		ProductRole productRoleToBeAdded = new ProductRole();
@@ -129,7 +129,7 @@ public class ProductRoleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductRole(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductRoleController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productRoleId}")
+	@GetMapping("/{productRoleId}")
 	public ResponseEntity<Object> findById(@PathVariable String productRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productRoleId", productRoleId);
@@ -207,7 +207,7 @@ public class ProductRoleController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productRoleId}")
+	@DeleteMapping("/{productRoleId}")
 	public ResponseEntity<Object> deleteProductRoleByIdUpdated(@PathVariable String productRoleId) throws Exception {
 		DeleteProductRole command = new DeleteProductRole(productRoleId);
 

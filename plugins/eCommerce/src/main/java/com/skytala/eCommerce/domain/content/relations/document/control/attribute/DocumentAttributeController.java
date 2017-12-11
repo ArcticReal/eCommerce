@@ -57,7 +57,7 @@ public class DocumentAttributeController {
 	 * @return a List with the DocumentAttributes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findDocumentAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDocumentAttributesBy query = new FindDocumentAttributesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class DocumentAttributeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createDocumentAttribute(HttpServletRequest request) throws Exception {
 
 		DocumentAttribute documentAttributeToBeAdded = new DocumentAttribute();
@@ -129,7 +129,7 @@ public class DocumentAttributeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateDocumentAttribute(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class DocumentAttributeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{documentAttributeId}")
+	@GetMapping("/{documentAttributeId}")
 	public ResponseEntity<Object> findById(@PathVariable String documentAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("documentAttributeId", documentAttributeId);
@@ -207,7 +207,7 @@ public class DocumentAttributeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{documentAttributeId}")
+	@DeleteMapping("/{documentAttributeId}")
 	public ResponseEntity<Object> deleteDocumentAttributeByIdUpdated(@PathVariable String documentAttributeId) throws Exception {
 		DeleteDocumentAttribute command = new DeleteDocumentAttribute(documentAttributeId);
 

@@ -57,7 +57,7 @@ public class EmplLeaveController {
 	 * @return a List with the EmplLeaves
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findEmplLeavesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindEmplLeavesBy query = new FindEmplLeavesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class EmplLeaveController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createEmplLeave(HttpServletRequest request) throws Exception {
 
 		EmplLeave emplLeaveToBeAdded = new EmplLeave();
@@ -129,7 +129,7 @@ public class EmplLeaveController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateEmplLeave(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class EmplLeaveController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{emplLeaveId}")
+	@GetMapping("/{emplLeaveId}")
 	public ResponseEntity<Object> findById(@PathVariable String emplLeaveId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("emplLeaveId", emplLeaveId);
@@ -207,7 +207,7 @@ public class EmplLeaveController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{emplLeaveId}")
+	@DeleteMapping("/{emplLeaveId}")
 	public ResponseEntity<Object> deleteEmplLeaveByIdUpdated(@PathVariable String emplLeaveId) throws Exception {
 		DeleteEmplLeave command = new DeleteEmplLeave(emplLeaveId);
 

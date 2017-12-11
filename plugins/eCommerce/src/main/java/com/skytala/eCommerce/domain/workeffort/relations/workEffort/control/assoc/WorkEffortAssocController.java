@@ -57,7 +57,7 @@ public class WorkEffortAssocController {
 	 * @return a List with the WorkEffortAssocs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWorkEffortAssocsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortAssocsBy query = new FindWorkEffortAssocsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WorkEffortAssocController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWorkEffortAssoc(HttpServletRequest request) throws Exception {
 
 		WorkEffortAssoc workEffortAssocToBeAdded = new WorkEffortAssoc();
@@ -129,7 +129,7 @@ public class WorkEffortAssocController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWorkEffortAssoc(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WorkEffortAssocController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{workEffortAssocId}")
+	@GetMapping("/{workEffortAssocId}")
 	public ResponseEntity<Object> findById(@PathVariable String workEffortAssocId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortAssocId", workEffortAssocId);
@@ -207,7 +207,7 @@ public class WorkEffortAssocController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{workEffortAssocId}")
+	@DeleteMapping("/{workEffortAssocId}")
 	public ResponseEntity<Object> deleteWorkEffortAssocByIdUpdated(@PathVariable String workEffortAssocId) throws Exception {
 		DeleteWorkEffortAssoc command = new DeleteWorkEffortAssoc(workEffortAssocId);
 

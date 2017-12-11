@@ -57,7 +57,7 @@ public class QuoteWorkEffortController {
 	 * @return a List with the QuoteWorkEfforts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findQuoteWorkEffortsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindQuoteWorkEffortsBy query = new FindQuoteWorkEffortsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class QuoteWorkEffortController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createQuoteWorkEffort(HttpServletRequest request) throws Exception {
 
 		QuoteWorkEffort quoteWorkEffortToBeAdded = new QuoteWorkEffort();
@@ -129,7 +129,7 @@ public class QuoteWorkEffortController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateQuoteWorkEffort(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class QuoteWorkEffortController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{quoteWorkEffortId}")
+	@GetMapping("/{quoteWorkEffortId}")
 	public ResponseEntity<Object> findById(@PathVariable String quoteWorkEffortId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("quoteWorkEffortId", quoteWorkEffortId);
@@ -207,7 +207,7 @@ public class QuoteWorkEffortController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{quoteWorkEffortId}")
+	@DeleteMapping("/{quoteWorkEffortId}")
 	public ResponseEntity<Object> deleteQuoteWorkEffortByIdUpdated(@PathVariable String quoteWorkEffortId) throws Exception {
 		DeleteQuoteWorkEffort command = new DeleteQuoteWorkEffort(quoteWorkEffortId);
 

@@ -57,7 +57,7 @@ public class ContentApprovalController {
 	 * @return a List with the ContentApprovals
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findContentApprovalsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContentApprovalsBy query = new FindContentApprovalsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ContentApprovalController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createContentApproval(HttpServletRequest request) throws Exception {
 
 		ContentApproval contentApprovalToBeAdded = new ContentApproval();
@@ -129,7 +129,7 @@ public class ContentApprovalController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateContentApproval(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ContentApprovalController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{contentApprovalId}")
+	@GetMapping("/{contentApprovalId}")
 	public ResponseEntity<Object> findById(@PathVariable String contentApprovalId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contentApprovalId", contentApprovalId);
@@ -207,7 +207,7 @@ public class ContentApprovalController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{contentApprovalId}")
+	@DeleteMapping("/{contentApprovalId}")
 	public ResponseEntity<Object> deleteContentApprovalByIdUpdated(@PathVariable String contentApprovalId) throws Exception {
 		DeleteContentApproval command = new DeleteContentApproval(contentApprovalId);
 

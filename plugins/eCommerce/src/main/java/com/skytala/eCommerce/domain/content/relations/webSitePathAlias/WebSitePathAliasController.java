@@ -57,7 +57,7 @@ public class WebSitePathAliasController {
 	 * @return a List with the WebSitePathAliass
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWebSitePathAliassBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWebSitePathAliassBy query = new FindWebSitePathAliassBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WebSitePathAliasController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWebSitePathAlias(HttpServletRequest request) throws Exception {
 
 		WebSitePathAlias webSitePathAliasToBeAdded = new WebSitePathAlias();
@@ -129,7 +129,7 @@ public class WebSitePathAliasController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWebSitePathAlias(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WebSitePathAliasController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{webSitePathAliasId}")
+	@GetMapping("/{webSitePathAliasId}")
 	public ResponseEntity<Object> findById(@PathVariable String webSitePathAliasId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("webSitePathAliasId", webSitePathAliasId);
@@ -207,7 +207,7 @@ public class WebSitePathAliasController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{webSitePathAliasId}")
+	@DeleteMapping("/{webSitePathAliasId}")
 	public ResponseEntity<Object> deleteWebSitePathAliasByIdUpdated(@PathVariable String webSitePathAliasId) throws Exception {
 		DeleteWebSitePathAlias command = new DeleteWebSitePathAlias(webSitePathAliasId);
 

@@ -57,7 +57,7 @@ public class DeliveryController {
 	 * @return a List with the Deliverys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findDeliverysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDeliverysBy query = new FindDeliverysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class DeliveryController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createDelivery(HttpServletRequest request) throws Exception {
 
 		Delivery deliveryToBeAdded = new Delivery();
@@ -129,7 +129,7 @@ public class DeliveryController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateDelivery(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class DeliveryController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{deliveryId}")
+	@GetMapping("/{deliveryId}")
 	public ResponseEntity<Object> findById(@PathVariable String deliveryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("deliveryId", deliveryId);
@@ -207,7 +207,7 @@ public class DeliveryController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{deliveryId}")
+	@DeleteMapping("/{deliveryId}")
 	public ResponseEntity<Object> deleteDeliveryByIdUpdated(@PathVariable String deliveryId) throws Exception {
 		DeleteDelivery command = new DeleteDelivery(deliveryId);
 

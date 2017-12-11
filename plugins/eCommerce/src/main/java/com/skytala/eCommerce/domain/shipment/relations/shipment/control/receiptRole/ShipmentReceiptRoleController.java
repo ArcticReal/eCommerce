@@ -57,7 +57,7 @@ public class ShipmentReceiptRoleController {
 	 * @return a List with the ShipmentReceiptRoles
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findShipmentReceiptRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentReceiptRolesBy query = new FindShipmentReceiptRolesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ShipmentReceiptRoleController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createShipmentReceiptRole(HttpServletRequest request) throws Exception {
 
 		ShipmentReceiptRole shipmentReceiptRoleToBeAdded = new ShipmentReceiptRole();
@@ -129,7 +129,7 @@ public class ShipmentReceiptRoleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateShipmentReceiptRole(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ShipmentReceiptRoleController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{shipmentReceiptRoleId}")
+	@GetMapping("/{shipmentReceiptRoleId}")
 	public ResponseEntity<Object> findById(@PathVariable String shipmentReceiptRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentReceiptRoleId", shipmentReceiptRoleId);
@@ -207,7 +207,7 @@ public class ShipmentReceiptRoleController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{shipmentReceiptRoleId}")
+	@DeleteMapping("/{shipmentReceiptRoleId}")
 	public ResponseEntity<Object> deleteShipmentReceiptRoleByIdUpdated(@PathVariable String shipmentReceiptRoleId) throws Exception {
 		DeleteShipmentReceiptRole command = new DeleteShipmentReceiptRole(shipmentReceiptRoleId);
 

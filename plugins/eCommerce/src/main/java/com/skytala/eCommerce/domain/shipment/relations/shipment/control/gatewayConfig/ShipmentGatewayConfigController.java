@@ -57,7 +57,7 @@ public class ShipmentGatewayConfigController {
 	 * @return a List with the ShipmentGatewayConfigs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findShipmentGatewayConfigsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentGatewayConfigsBy query = new FindShipmentGatewayConfigsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ShipmentGatewayConfigController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createShipmentGatewayConfig(HttpServletRequest request) throws Exception {
 
 		ShipmentGatewayConfig shipmentGatewayConfigToBeAdded = new ShipmentGatewayConfig();
@@ -129,7 +129,7 @@ public class ShipmentGatewayConfigController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateShipmentGatewayConfig(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ShipmentGatewayConfigController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{shipmentGatewayConfigId}")
+	@GetMapping("/{shipmentGatewayConfigId}")
 	public ResponseEntity<Object> findById(@PathVariable String shipmentGatewayConfigId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentGatewayConfigId", shipmentGatewayConfigId);
@@ -207,7 +207,7 @@ public class ShipmentGatewayConfigController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{shipmentGatewayConfigId}")
+	@DeleteMapping("/{shipmentGatewayConfigId}")
 	public ResponseEntity<Object> deleteShipmentGatewayConfigByIdUpdated(@PathVariable String shipmentGatewayConfigId) throws Exception {
 		DeleteShipmentGatewayConfig command = new DeleteShipmentGatewayConfig(shipmentGatewayConfigId);
 

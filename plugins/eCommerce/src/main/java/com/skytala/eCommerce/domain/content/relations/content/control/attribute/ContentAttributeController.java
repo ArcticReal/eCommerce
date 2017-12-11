@@ -57,7 +57,7 @@ public class ContentAttributeController {
 	 * @return a List with the ContentAttributes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findContentAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContentAttributesBy query = new FindContentAttributesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ContentAttributeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createContentAttribute(HttpServletRequest request) throws Exception {
 
 		ContentAttribute contentAttributeToBeAdded = new ContentAttribute();
@@ -129,7 +129,7 @@ public class ContentAttributeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateContentAttribute(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ContentAttributeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{contentAttributeId}")
+	@GetMapping("/{contentAttributeId}")
 	public ResponseEntity<Object> findById(@PathVariable String contentAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contentAttributeId", contentAttributeId);
@@ -207,7 +207,7 @@ public class ContentAttributeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{contentAttributeId}")
+	@DeleteMapping("/{contentAttributeId}")
 	public ResponseEntity<Object> deleteContentAttributeByIdUpdated(@PathVariable String contentAttributeId) throws Exception {
 		DeleteContentAttribute command = new DeleteContentAttribute(contentAttributeId);
 

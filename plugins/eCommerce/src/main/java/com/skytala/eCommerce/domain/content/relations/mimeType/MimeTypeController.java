@@ -57,7 +57,7 @@ public class MimeTypeController {
 	 * @return a List with the MimeTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findMimeTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindMimeTypesBy query = new FindMimeTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class MimeTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createMimeType(HttpServletRequest request) throws Exception {
 
 		MimeType mimeTypeToBeAdded = new MimeType();
@@ -129,7 +129,7 @@ public class MimeTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateMimeType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class MimeTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{mimeTypeId}")
+	@GetMapping("/{mimeTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String mimeTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("mimeTypeId", mimeTypeId);
@@ -207,7 +207,7 @@ public class MimeTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{mimeTypeId}")
+	@DeleteMapping("/{mimeTypeId}")
 	public ResponseEntity<Object> deleteMimeTypeByIdUpdated(@PathVariable String mimeTypeId) throws Exception {
 		DeleteMimeType command = new DeleteMimeType(mimeTypeId);
 

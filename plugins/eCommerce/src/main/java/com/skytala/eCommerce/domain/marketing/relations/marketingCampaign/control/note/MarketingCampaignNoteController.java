@@ -57,7 +57,7 @@ public class MarketingCampaignNoteController {
 	 * @return a List with the MarketingCampaignNotes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findMarketingCampaignNotesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindMarketingCampaignNotesBy query = new FindMarketingCampaignNotesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class MarketingCampaignNoteController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createMarketingCampaignNote(HttpServletRequest request) throws Exception {
 
 		MarketingCampaignNote marketingCampaignNoteToBeAdded = new MarketingCampaignNote();
@@ -129,7 +129,7 @@ public class MarketingCampaignNoteController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateMarketingCampaignNote(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class MarketingCampaignNoteController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{marketingCampaignNoteId}")
+	@GetMapping("/{marketingCampaignNoteId}")
 	public ResponseEntity<Object> findById(@PathVariable String marketingCampaignNoteId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("marketingCampaignNoteId", marketingCampaignNoteId);
@@ -207,7 +207,7 @@ public class MarketingCampaignNoteController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{marketingCampaignNoteId}")
+	@DeleteMapping("/{marketingCampaignNoteId}")
 	public ResponseEntity<Object> deleteMarketingCampaignNoteByIdUpdated(@PathVariable String marketingCampaignNoteId) throws Exception {
 		DeleteMarketingCampaignNote command = new DeleteMarketingCampaignNote(marketingCampaignNoteId);
 

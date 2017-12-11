@@ -57,7 +57,7 @@ public class PicklistStatusHistoryController {
 	 * @return a List with the PicklistStatusHistorys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPicklistStatusHistorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPicklistStatusHistorysBy query = new FindPicklistStatusHistorysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PicklistStatusHistoryController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPicklistStatusHistory(HttpServletRequest request) throws Exception {
 
 		PicklistStatusHistory picklistStatusHistoryToBeAdded = new PicklistStatusHistory();
@@ -129,7 +129,7 @@ public class PicklistStatusHistoryController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePicklistStatusHistory(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PicklistStatusHistoryController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{picklistStatusHistoryId}")
+	@GetMapping("/{picklistStatusHistoryId}")
 	public ResponseEntity<Object> findById(@PathVariable String picklistStatusHistoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("picklistStatusHistoryId", picklistStatusHistoryId);
@@ -207,7 +207,7 @@ public class PicklistStatusHistoryController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{picklistStatusHistoryId}")
+	@DeleteMapping("/{picklistStatusHistoryId}")
 	public ResponseEntity<Object> deletePicklistStatusHistoryByIdUpdated(@PathVariable String picklistStatusHistoryId) throws Exception {
 		DeletePicklistStatusHistory command = new DeletePicklistStatusHistory(picklistStatusHistoryId);
 

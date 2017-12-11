@@ -57,7 +57,7 @@ public class ShoppingListController {
 	 * @return a List with the ShoppingLists
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findShoppingListsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShoppingListsBy query = new FindShoppingListsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ShoppingListController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createShoppingList(HttpServletRequest request) throws Exception {
 
 		ShoppingList shoppingListToBeAdded = new ShoppingList();
@@ -129,7 +129,7 @@ public class ShoppingListController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateShoppingList(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ShoppingListController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{shoppingListId}")
+	@GetMapping("/{shoppingListId}")
 	public ResponseEntity<Object> findById(@PathVariable String shoppingListId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shoppingListId", shoppingListId);
@@ -207,7 +207,7 @@ public class ShoppingListController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{shoppingListId}")
+	@DeleteMapping("/{shoppingListId}")
 	public ResponseEntity<Object> deleteShoppingListByIdUpdated(@PathVariable String shoppingListId) throws Exception {
 		DeleteShoppingList command = new DeleteShoppingList(shoppingListId);
 

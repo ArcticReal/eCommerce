@@ -57,7 +57,7 @@ public class OrderAdjustmentTypeAttrController {
 	 * @return a List with the OrderAdjustmentTypeAttrs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderAdjustmentTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderAdjustmentTypeAttrsBy query = new FindOrderAdjustmentTypeAttrsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderAdjustmentTypeAttrController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderAdjustmentTypeAttr(HttpServletRequest request) throws Exception {
 
 		OrderAdjustmentTypeAttr orderAdjustmentTypeAttrToBeAdded = new OrderAdjustmentTypeAttr();
@@ -129,7 +129,7 @@ public class OrderAdjustmentTypeAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderAdjustmentTypeAttr(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderAdjustmentTypeAttrController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderAdjustmentTypeAttrId}")
+	@GetMapping("/{orderAdjustmentTypeAttrId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderAdjustmentTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderAdjustmentTypeAttrId", orderAdjustmentTypeAttrId);
@@ -207,7 +207,7 @@ public class OrderAdjustmentTypeAttrController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderAdjustmentTypeAttrId}")
+	@DeleteMapping("/{orderAdjustmentTypeAttrId}")
 	public ResponseEntity<Object> deleteOrderAdjustmentTypeAttrByIdUpdated(@PathVariable String orderAdjustmentTypeAttrId) throws Exception {
 		DeleteOrderAdjustmentTypeAttr command = new DeleteOrderAdjustmentTypeAttr(orderAdjustmentTypeAttrId);
 

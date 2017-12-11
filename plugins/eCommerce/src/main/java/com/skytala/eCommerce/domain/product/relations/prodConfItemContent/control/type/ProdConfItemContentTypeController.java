@@ -57,7 +57,7 @@ public class ProdConfItemContentTypeController {
 	 * @return a List with the ProdConfItemContentTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProdConfItemContentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProdConfItemContentTypesBy query = new FindProdConfItemContentTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProdConfItemContentTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProdConfItemContentType(HttpServletRequest request) throws Exception {
 
 		ProdConfItemContentType prodConfItemContentTypeToBeAdded = new ProdConfItemContentType();
@@ -129,7 +129,7 @@ public class ProdConfItemContentTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProdConfItemContentType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProdConfItemContentTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{prodConfItemContentTypeId}")
+	@GetMapping("/{prodConfItemContentTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String prodConfItemContentTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("prodConfItemContentTypeId", prodConfItemContentTypeId);
@@ -207,7 +207,7 @@ public class ProdConfItemContentTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{prodConfItemContentTypeId}")
+	@DeleteMapping("/{prodConfItemContentTypeId}")
 	public ResponseEntity<Object> deleteProdConfItemContentTypeByIdUpdated(@PathVariable String prodConfItemContentTypeId) throws Exception {
 		DeleteProdConfItemContentType command = new DeleteProdConfItemContentType(prodConfItemContentTypeId);
 

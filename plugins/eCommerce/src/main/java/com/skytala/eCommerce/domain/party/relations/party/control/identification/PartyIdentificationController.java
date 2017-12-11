@@ -57,7 +57,7 @@ public class PartyIdentificationController {
 	 * @return a List with the PartyIdentifications
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyIdentificationsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyIdentificationsBy query = new FindPartyIdentificationsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyIdentificationController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyIdentification(HttpServletRequest request) throws Exception {
 
 		PartyIdentification partyIdentificationToBeAdded = new PartyIdentification();
@@ -129,7 +129,7 @@ public class PartyIdentificationController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyIdentification(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyIdentificationController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyIdentificationId}")
+	@GetMapping("/{partyIdentificationId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyIdentificationId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyIdentificationId", partyIdentificationId);
@@ -207,7 +207,7 @@ public class PartyIdentificationController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyIdentificationId}")
+	@DeleteMapping("/{partyIdentificationId}")
 	public ResponseEntity<Object> deletePartyIdentificationByIdUpdated(@PathVariable String partyIdentificationId) throws Exception {
 		DeletePartyIdentification command = new DeletePartyIdentification(partyIdentificationId);
 

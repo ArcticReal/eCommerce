@@ -57,7 +57,7 @@ public class PaymentGatewayCyberSourceController {
 	 * @return a List with the PaymentGatewayCyberSources
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPaymentGatewayCyberSourcesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentGatewayCyberSourcesBy query = new FindPaymentGatewayCyberSourcesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PaymentGatewayCyberSourceController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPaymentGatewayCyberSource(HttpServletRequest request) throws Exception {
 
 		PaymentGatewayCyberSource paymentGatewayCyberSourceToBeAdded = new PaymentGatewayCyberSource();
@@ -129,7 +129,7 @@ public class PaymentGatewayCyberSourceController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePaymentGatewayCyberSource(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PaymentGatewayCyberSourceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{paymentGatewayCyberSourceId}")
+	@GetMapping("/{paymentGatewayCyberSourceId}")
 	public ResponseEntity<Object> findById(@PathVariable String paymentGatewayCyberSourceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentGatewayCyberSourceId", paymentGatewayCyberSourceId);
@@ -207,7 +207,7 @@ public class PaymentGatewayCyberSourceController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{paymentGatewayCyberSourceId}")
+	@DeleteMapping("/{paymentGatewayCyberSourceId}")
 	public ResponseEntity<Object> deletePaymentGatewayCyberSourceByIdUpdated(@PathVariable String paymentGatewayCyberSourceId) throws Exception {
 		DeletePaymentGatewayCyberSource command = new DeletePaymentGatewayCyberSource(paymentGatewayCyberSourceId);
 

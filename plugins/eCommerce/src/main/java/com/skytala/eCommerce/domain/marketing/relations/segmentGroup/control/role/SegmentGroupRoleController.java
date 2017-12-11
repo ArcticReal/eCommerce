@@ -57,7 +57,7 @@ public class SegmentGroupRoleController {
 	 * @return a List with the SegmentGroupRoles
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSegmentGroupRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSegmentGroupRolesBy query = new FindSegmentGroupRolesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SegmentGroupRoleController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSegmentGroupRole(HttpServletRequest request) throws Exception {
 
 		SegmentGroupRole segmentGroupRoleToBeAdded = new SegmentGroupRole();
@@ -129,7 +129,7 @@ public class SegmentGroupRoleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSegmentGroupRole(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SegmentGroupRoleController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{segmentGroupRoleId}")
+	@GetMapping("/{segmentGroupRoleId}")
 	public ResponseEntity<Object> findById(@PathVariable String segmentGroupRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("segmentGroupRoleId", segmentGroupRoleId);
@@ -207,7 +207,7 @@ public class SegmentGroupRoleController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{segmentGroupRoleId}")
+	@DeleteMapping("/{segmentGroupRoleId}")
 	public ResponseEntity<Object> deleteSegmentGroupRoleByIdUpdated(@PathVariable String segmentGroupRoleId) throws Exception {
 		DeleteSegmentGroupRole command = new DeleteSegmentGroupRole(segmentGroupRoleId);
 

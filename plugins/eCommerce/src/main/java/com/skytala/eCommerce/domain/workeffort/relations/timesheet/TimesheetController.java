@@ -57,7 +57,7 @@ public class TimesheetController {
 	 * @return a List with the Timesheets
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findTimesheetsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTimesheetsBy query = new FindTimesheetsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class TimesheetController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createTimesheet(HttpServletRequest request) throws Exception {
 
 		Timesheet timesheetToBeAdded = new Timesheet();
@@ -129,7 +129,7 @@ public class TimesheetController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateTimesheet(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class TimesheetController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{timesheetId}")
+	@GetMapping("/{timesheetId}")
 	public ResponseEntity<Object> findById(@PathVariable String timesheetId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("timesheetId", timesheetId);
@@ -207,7 +207,7 @@ public class TimesheetController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{timesheetId}")
+	@DeleteMapping("/{timesheetId}")
 	public ResponseEntity<Object> deleteTimesheetByIdUpdated(@PathVariable String timesheetId) throws Exception {
 		DeleteTimesheet command = new DeleteTimesheet(timesheetId);
 

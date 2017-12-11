@@ -57,7 +57,7 @@ public class SalesOpportunityWorkEffortController {
 	 * @return a List with the SalesOpportunityWorkEfforts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSalesOpportunityWorkEffortsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSalesOpportunityWorkEffortsBy query = new FindSalesOpportunityWorkEffortsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SalesOpportunityWorkEffortController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSalesOpportunityWorkEffort(HttpServletRequest request) throws Exception {
 
 		SalesOpportunityWorkEffort salesOpportunityWorkEffortToBeAdded = new SalesOpportunityWorkEffort();
@@ -129,7 +129,7 @@ public class SalesOpportunityWorkEffortController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSalesOpportunityWorkEffort(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SalesOpportunityWorkEffortController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{salesOpportunityWorkEffortId}")
+	@GetMapping("/{salesOpportunityWorkEffortId}")
 	public ResponseEntity<Object> findById(@PathVariable String salesOpportunityWorkEffortId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("salesOpportunityWorkEffortId", salesOpportunityWorkEffortId);
@@ -207,7 +207,7 @@ public class SalesOpportunityWorkEffortController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{salesOpportunityWorkEffortId}")
+	@DeleteMapping("/{salesOpportunityWorkEffortId}")
 	public ResponseEntity<Object> deleteSalesOpportunityWorkEffortByIdUpdated(@PathVariable String salesOpportunityWorkEffortId) throws Exception {
 		DeleteSalesOpportunityWorkEffort command = new DeleteSalesOpportunityWorkEffort(salesOpportunityWorkEffortId);
 

@@ -57,7 +57,7 @@ public class PaymentController {
 	 * @return a List with the Payments
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPaymentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentsBy query = new FindPaymentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PaymentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPayment(HttpServletRequest request) throws Exception {
 
 		Payment paymentToBeAdded = new Payment();
@@ -129,7 +129,7 @@ public class PaymentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePayment(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PaymentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{paymentId}")
+	@GetMapping("/{paymentId}")
 	public ResponseEntity<Object> findById(@PathVariable String paymentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentId", paymentId);
@@ -207,7 +207,7 @@ public class PaymentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{paymentId}")
+	@DeleteMapping("/{paymentId}")
 	public ResponseEntity<Object> deletePaymentByIdUpdated(@PathVariable String paymentId) throws Exception {
 		DeletePayment command = new DeletePayment(paymentId);
 

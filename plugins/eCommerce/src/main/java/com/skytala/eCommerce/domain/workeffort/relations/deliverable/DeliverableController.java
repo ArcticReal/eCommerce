@@ -57,7 +57,7 @@ public class DeliverableController {
 	 * @return a List with the Deliverables
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findDeliverablesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDeliverablesBy query = new FindDeliverablesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class DeliverableController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createDeliverable(HttpServletRequest request) throws Exception {
 
 		Deliverable deliverableToBeAdded = new Deliverable();
@@ -129,7 +129,7 @@ public class DeliverableController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateDeliverable(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class DeliverableController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{deliverableId}")
+	@GetMapping("/{deliverableId}")
 	public ResponseEntity<Object> findById(@PathVariable String deliverableId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("deliverableId", deliverableId);
@@ -207,7 +207,7 @@ public class DeliverableController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{deliverableId}")
+	@DeleteMapping("/{deliverableId}")
 	public ResponseEntity<Object> deleteDeliverableByIdUpdated(@PathVariable String deliverableId) throws Exception {
 		DeleteDeliverable command = new DeleteDeliverable(deliverableId);
 

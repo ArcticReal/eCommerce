@@ -57,7 +57,7 @@ public class AgreementFacilityApplController {
 	 * @return a List with the AgreementFacilityAppls
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findAgreementFacilityApplsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAgreementFacilityApplsBy query = new FindAgreementFacilityApplsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class AgreementFacilityApplController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createAgreementFacilityAppl(HttpServletRequest request) throws Exception {
 
 		AgreementFacilityAppl agreementFacilityApplToBeAdded = new AgreementFacilityAppl();
@@ -129,7 +129,7 @@ public class AgreementFacilityApplController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateAgreementFacilityAppl(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class AgreementFacilityApplController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{agreementFacilityApplId}")
+	@GetMapping("/{agreementFacilityApplId}")
 	public ResponseEntity<Object> findById(@PathVariable String agreementFacilityApplId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("agreementFacilityApplId", agreementFacilityApplId);
@@ -207,7 +207,7 @@ public class AgreementFacilityApplController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{agreementFacilityApplId}")
+	@DeleteMapping("/{agreementFacilityApplId}")
 	public ResponseEntity<Object> deleteAgreementFacilityApplByIdUpdated(@PathVariable String agreementFacilityApplId) throws Exception {
 		DeleteAgreementFacilityAppl command = new DeleteAgreementFacilityAppl(agreementFacilityApplId);
 

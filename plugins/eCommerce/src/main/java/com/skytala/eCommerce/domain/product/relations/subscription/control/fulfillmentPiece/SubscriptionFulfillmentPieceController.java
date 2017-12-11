@@ -57,7 +57,7 @@ public class SubscriptionFulfillmentPieceController {
 	 * @return a List with the SubscriptionFulfillmentPieces
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSubscriptionFulfillmentPiecesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSubscriptionFulfillmentPiecesBy query = new FindSubscriptionFulfillmentPiecesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SubscriptionFulfillmentPieceController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSubscriptionFulfillmentPiece(HttpServletRequest request) throws Exception {
 
 		SubscriptionFulfillmentPiece subscriptionFulfillmentPieceToBeAdded = new SubscriptionFulfillmentPiece();
@@ -129,7 +129,7 @@ public class SubscriptionFulfillmentPieceController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSubscriptionFulfillmentPiece(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SubscriptionFulfillmentPieceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{subscriptionFulfillmentPieceId}")
+	@GetMapping("/{subscriptionFulfillmentPieceId}")
 	public ResponseEntity<Object> findById(@PathVariable String subscriptionFulfillmentPieceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("subscriptionFulfillmentPieceId", subscriptionFulfillmentPieceId);
@@ -207,7 +207,7 @@ public class SubscriptionFulfillmentPieceController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{subscriptionFulfillmentPieceId}")
+	@DeleteMapping("/{subscriptionFulfillmentPieceId}")
 	public ResponseEntity<Object> deleteSubscriptionFulfillmentPieceByIdUpdated(@PathVariable String subscriptionFulfillmentPieceId) throws Exception {
 		DeleteSubscriptionFulfillmentPiece command = new DeleteSubscriptionFulfillmentPiece(subscriptionFulfillmentPieceId);
 

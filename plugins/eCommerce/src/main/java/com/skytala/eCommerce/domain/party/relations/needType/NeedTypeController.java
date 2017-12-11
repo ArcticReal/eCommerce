@@ -57,7 +57,7 @@ public class NeedTypeController {
 	 * @return a List with the NeedTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findNeedTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindNeedTypesBy query = new FindNeedTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class NeedTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createNeedType(HttpServletRequest request) throws Exception {
 
 		NeedType needTypeToBeAdded = new NeedType();
@@ -129,7 +129,7 @@ public class NeedTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateNeedType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class NeedTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{needTypeId}")
+	@GetMapping("/{needTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String needTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("needTypeId", needTypeId);
@@ -207,7 +207,7 @@ public class NeedTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{needTypeId}")
+	@DeleteMapping("/{needTypeId}")
 	public ResponseEntity<Object> deleteNeedTypeByIdUpdated(@PathVariable String needTypeId) throws Exception {
 		DeleteNeedType command = new DeleteNeedType(needTypeId);
 

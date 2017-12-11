@@ -57,7 +57,7 @@ public class PaymentGatewaySecurePayController {
 	 * @return a List with the PaymentGatewaySecurePays
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPaymentGatewaySecurePaysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentGatewaySecurePaysBy query = new FindPaymentGatewaySecurePaysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PaymentGatewaySecurePayController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPaymentGatewaySecurePay(HttpServletRequest request) throws Exception {
 
 		PaymentGatewaySecurePay paymentGatewaySecurePayToBeAdded = new PaymentGatewaySecurePay();
@@ -129,7 +129,7 @@ public class PaymentGatewaySecurePayController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePaymentGatewaySecurePay(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PaymentGatewaySecurePayController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{paymentGatewaySecurePayId}")
+	@GetMapping("/{paymentGatewaySecurePayId}")
 	public ResponseEntity<Object> findById(@PathVariable String paymentGatewaySecurePayId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentGatewaySecurePayId", paymentGatewaySecurePayId);
@@ -207,7 +207,7 @@ public class PaymentGatewaySecurePayController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{paymentGatewaySecurePayId}")
+	@DeleteMapping("/{paymentGatewaySecurePayId}")
 	public ResponseEntity<Object> deletePaymentGatewaySecurePayByIdUpdated(@PathVariable String paymentGatewaySecurePayId) throws Exception {
 		DeletePaymentGatewaySecurePay command = new DeletePaymentGatewaySecurePay(paymentGatewaySecurePayId);
 

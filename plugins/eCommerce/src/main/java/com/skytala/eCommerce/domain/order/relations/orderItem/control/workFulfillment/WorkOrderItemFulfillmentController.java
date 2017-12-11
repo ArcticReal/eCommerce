@@ -57,7 +57,7 @@ public class WorkOrderItemFulfillmentController {
 	 * @return a List with the WorkOrderItemFulfillments
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWorkOrderItemFulfillmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkOrderItemFulfillmentsBy query = new FindWorkOrderItemFulfillmentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WorkOrderItemFulfillmentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWorkOrderItemFulfillment(HttpServletRequest request) throws Exception {
 
 		WorkOrderItemFulfillment workOrderItemFulfillmentToBeAdded = new WorkOrderItemFulfillment();
@@ -129,7 +129,7 @@ public class WorkOrderItemFulfillmentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWorkOrderItemFulfillment(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WorkOrderItemFulfillmentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{workOrderItemFulfillmentId}")
+	@GetMapping("/{workOrderItemFulfillmentId}")
 	public ResponseEntity<Object> findById(@PathVariable String workOrderItemFulfillmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workOrderItemFulfillmentId", workOrderItemFulfillmentId);
@@ -207,7 +207,7 @@ public class WorkOrderItemFulfillmentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{workOrderItemFulfillmentId}")
+	@DeleteMapping("/{workOrderItemFulfillmentId}")
 	public ResponseEntity<Object> deleteWorkOrderItemFulfillmentByIdUpdated(@PathVariable String workOrderItemFulfillmentId) throws Exception {
 		DeleteWorkOrderItemFulfillment command = new DeleteWorkOrderItemFulfillment(workOrderItemFulfillmentId);
 

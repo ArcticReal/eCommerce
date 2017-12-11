@@ -57,7 +57,7 @@ public class TrainingClassTypeController {
 	 * @return a List with the TrainingClassTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findTrainingClassTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTrainingClassTypesBy query = new FindTrainingClassTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class TrainingClassTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createTrainingClassType(HttpServletRequest request) throws Exception {
 
 		TrainingClassType trainingClassTypeToBeAdded = new TrainingClassType();
@@ -129,7 +129,7 @@ public class TrainingClassTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateTrainingClassType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class TrainingClassTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{trainingClassTypeId}")
+	@GetMapping("/{trainingClassTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String trainingClassTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("trainingClassTypeId", trainingClassTypeId);
@@ -207,7 +207,7 @@ public class TrainingClassTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{trainingClassTypeId}")
+	@DeleteMapping("/{trainingClassTypeId}")
 	public ResponseEntity<Object> deleteTrainingClassTypeByIdUpdated(@PathVariable String trainingClassTypeId) throws Exception {
 		DeleteTrainingClassType command = new DeleteTrainingClassType(trainingClassTypeId);
 

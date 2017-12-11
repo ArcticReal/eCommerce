@@ -57,7 +57,7 @@ public class WorkEffortBillingController {
 	 * @return a List with the WorkEffortBillings
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWorkEffortBillingsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortBillingsBy query = new FindWorkEffortBillingsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WorkEffortBillingController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWorkEffortBilling(HttpServletRequest request) throws Exception {
 
 		WorkEffortBilling workEffortBillingToBeAdded = new WorkEffortBilling();
@@ -129,7 +129,7 @@ public class WorkEffortBillingController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWorkEffortBilling(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WorkEffortBillingController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{workEffortBillingId}")
+	@GetMapping("/{workEffortBillingId}")
 	public ResponseEntity<Object> findById(@PathVariable String workEffortBillingId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortBillingId", workEffortBillingId);
@@ -207,7 +207,7 @@ public class WorkEffortBillingController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{workEffortBillingId}")
+	@DeleteMapping("/{workEffortBillingId}")
 	public ResponseEntity<Object> deleteWorkEffortBillingByIdUpdated(@PathVariable String workEffortBillingId) throws Exception {
 		DeleteWorkEffortBilling command = new DeleteWorkEffortBilling(workEffortBillingId);
 

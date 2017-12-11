@@ -57,7 +57,7 @@ public class PaymentMethodTypeGlAccountController {
 	 * @return a List with the PaymentMethodTypeGlAccounts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPaymentMethodTypeGlAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentMethodTypeGlAccountsBy query = new FindPaymentMethodTypeGlAccountsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PaymentMethodTypeGlAccountController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPaymentMethodTypeGlAccount(HttpServletRequest request) throws Exception {
 
 		PaymentMethodTypeGlAccount paymentMethodTypeGlAccountToBeAdded = new PaymentMethodTypeGlAccount();
@@ -129,7 +129,7 @@ public class PaymentMethodTypeGlAccountController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePaymentMethodTypeGlAccount(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PaymentMethodTypeGlAccountController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{paymentMethodTypeGlAccountId}")
+	@GetMapping("/{paymentMethodTypeGlAccountId}")
 	public ResponseEntity<Object> findById(@PathVariable String paymentMethodTypeGlAccountId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentMethodTypeGlAccountId", paymentMethodTypeGlAccountId);
@@ -207,7 +207,7 @@ public class PaymentMethodTypeGlAccountController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{paymentMethodTypeGlAccountId}")
+	@DeleteMapping("/{paymentMethodTypeGlAccountId}")
 	public ResponseEntity<Object> deletePaymentMethodTypeGlAccountByIdUpdated(@PathVariable String paymentMethodTypeGlAccountId) throws Exception {
 		DeletePaymentMethodTypeGlAccount command = new DeletePaymentMethodTypeGlAccount(paymentMethodTypeGlAccountId);
 

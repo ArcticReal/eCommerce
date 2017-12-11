@@ -57,7 +57,7 @@ public class BillingAccountRoleController {
 	 * @return a List with the BillingAccountRoles
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findBillingAccountRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindBillingAccountRolesBy query = new FindBillingAccountRolesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class BillingAccountRoleController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createBillingAccountRole(HttpServletRequest request) throws Exception {
 
 		BillingAccountRole billingAccountRoleToBeAdded = new BillingAccountRole();
@@ -129,7 +129,7 @@ public class BillingAccountRoleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateBillingAccountRole(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class BillingAccountRoleController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{billingAccountRoleId}")
+	@GetMapping("/{billingAccountRoleId}")
 	public ResponseEntity<Object> findById(@PathVariable String billingAccountRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("billingAccountRoleId", billingAccountRoleId);
@@ -207,7 +207,7 @@ public class BillingAccountRoleController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{billingAccountRoleId}")
+	@DeleteMapping("/{billingAccountRoleId}")
 	public ResponseEntity<Object> deleteBillingAccountRoleByIdUpdated(@PathVariable String billingAccountRoleId) throws Exception {
 		DeleteBillingAccountRole command = new DeleteBillingAccountRole(billingAccountRoleId);
 

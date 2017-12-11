@@ -57,7 +57,7 @@ public class UserLoginSessionController {
 	 * @return a List with the UserLoginSessions
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findUserLoginSessionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindUserLoginSessionsBy query = new FindUserLoginSessionsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class UserLoginSessionController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createUserLoginSession(HttpServletRequest request) throws Exception {
 
 		UserLoginSession userLoginSessionToBeAdded = new UserLoginSession();
@@ -129,7 +129,7 @@ public class UserLoginSessionController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateUserLoginSession(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class UserLoginSessionController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{userLoginSessionId}")
+	@GetMapping("/{userLoginSessionId}")
 	public ResponseEntity<Object> findById(@PathVariable String userLoginSessionId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("userLoginSessionId", userLoginSessionId);
@@ -207,7 +207,7 @@ public class UserLoginSessionController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{userLoginSessionId}")
+	@DeleteMapping("/{userLoginSessionId}")
 	public ResponseEntity<Object> deleteUserLoginSessionByIdUpdated(@PathVariable String userLoginSessionId) throws Exception {
 		DeleteUserLoginSession command = new DeleteUserLoginSession(userLoginSessionId);
 

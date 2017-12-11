@@ -57,7 +57,7 @@ public class FixedAssetGeoPointController {
 	 * @return a List with the FixedAssetGeoPoints
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFixedAssetGeoPointsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFixedAssetGeoPointsBy query = new FindFixedAssetGeoPointsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FixedAssetGeoPointController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFixedAssetGeoPoint(HttpServletRequest request) throws Exception {
 
 		FixedAssetGeoPoint fixedAssetGeoPointToBeAdded = new FixedAssetGeoPoint();
@@ -129,7 +129,7 @@ public class FixedAssetGeoPointController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFixedAssetGeoPoint(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FixedAssetGeoPointController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{fixedAssetGeoPointId}")
+	@GetMapping("/{fixedAssetGeoPointId}")
 	public ResponseEntity<Object> findById(@PathVariable String fixedAssetGeoPointId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("fixedAssetGeoPointId", fixedAssetGeoPointId);
@@ -207,7 +207,7 @@ public class FixedAssetGeoPointController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{fixedAssetGeoPointId}")
+	@DeleteMapping("/{fixedAssetGeoPointId}")
 	public ResponseEntity<Object> deleteFixedAssetGeoPointByIdUpdated(@PathVariable String fixedAssetGeoPointId) throws Exception {
 		DeleteFixedAssetGeoPoint command = new DeleteFixedAssetGeoPoint(fixedAssetGeoPointId);
 

@@ -57,7 +57,7 @@ public class WorkEffortInventoryProducedController {
 	 * @return a List with the WorkEffortInventoryProduceds
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWorkEffortInventoryProducedsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortInventoryProducedsBy query = new FindWorkEffortInventoryProducedsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WorkEffortInventoryProducedController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWorkEffortInventoryProduced(HttpServletRequest request) throws Exception {
 
 		WorkEffortInventoryProduced workEffortInventoryProducedToBeAdded = new WorkEffortInventoryProduced();
@@ -129,7 +129,7 @@ public class WorkEffortInventoryProducedController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWorkEffortInventoryProduced(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WorkEffortInventoryProducedController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{workEffortInventoryProducedId}")
+	@GetMapping("/{workEffortInventoryProducedId}")
 	public ResponseEntity<Object> findById(@PathVariable String workEffortInventoryProducedId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortInventoryProducedId", workEffortInventoryProducedId);
@@ -207,7 +207,7 @@ public class WorkEffortInventoryProducedController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{workEffortInventoryProducedId}")
+	@DeleteMapping("/{workEffortInventoryProducedId}")
 	public ResponseEntity<Object> deleteWorkEffortInventoryProducedByIdUpdated(@PathVariable String workEffortInventoryProducedId) throws Exception {
 		DeleteWorkEffortInventoryProduced command = new DeleteWorkEffortInventoryProduced(workEffortInventoryProducedId);
 

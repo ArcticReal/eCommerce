@@ -57,7 +57,7 @@ public class ProductStoreRoleController {
 	 * @return a List with the ProductStoreRoles
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductStoreRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductStoreRolesBy query = new FindProductStoreRolesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductStoreRoleController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductStoreRole(HttpServletRequest request) throws Exception {
 
 		ProductStoreRole productStoreRoleToBeAdded = new ProductStoreRole();
@@ -129,7 +129,7 @@ public class ProductStoreRoleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductStoreRole(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductStoreRoleController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productStoreRoleId}")
+	@GetMapping("/{productStoreRoleId}")
 	public ResponseEntity<Object> findById(@PathVariable String productStoreRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productStoreRoleId", productStoreRoleId);
@@ -207,7 +207,7 @@ public class ProductStoreRoleController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productStoreRoleId}")
+	@DeleteMapping("/{productStoreRoleId}")
 	public ResponseEntity<Object> deleteProductStoreRoleByIdUpdated(@PathVariable String productStoreRoleId) throws Exception {
 		DeleteProductStoreRole command = new DeleteProductStoreRole(productStoreRoleId);
 

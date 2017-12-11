@@ -57,7 +57,7 @@ public class CustRequestController {
 	 * @return a List with the CustRequests
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findCustRequestsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCustRequestsBy query = new FindCustRequestsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class CustRequestController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createCustRequest(HttpServletRequest request) throws Exception {
 
 		CustRequest custRequestToBeAdded = new CustRequest();
@@ -129,7 +129,7 @@ public class CustRequestController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateCustRequest(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class CustRequestController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{custRequestId}")
+	@GetMapping("/{custRequestId}")
 	public ResponseEntity<Object> findById(@PathVariable String custRequestId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("custRequestId", custRequestId);
@@ -207,7 +207,7 @@ public class CustRequestController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{custRequestId}")
+	@DeleteMapping("/{custRequestId}")
 	public ResponseEntity<Object> deleteCustRequestByIdUpdated(@PathVariable String custRequestId) throws Exception {
 		DeleteCustRequest command = new DeleteCustRequest(custRequestId);
 

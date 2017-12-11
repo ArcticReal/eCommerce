@@ -57,7 +57,7 @@ public class WorkEffortInventoryAssignController {
 	 * @return a List with the WorkEffortInventoryAssigns
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWorkEffortInventoryAssignsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortInventoryAssignsBy query = new FindWorkEffortInventoryAssignsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WorkEffortInventoryAssignController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWorkEffortInventoryAssign(HttpServletRequest request) throws Exception {
 
 		WorkEffortInventoryAssign workEffortInventoryAssignToBeAdded = new WorkEffortInventoryAssign();
@@ -129,7 +129,7 @@ public class WorkEffortInventoryAssignController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWorkEffortInventoryAssign(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WorkEffortInventoryAssignController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{workEffortInventoryAssignId}")
+	@GetMapping("/{workEffortInventoryAssignId}")
 	public ResponseEntity<Object> findById(@PathVariable String workEffortInventoryAssignId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortInventoryAssignId", workEffortInventoryAssignId);
@@ -207,7 +207,7 @@ public class WorkEffortInventoryAssignController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{workEffortInventoryAssignId}")
+	@DeleteMapping("/{workEffortInventoryAssignId}")
 	public ResponseEntity<Object> deleteWorkEffortInventoryAssignByIdUpdated(@PathVariable String workEffortInventoryAssignId) throws Exception {
 		DeleteWorkEffortInventoryAssign command = new DeleteWorkEffortInventoryAssign(workEffortInventoryAssignId);
 

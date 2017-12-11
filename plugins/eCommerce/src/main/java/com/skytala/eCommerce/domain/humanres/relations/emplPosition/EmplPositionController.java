@@ -57,7 +57,7 @@ public class EmplPositionController {
 	 * @return a List with the EmplPositions
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findEmplPositionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindEmplPositionsBy query = new FindEmplPositionsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class EmplPositionController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createEmplPosition(HttpServletRequest request) throws Exception {
 
 		EmplPosition emplPositionToBeAdded = new EmplPosition();
@@ -129,7 +129,7 @@ public class EmplPositionController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateEmplPosition(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class EmplPositionController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{emplPositionId}")
+	@GetMapping("/{emplPositionId}")
 	public ResponseEntity<Object> findById(@PathVariable String emplPositionId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("emplPositionId", emplPositionId);
@@ -207,7 +207,7 @@ public class EmplPositionController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{emplPositionId}")
+	@DeleteMapping("/{emplPositionId}")
 	public ResponseEntity<Object> deleteEmplPositionByIdUpdated(@PathVariable String emplPositionId) throws Exception {
 		DeleteEmplPosition command = new DeleteEmplPosition(emplPositionId);
 

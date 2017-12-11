@@ -57,7 +57,7 @@ public class VideoDataResourceController {
 	 * @return a List with the VideoDataResources
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findVideoDataResourcesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindVideoDataResourcesBy query = new FindVideoDataResourcesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class VideoDataResourceController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createVideoDataResource(HttpServletRequest request) throws Exception {
 
 		VideoDataResource videoDataResourceToBeAdded = new VideoDataResource();
@@ -129,7 +129,7 @@ public class VideoDataResourceController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateVideoDataResource(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class VideoDataResourceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{videoDataResourceId}")
+	@GetMapping("/{videoDataResourceId}")
 	public ResponseEntity<Object> findById(@PathVariable String videoDataResourceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("videoDataResourceId", videoDataResourceId);
@@ -207,7 +207,7 @@ public class VideoDataResourceController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{videoDataResourceId}")
+	@DeleteMapping("/{videoDataResourceId}")
 	public ResponseEntity<Object> deleteVideoDataResourceByIdUpdated(@PathVariable String videoDataResourceId) throws Exception {
 		DeleteVideoDataResource command = new DeleteVideoDataResource(videoDataResourceId);
 

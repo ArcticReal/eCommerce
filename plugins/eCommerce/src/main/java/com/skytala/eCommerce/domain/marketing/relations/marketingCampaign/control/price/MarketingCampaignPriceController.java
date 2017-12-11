@@ -57,7 +57,7 @@ public class MarketingCampaignPriceController {
 	 * @return a List with the MarketingCampaignPrices
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findMarketingCampaignPricesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindMarketingCampaignPricesBy query = new FindMarketingCampaignPricesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class MarketingCampaignPriceController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createMarketingCampaignPrice(HttpServletRequest request) throws Exception {
 
 		MarketingCampaignPrice marketingCampaignPriceToBeAdded = new MarketingCampaignPrice();
@@ -129,7 +129,7 @@ public class MarketingCampaignPriceController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateMarketingCampaignPrice(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class MarketingCampaignPriceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{marketingCampaignPriceId}")
+	@GetMapping("/{marketingCampaignPriceId}")
 	public ResponseEntity<Object> findById(@PathVariable String marketingCampaignPriceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("marketingCampaignPriceId", marketingCampaignPriceId);
@@ -207,7 +207,7 @@ public class MarketingCampaignPriceController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{marketingCampaignPriceId}")
+	@DeleteMapping("/{marketingCampaignPriceId}")
 	public ResponseEntity<Object> deleteMarketingCampaignPriceByIdUpdated(@PathVariable String marketingCampaignPriceId) throws Exception {
 		DeleteMarketingCampaignPrice command = new DeleteMarketingCampaignPrice(marketingCampaignPriceId);
 

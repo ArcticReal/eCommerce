@@ -57,7 +57,7 @@ public class ResponsibilityTypeController {
 	 * @return a List with the ResponsibilityTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findResponsibilityTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindResponsibilityTypesBy query = new FindResponsibilityTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ResponsibilityTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createResponsibilityType(HttpServletRequest request) throws Exception {
 
 		ResponsibilityType responsibilityTypeToBeAdded = new ResponsibilityType();
@@ -129,7 +129,7 @@ public class ResponsibilityTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateResponsibilityType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ResponsibilityTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{responsibilityTypeId}")
+	@GetMapping("/{responsibilityTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String responsibilityTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("responsibilityTypeId", responsibilityTypeId);
@@ -207,7 +207,7 @@ public class ResponsibilityTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{responsibilityTypeId}")
+	@DeleteMapping("/{responsibilityTypeId}")
 	public ResponseEntity<Object> deleteResponsibilityTypeByIdUpdated(@PathVariable String responsibilityTypeId) throws Exception {
 		DeleteResponsibilityType command = new DeleteResponsibilityType(responsibilityTypeId);
 

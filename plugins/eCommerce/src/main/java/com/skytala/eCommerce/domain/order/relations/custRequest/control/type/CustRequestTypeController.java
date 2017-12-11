@@ -57,7 +57,7 @@ public class CustRequestTypeController {
 	 * @return a List with the CustRequestTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findCustRequestTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCustRequestTypesBy query = new FindCustRequestTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class CustRequestTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createCustRequestType(HttpServletRequest request) throws Exception {
 
 		CustRequestType custRequestTypeToBeAdded = new CustRequestType();
@@ -129,7 +129,7 @@ public class CustRequestTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateCustRequestType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class CustRequestTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{custRequestTypeId}")
+	@GetMapping("/{custRequestTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String custRequestTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("custRequestTypeId", custRequestTypeId);
@@ -207,7 +207,7 @@ public class CustRequestTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{custRequestTypeId}")
+	@DeleteMapping("/{custRequestTypeId}")
 	public ResponseEntity<Object> deleteCustRequestTypeByIdUpdated(@PathVariable String custRequestTypeId) throws Exception {
 		DeleteCustRequestType command = new DeleteCustRequestType(custRequestTypeId);
 

@@ -57,7 +57,7 @@ public class ProductStoreGroupTypeController {
 	 * @return a List with the ProductStoreGroupTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductStoreGroupTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductStoreGroupTypesBy query = new FindProductStoreGroupTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductStoreGroupTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductStoreGroupType(HttpServletRequest request) throws Exception {
 
 		ProductStoreGroupType productStoreGroupTypeToBeAdded = new ProductStoreGroupType();
@@ -129,7 +129,7 @@ public class ProductStoreGroupTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductStoreGroupType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductStoreGroupTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productStoreGroupTypeId}")
+	@GetMapping("/{productStoreGroupTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String productStoreGroupTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productStoreGroupTypeId", productStoreGroupTypeId);
@@ -207,7 +207,7 @@ public class ProductStoreGroupTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productStoreGroupTypeId}")
+	@DeleteMapping("/{productStoreGroupTypeId}")
 	public ResponseEntity<Object> deleteProductStoreGroupTypeByIdUpdated(@PathVariable String productStoreGroupTypeId) throws Exception {
 		DeleteProductStoreGroupType command = new DeleteProductStoreGroupType(productStoreGroupTypeId);
 

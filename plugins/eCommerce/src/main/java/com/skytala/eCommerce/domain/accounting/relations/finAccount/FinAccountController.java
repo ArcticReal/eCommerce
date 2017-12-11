@@ -57,7 +57,7 @@ public class FinAccountController {
 	 * @return a List with the FinAccounts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFinAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFinAccountsBy query = new FindFinAccountsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FinAccountController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFinAccount(HttpServletRequest request) throws Exception {
 
 		FinAccount finAccountToBeAdded = new FinAccount();
@@ -129,7 +129,7 @@ public class FinAccountController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFinAccount(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FinAccountController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{finAccountId}")
+	@GetMapping("/{finAccountId}")
 	public ResponseEntity<Object> findById(@PathVariable String finAccountId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("finAccountId", finAccountId);
@@ -207,7 +207,7 @@ public class FinAccountController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{finAccountId}")
+	@DeleteMapping("/{finAccountId}")
 	public ResponseEntity<Object> deleteFinAccountByIdUpdated(@PathVariable String finAccountId) throws Exception {
 		DeleteFinAccount command = new DeleteFinAccount(finAccountId);
 

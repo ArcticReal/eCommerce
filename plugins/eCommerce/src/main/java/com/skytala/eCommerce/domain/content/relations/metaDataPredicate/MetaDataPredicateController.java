@@ -57,7 +57,7 @@ public class MetaDataPredicateController {
 	 * @return a List with the MetaDataPredicates
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findMetaDataPredicatesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindMetaDataPredicatesBy query = new FindMetaDataPredicatesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class MetaDataPredicateController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createMetaDataPredicate(HttpServletRequest request) throws Exception {
 
 		MetaDataPredicate metaDataPredicateToBeAdded = new MetaDataPredicate();
@@ -129,7 +129,7 @@ public class MetaDataPredicateController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateMetaDataPredicate(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class MetaDataPredicateController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{metaDataPredicateId}")
+	@GetMapping("/{metaDataPredicateId}")
 	public ResponseEntity<Object> findById(@PathVariable String metaDataPredicateId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("metaDataPredicateId", metaDataPredicateId);
@@ -207,7 +207,7 @@ public class MetaDataPredicateController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{metaDataPredicateId}")
+	@DeleteMapping("/{metaDataPredicateId}")
 	public ResponseEntity<Object> deleteMetaDataPredicateByIdUpdated(@PathVariable String metaDataPredicateId) throws Exception {
 		DeleteMetaDataPredicate command = new DeleteMetaDataPredicate(metaDataPredicateId);
 

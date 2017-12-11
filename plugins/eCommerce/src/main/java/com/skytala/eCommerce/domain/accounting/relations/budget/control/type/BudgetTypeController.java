@@ -57,7 +57,7 @@ public class BudgetTypeController {
 	 * @return a List with the BudgetTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findBudgetTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindBudgetTypesBy query = new FindBudgetTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class BudgetTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createBudgetType(HttpServletRequest request) throws Exception {
 
 		BudgetType budgetTypeToBeAdded = new BudgetType();
@@ -129,7 +129,7 @@ public class BudgetTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateBudgetType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class BudgetTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{budgetTypeId}")
+	@GetMapping("/{budgetTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String budgetTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("budgetTypeId", budgetTypeId);
@@ -207,7 +207,7 @@ public class BudgetTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{budgetTypeId}")
+	@DeleteMapping("/{budgetTypeId}")
 	public ResponseEntity<Object> deleteBudgetTypeByIdUpdated(@PathVariable String budgetTypeId) throws Exception {
 		DeleteBudgetType command = new DeleteBudgetType(budgetTypeId);
 

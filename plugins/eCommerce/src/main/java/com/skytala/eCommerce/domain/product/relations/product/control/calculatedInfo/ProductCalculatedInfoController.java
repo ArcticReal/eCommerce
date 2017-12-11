@@ -57,7 +57,7 @@ public class ProductCalculatedInfoController {
 	 * @return a List with the ProductCalculatedInfos
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductCalculatedInfosBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductCalculatedInfosBy query = new FindProductCalculatedInfosBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductCalculatedInfoController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductCalculatedInfo(HttpServletRequest request) throws Exception {
 
 		ProductCalculatedInfo productCalculatedInfoToBeAdded = new ProductCalculatedInfo();
@@ -129,7 +129,7 @@ public class ProductCalculatedInfoController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductCalculatedInfo(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductCalculatedInfoController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productCalculatedInfoId}")
+	@GetMapping("/{productCalculatedInfoId}")
 	public ResponseEntity<Object> findById(@PathVariable String productCalculatedInfoId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productCalculatedInfoId", productCalculatedInfoId);
@@ -207,7 +207,7 @@ public class ProductCalculatedInfoController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productCalculatedInfoId}")
+	@DeleteMapping("/{productCalculatedInfoId}")
 	public ResponseEntity<Object> deleteProductCalculatedInfoByIdUpdated(@PathVariable String productCalculatedInfoId) throws Exception {
 		DeleteProductCalculatedInfo command = new DeleteProductCalculatedInfo(productCalculatedInfoId);
 

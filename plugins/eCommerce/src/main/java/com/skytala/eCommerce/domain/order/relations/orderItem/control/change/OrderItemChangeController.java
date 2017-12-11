@@ -57,7 +57,7 @@ public class OrderItemChangeController {
 	 * @return a List with the OrderItemChanges
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderItemChangesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderItemChangesBy query = new FindOrderItemChangesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderItemChangeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderItemChange(HttpServletRequest request) throws Exception {
 
 		OrderItemChange orderItemChangeToBeAdded = new OrderItemChange();
@@ -129,7 +129,7 @@ public class OrderItemChangeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderItemChange(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderItemChangeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderItemChangeId}")
+	@GetMapping("/{orderItemChangeId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderItemChangeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderItemChangeId", orderItemChangeId);
@@ -207,7 +207,7 @@ public class OrderItemChangeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderItemChangeId}")
+	@DeleteMapping("/{orderItemChangeId}")
 	public ResponseEntity<Object> deleteOrderItemChangeByIdUpdated(@PathVariable String orderItemChangeId) throws Exception {
 		DeleteOrderItemChange command = new DeleteOrderItemChange(orderItemChangeId);
 

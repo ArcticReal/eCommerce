@@ -57,7 +57,7 @@ public class SalesForecastHistoryController {
 	 * @return a List with the SalesForecastHistorys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSalesForecastHistorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSalesForecastHistorysBy query = new FindSalesForecastHistorysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SalesForecastHistoryController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSalesForecastHistory(HttpServletRequest request) throws Exception {
 
 		SalesForecastHistory salesForecastHistoryToBeAdded = new SalesForecastHistory();
@@ -129,7 +129,7 @@ public class SalesForecastHistoryController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSalesForecastHistory(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SalesForecastHistoryController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{salesForecastHistoryId}")
+	@GetMapping("/{salesForecastHistoryId}")
 	public ResponseEntity<Object> findById(@PathVariable String salesForecastHistoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("salesForecastHistoryId", salesForecastHistoryId);
@@ -207,7 +207,7 @@ public class SalesForecastHistoryController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{salesForecastHistoryId}")
+	@DeleteMapping("/{salesForecastHistoryId}")
 	public ResponseEntity<Object> deleteSalesForecastHistoryByIdUpdated(@PathVariable String salesForecastHistoryId) throws Exception {
 		DeleteSalesForecastHistory command = new DeleteSalesForecastHistory(salesForecastHistoryId);
 

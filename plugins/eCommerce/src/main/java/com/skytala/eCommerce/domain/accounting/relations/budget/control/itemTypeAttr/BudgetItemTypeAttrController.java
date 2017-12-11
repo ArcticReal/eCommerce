@@ -57,7 +57,7 @@ public class BudgetItemTypeAttrController {
 	 * @return a List with the BudgetItemTypeAttrs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findBudgetItemTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindBudgetItemTypeAttrsBy query = new FindBudgetItemTypeAttrsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class BudgetItemTypeAttrController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createBudgetItemTypeAttr(HttpServletRequest request) throws Exception {
 
 		BudgetItemTypeAttr budgetItemTypeAttrToBeAdded = new BudgetItemTypeAttr();
@@ -129,7 +129,7 @@ public class BudgetItemTypeAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateBudgetItemTypeAttr(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class BudgetItemTypeAttrController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{budgetItemTypeAttrId}")
+	@GetMapping("/{budgetItemTypeAttrId}")
 	public ResponseEntity<Object> findById(@PathVariable String budgetItemTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("budgetItemTypeAttrId", budgetItemTypeAttrId);
@@ -207,7 +207,7 @@ public class BudgetItemTypeAttrController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{budgetItemTypeAttrId}")
+	@DeleteMapping("/{budgetItemTypeAttrId}")
 	public ResponseEntity<Object> deleteBudgetItemTypeAttrByIdUpdated(@PathVariable String budgetItemTypeAttrId) throws Exception {
 		DeleteBudgetItemTypeAttr command = new DeleteBudgetItemTypeAttr(budgetItemTypeAttrId);
 

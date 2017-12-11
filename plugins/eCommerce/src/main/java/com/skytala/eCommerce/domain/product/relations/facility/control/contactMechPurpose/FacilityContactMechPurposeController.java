@@ -57,7 +57,7 @@ public class FacilityContactMechPurposeController {
 	 * @return a List with the FacilityContactMechPurposes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFacilityContactMechPurposesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFacilityContactMechPurposesBy query = new FindFacilityContactMechPurposesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FacilityContactMechPurposeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFacilityContactMechPurpose(HttpServletRequest request) throws Exception {
 
 		FacilityContactMechPurpose facilityContactMechPurposeToBeAdded = new FacilityContactMechPurpose();
@@ -129,7 +129,7 @@ public class FacilityContactMechPurposeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFacilityContactMechPurpose(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FacilityContactMechPurposeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{facilityContactMechPurposeId}")
+	@GetMapping("/{facilityContactMechPurposeId}")
 	public ResponseEntity<Object> findById(@PathVariable String facilityContactMechPurposeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("facilityContactMechPurposeId", facilityContactMechPurposeId);
@@ -207,7 +207,7 @@ public class FacilityContactMechPurposeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{facilityContactMechPurposeId}")
+	@DeleteMapping("/{facilityContactMechPurposeId}")
 	public ResponseEntity<Object> deleteFacilityContactMechPurposeByIdUpdated(@PathVariable String facilityContactMechPurposeId) throws Exception {
 		DeleteFacilityContactMechPurpose command = new DeleteFacilityContactMechPurpose(facilityContactMechPurposeId);
 

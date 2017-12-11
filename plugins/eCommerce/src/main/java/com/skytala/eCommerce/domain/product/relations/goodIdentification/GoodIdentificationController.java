@@ -57,7 +57,7 @@ public class GoodIdentificationController {
 	 * @return a List with the GoodIdentifications
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findGoodIdentificationsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGoodIdentificationsBy query = new FindGoodIdentificationsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class GoodIdentificationController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createGoodIdentification(HttpServletRequest request) throws Exception {
 
 		GoodIdentification goodIdentificationToBeAdded = new GoodIdentification();
@@ -129,7 +129,7 @@ public class GoodIdentificationController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateGoodIdentification(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class GoodIdentificationController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{goodIdentificationId}")
+	@GetMapping("/{goodIdentificationId}")
 	public ResponseEntity<Object> findById(@PathVariable String goodIdentificationId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("goodIdentificationId", goodIdentificationId);
@@ -207,7 +207,7 @@ public class GoodIdentificationController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{goodIdentificationId}")
+	@DeleteMapping("/{goodIdentificationId}")
 	public ResponseEntity<Object> deleteGoodIdentificationByIdUpdated(@PathVariable String goodIdentificationId) throws Exception {
 		DeleteGoodIdentification command = new DeleteGoodIdentification(goodIdentificationId);
 

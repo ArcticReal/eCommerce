@@ -57,7 +57,7 @@ public class ShipmentContactMechTypeController {
 	 * @return a List with the ShipmentContactMechTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findShipmentContactMechTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentContactMechTypesBy query = new FindShipmentContactMechTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ShipmentContactMechTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createShipmentContactMechType(HttpServletRequest request) throws Exception {
 
 		ShipmentContactMechType shipmentContactMechTypeToBeAdded = new ShipmentContactMechType();
@@ -129,7 +129,7 @@ public class ShipmentContactMechTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateShipmentContactMechType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ShipmentContactMechTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{shipmentContactMechTypeId}")
+	@GetMapping("/{shipmentContactMechTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String shipmentContactMechTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentContactMechTypeId", shipmentContactMechTypeId);
@@ -207,7 +207,7 @@ public class ShipmentContactMechTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{shipmentContactMechTypeId}")
+	@DeleteMapping("/{shipmentContactMechTypeId}")
 	public ResponseEntity<Object> deleteShipmentContactMechTypeByIdUpdated(@PathVariable String shipmentContactMechTypeId) throws Exception {
 		DeleteShipmentContactMechType command = new DeleteShipmentContactMechType(shipmentContactMechTypeId);
 

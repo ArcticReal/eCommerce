@@ -57,7 +57,7 @@ public class VarianceReasonGlAccountController {
 	 * @return a List with the VarianceReasonGlAccounts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findVarianceReasonGlAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindVarianceReasonGlAccountsBy query = new FindVarianceReasonGlAccountsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class VarianceReasonGlAccountController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createVarianceReasonGlAccount(HttpServletRequest request) throws Exception {
 
 		VarianceReasonGlAccount varianceReasonGlAccountToBeAdded = new VarianceReasonGlAccount();
@@ -129,7 +129,7 @@ public class VarianceReasonGlAccountController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateVarianceReasonGlAccount(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class VarianceReasonGlAccountController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{varianceReasonGlAccountId}")
+	@GetMapping("/{varianceReasonGlAccountId}")
 	public ResponseEntity<Object> findById(@PathVariable String varianceReasonGlAccountId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("varianceReasonGlAccountId", varianceReasonGlAccountId);
@@ -207,7 +207,7 @@ public class VarianceReasonGlAccountController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{varianceReasonGlAccountId}")
+	@DeleteMapping("/{varianceReasonGlAccountId}")
 	public ResponseEntity<Object> deleteVarianceReasonGlAccountByIdUpdated(@PathVariable String varianceReasonGlAccountId) throws Exception {
 		DeleteVarianceReasonGlAccount command = new DeleteVarianceReasonGlAccount(varianceReasonGlAccountId);
 

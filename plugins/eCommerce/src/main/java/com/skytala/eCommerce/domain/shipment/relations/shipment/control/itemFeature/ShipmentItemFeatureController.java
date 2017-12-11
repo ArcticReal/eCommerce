@@ -57,7 +57,7 @@ public class ShipmentItemFeatureController {
 	 * @return a List with the ShipmentItemFeatures
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findShipmentItemFeaturesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentItemFeaturesBy query = new FindShipmentItemFeaturesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ShipmentItemFeatureController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createShipmentItemFeature(HttpServletRequest request) throws Exception {
 
 		ShipmentItemFeature shipmentItemFeatureToBeAdded = new ShipmentItemFeature();
@@ -129,7 +129,7 @@ public class ShipmentItemFeatureController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateShipmentItemFeature(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ShipmentItemFeatureController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{shipmentItemFeatureId}")
+	@GetMapping("/{shipmentItemFeatureId}")
 	public ResponseEntity<Object> findById(@PathVariable String shipmentItemFeatureId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentItemFeatureId", shipmentItemFeatureId);
@@ -207,7 +207,7 @@ public class ShipmentItemFeatureController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{shipmentItemFeatureId}")
+	@DeleteMapping("/{shipmentItemFeatureId}")
 	public ResponseEntity<Object> deleteShipmentItemFeatureByIdUpdated(@PathVariable String shipmentItemFeatureId) throws Exception {
 		DeleteShipmentItemFeature command = new DeleteShipmentItemFeature(shipmentItemFeatureId);
 

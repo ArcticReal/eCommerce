@@ -57,7 +57,7 @@ public class ProductContentController {
 	 * @return a List with the ProductContents
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductContentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductContentsBy query = new FindProductContentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductContentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductContent(HttpServletRequest request) throws Exception {
 
 		ProductContent productContentToBeAdded = new ProductContent();
@@ -129,7 +129,7 @@ public class ProductContentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductContent(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductContentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productContentId}")
+	@GetMapping("/{productContentId}")
 	public ResponseEntity<Object> findById(@PathVariable String productContentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productContentId", productContentId);
@@ -207,7 +207,7 @@ public class ProductContentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productContentId}")
+	@DeleteMapping("/{productContentId}")
 	public ResponseEntity<Object> deleteProductContentByIdUpdated(@PathVariable String productContentId) throws Exception {
 		DeleteProductContent command = new DeleteProductContent(productContentId);
 

@@ -57,7 +57,7 @@ public class WorkEffortStatusController {
 	 * @return a List with the WorkEffortStatuss
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWorkEffortStatussBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortStatussBy query = new FindWorkEffortStatussBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WorkEffortStatusController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWorkEffortStatus(HttpServletRequest request) throws Exception {
 
 		WorkEffortStatus workEffortStatusToBeAdded = new WorkEffortStatus();
@@ -129,7 +129,7 @@ public class WorkEffortStatusController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWorkEffortStatus(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WorkEffortStatusController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{workEffortStatusId}")
+	@GetMapping("/{workEffortStatusId}")
 	public ResponseEntity<Object> findById(@PathVariable String workEffortStatusId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortStatusId", workEffortStatusId);
@@ -207,7 +207,7 @@ public class WorkEffortStatusController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{workEffortStatusId}")
+	@DeleteMapping("/{workEffortStatusId}")
 	public ResponseEntity<Object> deleteWorkEffortStatusByIdUpdated(@PathVariable String workEffortStatusId) throws Exception {
 		DeleteWorkEffortStatus command = new DeleteWorkEffortStatus(workEffortStatusId);
 

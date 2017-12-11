@@ -57,7 +57,7 @@ public class CostComponentAttributeController {
 	 * @return a List with the CostComponentAttributes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findCostComponentAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCostComponentAttributesBy query = new FindCostComponentAttributesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class CostComponentAttributeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createCostComponentAttribute(HttpServletRequest request) throws Exception {
 
 		CostComponentAttribute costComponentAttributeToBeAdded = new CostComponentAttribute();
@@ -129,7 +129,7 @@ public class CostComponentAttributeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateCostComponentAttribute(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class CostComponentAttributeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{costComponentAttributeId}")
+	@GetMapping("/{costComponentAttributeId}")
 	public ResponseEntity<Object> findById(@PathVariable String costComponentAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("costComponentAttributeId", costComponentAttributeId);
@@ -207,7 +207,7 @@ public class CostComponentAttributeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{costComponentAttributeId}")
+	@DeleteMapping("/{costComponentAttributeId}")
 	public ResponseEntity<Object> deleteCostComponentAttributeByIdUpdated(@PathVariable String costComponentAttributeId) throws Exception {
 		DeleteCostComponentAttribute command = new DeleteCostComponentAttribute(costComponentAttributeId);
 

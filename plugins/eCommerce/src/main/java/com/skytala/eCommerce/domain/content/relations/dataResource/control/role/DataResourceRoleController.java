@@ -57,7 +57,7 @@ public class DataResourceRoleController {
 	 * @return a List with the DataResourceRoles
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findDataResourceRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDataResourceRolesBy query = new FindDataResourceRolesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class DataResourceRoleController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createDataResourceRole(HttpServletRequest request) throws Exception {
 
 		DataResourceRole dataResourceRoleToBeAdded = new DataResourceRole();
@@ -129,7 +129,7 @@ public class DataResourceRoleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateDataResourceRole(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class DataResourceRoleController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{dataResourceRoleId}")
+	@GetMapping("/{dataResourceRoleId}")
 	public ResponseEntity<Object> findById(@PathVariable String dataResourceRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("dataResourceRoleId", dataResourceRoleId);
@@ -207,7 +207,7 @@ public class DataResourceRoleController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{dataResourceRoleId}")
+	@DeleteMapping("/{dataResourceRoleId}")
 	public ResponseEntity<Object> deleteDataResourceRoleByIdUpdated(@PathVariable String dataResourceRoleId) throws Exception {
 		DeleteDataResourceRole command = new DeleteDataResourceRole(dataResourceRoleId);
 

@@ -57,7 +57,7 @@ public class PartyResumeController {
 	 * @return a List with the PartyResumes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyResumesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyResumesBy query = new FindPartyResumesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyResumeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyResume(HttpServletRequest request) throws Exception {
 
 		PartyResume partyResumeToBeAdded = new PartyResume();
@@ -129,7 +129,7 @@ public class PartyResumeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyResume(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyResumeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyResumeId}")
+	@GetMapping("/{partyResumeId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyResumeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyResumeId", partyResumeId);
@@ -207,7 +207,7 @@ public class PartyResumeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyResumeId}")
+	@DeleteMapping("/{partyResumeId}")
 	public ResponseEntity<Object> deletePartyResumeByIdUpdated(@PathVariable String partyResumeId) throws Exception {
 		DeletePartyResume command = new DeletePartyResume(partyResumeId);
 

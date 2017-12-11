@@ -57,7 +57,7 @@ public class SurveyTriggerController {
 	 * @return a List with the SurveyTriggers
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSurveyTriggersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSurveyTriggersBy query = new FindSurveyTriggersBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SurveyTriggerController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSurveyTrigger(HttpServletRequest request) throws Exception {
 
 		SurveyTrigger surveyTriggerToBeAdded = new SurveyTrigger();
@@ -129,7 +129,7 @@ public class SurveyTriggerController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSurveyTrigger(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SurveyTriggerController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{surveyTriggerId}")
+	@GetMapping("/{surveyTriggerId}")
 	public ResponseEntity<Object> findById(@PathVariable String surveyTriggerId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("surveyTriggerId", surveyTriggerId);
@@ -207,7 +207,7 @@ public class SurveyTriggerController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{surveyTriggerId}")
+	@DeleteMapping("/{surveyTriggerId}")
 	public ResponseEntity<Object> deleteSurveyTriggerByIdUpdated(@PathVariable String surveyTriggerId) throws Exception {
 		DeleteSurveyTrigger command = new DeleteSurveyTrigger(surveyTriggerId);
 

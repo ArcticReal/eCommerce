@@ -57,7 +57,7 @@ public class ContactMechAttributeController {
 	 * @return a List with the ContactMechAttributes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findContactMechAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContactMechAttributesBy query = new FindContactMechAttributesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ContactMechAttributeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createContactMechAttribute(HttpServletRequest request) throws Exception {
 
 		ContactMechAttribute contactMechAttributeToBeAdded = new ContactMechAttribute();
@@ -129,7 +129,7 @@ public class ContactMechAttributeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateContactMechAttribute(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ContactMechAttributeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{contactMechAttributeId}")
+	@GetMapping("/{contactMechAttributeId}")
 	public ResponseEntity<Object> findById(@PathVariable String contactMechAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contactMechAttributeId", contactMechAttributeId);
@@ -207,7 +207,7 @@ public class ContactMechAttributeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{contactMechAttributeId}")
+	@DeleteMapping("/{contactMechAttributeId}")
 	public ResponseEntity<Object> deleteContactMechAttributeByIdUpdated(@PathVariable String contactMechAttributeId) throws Exception {
 		DeleteContactMechAttribute command = new DeleteContactMechAttribute(contactMechAttributeId);
 

@@ -57,7 +57,7 @@ public class InventoryItemAttributeController {
 	 * @return a List with the InventoryItemAttributes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findInventoryItemAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInventoryItemAttributesBy query = new FindInventoryItemAttributesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class InventoryItemAttributeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createInventoryItemAttribute(HttpServletRequest request) throws Exception {
 
 		InventoryItemAttribute inventoryItemAttributeToBeAdded = new InventoryItemAttribute();
@@ -129,7 +129,7 @@ public class InventoryItemAttributeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateInventoryItemAttribute(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class InventoryItemAttributeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{inventoryItemAttributeId}")
+	@GetMapping("/{inventoryItemAttributeId}")
 	public ResponseEntity<Object> findById(@PathVariable String inventoryItemAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("inventoryItemAttributeId", inventoryItemAttributeId);
@@ -207,7 +207,7 @@ public class InventoryItemAttributeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{inventoryItemAttributeId}")
+	@DeleteMapping("/{inventoryItemAttributeId}")
 	public ResponseEntity<Object> deleteInventoryItemAttributeByIdUpdated(@PathVariable String inventoryItemAttributeId) throws Exception {
 		DeleteInventoryItemAttribute command = new DeleteInventoryItemAttribute(inventoryItemAttributeId);
 

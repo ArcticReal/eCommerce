@@ -57,7 +57,7 @@ public class VarianceReasonController {
 	 * @return a List with the VarianceReasons
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findVarianceReasonsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindVarianceReasonsBy query = new FindVarianceReasonsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class VarianceReasonController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createVarianceReason(HttpServletRequest request) throws Exception {
 
 		VarianceReason varianceReasonToBeAdded = new VarianceReason();
@@ -129,7 +129,7 @@ public class VarianceReasonController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateVarianceReason(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class VarianceReasonController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{varianceReasonId}")
+	@GetMapping("/{varianceReasonId}")
 	public ResponseEntity<Object> findById(@PathVariable String varianceReasonId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("varianceReasonId", varianceReasonId);
@@ -207,7 +207,7 @@ public class VarianceReasonController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{varianceReasonId}")
+	@DeleteMapping("/{varianceReasonId}")
 	public ResponseEntity<Object> deleteVarianceReasonByIdUpdated(@PathVariable String varianceReasonId) throws Exception {
 		DeleteVarianceReason command = new DeleteVarianceReason(varianceReasonId);
 

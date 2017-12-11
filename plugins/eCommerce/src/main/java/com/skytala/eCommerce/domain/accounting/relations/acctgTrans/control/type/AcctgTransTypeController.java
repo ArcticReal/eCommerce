@@ -57,7 +57,7 @@ public class AcctgTransTypeController {
 	 * @return a List with the AcctgTransTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findAcctgTransTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAcctgTransTypesBy query = new FindAcctgTransTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class AcctgTransTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createAcctgTransType(HttpServletRequest request) throws Exception {
 
 		AcctgTransType acctgTransTypeToBeAdded = new AcctgTransType();
@@ -129,7 +129,7 @@ public class AcctgTransTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateAcctgTransType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class AcctgTransTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{acctgTransTypeId}")
+	@GetMapping("/{acctgTransTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String acctgTransTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("acctgTransTypeId", acctgTransTypeId);
@@ -207,7 +207,7 @@ public class AcctgTransTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{acctgTransTypeId}")
+	@DeleteMapping("/{acctgTransTypeId}")
 	public ResponseEntity<Object> deleteAcctgTransTypeByIdUpdated(@PathVariable String acctgTransTypeId) throws Exception {
 		DeleteAcctgTransType command = new DeleteAcctgTransType(acctgTransTypeId);
 

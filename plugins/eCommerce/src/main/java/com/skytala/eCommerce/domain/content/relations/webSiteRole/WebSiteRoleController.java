@@ -57,7 +57,7 @@ public class WebSiteRoleController {
 	 * @return a List with the WebSiteRoles
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWebSiteRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWebSiteRolesBy query = new FindWebSiteRolesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WebSiteRoleController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWebSiteRole(HttpServletRequest request) throws Exception {
 
 		WebSiteRole webSiteRoleToBeAdded = new WebSiteRole();
@@ -129,7 +129,7 @@ public class WebSiteRoleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWebSiteRole(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WebSiteRoleController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{webSiteRoleId}")
+	@GetMapping("/{webSiteRoleId}")
 	public ResponseEntity<Object> findById(@PathVariable String webSiteRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("webSiteRoleId", webSiteRoleId);
@@ -207,7 +207,7 @@ public class WebSiteRoleController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{webSiteRoleId}")
+	@DeleteMapping("/{webSiteRoleId}")
 	public ResponseEntity<Object> deleteWebSiteRoleByIdUpdated(@PathVariable String webSiteRoleId) throws Exception {
 		DeleteWebSiteRole command = new DeleteWebSiteRole(webSiteRoleId);
 

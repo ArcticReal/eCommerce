@@ -57,7 +57,7 @@ public class SurveyResponseController {
 	 * @return a List with the SurveyResponses
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSurveyResponsesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSurveyResponsesBy query = new FindSurveyResponsesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SurveyResponseController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSurveyResponse(HttpServletRequest request) throws Exception {
 
 		SurveyResponse surveyResponseToBeAdded = new SurveyResponse();
@@ -129,7 +129,7 @@ public class SurveyResponseController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSurveyResponse(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SurveyResponseController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{surveyResponseId}")
+	@GetMapping("/{surveyResponseId}")
 	public ResponseEntity<Object> findById(@PathVariable String surveyResponseId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("surveyResponseId", surveyResponseId);
@@ -207,7 +207,7 @@ public class SurveyResponseController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{surveyResponseId}")
+	@DeleteMapping("/{surveyResponseId}")
 	public ResponseEntity<Object> deleteSurveyResponseByIdUpdated(@PathVariable String surveyResponseId) throws Exception {
 		DeleteSurveyResponse command = new DeleteSurveyResponse(surveyResponseId);
 

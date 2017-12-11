@@ -57,7 +57,7 @@ public class WorkEffortPurposeTypeController {
 	 * @return a List with the WorkEffortPurposeTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWorkEffortPurposeTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortPurposeTypesBy query = new FindWorkEffortPurposeTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WorkEffortPurposeTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWorkEffortPurposeType(HttpServletRequest request) throws Exception {
 
 		WorkEffortPurposeType workEffortPurposeTypeToBeAdded = new WorkEffortPurposeType();
@@ -129,7 +129,7 @@ public class WorkEffortPurposeTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWorkEffortPurposeType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WorkEffortPurposeTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{workEffortPurposeTypeId}")
+	@GetMapping("/{workEffortPurposeTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String workEffortPurposeTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortPurposeTypeId", workEffortPurposeTypeId);
@@ -207,7 +207,7 @@ public class WorkEffortPurposeTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{workEffortPurposeTypeId}")
+	@DeleteMapping("/{workEffortPurposeTypeId}")
 	public ResponseEntity<Object> deleteWorkEffortPurposeTypeByIdUpdated(@PathVariable String workEffortPurposeTypeId) throws Exception {
 		DeleteWorkEffortPurposeType command = new DeleteWorkEffortPurposeType(workEffortPurposeTypeId);
 

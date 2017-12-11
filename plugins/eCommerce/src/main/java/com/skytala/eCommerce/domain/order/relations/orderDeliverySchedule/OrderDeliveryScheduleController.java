@@ -57,7 +57,7 @@ public class OrderDeliveryScheduleController {
 	 * @return a List with the OrderDeliverySchedules
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderDeliverySchedulesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderDeliverySchedulesBy query = new FindOrderDeliverySchedulesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderDeliveryScheduleController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderDeliverySchedule(HttpServletRequest request) throws Exception {
 
 		OrderDeliverySchedule orderDeliveryScheduleToBeAdded = new OrderDeliverySchedule();
@@ -129,7 +129,7 @@ public class OrderDeliveryScheduleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderDeliverySchedule(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderDeliveryScheduleController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderDeliveryScheduleId}")
+	@GetMapping("/{orderDeliveryScheduleId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderDeliveryScheduleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderDeliveryScheduleId", orderDeliveryScheduleId);
@@ -207,7 +207,7 @@ public class OrderDeliveryScheduleController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderDeliveryScheduleId}")
+	@DeleteMapping("/{orderDeliveryScheduleId}")
 	public ResponseEntity<Object> deleteOrderDeliveryScheduleByIdUpdated(@PathVariable String orderDeliveryScheduleId) throws Exception {
 		DeleteOrderDeliverySchedule command = new DeleteOrderDeliverySchedule(orderDeliveryScheduleId);
 

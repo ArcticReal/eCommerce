@@ -57,7 +57,7 @@ public class PaymentGatewayRespMsgController {
 	 * @return a List with the PaymentGatewayRespMsgs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPaymentGatewayRespMsgsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentGatewayRespMsgsBy query = new FindPaymentGatewayRespMsgsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PaymentGatewayRespMsgController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPaymentGatewayRespMsg(HttpServletRequest request) throws Exception {
 
 		PaymentGatewayRespMsg paymentGatewayRespMsgToBeAdded = new PaymentGatewayRespMsg();
@@ -129,7 +129,7 @@ public class PaymentGatewayRespMsgController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePaymentGatewayRespMsg(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PaymentGatewayRespMsgController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{paymentGatewayRespMsgId}")
+	@GetMapping("/{paymentGatewayRespMsgId}")
 	public ResponseEntity<Object> findById(@PathVariable String paymentGatewayRespMsgId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentGatewayRespMsgId", paymentGatewayRespMsgId);
@@ -207,7 +207,7 @@ public class PaymentGatewayRespMsgController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{paymentGatewayRespMsgId}")
+	@DeleteMapping("/{paymentGatewayRespMsgId}")
 	public ResponseEntity<Object> deletePaymentGatewayRespMsgByIdUpdated(@PathVariable String paymentGatewayRespMsgId) throws Exception {
 		DeletePaymentGatewayRespMsg command = new DeletePaymentGatewayRespMsg(paymentGatewayRespMsgId);
 

@@ -57,7 +57,7 @@ public class AgreementPromoApplController {
 	 * @return a List with the AgreementPromoAppls
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findAgreementPromoApplsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAgreementPromoApplsBy query = new FindAgreementPromoApplsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class AgreementPromoApplController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createAgreementPromoAppl(HttpServletRequest request) throws Exception {
 
 		AgreementPromoAppl agreementPromoApplToBeAdded = new AgreementPromoAppl();
@@ -129,7 +129,7 @@ public class AgreementPromoApplController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateAgreementPromoAppl(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class AgreementPromoApplController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{agreementPromoApplId}")
+	@GetMapping("/{agreementPromoApplId}")
 	public ResponseEntity<Object> findById(@PathVariable String agreementPromoApplId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("agreementPromoApplId", agreementPromoApplId);
@@ -207,7 +207,7 @@ public class AgreementPromoApplController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{agreementPromoApplId}")
+	@DeleteMapping("/{agreementPromoApplId}")
 	public ResponseEntity<Object> deleteAgreementPromoApplByIdUpdated(@PathVariable String agreementPromoApplId) throws Exception {
 		DeleteAgreementPromoAppl command = new DeleteAgreementPromoAppl(agreementPromoApplId);
 

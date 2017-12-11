@@ -57,7 +57,7 @@ public class TerminationReasonController {
 	 * @return a List with the TerminationReasons
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findTerminationReasonsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTerminationReasonsBy query = new FindTerminationReasonsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class TerminationReasonController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createTerminationReason(HttpServletRequest request) throws Exception {
 
 		TerminationReason terminationReasonToBeAdded = new TerminationReason();
@@ -129,7 +129,7 @@ public class TerminationReasonController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateTerminationReason(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class TerminationReasonController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{terminationReasonId}")
+	@GetMapping("/{terminationReasonId}")
 	public ResponseEntity<Object> findById(@PathVariable String terminationReasonId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("terminationReasonId", terminationReasonId);
@@ -207,7 +207,7 @@ public class TerminationReasonController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{terminationReasonId}")
+	@DeleteMapping("/{terminationReasonId}")
 	public ResponseEntity<Object> deleteTerminationReasonByIdUpdated(@PathVariable String terminationReasonId) throws Exception {
 		DeleteTerminationReason command = new DeleteTerminationReason(terminationReasonId);
 

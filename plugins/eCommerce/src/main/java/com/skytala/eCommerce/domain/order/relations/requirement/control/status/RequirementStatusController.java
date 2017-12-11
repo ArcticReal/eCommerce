@@ -57,7 +57,7 @@ public class RequirementStatusController {
 	 * @return a List with the RequirementStatuss
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findRequirementStatussBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindRequirementStatussBy query = new FindRequirementStatussBy(allRequestParams);
@@ -83,7 +83,7 @@ public class RequirementStatusController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createRequirementStatus(HttpServletRequest request) throws Exception {
 
 		RequirementStatus requirementStatusToBeAdded = new RequirementStatus();
@@ -129,7 +129,7 @@ public class RequirementStatusController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateRequirementStatus(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class RequirementStatusController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{requirementStatusId}")
+	@GetMapping("/{requirementStatusId}")
 	public ResponseEntity<Object> findById(@PathVariable String requirementStatusId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("requirementStatusId", requirementStatusId);
@@ -207,7 +207,7 @@ public class RequirementStatusController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{requirementStatusId}")
+	@DeleteMapping("/{requirementStatusId}")
 	public ResponseEntity<Object> deleteRequirementStatusByIdUpdated(@PathVariable String requirementStatusId) throws Exception {
 		DeleteRequirementStatus command = new DeleteRequirementStatus(requirementStatusId);
 

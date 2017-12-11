@@ -57,7 +57,7 @@ public class SurveyPageController {
 	 * @return a List with the SurveyPages
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSurveyPagesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSurveyPagesBy query = new FindSurveyPagesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SurveyPageController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSurveyPage(HttpServletRequest request) throws Exception {
 
 		SurveyPage surveyPageToBeAdded = new SurveyPage();
@@ -129,7 +129,7 @@ public class SurveyPageController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSurveyPage(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SurveyPageController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{surveyPageId}")
+	@GetMapping("/{surveyPageId}")
 	public ResponseEntity<Object> findById(@PathVariable String surveyPageId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("surveyPageId", surveyPageId);
@@ -207,7 +207,7 @@ public class SurveyPageController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{surveyPageId}")
+	@DeleteMapping("/{surveyPageId}")
 	public ResponseEntity<Object> deleteSurveyPageByIdUpdated(@PathVariable String surveyPageId) throws Exception {
 		DeleteSurveyPage command = new DeleteSurveyPage(surveyPageId);
 

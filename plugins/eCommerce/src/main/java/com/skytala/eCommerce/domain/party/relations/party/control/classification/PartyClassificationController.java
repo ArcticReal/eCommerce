@@ -57,7 +57,7 @@ public class PartyClassificationController {
 	 * @return a List with the PartyClassifications
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyClassificationsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyClassificationsBy query = new FindPartyClassificationsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyClassificationController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyClassification(HttpServletRequest request) throws Exception {
 
 		PartyClassification partyClassificationToBeAdded = new PartyClassification();
@@ -129,7 +129,7 @@ public class PartyClassificationController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyClassification(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyClassificationController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyClassificationId}")
+	@GetMapping("/{partyClassificationId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyClassificationId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyClassificationId", partyClassificationId);
@@ -207,7 +207,7 @@ public class PartyClassificationController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyClassificationId}")
+	@DeleteMapping("/{partyClassificationId}")
 	public ResponseEntity<Object> deletePartyClassificationByIdUpdated(@PathVariable String partyClassificationId) throws Exception {
 		DeletePartyClassification command = new DeletePartyClassification(partyClassificationId);
 

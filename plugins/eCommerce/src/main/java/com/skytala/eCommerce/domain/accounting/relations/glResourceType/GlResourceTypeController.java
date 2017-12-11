@@ -57,7 +57,7 @@ public class GlResourceTypeController {
 	 * @return a List with the GlResourceTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findGlResourceTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGlResourceTypesBy query = new FindGlResourceTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class GlResourceTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createGlResourceType(HttpServletRequest request) throws Exception {
 
 		GlResourceType glResourceTypeToBeAdded = new GlResourceType();
@@ -129,7 +129,7 @@ public class GlResourceTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateGlResourceType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class GlResourceTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{glResourceTypeId}")
+	@GetMapping("/{glResourceTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String glResourceTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("glResourceTypeId", glResourceTypeId);
@@ -207,7 +207,7 @@ public class GlResourceTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{glResourceTypeId}")
+	@DeleteMapping("/{glResourceTypeId}")
 	public ResponseEntity<Object> deleteGlResourceTypeByIdUpdated(@PathVariable String glResourceTypeId) throws Exception {
 		DeleteGlResourceType command = new DeleteGlResourceType(glResourceTypeId);
 

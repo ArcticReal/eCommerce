@@ -57,7 +57,7 @@ public class EmploymentController {
 	 * @return a List with the Employments
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findEmploymentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindEmploymentsBy query = new FindEmploymentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class EmploymentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createEmployment(HttpServletRequest request) throws Exception {
 
 		Employment employmentToBeAdded = new Employment();
@@ -129,7 +129,7 @@ public class EmploymentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateEmployment(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class EmploymentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{employmentId}")
+	@GetMapping("/{employmentId}")
 	public ResponseEntity<Object> findById(@PathVariable String employmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("employmentId", employmentId);
@@ -207,7 +207,7 @@ public class EmploymentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{employmentId}")
+	@DeleteMapping("/{employmentId}")
 	public ResponseEntity<Object> deleteEmploymentByIdUpdated(@PathVariable String employmentId) throws Exception {
 		DeleteEmployment command = new DeleteEmployment(employmentId);
 

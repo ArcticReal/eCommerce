@@ -57,7 +57,7 @@ public class PartyClassificationTypeController {
 	 * @return a List with the PartyClassificationTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyClassificationTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyClassificationTypesBy query = new FindPartyClassificationTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyClassificationTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyClassificationType(HttpServletRequest request) throws Exception {
 
 		PartyClassificationType partyClassificationTypeToBeAdded = new PartyClassificationType();
@@ -129,7 +129,7 @@ public class PartyClassificationTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyClassificationType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyClassificationTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyClassificationTypeId}")
+	@GetMapping("/{partyClassificationTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyClassificationTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyClassificationTypeId", partyClassificationTypeId);
@@ -207,7 +207,7 @@ public class PartyClassificationTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyClassificationTypeId}")
+	@DeleteMapping("/{partyClassificationTypeId}")
 	public ResponseEntity<Object> deletePartyClassificationTypeByIdUpdated(@PathVariable String partyClassificationTypeId) throws Exception {
 		DeletePartyClassificationType command = new DeletePartyClassificationType(partyClassificationTypeId);
 

@@ -57,7 +57,7 @@ public class FixedAssetTypeAttrController {
 	 * @return a List with the FixedAssetTypeAttrs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFixedAssetTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFixedAssetTypeAttrsBy query = new FindFixedAssetTypeAttrsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FixedAssetTypeAttrController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFixedAssetTypeAttr(HttpServletRequest request) throws Exception {
 
 		FixedAssetTypeAttr fixedAssetTypeAttrToBeAdded = new FixedAssetTypeAttr();
@@ -129,7 +129,7 @@ public class FixedAssetTypeAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFixedAssetTypeAttr(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FixedAssetTypeAttrController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{fixedAssetTypeAttrId}")
+	@GetMapping("/{fixedAssetTypeAttrId}")
 	public ResponseEntity<Object> findById(@PathVariable String fixedAssetTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("fixedAssetTypeAttrId", fixedAssetTypeAttrId);
@@ -207,7 +207,7 @@ public class FixedAssetTypeAttrController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{fixedAssetTypeAttrId}")
+	@DeleteMapping("/{fixedAssetTypeAttrId}")
 	public ResponseEntity<Object> deleteFixedAssetTypeAttrByIdUpdated(@PathVariable String fixedAssetTypeAttrId) throws Exception {
 		DeleteFixedAssetTypeAttr command = new DeleteFixedAssetTypeAttr(fixedAssetTypeAttrId);
 

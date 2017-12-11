@@ -57,7 +57,7 @@ public class FacilityGroupMemberController {
 	 * @return a List with the FacilityGroupMembers
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFacilityGroupMembersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFacilityGroupMembersBy query = new FindFacilityGroupMembersBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FacilityGroupMemberController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFacilityGroupMember(HttpServletRequest request) throws Exception {
 
 		FacilityGroupMember facilityGroupMemberToBeAdded = new FacilityGroupMember();
@@ -129,7 +129,7 @@ public class FacilityGroupMemberController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFacilityGroupMember(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FacilityGroupMemberController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{facilityGroupMemberId}")
+	@GetMapping("/{facilityGroupMemberId}")
 	public ResponseEntity<Object> findById(@PathVariable String facilityGroupMemberId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("facilityGroupMemberId", facilityGroupMemberId);
@@ -207,7 +207,7 @@ public class FacilityGroupMemberController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{facilityGroupMemberId}")
+	@DeleteMapping("/{facilityGroupMemberId}")
 	public ResponseEntity<Object> deleteFacilityGroupMemberByIdUpdated(@PathVariable String facilityGroupMemberId) throws Exception {
 		DeleteFacilityGroupMember command = new DeleteFacilityGroupMember(facilityGroupMemberId);
 

@@ -57,7 +57,7 @@ public class MarketingCampaignRoleController {
 	 * @return a List with the MarketingCampaignRoles
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findMarketingCampaignRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindMarketingCampaignRolesBy query = new FindMarketingCampaignRolesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class MarketingCampaignRoleController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createMarketingCampaignRole(HttpServletRequest request) throws Exception {
 
 		MarketingCampaignRole marketingCampaignRoleToBeAdded = new MarketingCampaignRole();
@@ -129,7 +129,7 @@ public class MarketingCampaignRoleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateMarketingCampaignRole(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class MarketingCampaignRoleController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{marketingCampaignRoleId}")
+	@GetMapping("/{marketingCampaignRoleId}")
 	public ResponseEntity<Object> findById(@PathVariable String marketingCampaignRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("marketingCampaignRoleId", marketingCampaignRoleId);
@@ -207,7 +207,7 @@ public class MarketingCampaignRoleController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{marketingCampaignRoleId}")
+	@DeleteMapping("/{marketingCampaignRoleId}")
 	public ResponseEntity<Object> deleteMarketingCampaignRoleByIdUpdated(@PathVariable String marketingCampaignRoleId) throws Exception {
 		DeleteMarketingCampaignRole command = new DeleteMarketingCampaignRole(marketingCampaignRoleId);
 

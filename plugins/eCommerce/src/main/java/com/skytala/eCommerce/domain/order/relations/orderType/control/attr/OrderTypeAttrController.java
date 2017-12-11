@@ -57,7 +57,7 @@ public class OrderTypeAttrController {
 	 * @return a List with the OrderTypeAttrs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderTypeAttrsBy query = new FindOrderTypeAttrsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderTypeAttrController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderTypeAttr(HttpServletRequest request) throws Exception {
 
 		OrderTypeAttr orderTypeAttrToBeAdded = new OrderTypeAttr();
@@ -129,7 +129,7 @@ public class OrderTypeAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderTypeAttr(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderTypeAttrController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderTypeAttrId}")
+	@GetMapping("/{orderTypeAttrId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderTypeAttrId", orderTypeAttrId);
@@ -207,7 +207,7 @@ public class OrderTypeAttrController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderTypeAttrId}")
+	@DeleteMapping("/{orderTypeAttrId}")
 	public ResponseEntity<Object> deleteOrderTypeAttrByIdUpdated(@PathVariable String orderTypeAttrId) throws Exception {
 		DeleteOrderTypeAttr command = new DeleteOrderTypeAttr(orderTypeAttrId);
 

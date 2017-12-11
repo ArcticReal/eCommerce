@@ -57,7 +57,7 @@ public class OrderItemRoleController {
 	 * @return a List with the OrderItemRoles
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderItemRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderItemRolesBy query = new FindOrderItemRolesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderItemRoleController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderItemRole(HttpServletRequest request) throws Exception {
 
 		OrderItemRole orderItemRoleToBeAdded = new OrderItemRole();
@@ -129,7 +129,7 @@ public class OrderItemRoleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderItemRole(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderItemRoleController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderItemRoleId}")
+	@GetMapping("/{orderItemRoleId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderItemRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderItemRoleId", orderItemRoleId);
@@ -207,7 +207,7 @@ public class OrderItemRoleController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderItemRoleId}")
+	@DeleteMapping("/{orderItemRoleId}")
 	public ResponseEntity<Object> deleteOrderItemRoleByIdUpdated(@PathVariable String orderItemRoleId) throws Exception {
 		DeleteOrderItemRole command = new DeleteOrderItemRole(orderItemRoleId);
 

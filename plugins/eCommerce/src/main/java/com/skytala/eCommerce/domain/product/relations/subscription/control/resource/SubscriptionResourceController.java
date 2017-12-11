@@ -57,7 +57,7 @@ public class SubscriptionResourceController {
 	 * @return a List with the SubscriptionResources
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSubscriptionResourcesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSubscriptionResourcesBy query = new FindSubscriptionResourcesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SubscriptionResourceController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSubscriptionResource(HttpServletRequest request) throws Exception {
 
 		SubscriptionResource subscriptionResourceToBeAdded = new SubscriptionResource();
@@ -129,7 +129,7 @@ public class SubscriptionResourceController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSubscriptionResource(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SubscriptionResourceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{subscriptionResourceId}")
+	@GetMapping("/{subscriptionResourceId}")
 	public ResponseEntity<Object> findById(@PathVariable String subscriptionResourceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("subscriptionResourceId", subscriptionResourceId);
@@ -207,7 +207,7 @@ public class SubscriptionResourceController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{subscriptionResourceId}")
+	@DeleteMapping("/{subscriptionResourceId}")
 	public ResponseEntity<Object> deleteSubscriptionResourceByIdUpdated(@PathVariable String subscriptionResourceId) throws Exception {
 		DeleteSubscriptionResource command = new DeleteSubscriptionResource(subscriptionResourceId);
 

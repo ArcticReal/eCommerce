@@ -57,7 +57,7 @@ public class PaymentGlAccountTypeMapController {
 	 * @return a List with the PaymentGlAccountTypeMaps
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPaymentGlAccountTypeMapsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentGlAccountTypeMapsBy query = new FindPaymentGlAccountTypeMapsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PaymentGlAccountTypeMapController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPaymentGlAccountTypeMap(HttpServletRequest request) throws Exception {
 
 		PaymentGlAccountTypeMap paymentGlAccountTypeMapToBeAdded = new PaymentGlAccountTypeMap();
@@ -129,7 +129,7 @@ public class PaymentGlAccountTypeMapController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePaymentGlAccountTypeMap(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PaymentGlAccountTypeMapController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{paymentGlAccountTypeMapId}")
+	@GetMapping("/{paymentGlAccountTypeMapId}")
 	public ResponseEntity<Object> findById(@PathVariable String paymentGlAccountTypeMapId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentGlAccountTypeMapId", paymentGlAccountTypeMapId);
@@ -207,7 +207,7 @@ public class PaymentGlAccountTypeMapController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{paymentGlAccountTypeMapId}")
+	@DeleteMapping("/{paymentGlAccountTypeMapId}")
 	public ResponseEntity<Object> deletePaymentGlAccountTypeMapByIdUpdated(@PathVariable String paymentGlAccountTypeMapId) throws Exception {
 		DeletePaymentGlAccountTypeMap command = new DeletePaymentGlAccountTypeMap(paymentGlAccountTypeMapId);
 

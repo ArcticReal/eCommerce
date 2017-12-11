@@ -57,7 +57,7 @@ public class ProductPaymentMethodTypeController {
 	 * @return a List with the ProductPaymentMethodTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductPaymentMethodTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductPaymentMethodTypesBy query = new FindProductPaymentMethodTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductPaymentMethodTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductPaymentMethodType(HttpServletRequest request) throws Exception {
 
 		ProductPaymentMethodType productPaymentMethodTypeToBeAdded = new ProductPaymentMethodType();
@@ -129,7 +129,7 @@ public class ProductPaymentMethodTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductPaymentMethodType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductPaymentMethodTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productPaymentMethodTypeId}")
+	@GetMapping("/{productPaymentMethodTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String productPaymentMethodTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productPaymentMethodTypeId", productPaymentMethodTypeId);
@@ -207,7 +207,7 @@ public class ProductPaymentMethodTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productPaymentMethodTypeId}")
+	@DeleteMapping("/{productPaymentMethodTypeId}")
 	public ResponseEntity<Object> deleteProductPaymentMethodTypeByIdUpdated(@PathVariable String productPaymentMethodTypeId) throws Exception {
 		DeleteProductPaymentMethodType command = new DeleteProductPaymentMethodType(productPaymentMethodTypeId);
 

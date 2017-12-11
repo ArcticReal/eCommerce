@@ -57,7 +57,7 @@ public class DeductionController {
 	 * @return a List with the Deductions
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findDeductionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDeductionsBy query = new FindDeductionsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class DeductionController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createDeduction(HttpServletRequest request) throws Exception {
 
 		Deduction deductionToBeAdded = new Deduction();
@@ -129,7 +129,7 @@ public class DeductionController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateDeduction(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class DeductionController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{deductionId}")
+	@GetMapping("/{deductionId}")
 	public ResponseEntity<Object> findById(@PathVariable String deductionId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("deductionId", deductionId);
@@ -207,7 +207,7 @@ public class DeductionController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{deductionId}")
+	@DeleteMapping("/{deductionId}")
 	public ResponseEntity<Object> deleteDeductionByIdUpdated(@PathVariable String deductionId) throws Exception {
 		DeleteDeduction command = new DeleteDeduction(deductionId);
 

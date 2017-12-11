@@ -57,7 +57,7 @@ public class GiftCardFulfillmentController {
 	 * @return a List with the GiftCardFulfillments
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findGiftCardFulfillmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGiftCardFulfillmentsBy query = new FindGiftCardFulfillmentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class GiftCardFulfillmentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createGiftCardFulfillment(HttpServletRequest request) throws Exception {
 
 		GiftCardFulfillment giftCardFulfillmentToBeAdded = new GiftCardFulfillment();
@@ -129,7 +129,7 @@ public class GiftCardFulfillmentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateGiftCardFulfillment(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class GiftCardFulfillmentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{giftCardFulfillmentId}")
+	@GetMapping("/{giftCardFulfillmentId}")
 	public ResponseEntity<Object> findById(@PathVariable String giftCardFulfillmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("giftCardFulfillmentId", giftCardFulfillmentId);
@@ -207,7 +207,7 @@ public class GiftCardFulfillmentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{giftCardFulfillmentId}")
+	@DeleteMapping("/{giftCardFulfillmentId}")
 	public ResponseEntity<Object> deleteGiftCardFulfillmentByIdUpdated(@PathVariable String giftCardFulfillmentId) throws Exception {
 		DeleteGiftCardFulfillment command = new DeleteGiftCardFulfillment(giftCardFulfillmentId);
 

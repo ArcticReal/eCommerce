@@ -57,7 +57,7 @@ public class InventoryItemLabelController {
 	 * @return a List with the InventoryItemLabels
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findInventoryItemLabelsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInventoryItemLabelsBy query = new FindInventoryItemLabelsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class InventoryItemLabelController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createInventoryItemLabel(HttpServletRequest request) throws Exception {
 
 		InventoryItemLabel inventoryItemLabelToBeAdded = new InventoryItemLabel();
@@ -129,7 +129,7 @@ public class InventoryItemLabelController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateInventoryItemLabel(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class InventoryItemLabelController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{inventoryItemLabelId}")
+	@GetMapping("/{inventoryItemLabelId}")
 	public ResponseEntity<Object> findById(@PathVariable String inventoryItemLabelId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("inventoryItemLabelId", inventoryItemLabelId);
@@ -207,7 +207,7 @@ public class InventoryItemLabelController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{inventoryItemLabelId}")
+	@DeleteMapping("/{inventoryItemLabelId}")
 	public ResponseEntity<Object> deleteInventoryItemLabelByIdUpdated(@PathVariable String inventoryItemLabelId) throws Exception {
 		DeleteInventoryItemLabel command = new DeleteInventoryItemLabel(inventoryItemLabelId);
 

@@ -57,7 +57,7 @@ public class ProductAssocTypeController {
 	 * @return a List with the ProductAssocTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductAssocTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductAssocTypesBy query = new FindProductAssocTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductAssocTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductAssocType(HttpServletRequest request) throws Exception {
 
 		ProductAssocType productAssocTypeToBeAdded = new ProductAssocType();
@@ -129,7 +129,7 @@ public class ProductAssocTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductAssocType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductAssocTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productAssocTypeId}")
+	@GetMapping("/{productAssocTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String productAssocTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productAssocTypeId", productAssocTypeId);
@@ -207,7 +207,7 @@ public class ProductAssocTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productAssocTypeId}")
+	@DeleteMapping("/{productAssocTypeId}")
 	public ResponseEntity<Object> deleteProductAssocTypeByIdUpdated(@PathVariable String productAssocTypeId) throws Exception {
 		DeleteProductAssocType command = new DeleteProductAssocType(productAssocTypeId);
 

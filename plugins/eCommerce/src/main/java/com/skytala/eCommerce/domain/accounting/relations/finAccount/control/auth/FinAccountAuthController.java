@@ -57,7 +57,7 @@ public class FinAccountAuthController {
 	 * @return a List with the FinAccountAuths
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFinAccountAuthsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFinAccountAuthsBy query = new FindFinAccountAuthsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FinAccountAuthController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFinAccountAuth(HttpServletRequest request) throws Exception {
 
 		FinAccountAuth finAccountAuthToBeAdded = new FinAccountAuth();
@@ -129,7 +129,7 @@ public class FinAccountAuthController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFinAccountAuth(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FinAccountAuthController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{finAccountAuthId}")
+	@GetMapping("/{finAccountAuthId}")
 	public ResponseEntity<Object> findById(@PathVariable String finAccountAuthId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("finAccountAuthId", finAccountAuthId);
@@ -207,7 +207,7 @@ public class FinAccountAuthController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{finAccountAuthId}")
+	@DeleteMapping("/{finAccountAuthId}")
 	public ResponseEntity<Object> deleteFinAccountAuthByIdUpdated(@PathVariable String finAccountAuthId) throws Exception {
 		DeleteFinAccountAuth command = new DeleteFinAccountAuth(finAccountAuthId);
 

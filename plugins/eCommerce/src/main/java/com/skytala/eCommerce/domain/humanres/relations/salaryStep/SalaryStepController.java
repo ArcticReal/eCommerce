@@ -57,7 +57,7 @@ public class SalaryStepController {
 	 * @return a List with the SalarySteps
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSalaryStepsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSalaryStepsBy query = new FindSalaryStepsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SalaryStepController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSalaryStep(HttpServletRequest request) throws Exception {
 
 		SalaryStep salaryStepToBeAdded = new SalaryStep();
@@ -129,7 +129,7 @@ public class SalaryStepController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSalaryStep(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SalaryStepController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{salaryStepId}")
+	@GetMapping("/{salaryStepId}")
 	public ResponseEntity<Object> findById(@PathVariable String salaryStepId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("salaryStepId", salaryStepId);
@@ -207,7 +207,7 @@ public class SalaryStepController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{salaryStepId}")
+	@DeleteMapping("/{salaryStepId}")
 	public ResponseEntity<Object> deleteSalaryStepByIdUpdated(@PathVariable String salaryStepId) throws Exception {
 		DeleteSalaryStep command = new DeleteSalaryStep(salaryStepId);
 

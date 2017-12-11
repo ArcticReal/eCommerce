@@ -57,7 +57,7 @@ public class InventoryTransferController {
 	 * @return a List with the InventoryTransfers
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findInventoryTransfersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInventoryTransfersBy query = new FindInventoryTransfersBy(allRequestParams);
@@ -83,7 +83,7 @@ public class InventoryTransferController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createInventoryTransfer(HttpServletRequest request) throws Exception {
 
 		InventoryTransfer inventoryTransferToBeAdded = new InventoryTransfer();
@@ -129,7 +129,7 @@ public class InventoryTransferController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateInventoryTransfer(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class InventoryTransferController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{inventoryTransferId}")
+	@GetMapping("/{inventoryTransferId}")
 	public ResponseEntity<Object> findById(@PathVariable String inventoryTransferId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("inventoryTransferId", inventoryTransferId);
@@ -207,7 +207,7 @@ public class InventoryTransferController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{inventoryTransferId}")
+	@DeleteMapping("/{inventoryTransferId}")
 	public ResponseEntity<Object> deleteInventoryTransferByIdUpdated(@PathVariable String inventoryTransferId) throws Exception {
 		DeleteInventoryTransfer command = new DeleteInventoryTransfer(inventoryTransferId);
 

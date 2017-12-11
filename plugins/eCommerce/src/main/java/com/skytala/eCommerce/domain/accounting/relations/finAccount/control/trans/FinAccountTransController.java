@@ -57,7 +57,7 @@ public class FinAccountTransController {
 	 * @return a List with the FinAccountTranss
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFinAccountTranssBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFinAccountTranssBy query = new FindFinAccountTranssBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FinAccountTransController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFinAccountTrans(HttpServletRequest request) throws Exception {
 
 		FinAccountTrans finAccountTransToBeAdded = new FinAccountTrans();
@@ -129,7 +129,7 @@ public class FinAccountTransController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFinAccountTrans(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FinAccountTransController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{finAccountTransId}")
+	@GetMapping("/{finAccountTransId}")
 	public ResponseEntity<Object> findById(@PathVariable String finAccountTransId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("finAccountTransId", finAccountTransId);
@@ -207,7 +207,7 @@ public class FinAccountTransController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{finAccountTransId}")
+	@DeleteMapping("/{finAccountTransId}")
 	public ResponseEntity<Object> deleteFinAccountTransByIdUpdated(@PathVariable String finAccountTransId) throws Exception {
 		DeleteFinAccountTrans command = new DeleteFinAccountTrans(finAccountTransId);
 

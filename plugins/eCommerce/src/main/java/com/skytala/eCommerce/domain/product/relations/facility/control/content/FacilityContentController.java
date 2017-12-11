@@ -57,7 +57,7 @@ public class FacilityContentController {
 	 * @return a List with the FacilityContents
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFacilityContentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFacilityContentsBy query = new FindFacilityContentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FacilityContentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFacilityContent(HttpServletRequest request) throws Exception {
 
 		FacilityContent facilityContentToBeAdded = new FacilityContent();
@@ -129,7 +129,7 @@ public class FacilityContentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFacilityContent(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FacilityContentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{facilityContentId}")
+	@GetMapping("/{facilityContentId}")
 	public ResponseEntity<Object> findById(@PathVariable String facilityContentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("facilityContentId", facilityContentId);
@@ -207,7 +207,7 @@ public class FacilityContentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{facilityContentId}")
+	@DeleteMapping("/{facilityContentId}")
 	public ResponseEntity<Object> deleteFacilityContentByIdUpdated(@PathVariable String facilityContentId) throws Exception {
 		DeleteFacilityContent command = new DeleteFacilityContent(facilityContentId);
 

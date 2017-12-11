@@ -57,7 +57,7 @@ public class PaymentGatewayiDEALController {
 	 * @return a List with the PaymentGatewayiDEALs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPaymentGatewayiDEALsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentGatewayiDEALsBy query = new FindPaymentGatewayiDEALsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PaymentGatewayiDEALController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPaymentGatewayiDEAL(HttpServletRequest request) throws Exception {
 
 		PaymentGatewayiDEAL paymentGatewayiDEALToBeAdded = new PaymentGatewayiDEAL();
@@ -129,7 +129,7 @@ public class PaymentGatewayiDEALController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePaymentGatewayiDEAL(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PaymentGatewayiDEALController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{paymentGatewayiDEALId}")
+	@GetMapping("/{paymentGatewayiDEALId}")
 	public ResponseEntity<Object> findById(@PathVariable String paymentGatewayiDEALId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentGatewayiDEALId", paymentGatewayiDEALId);
@@ -207,7 +207,7 @@ public class PaymentGatewayiDEALController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{paymentGatewayiDEALId}")
+	@DeleteMapping("/{paymentGatewayiDEALId}")
 	public ResponseEntity<Object> deletePaymentGatewayiDEALByIdUpdated(@PathVariable String paymentGatewayiDEALId) throws Exception {
 		DeletePaymentGatewayiDEAL command = new DeletePaymentGatewayiDEAL(paymentGatewayiDEALId);
 

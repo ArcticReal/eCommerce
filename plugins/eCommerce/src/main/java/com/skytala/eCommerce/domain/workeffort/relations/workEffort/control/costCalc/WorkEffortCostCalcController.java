@@ -57,7 +57,7 @@ public class WorkEffortCostCalcController {
 	 * @return a List with the WorkEffortCostCalcs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWorkEffortCostCalcsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortCostCalcsBy query = new FindWorkEffortCostCalcsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WorkEffortCostCalcController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWorkEffortCostCalc(HttpServletRequest request) throws Exception {
 
 		WorkEffortCostCalc workEffortCostCalcToBeAdded = new WorkEffortCostCalc();
@@ -129,7 +129,7 @@ public class WorkEffortCostCalcController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWorkEffortCostCalc(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WorkEffortCostCalcController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{workEffortCostCalcId}")
+	@GetMapping("/{workEffortCostCalcId}")
 	public ResponseEntity<Object> findById(@PathVariable String workEffortCostCalcId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortCostCalcId", workEffortCostCalcId);
@@ -207,7 +207,7 @@ public class WorkEffortCostCalcController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{workEffortCostCalcId}")
+	@DeleteMapping("/{workEffortCostCalcId}")
 	public ResponseEntity<Object> deleteWorkEffortCostCalcByIdUpdated(@PathVariable String workEffortCostCalcId) throws Exception {
 		DeleteWorkEffortCostCalc command = new DeleteWorkEffortCostCalc(workEffortCostCalcId);
 

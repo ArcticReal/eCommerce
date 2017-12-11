@@ -57,7 +57,7 @@ public class TaxAuthorityCategoryController {
 	 * @return a List with the TaxAuthorityCategorys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findTaxAuthorityCategorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTaxAuthorityCategorysBy query = new FindTaxAuthorityCategorysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class TaxAuthorityCategoryController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createTaxAuthorityCategory(HttpServletRequest request) throws Exception {
 
 		TaxAuthorityCategory taxAuthorityCategoryToBeAdded = new TaxAuthorityCategory();
@@ -129,7 +129,7 @@ public class TaxAuthorityCategoryController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateTaxAuthorityCategory(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class TaxAuthorityCategoryController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{taxAuthorityCategoryId}")
+	@GetMapping("/{taxAuthorityCategoryId}")
 	public ResponseEntity<Object> findById(@PathVariable String taxAuthorityCategoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("taxAuthorityCategoryId", taxAuthorityCategoryId);
@@ -207,7 +207,7 @@ public class TaxAuthorityCategoryController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{taxAuthorityCategoryId}")
+	@DeleteMapping("/{taxAuthorityCategoryId}")
 	public ResponseEntity<Object> deleteTaxAuthorityCategoryByIdUpdated(@PathVariable String taxAuthorityCategoryId) throws Exception {
 		DeleteTaxAuthorityCategory command = new DeleteTaxAuthorityCategory(taxAuthorityCategoryId);
 

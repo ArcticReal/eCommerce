@@ -57,7 +57,7 @@ public class SubscriptionAttributeController {
 	 * @return a List with the SubscriptionAttributes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSubscriptionAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSubscriptionAttributesBy query = new FindSubscriptionAttributesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SubscriptionAttributeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSubscriptionAttribute(HttpServletRequest request) throws Exception {
 
 		SubscriptionAttribute subscriptionAttributeToBeAdded = new SubscriptionAttribute();
@@ -129,7 +129,7 @@ public class SubscriptionAttributeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSubscriptionAttribute(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SubscriptionAttributeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{subscriptionAttributeId}")
+	@GetMapping("/{subscriptionAttributeId}")
 	public ResponseEntity<Object> findById(@PathVariable String subscriptionAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("subscriptionAttributeId", subscriptionAttributeId);
@@ -207,7 +207,7 @@ public class SubscriptionAttributeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{subscriptionAttributeId}")
+	@DeleteMapping("/{subscriptionAttributeId}")
 	public ResponseEntity<Object> deleteSubscriptionAttributeByIdUpdated(@PathVariable String subscriptionAttributeId) throws Exception {
 		DeleteSubscriptionAttribute command = new DeleteSubscriptionAttribute(subscriptionAttributeId);
 

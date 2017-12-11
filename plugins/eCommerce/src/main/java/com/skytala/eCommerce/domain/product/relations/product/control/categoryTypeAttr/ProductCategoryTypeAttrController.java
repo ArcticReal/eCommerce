@@ -57,7 +57,7 @@ public class ProductCategoryTypeAttrController {
 	 * @return a List with the ProductCategoryTypeAttrs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductCategoryTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductCategoryTypeAttrsBy query = new FindProductCategoryTypeAttrsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductCategoryTypeAttrController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductCategoryTypeAttr(HttpServletRequest request) throws Exception {
 
 		ProductCategoryTypeAttr productCategoryTypeAttrToBeAdded = new ProductCategoryTypeAttr();
@@ -129,7 +129,7 @@ public class ProductCategoryTypeAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductCategoryTypeAttr(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductCategoryTypeAttrController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productCategoryTypeAttrId}")
+	@GetMapping("/{productCategoryTypeAttrId}")
 	public ResponseEntity<Object> findById(@PathVariable String productCategoryTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productCategoryTypeAttrId", productCategoryTypeAttrId);
@@ -207,7 +207,7 @@ public class ProductCategoryTypeAttrController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productCategoryTypeAttrId}")
+	@DeleteMapping("/{productCategoryTypeAttrId}")
 	public ResponseEntity<Object> deleteProductCategoryTypeAttrByIdUpdated(@PathVariable String productCategoryTypeAttrId) throws Exception {
 		DeleteProductCategoryTypeAttr command = new DeleteProductCategoryTypeAttr(productCategoryTypeAttrId);
 

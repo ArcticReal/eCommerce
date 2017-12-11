@@ -57,7 +57,7 @@ public class GlReconciliationEntryController {
 	 * @return a List with the GlReconciliationEntrys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findGlReconciliationEntrysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGlReconciliationEntrysBy query = new FindGlReconciliationEntrysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class GlReconciliationEntryController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createGlReconciliationEntry(HttpServletRequest request) throws Exception {
 
 		GlReconciliationEntry glReconciliationEntryToBeAdded = new GlReconciliationEntry();
@@ -129,7 +129,7 @@ public class GlReconciliationEntryController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateGlReconciliationEntry(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class GlReconciliationEntryController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{glReconciliationEntryId}")
+	@GetMapping("/{glReconciliationEntryId}")
 	public ResponseEntity<Object> findById(@PathVariable String glReconciliationEntryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("glReconciliationEntryId", glReconciliationEntryId);
@@ -207,7 +207,7 @@ public class GlReconciliationEntryController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{glReconciliationEntryId}")
+	@DeleteMapping("/{glReconciliationEntryId}")
 	public ResponseEntity<Object> deleteGlReconciliationEntryByIdUpdated(@PathVariable String glReconciliationEntryId) throws Exception {
 		DeleteGlReconciliationEntry command = new DeleteGlReconciliationEntry(glReconciliationEntryId);
 

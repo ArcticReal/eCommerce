@@ -57,7 +57,7 @@ public class AgreementGeographicalApplicController {
 	 * @return a List with the AgreementGeographicalApplics
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findAgreementGeographicalApplicsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAgreementGeographicalApplicsBy query = new FindAgreementGeographicalApplicsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class AgreementGeographicalApplicController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createAgreementGeographicalApplic(HttpServletRequest request) throws Exception {
 
 		AgreementGeographicalApplic agreementGeographicalApplicToBeAdded = new AgreementGeographicalApplic();
@@ -129,7 +129,7 @@ public class AgreementGeographicalApplicController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateAgreementGeographicalApplic(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class AgreementGeographicalApplicController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{agreementGeographicalApplicId}")
+	@GetMapping("/{agreementGeographicalApplicId}")
 	public ResponseEntity<Object> findById(@PathVariable String agreementGeographicalApplicId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("agreementGeographicalApplicId", agreementGeographicalApplicId);
@@ -207,7 +207,7 @@ public class AgreementGeographicalApplicController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{agreementGeographicalApplicId}")
+	@DeleteMapping("/{agreementGeographicalApplicId}")
 	public ResponseEntity<Object> deleteAgreementGeographicalApplicByIdUpdated(@PathVariable String agreementGeographicalApplicId) throws Exception {
 		DeleteAgreementGeographicalApplic command = new DeleteAgreementGeographicalApplic(agreementGeographicalApplicId);
 

@@ -57,7 +57,7 @@ public class ItemIssuanceController {
 	 * @return a List with the ItemIssuances
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findItemIssuancesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindItemIssuancesBy query = new FindItemIssuancesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ItemIssuanceController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createItemIssuance(HttpServletRequest request) throws Exception {
 
 		ItemIssuance itemIssuanceToBeAdded = new ItemIssuance();
@@ -129,7 +129,7 @@ public class ItemIssuanceController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateItemIssuance(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ItemIssuanceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{itemIssuanceId}")
+	@GetMapping("/{itemIssuanceId}")
 	public ResponseEntity<Object> findById(@PathVariable String itemIssuanceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("itemIssuanceId", itemIssuanceId);
@@ -207,7 +207,7 @@ public class ItemIssuanceController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{itemIssuanceId}")
+	@DeleteMapping("/{itemIssuanceId}")
 	public ResponseEntity<Object> deleteItemIssuanceByIdUpdated(@PathVariable String itemIssuanceId) throws Exception {
 		DeleteItemIssuance command = new DeleteItemIssuance(itemIssuanceId);
 

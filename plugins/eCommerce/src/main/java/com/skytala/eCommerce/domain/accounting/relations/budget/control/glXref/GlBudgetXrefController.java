@@ -57,7 +57,7 @@ public class GlBudgetXrefController {
 	 * @return a List with the GlBudgetXrefs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findGlBudgetXrefsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGlBudgetXrefsBy query = new FindGlBudgetXrefsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class GlBudgetXrefController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createGlBudgetXref(HttpServletRequest request) throws Exception {
 
 		GlBudgetXref glBudgetXrefToBeAdded = new GlBudgetXref();
@@ -129,7 +129,7 @@ public class GlBudgetXrefController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateGlBudgetXref(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class GlBudgetXrefController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{glBudgetXrefId}")
+	@GetMapping("/{glBudgetXrefId}")
 	public ResponseEntity<Object> findById(@PathVariable String glBudgetXrefId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("glBudgetXrefId", glBudgetXrefId);
@@ -207,7 +207,7 @@ public class GlBudgetXrefController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{glBudgetXrefId}")
+	@DeleteMapping("/{glBudgetXrefId}")
 	public ResponseEntity<Object> deleteGlBudgetXrefByIdUpdated(@PathVariable String glBudgetXrefId) throws Exception {
 		DeleteGlBudgetXref command = new DeleteGlBudgetXref(glBudgetXrefId);
 

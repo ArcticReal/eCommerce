@@ -57,7 +57,7 @@ public class SubscriptionCommEventController {
 	 * @return a List with the SubscriptionCommEvents
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSubscriptionCommEventsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSubscriptionCommEventsBy query = new FindSubscriptionCommEventsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SubscriptionCommEventController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSubscriptionCommEvent(HttpServletRequest request) throws Exception {
 
 		SubscriptionCommEvent subscriptionCommEventToBeAdded = new SubscriptionCommEvent();
@@ -129,7 +129,7 @@ public class SubscriptionCommEventController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSubscriptionCommEvent(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SubscriptionCommEventController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{subscriptionCommEventId}")
+	@GetMapping("/{subscriptionCommEventId}")
 	public ResponseEntity<Object> findById(@PathVariable String subscriptionCommEventId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("subscriptionCommEventId", subscriptionCommEventId);
@@ -207,7 +207,7 @@ public class SubscriptionCommEventController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{subscriptionCommEventId}")
+	@DeleteMapping("/{subscriptionCommEventId}")
 	public ResponseEntity<Object> deleteSubscriptionCommEventByIdUpdated(@PathVariable String subscriptionCommEventId) throws Exception {
 		DeleteSubscriptionCommEvent command = new DeleteSubscriptionCommEvent(subscriptionCommEventId);
 

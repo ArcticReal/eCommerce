@@ -57,7 +57,7 @@ public class BudgetItemController {
 	 * @return a List with the BudgetItems
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findBudgetItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindBudgetItemsBy query = new FindBudgetItemsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class BudgetItemController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createBudgetItem(HttpServletRequest request) throws Exception {
 
 		BudgetItem budgetItemToBeAdded = new BudgetItem();
@@ -129,7 +129,7 @@ public class BudgetItemController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateBudgetItem(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class BudgetItemController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{budgetItemId}")
+	@GetMapping("/{budgetItemId}")
 	public ResponseEntity<Object> findById(@PathVariable String budgetItemId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("budgetItemId", budgetItemId);
@@ -207,7 +207,7 @@ public class BudgetItemController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{budgetItemId}")
+	@DeleteMapping("/{budgetItemId}")
 	public ResponseEntity<Object> deleteBudgetItemByIdUpdated(@PathVariable String budgetItemId) throws Exception {
 		DeleteBudgetItem command = new DeleteBudgetItem(budgetItemId);
 

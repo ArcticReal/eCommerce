@@ -57,7 +57,7 @@ public class PaymentContentTypeController {
 	 * @return a List with the PaymentContentTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPaymentContentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentContentTypesBy query = new FindPaymentContentTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PaymentContentTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPaymentContentType(HttpServletRequest request) throws Exception {
 
 		PaymentContentType paymentContentTypeToBeAdded = new PaymentContentType();
@@ -129,7 +129,7 @@ public class PaymentContentTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePaymentContentType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PaymentContentTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{paymentContentTypeId}")
+	@GetMapping("/{paymentContentTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String paymentContentTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentContentTypeId", paymentContentTypeId);
@@ -207,7 +207,7 @@ public class PaymentContentTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{paymentContentTypeId}")
+	@DeleteMapping("/{paymentContentTypeId}")
 	public ResponseEntity<Object> deletePaymentContentTypeByIdUpdated(@PathVariable String paymentContentTypeId) throws Exception {
 		DeletePaymentContentType command = new DeletePaymentContentType(paymentContentTypeId);
 

@@ -57,7 +57,7 @@ public class ProductCategoryRollupController {
 	 * @return a List with the ProductCategoryRollups
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductCategoryRollupsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductCategoryRollupsBy query = new FindProductCategoryRollupsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductCategoryRollupController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductCategoryRollup(HttpServletRequest request) throws Exception {
 
 		ProductCategoryRollup productCategoryRollupToBeAdded = new ProductCategoryRollup();
@@ -129,7 +129,7 @@ public class ProductCategoryRollupController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductCategoryRollup(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductCategoryRollupController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productCategoryRollupId}")
+	@GetMapping("/{productCategoryRollupId}")
 	public ResponseEntity<Object> findById(@PathVariable String productCategoryRollupId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productCategoryRollupId", productCategoryRollupId);
@@ -207,7 +207,7 @@ public class ProductCategoryRollupController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productCategoryRollupId}")
+	@DeleteMapping("/{productCategoryRollupId}")
 	public ResponseEntity<Object> deleteProductCategoryRollupByIdUpdated(@PathVariable String productCategoryRollupId) throws Exception {
 		DeleteProductCategoryRollup command = new DeleteProductCategoryRollup(productCategoryRollupId);
 

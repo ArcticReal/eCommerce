@@ -57,7 +57,7 @@ public class ContainerGeoPointController {
 	 * @return a List with the ContainerGeoPoints
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findContainerGeoPointsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContainerGeoPointsBy query = new FindContainerGeoPointsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ContainerGeoPointController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createContainerGeoPoint(HttpServletRequest request) throws Exception {
 
 		ContainerGeoPoint containerGeoPointToBeAdded = new ContainerGeoPoint();
@@ -129,7 +129,7 @@ public class ContainerGeoPointController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateContainerGeoPoint(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ContainerGeoPointController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{containerGeoPointId}")
+	@GetMapping("/{containerGeoPointId}")
 	public ResponseEntity<Object> findById(@PathVariable String containerGeoPointId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("containerGeoPointId", containerGeoPointId);
@@ -207,7 +207,7 @@ public class ContainerGeoPointController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{containerGeoPointId}")
+	@DeleteMapping("/{containerGeoPointId}")
 	public ResponseEntity<Object> deleteContainerGeoPointByIdUpdated(@PathVariable String containerGeoPointId) throws Exception {
 		DeleteContainerGeoPoint command = new DeleteContainerGeoPoint(containerGeoPointId);
 

@@ -57,7 +57,7 @@ public class FinAccountStatusController {
 	 * @return a List with the FinAccountStatuss
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFinAccountStatussBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFinAccountStatussBy query = new FindFinAccountStatussBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FinAccountStatusController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFinAccountStatus(HttpServletRequest request) throws Exception {
 
 		FinAccountStatus finAccountStatusToBeAdded = new FinAccountStatus();
@@ -129,7 +129,7 @@ public class FinAccountStatusController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFinAccountStatus(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FinAccountStatusController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{finAccountStatusId}")
+	@GetMapping("/{finAccountStatusId}")
 	public ResponseEntity<Object> findById(@PathVariable String finAccountStatusId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("finAccountStatusId", finAccountStatusId);
@@ -207,7 +207,7 @@ public class FinAccountStatusController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{finAccountStatusId}")
+	@DeleteMapping("/{finAccountStatusId}")
 	public ResponseEntity<Object> deleteFinAccountStatusByIdUpdated(@PathVariable String finAccountStatusId) throws Exception {
 		DeleteFinAccountStatus command = new DeleteFinAccountStatus(finAccountStatusId);
 

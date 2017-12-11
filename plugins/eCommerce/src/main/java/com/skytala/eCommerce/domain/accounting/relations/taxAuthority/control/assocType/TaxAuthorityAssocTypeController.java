@@ -57,7 +57,7 @@ public class TaxAuthorityAssocTypeController {
 	 * @return a List with the TaxAuthorityAssocTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findTaxAuthorityAssocTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTaxAuthorityAssocTypesBy query = new FindTaxAuthorityAssocTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class TaxAuthorityAssocTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createTaxAuthorityAssocType(HttpServletRequest request) throws Exception {
 
 		TaxAuthorityAssocType taxAuthorityAssocTypeToBeAdded = new TaxAuthorityAssocType();
@@ -129,7 +129,7 @@ public class TaxAuthorityAssocTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateTaxAuthorityAssocType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class TaxAuthorityAssocTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{taxAuthorityAssocTypeId}")
+	@GetMapping("/{taxAuthorityAssocTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String taxAuthorityAssocTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("taxAuthorityAssocTypeId", taxAuthorityAssocTypeId);
@@ -207,7 +207,7 @@ public class TaxAuthorityAssocTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{taxAuthorityAssocTypeId}")
+	@DeleteMapping("/{taxAuthorityAssocTypeId}")
 	public ResponseEntity<Object> deleteTaxAuthorityAssocTypeByIdUpdated(@PathVariable String taxAuthorityAssocTypeId) throws Exception {
 		DeleteTaxAuthorityAssocType command = new DeleteTaxAuthorityAssocType(taxAuthorityAssocTypeId);
 

@@ -57,7 +57,7 @@ public class FinAccountTypeGlAccountController {
 	 * @return a List with the FinAccountTypeGlAccounts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFinAccountTypeGlAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFinAccountTypeGlAccountsBy query = new FindFinAccountTypeGlAccountsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FinAccountTypeGlAccountController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFinAccountTypeGlAccount(HttpServletRequest request) throws Exception {
 
 		FinAccountTypeGlAccount finAccountTypeGlAccountToBeAdded = new FinAccountTypeGlAccount();
@@ -129,7 +129,7 @@ public class FinAccountTypeGlAccountController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFinAccountTypeGlAccount(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FinAccountTypeGlAccountController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{finAccountTypeGlAccountId}")
+	@GetMapping("/{finAccountTypeGlAccountId}")
 	public ResponseEntity<Object> findById(@PathVariable String finAccountTypeGlAccountId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("finAccountTypeGlAccountId", finAccountTypeGlAccountId);
@@ -207,7 +207,7 @@ public class FinAccountTypeGlAccountController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{finAccountTypeGlAccountId}")
+	@DeleteMapping("/{finAccountTypeGlAccountId}")
 	public ResponseEntity<Object> deleteFinAccountTypeGlAccountByIdUpdated(@PathVariable String finAccountTypeGlAccountId) throws Exception {
 		DeleteFinAccountTypeGlAccount command = new DeleteFinAccountTypeGlAccount(finAccountTypeGlAccountId);
 

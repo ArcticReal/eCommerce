@@ -57,7 +57,7 @@ public class PartyCarrierAccountController {
 	 * @return a List with the PartyCarrierAccounts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyCarrierAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyCarrierAccountsBy query = new FindPartyCarrierAccountsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyCarrierAccountController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyCarrierAccount(HttpServletRequest request) throws Exception {
 
 		PartyCarrierAccount partyCarrierAccountToBeAdded = new PartyCarrierAccount();
@@ -129,7 +129,7 @@ public class PartyCarrierAccountController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyCarrierAccount(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyCarrierAccountController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyCarrierAccountId}")
+	@GetMapping("/{partyCarrierAccountId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyCarrierAccountId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyCarrierAccountId", partyCarrierAccountId);
@@ -207,7 +207,7 @@ public class PartyCarrierAccountController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyCarrierAccountId}")
+	@DeleteMapping("/{partyCarrierAccountId}")
 	public ResponseEntity<Object> deletePartyCarrierAccountByIdUpdated(@PathVariable String partyCarrierAccountId) throws Exception {
 		DeletePartyCarrierAccount command = new DeletePartyCarrierAccount(partyCarrierAccountId);
 

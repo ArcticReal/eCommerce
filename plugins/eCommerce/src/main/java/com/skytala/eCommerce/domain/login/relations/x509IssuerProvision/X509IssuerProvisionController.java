@@ -57,7 +57,7 @@ public class X509IssuerProvisionController {
 	 * @return a List with the X509IssuerProvisions
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findX509IssuerProvisionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindX509IssuerProvisionsBy query = new FindX509IssuerProvisionsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class X509IssuerProvisionController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createX509IssuerProvision(HttpServletRequest request) throws Exception {
 
 		X509IssuerProvision x509IssuerProvisionToBeAdded = new X509IssuerProvision();
@@ -129,7 +129,7 @@ public class X509IssuerProvisionController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateX509IssuerProvision(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class X509IssuerProvisionController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{x509IssuerProvisionId}")
+	@GetMapping("/{x509IssuerProvisionId}")
 	public ResponseEntity<Object> findById(@PathVariable String x509IssuerProvisionId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("x509IssuerProvisionId", x509IssuerProvisionId);
@@ -207,7 +207,7 @@ public class X509IssuerProvisionController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{x509IssuerProvisionId}")
+	@DeleteMapping("/{x509IssuerProvisionId}")
 	public ResponseEntity<Object> deleteX509IssuerProvisionByIdUpdated(@PathVariable String x509IssuerProvisionId) throws Exception {
 		DeleteX509IssuerProvision command = new DeleteX509IssuerProvision(x509IssuerProvisionId);
 

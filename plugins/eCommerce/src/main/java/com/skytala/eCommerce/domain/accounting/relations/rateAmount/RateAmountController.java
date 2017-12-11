@@ -57,7 +57,7 @@ public class RateAmountController {
 	 * @return a List with the RateAmounts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findRateAmountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindRateAmountsBy query = new FindRateAmountsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class RateAmountController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createRateAmount(HttpServletRequest request) throws Exception {
 
 		RateAmount rateAmountToBeAdded = new RateAmount();
@@ -129,7 +129,7 @@ public class RateAmountController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateRateAmount(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class RateAmountController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{rateAmountId}")
+	@GetMapping("/{rateAmountId}")
 	public ResponseEntity<Object> findById(@PathVariable String rateAmountId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("rateAmountId", rateAmountId);
@@ -207,7 +207,7 @@ public class RateAmountController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{rateAmountId}")
+	@DeleteMapping("/{rateAmountId}")
 	public ResponseEntity<Object> deleteRateAmountByIdUpdated(@PathVariable String rateAmountId) throws Exception {
 		DeleteRateAmount command = new DeleteRateAmount(rateAmountId);
 

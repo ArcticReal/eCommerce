@@ -57,7 +57,7 @@ public class ContentPurposeController {
 	 * @return a List with the ContentPurposes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findContentPurposesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContentPurposesBy query = new FindContentPurposesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ContentPurposeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createContentPurpose(HttpServletRequest request) throws Exception {
 
 		ContentPurpose contentPurposeToBeAdded = new ContentPurpose();
@@ -129,7 +129,7 @@ public class ContentPurposeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateContentPurpose(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ContentPurposeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{contentPurposeId}")
+	@GetMapping("/{contentPurposeId}")
 	public ResponseEntity<Object> findById(@PathVariable String contentPurposeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contentPurposeId", contentPurposeId);
@@ -207,7 +207,7 @@ public class ContentPurposeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{contentPurposeId}")
+	@DeleteMapping("/{contentPurposeId}")
 	public ResponseEntity<Object> deleteContentPurposeByIdUpdated(@PathVariable String contentPurposeId) throws Exception {
 		DeleteContentPurpose command = new DeleteContentPurpose(contentPurposeId);
 

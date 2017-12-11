@@ -57,7 +57,7 @@ public class ReturnContactMechController {
 	 * @return a List with the ReturnContactMechs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findReturnContactMechsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindReturnContactMechsBy query = new FindReturnContactMechsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ReturnContactMechController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createReturnContactMech(HttpServletRequest request) throws Exception {
 
 		ReturnContactMech returnContactMechToBeAdded = new ReturnContactMech();
@@ -129,7 +129,7 @@ public class ReturnContactMechController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateReturnContactMech(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ReturnContactMechController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{returnContactMechId}")
+	@GetMapping("/{returnContactMechId}")
 	public ResponseEntity<Object> findById(@PathVariable String returnContactMechId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("returnContactMechId", returnContactMechId);
@@ -207,7 +207,7 @@ public class ReturnContactMechController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{returnContactMechId}")
+	@DeleteMapping("/{returnContactMechId}")
 	public ResponseEntity<Object> deleteReturnContactMechByIdUpdated(@PathVariable String returnContactMechId) throws Exception {
 		DeleteReturnContactMech command = new DeleteReturnContactMech(returnContactMechId);
 

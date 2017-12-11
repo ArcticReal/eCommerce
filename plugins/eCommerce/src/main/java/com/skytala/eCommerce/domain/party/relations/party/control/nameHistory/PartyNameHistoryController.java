@@ -57,7 +57,7 @@ public class PartyNameHistoryController {
 	 * @return a List with the PartyNameHistorys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyNameHistorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyNameHistorysBy query = new FindPartyNameHistorysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyNameHistoryController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyNameHistory(HttpServletRequest request) throws Exception {
 
 		PartyNameHistory partyNameHistoryToBeAdded = new PartyNameHistory();
@@ -129,7 +129,7 @@ public class PartyNameHistoryController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyNameHistory(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyNameHistoryController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyNameHistoryId}")
+	@GetMapping("/{partyNameHistoryId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyNameHistoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyNameHistoryId", partyNameHistoryId);
@@ -207,7 +207,7 @@ public class PartyNameHistoryController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyNameHistoryId}")
+	@DeleteMapping("/{partyNameHistoryId}")
 	public ResponseEntity<Object> deletePartyNameHistoryByIdUpdated(@PathVariable String partyNameHistoryId) throws Exception {
 		DeletePartyNameHistory command = new DeletePartyNameHistory(partyNameHistoryId);
 

@@ -57,7 +57,7 @@ public class PartyStatusController {
 	 * @return a List with the PartyStatuss
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyStatussBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyStatussBy query = new FindPartyStatussBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyStatusController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyStatus(HttpServletRequest request) throws Exception {
 
 		PartyStatus partyStatusToBeAdded = new PartyStatus();
@@ -129,7 +129,7 @@ public class PartyStatusController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyStatus(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyStatusController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyStatusId}")
+	@GetMapping("/{partyStatusId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyStatusId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyStatusId", partyStatusId);
@@ -207,7 +207,7 @@ public class PartyStatusController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyStatusId}")
+	@DeleteMapping("/{partyStatusId}")
 	public ResponseEntity<Object> deletePartyStatusByIdUpdated(@PathVariable String partyStatusId) throws Exception {
 		DeletePartyStatus command = new DeletePartyStatus(partyStatusId);
 

@@ -57,7 +57,7 @@ public class FixedAssetDepMethodController {
 	 * @return a List with the FixedAssetDepMethods
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFixedAssetDepMethodsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFixedAssetDepMethodsBy query = new FindFixedAssetDepMethodsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FixedAssetDepMethodController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFixedAssetDepMethod(HttpServletRequest request) throws Exception {
 
 		FixedAssetDepMethod fixedAssetDepMethodToBeAdded = new FixedAssetDepMethod();
@@ -129,7 +129,7 @@ public class FixedAssetDepMethodController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFixedAssetDepMethod(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FixedAssetDepMethodController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{fixedAssetDepMethodId}")
+	@GetMapping("/{fixedAssetDepMethodId}")
 	public ResponseEntity<Object> findById(@PathVariable String fixedAssetDepMethodId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("fixedAssetDepMethodId", fixedAssetDepMethodId);
@@ -207,7 +207,7 @@ public class FixedAssetDepMethodController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{fixedAssetDepMethodId}")
+	@DeleteMapping("/{fixedAssetDepMethodId}")
 	public ResponseEntity<Object> deleteFixedAssetDepMethodByIdUpdated(@PathVariable String fixedAssetDepMethodId) throws Exception {
 		DeleteFixedAssetDepMethod command = new DeleteFixedAssetDepMethod(fixedAssetDepMethodId);
 

@@ -57,7 +57,7 @@ public class ProductCostComponentCalcController {
 	 * @return a List with the ProductCostComponentCalcs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductCostComponentCalcsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductCostComponentCalcsBy query = new FindProductCostComponentCalcsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductCostComponentCalcController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductCostComponentCalc(HttpServletRequest request) throws Exception {
 
 		ProductCostComponentCalc productCostComponentCalcToBeAdded = new ProductCostComponentCalc();
@@ -129,7 +129,7 @@ public class ProductCostComponentCalcController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductCostComponentCalc(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductCostComponentCalcController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productCostComponentCalcId}")
+	@GetMapping("/{productCostComponentCalcId}")
 	public ResponseEntity<Object> findById(@PathVariable String productCostComponentCalcId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productCostComponentCalcId", productCostComponentCalcId);
@@ -207,7 +207,7 @@ public class ProductCostComponentCalcController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productCostComponentCalcId}")
+	@DeleteMapping("/{productCostComponentCalcId}")
 	public ResponseEntity<Object> deleteProductCostComponentCalcByIdUpdated(@PathVariable String productCostComponentCalcId) throws Exception {
 		DeleteProductCostComponentCalc command = new DeleteProductCostComponentCalc(productCostComponentCalcId);
 

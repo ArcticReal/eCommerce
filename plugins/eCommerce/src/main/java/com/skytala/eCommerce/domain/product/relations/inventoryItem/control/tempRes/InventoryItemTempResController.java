@@ -57,7 +57,7 @@ public class InventoryItemTempResController {
 	 * @return a List with the InventoryItemTempRess
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findInventoryItemTempRessBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInventoryItemTempRessBy query = new FindInventoryItemTempRessBy(allRequestParams);
@@ -83,7 +83,7 @@ public class InventoryItemTempResController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createInventoryItemTempRes(HttpServletRequest request) throws Exception {
 
 		InventoryItemTempRes inventoryItemTempResToBeAdded = new InventoryItemTempRes();
@@ -129,7 +129,7 @@ public class InventoryItemTempResController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateInventoryItemTempRes(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class InventoryItemTempResController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{inventoryItemTempResId}")
+	@GetMapping("/{inventoryItemTempResId}")
 	public ResponseEntity<Object> findById(@PathVariable String inventoryItemTempResId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("inventoryItemTempResId", inventoryItemTempResId);
@@ -207,7 +207,7 @@ public class InventoryItemTempResController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{inventoryItemTempResId}")
+	@DeleteMapping("/{inventoryItemTempResId}")
 	public ResponseEntity<Object> deleteInventoryItemTempResByIdUpdated(@PathVariable String inventoryItemTempResId) throws Exception {
 		DeleteInventoryItemTempRes command = new DeleteInventoryItemTempRes(inventoryItemTempResId);
 

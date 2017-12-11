@@ -57,7 +57,7 @@ public class SupplierRatingTypeController {
 	 * @return a List with the SupplierRatingTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSupplierRatingTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSupplierRatingTypesBy query = new FindSupplierRatingTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SupplierRatingTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSupplierRatingType(HttpServletRequest request) throws Exception {
 
 		SupplierRatingType supplierRatingTypeToBeAdded = new SupplierRatingType();
@@ -129,7 +129,7 @@ public class SupplierRatingTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSupplierRatingType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SupplierRatingTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{supplierRatingTypeId}")
+	@GetMapping("/{supplierRatingTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String supplierRatingTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("supplierRatingTypeId", supplierRatingTypeId);
@@ -207,7 +207,7 @@ public class SupplierRatingTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{supplierRatingTypeId}")
+	@DeleteMapping("/{supplierRatingTypeId}")
 	public ResponseEntity<Object> deleteSupplierRatingTypeByIdUpdated(@PathVariable String supplierRatingTypeId) throws Exception {
 		DeleteSupplierRatingType command = new DeleteSupplierRatingType(supplierRatingTypeId);
 

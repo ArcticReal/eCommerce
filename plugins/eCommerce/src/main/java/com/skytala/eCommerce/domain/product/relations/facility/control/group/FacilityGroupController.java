@@ -57,7 +57,7 @@ public class FacilityGroupController {
 	 * @return a List with the FacilityGroups
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFacilityGroupsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFacilityGroupsBy query = new FindFacilityGroupsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FacilityGroupController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFacilityGroup(HttpServletRequest request) throws Exception {
 
 		FacilityGroup facilityGroupToBeAdded = new FacilityGroup();
@@ -129,7 +129,7 @@ public class FacilityGroupController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFacilityGroup(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FacilityGroupController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{facilityGroupId}")
+	@GetMapping("/{facilityGroupId}")
 	public ResponseEntity<Object> findById(@PathVariable String facilityGroupId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("facilityGroupId", facilityGroupId);
@@ -207,7 +207,7 @@ public class FacilityGroupController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{facilityGroupId}")
+	@DeleteMapping("/{facilityGroupId}")
 	public ResponseEntity<Object> deleteFacilityGroupByIdUpdated(@PathVariable String facilityGroupId) throws Exception {
 		DeleteFacilityGroup command = new DeleteFacilityGroup(facilityGroupId);
 

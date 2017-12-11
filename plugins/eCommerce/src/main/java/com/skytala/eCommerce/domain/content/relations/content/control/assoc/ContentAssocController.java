@@ -57,7 +57,7 @@ public class ContentAssocController {
 	 * @return a List with the ContentAssocs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findContentAssocsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContentAssocsBy query = new FindContentAssocsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ContentAssocController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createContentAssoc(HttpServletRequest request) throws Exception {
 
 		ContentAssoc contentAssocToBeAdded = new ContentAssoc();
@@ -129,7 +129,7 @@ public class ContentAssocController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateContentAssoc(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ContentAssocController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{contentAssocId}")
+	@GetMapping("/{contentAssocId}")
 	public ResponseEntity<Object> findById(@PathVariable String contentAssocId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contentAssocId", contentAssocId);
@@ -207,7 +207,7 @@ public class ContentAssocController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{contentAssocId}")
+	@DeleteMapping("/{contentAssocId}")
 	public ResponseEntity<Object> deleteContentAssocByIdUpdated(@PathVariable String contentAssocId) throws Exception {
 		DeleteContentAssoc command = new DeleteContentAssoc(contentAssocId);
 

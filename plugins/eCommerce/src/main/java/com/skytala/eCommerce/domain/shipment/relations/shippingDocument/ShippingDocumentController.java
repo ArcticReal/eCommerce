@@ -57,7 +57,7 @@ public class ShippingDocumentController {
 	 * @return a List with the ShippingDocuments
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findShippingDocumentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShippingDocumentsBy query = new FindShippingDocumentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ShippingDocumentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createShippingDocument(HttpServletRequest request) throws Exception {
 
 		ShippingDocument shippingDocumentToBeAdded = new ShippingDocument();
@@ -129,7 +129,7 @@ public class ShippingDocumentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateShippingDocument(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ShippingDocumentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{shippingDocumentId}")
+	@GetMapping("/{shippingDocumentId}")
 	public ResponseEntity<Object> findById(@PathVariable String shippingDocumentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shippingDocumentId", shippingDocumentId);
@@ -207,7 +207,7 @@ public class ShippingDocumentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{shippingDocumentId}")
+	@DeleteMapping("/{shippingDocumentId}")
 	public ResponseEntity<Object> deleteShippingDocumentByIdUpdated(@PathVariable String shippingDocumentId) throws Exception {
 		DeleteShippingDocument command = new DeleteShippingDocument(shippingDocumentId);
 

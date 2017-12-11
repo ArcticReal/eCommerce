@@ -57,7 +57,7 @@ public class PaymentGroupTypeController {
 	 * @return a List with the PaymentGroupTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPaymentGroupTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentGroupTypesBy query = new FindPaymentGroupTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PaymentGroupTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPaymentGroupType(HttpServletRequest request) throws Exception {
 
 		PaymentGroupType paymentGroupTypeToBeAdded = new PaymentGroupType();
@@ -129,7 +129,7 @@ public class PaymentGroupTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePaymentGroupType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PaymentGroupTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{paymentGroupTypeId}")
+	@GetMapping("/{paymentGroupTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String paymentGroupTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentGroupTypeId", paymentGroupTypeId);
@@ -207,7 +207,7 @@ public class PaymentGroupTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{paymentGroupTypeId}")
+	@DeleteMapping("/{paymentGroupTypeId}")
 	public ResponseEntity<Object> deletePaymentGroupTypeByIdUpdated(@PathVariable String paymentGroupTypeId) throws Exception {
 		DeletePaymentGroupType command = new DeletePaymentGroupType(paymentGroupTypeId);
 

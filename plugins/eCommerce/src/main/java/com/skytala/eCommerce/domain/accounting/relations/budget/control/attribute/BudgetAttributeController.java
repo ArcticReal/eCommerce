@@ -57,7 +57,7 @@ public class BudgetAttributeController {
 	 * @return a List with the BudgetAttributes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findBudgetAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindBudgetAttributesBy query = new FindBudgetAttributesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class BudgetAttributeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createBudgetAttribute(HttpServletRequest request) throws Exception {
 
 		BudgetAttribute budgetAttributeToBeAdded = new BudgetAttribute();
@@ -129,7 +129,7 @@ public class BudgetAttributeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateBudgetAttribute(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class BudgetAttributeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{budgetAttributeId}")
+	@GetMapping("/{budgetAttributeId}")
 	public ResponseEntity<Object> findById(@PathVariable String budgetAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("budgetAttributeId", budgetAttributeId);
@@ -207,7 +207,7 @@ public class BudgetAttributeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{budgetAttributeId}")
+	@DeleteMapping("/{budgetAttributeId}")
 	public ResponseEntity<Object> deleteBudgetAttributeByIdUpdated(@PathVariable String budgetAttributeId) throws Exception {
 		DeleteBudgetAttribute command = new DeleteBudgetAttribute(budgetAttributeId);
 

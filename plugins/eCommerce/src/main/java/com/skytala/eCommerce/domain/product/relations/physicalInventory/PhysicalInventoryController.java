@@ -57,7 +57,7 @@ public class PhysicalInventoryController {
 	 * @return a List with the PhysicalInventorys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPhysicalInventorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPhysicalInventorysBy query = new FindPhysicalInventorysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PhysicalInventoryController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPhysicalInventory(HttpServletRequest request) throws Exception {
 
 		PhysicalInventory physicalInventoryToBeAdded = new PhysicalInventory();
@@ -129,7 +129,7 @@ public class PhysicalInventoryController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePhysicalInventory(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PhysicalInventoryController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{physicalInventoryId}")
+	@GetMapping("/{physicalInventoryId}")
 	public ResponseEntity<Object> findById(@PathVariable String physicalInventoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("physicalInventoryId", physicalInventoryId);
@@ -207,7 +207,7 @@ public class PhysicalInventoryController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{physicalInventoryId}")
+	@DeleteMapping("/{physicalInventoryId}")
 	public ResponseEntity<Object> deletePhysicalInventoryByIdUpdated(@PathVariable String physicalInventoryId) throws Exception {
 		DeletePhysicalInventory command = new DeletePhysicalInventory(physicalInventoryId);
 

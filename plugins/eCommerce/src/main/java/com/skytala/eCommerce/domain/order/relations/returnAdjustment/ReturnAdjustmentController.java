@@ -57,7 +57,7 @@ public class ReturnAdjustmentController {
 	 * @return a List with the ReturnAdjustments
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findReturnAdjustmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindReturnAdjustmentsBy query = new FindReturnAdjustmentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ReturnAdjustmentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createReturnAdjustment(HttpServletRequest request) throws Exception {
 
 		ReturnAdjustment returnAdjustmentToBeAdded = new ReturnAdjustment();
@@ -129,7 +129,7 @@ public class ReturnAdjustmentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateReturnAdjustment(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ReturnAdjustmentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{returnAdjustmentId}")
+	@GetMapping("/{returnAdjustmentId}")
 	public ResponseEntity<Object> findById(@PathVariable String returnAdjustmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("returnAdjustmentId", returnAdjustmentId);
@@ -207,7 +207,7 @@ public class ReturnAdjustmentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{returnAdjustmentId}")
+	@DeleteMapping("/{returnAdjustmentId}")
 	public ResponseEntity<Object> deleteReturnAdjustmentByIdUpdated(@PathVariable String returnAdjustmentId) throws Exception {
 		DeleteReturnAdjustment command = new DeleteReturnAdjustment(returnAdjustmentId);
 

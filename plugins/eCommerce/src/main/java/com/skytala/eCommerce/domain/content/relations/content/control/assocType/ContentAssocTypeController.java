@@ -57,7 +57,7 @@ public class ContentAssocTypeController {
 	 * @return a List with the ContentAssocTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findContentAssocTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContentAssocTypesBy query = new FindContentAssocTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ContentAssocTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createContentAssocType(HttpServletRequest request) throws Exception {
 
 		ContentAssocType contentAssocTypeToBeAdded = new ContentAssocType();
@@ -129,7 +129,7 @@ public class ContentAssocTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateContentAssocType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ContentAssocTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{contentAssocTypeId}")
+	@GetMapping("/{contentAssocTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String contentAssocTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contentAssocTypeId", contentAssocTypeId);
@@ -207,7 +207,7 @@ public class ContentAssocTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{contentAssocTypeId}")
+	@DeleteMapping("/{contentAssocTypeId}")
 	public ResponseEntity<Object> deleteContentAssocTypeByIdUpdated(@PathVariable String contentAssocTypeId) throws Exception {
 		DeleteContentAssocType command = new DeleteContentAssocType(contentAssocTypeId);
 

@@ -57,7 +57,7 @@ public class ShipmentItemBillingController {
 	 * @return a List with the ShipmentItemBillings
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findShipmentItemBillingsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentItemBillingsBy query = new FindShipmentItemBillingsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ShipmentItemBillingController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createShipmentItemBilling(HttpServletRequest request) throws Exception {
 
 		ShipmentItemBilling shipmentItemBillingToBeAdded = new ShipmentItemBilling();
@@ -129,7 +129,7 @@ public class ShipmentItemBillingController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateShipmentItemBilling(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ShipmentItemBillingController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{shipmentItemBillingId}")
+	@GetMapping("/{shipmentItemBillingId}")
 	public ResponseEntity<Object> findById(@PathVariable String shipmentItemBillingId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentItemBillingId", shipmentItemBillingId);
@@ -207,7 +207,7 @@ public class ShipmentItemBillingController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{shipmentItemBillingId}")
+	@DeleteMapping("/{shipmentItemBillingId}")
 	public ResponseEntity<Object> deleteShipmentItemBillingByIdUpdated(@PathVariable String shipmentItemBillingId) throws Exception {
 		DeleteShipmentItemBilling command = new DeleteShipmentItemBilling(shipmentItemBillingId);
 

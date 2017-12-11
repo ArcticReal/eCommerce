@@ -57,7 +57,7 @@ public class PartyTaxAuthInfoController {
 	 * @return a List with the PartyTaxAuthInfos
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyTaxAuthInfosBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyTaxAuthInfosBy query = new FindPartyTaxAuthInfosBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyTaxAuthInfoController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyTaxAuthInfo(HttpServletRequest request) throws Exception {
 
 		PartyTaxAuthInfo partyTaxAuthInfoToBeAdded = new PartyTaxAuthInfo();
@@ -129,7 +129,7 @@ public class PartyTaxAuthInfoController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyTaxAuthInfo(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyTaxAuthInfoController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyTaxAuthInfoId}")
+	@GetMapping("/{partyTaxAuthInfoId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyTaxAuthInfoId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyTaxAuthInfoId", partyTaxAuthInfoId);
@@ -207,7 +207,7 @@ public class PartyTaxAuthInfoController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyTaxAuthInfoId}")
+	@DeleteMapping("/{partyTaxAuthInfoId}")
 	public ResponseEntity<Object> deletePartyTaxAuthInfoByIdUpdated(@PathVariable String partyTaxAuthInfoId) throws Exception {
 		DeletePartyTaxAuthInfo command = new DeletePartyTaxAuthInfo(partyTaxAuthInfoId);
 

@@ -57,7 +57,7 @@ public class PostalAddressBoundaryController {
 	 * @return a List with the PostalAddressBoundarys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPostalAddressBoundarysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPostalAddressBoundarysBy query = new FindPostalAddressBoundarysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PostalAddressBoundaryController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPostalAddressBoundary(HttpServletRequest request) throws Exception {
 
 		PostalAddressBoundary postalAddressBoundaryToBeAdded = new PostalAddressBoundary();
@@ -129,7 +129,7 @@ public class PostalAddressBoundaryController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePostalAddressBoundary(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PostalAddressBoundaryController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{postalAddressBoundaryId}")
+	@GetMapping("/{postalAddressBoundaryId}")
 	public ResponseEntity<Object> findById(@PathVariable String postalAddressBoundaryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("postalAddressBoundaryId", postalAddressBoundaryId);
@@ -207,7 +207,7 @@ public class PostalAddressBoundaryController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{postalAddressBoundaryId}")
+	@DeleteMapping("/{postalAddressBoundaryId}")
 	public ResponseEntity<Object> deletePostalAddressBoundaryByIdUpdated(@PathVariable String postalAddressBoundaryId) throws Exception {
 		DeletePostalAddressBoundary command = new DeletePostalAddressBoundary(postalAddressBoundaryId);
 

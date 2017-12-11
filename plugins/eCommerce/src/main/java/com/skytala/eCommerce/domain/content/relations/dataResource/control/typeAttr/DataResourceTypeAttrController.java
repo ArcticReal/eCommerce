@@ -57,7 +57,7 @@ public class DataResourceTypeAttrController {
 	 * @return a List with the DataResourceTypeAttrs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findDataResourceTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDataResourceTypeAttrsBy query = new FindDataResourceTypeAttrsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class DataResourceTypeAttrController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createDataResourceTypeAttr(HttpServletRequest request) throws Exception {
 
 		DataResourceTypeAttr dataResourceTypeAttrToBeAdded = new DataResourceTypeAttr();
@@ -129,7 +129,7 @@ public class DataResourceTypeAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateDataResourceTypeAttr(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class DataResourceTypeAttrController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{dataResourceTypeAttrId}")
+	@GetMapping("/{dataResourceTypeAttrId}")
 	public ResponseEntity<Object> findById(@PathVariable String dataResourceTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("dataResourceTypeAttrId", dataResourceTypeAttrId);
@@ -207,7 +207,7 @@ public class DataResourceTypeAttrController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{dataResourceTypeAttrId}")
+	@DeleteMapping("/{dataResourceTypeAttrId}")
 	public ResponseEntity<Object> deleteDataResourceTypeAttrByIdUpdated(@PathVariable String dataResourceTypeAttrId) throws Exception {
 		DeleteDataResourceTypeAttr command = new DeleteDataResourceTypeAttr(dataResourceTypeAttrId);
 

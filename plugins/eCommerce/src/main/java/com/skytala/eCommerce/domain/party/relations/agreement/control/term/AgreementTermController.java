@@ -57,7 +57,7 @@ public class AgreementTermController {
 	 * @return a List with the AgreementTerms
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findAgreementTermsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAgreementTermsBy query = new FindAgreementTermsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class AgreementTermController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createAgreementTerm(HttpServletRequest request) throws Exception {
 
 		AgreementTerm agreementTermToBeAdded = new AgreementTerm();
@@ -129,7 +129,7 @@ public class AgreementTermController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateAgreementTerm(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class AgreementTermController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{agreementTermId}")
+	@GetMapping("/{agreementTermId}")
 	public ResponseEntity<Object> findById(@PathVariable String agreementTermId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("agreementTermId", agreementTermId);
@@ -207,7 +207,7 @@ public class AgreementTermController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{agreementTermId}")
+	@DeleteMapping("/{agreementTermId}")
 	public ResponseEntity<Object> deleteAgreementTermByIdUpdated(@PathVariable String agreementTermId) throws Exception {
 		DeleteAgreementTerm command = new DeleteAgreementTerm(agreementTermId);
 

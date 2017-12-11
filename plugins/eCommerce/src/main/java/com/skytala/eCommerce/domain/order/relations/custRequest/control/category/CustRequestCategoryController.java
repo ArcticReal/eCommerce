@@ -57,7 +57,7 @@ public class CustRequestCategoryController {
 	 * @return a List with the CustRequestCategorys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findCustRequestCategorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCustRequestCategorysBy query = new FindCustRequestCategorysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class CustRequestCategoryController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createCustRequestCategory(HttpServletRequest request) throws Exception {
 
 		CustRequestCategory custRequestCategoryToBeAdded = new CustRequestCategory();
@@ -129,7 +129,7 @@ public class CustRequestCategoryController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateCustRequestCategory(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class CustRequestCategoryController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{custRequestCategoryId}")
+	@GetMapping("/{custRequestCategoryId}")
 	public ResponseEntity<Object> findById(@PathVariable String custRequestCategoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("custRequestCategoryId", custRequestCategoryId);
@@ -207,7 +207,7 @@ public class CustRequestCategoryController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{custRequestCategoryId}")
+	@DeleteMapping("/{custRequestCategoryId}")
 	public ResponseEntity<Object> deleteCustRequestCategoryByIdUpdated(@PathVariable String custRequestCategoryId) throws Exception {
 		DeleteCustRequestCategory command = new DeleteCustRequestCategory(custRequestCategoryId);
 

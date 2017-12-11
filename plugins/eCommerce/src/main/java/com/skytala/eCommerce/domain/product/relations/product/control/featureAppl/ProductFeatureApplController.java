@@ -57,7 +57,7 @@ public class ProductFeatureApplController {
 	 * @return a List with the ProductFeatureAppls
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductFeatureApplsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductFeatureApplsBy query = new FindProductFeatureApplsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductFeatureApplController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductFeatureAppl(HttpServletRequest request) throws Exception {
 
 		ProductFeatureAppl productFeatureApplToBeAdded = new ProductFeatureAppl();
@@ -129,7 +129,7 @@ public class ProductFeatureApplController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductFeatureAppl(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductFeatureApplController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productFeatureApplId}")
+	@GetMapping("/{productFeatureApplId}")
 	public ResponseEntity<Object> findById(@PathVariable String productFeatureApplId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productFeatureApplId", productFeatureApplId);
@@ -207,7 +207,7 @@ public class ProductFeatureApplController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productFeatureApplId}")
+	@DeleteMapping("/{productFeatureApplId}")
 	public ResponseEntity<Object> deleteProductFeatureApplByIdUpdated(@PathVariable String productFeatureApplId) throws Exception {
 		DeleteProductFeatureAppl command = new DeleteProductFeatureAppl(productFeatureApplId);
 

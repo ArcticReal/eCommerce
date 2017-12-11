@@ -57,7 +57,7 @@ public class GlAccountGroupMemberController {
 	 * @return a List with the GlAccountGroupMembers
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findGlAccountGroupMembersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGlAccountGroupMembersBy query = new FindGlAccountGroupMembersBy(allRequestParams);
@@ -83,7 +83,7 @@ public class GlAccountGroupMemberController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createGlAccountGroupMember(HttpServletRequest request) throws Exception {
 
 		GlAccountGroupMember glAccountGroupMemberToBeAdded = new GlAccountGroupMember();
@@ -129,7 +129,7 @@ public class GlAccountGroupMemberController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateGlAccountGroupMember(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class GlAccountGroupMemberController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{glAccountGroupMemberId}")
+	@GetMapping("/{glAccountGroupMemberId}")
 	public ResponseEntity<Object> findById(@PathVariable String glAccountGroupMemberId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("glAccountGroupMemberId", glAccountGroupMemberId);
@@ -207,7 +207,7 @@ public class GlAccountGroupMemberController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{glAccountGroupMemberId}")
+	@DeleteMapping("/{glAccountGroupMemberId}")
 	public ResponseEntity<Object> deleteGlAccountGroupMemberByIdUpdated(@PathVariable String glAccountGroupMemberId) throws Exception {
 		DeleteGlAccountGroupMember command = new DeleteGlAccountGroupMember(glAccountGroupMemberId);
 

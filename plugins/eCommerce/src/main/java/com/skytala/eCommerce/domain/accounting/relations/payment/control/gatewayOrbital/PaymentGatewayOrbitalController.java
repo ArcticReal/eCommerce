@@ -57,7 +57,7 @@ public class PaymentGatewayOrbitalController {
 	 * @return a List with the PaymentGatewayOrbitals
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPaymentGatewayOrbitalsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentGatewayOrbitalsBy query = new FindPaymentGatewayOrbitalsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PaymentGatewayOrbitalController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPaymentGatewayOrbital(HttpServletRequest request) throws Exception {
 
 		PaymentGatewayOrbital paymentGatewayOrbitalToBeAdded = new PaymentGatewayOrbital();
@@ -129,7 +129,7 @@ public class PaymentGatewayOrbitalController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePaymentGatewayOrbital(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PaymentGatewayOrbitalController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{paymentGatewayOrbitalId}")
+	@GetMapping("/{paymentGatewayOrbitalId}")
 	public ResponseEntity<Object> findById(@PathVariable String paymentGatewayOrbitalId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentGatewayOrbitalId", paymentGatewayOrbitalId);
@@ -207,7 +207,7 @@ public class PaymentGatewayOrbitalController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{paymentGatewayOrbitalId}")
+	@DeleteMapping("/{paymentGatewayOrbitalId}")
 	public ResponseEntity<Object> deletePaymentGatewayOrbitalByIdUpdated(@PathVariable String paymentGatewayOrbitalId) throws Exception {
 		DeletePaymentGatewayOrbital command = new DeletePaymentGatewayOrbital(paymentGatewayOrbitalId);
 

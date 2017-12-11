@@ -57,7 +57,7 @@ public class DataResourceMetaDataController {
 	 * @return a List with the DataResourceMetaDatas
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findDataResourceMetaDatasBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDataResourceMetaDatasBy query = new FindDataResourceMetaDatasBy(allRequestParams);
@@ -83,7 +83,7 @@ public class DataResourceMetaDataController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createDataResourceMetaData(HttpServletRequest request) throws Exception {
 
 		DataResourceMetaData dataResourceMetaDataToBeAdded = new DataResourceMetaData();
@@ -129,7 +129,7 @@ public class DataResourceMetaDataController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateDataResourceMetaData(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class DataResourceMetaDataController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{dataResourceMetaDataId}")
+	@GetMapping("/{dataResourceMetaDataId}")
 	public ResponseEntity<Object> findById(@PathVariable String dataResourceMetaDataId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("dataResourceMetaDataId", dataResourceMetaDataId);
@@ -207,7 +207,7 @@ public class DataResourceMetaDataController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{dataResourceMetaDataId}")
+	@DeleteMapping("/{dataResourceMetaDataId}")
 	public ResponseEntity<Object> deleteDataResourceMetaDataByIdUpdated(@PathVariable String dataResourceMetaDataId) throws Exception {
 		DeleteDataResourceMetaData command = new DeleteDataResourceMetaData(dataResourceMetaDataId);
 

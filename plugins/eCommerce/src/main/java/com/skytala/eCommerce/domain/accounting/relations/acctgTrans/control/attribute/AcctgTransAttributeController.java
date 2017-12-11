@@ -57,7 +57,7 @@ public class AcctgTransAttributeController {
 	 * @return a List with the AcctgTransAttributes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findAcctgTransAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAcctgTransAttributesBy query = new FindAcctgTransAttributesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class AcctgTransAttributeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createAcctgTransAttribute(HttpServletRequest request) throws Exception {
 
 		AcctgTransAttribute acctgTransAttributeToBeAdded = new AcctgTransAttribute();
@@ -129,7 +129,7 @@ public class AcctgTransAttributeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateAcctgTransAttribute(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class AcctgTransAttributeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{acctgTransAttributeId}")
+	@GetMapping("/{acctgTransAttributeId}")
 	public ResponseEntity<Object> findById(@PathVariable String acctgTransAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("acctgTransAttributeId", acctgTransAttributeId);
@@ -207,7 +207,7 @@ public class AcctgTransAttributeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{acctgTransAttributeId}")
+	@DeleteMapping("/{acctgTransAttributeId}")
 	public ResponseEntity<Object> deleteAcctgTransAttributeByIdUpdated(@PathVariable String acctgTransAttributeId) throws Exception {
 		DeleteAcctgTransAttribute command = new DeleteAcctgTransAttribute(acctgTransAttributeId);
 

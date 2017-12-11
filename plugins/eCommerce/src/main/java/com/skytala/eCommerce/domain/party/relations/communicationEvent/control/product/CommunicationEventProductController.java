@@ -57,7 +57,7 @@ public class CommunicationEventProductController {
 	 * @return a List with the CommunicationEventProducts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findCommunicationEventProductsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCommunicationEventProductsBy query = new FindCommunicationEventProductsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class CommunicationEventProductController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createCommunicationEventProduct(HttpServletRequest request) throws Exception {
 
 		CommunicationEventProduct communicationEventProductToBeAdded = new CommunicationEventProduct();
@@ -129,7 +129,7 @@ public class CommunicationEventProductController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateCommunicationEventProduct(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class CommunicationEventProductController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{communicationEventProductId}")
+	@GetMapping("/{communicationEventProductId}")
 	public ResponseEntity<Object> findById(@PathVariable String communicationEventProductId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("communicationEventProductId", communicationEventProductId);
@@ -207,7 +207,7 @@ public class CommunicationEventProductController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{communicationEventProductId}")
+	@DeleteMapping("/{communicationEventProductId}")
 	public ResponseEntity<Object> deleteCommunicationEventProductByIdUpdated(@PathVariable String communicationEventProductId) throws Exception {
 		DeleteCommunicationEventProduct command = new DeleteCommunicationEventProduct(communicationEventProductId);
 

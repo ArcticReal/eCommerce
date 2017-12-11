@@ -57,7 +57,7 @@ public class DataResourceAttributeController {
 	 * @return a List with the DataResourceAttributes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findDataResourceAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDataResourceAttributesBy query = new FindDataResourceAttributesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class DataResourceAttributeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createDataResourceAttribute(HttpServletRequest request) throws Exception {
 
 		DataResourceAttribute dataResourceAttributeToBeAdded = new DataResourceAttribute();
@@ -129,7 +129,7 @@ public class DataResourceAttributeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateDataResourceAttribute(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class DataResourceAttributeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{dataResourceAttributeId}")
+	@GetMapping("/{dataResourceAttributeId}")
 	public ResponseEntity<Object> findById(@PathVariable String dataResourceAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("dataResourceAttributeId", dataResourceAttributeId);
@@ -207,7 +207,7 @@ public class DataResourceAttributeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{dataResourceAttributeId}")
+	@DeleteMapping("/{dataResourceAttributeId}")
 	public ResponseEntity<Object> deleteDataResourceAttributeByIdUpdated(@PathVariable String dataResourceAttributeId) throws Exception {
 		DeleteDataResourceAttribute command = new DeleteDataResourceAttribute(dataResourceAttributeId);
 

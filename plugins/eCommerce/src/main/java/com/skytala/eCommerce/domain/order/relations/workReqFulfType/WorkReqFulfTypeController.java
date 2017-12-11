@@ -57,7 +57,7 @@ public class WorkReqFulfTypeController {
 	 * @return a List with the WorkReqFulfTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWorkReqFulfTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkReqFulfTypesBy query = new FindWorkReqFulfTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WorkReqFulfTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWorkReqFulfType(HttpServletRequest request) throws Exception {
 
 		WorkReqFulfType workReqFulfTypeToBeAdded = new WorkReqFulfType();
@@ -129,7 +129,7 @@ public class WorkReqFulfTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWorkReqFulfType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WorkReqFulfTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{workReqFulfTypeId}")
+	@GetMapping("/{workReqFulfTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String workReqFulfTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workReqFulfTypeId", workReqFulfTypeId);
@@ -207,7 +207,7 @@ public class WorkReqFulfTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{workReqFulfTypeId}")
+	@DeleteMapping("/{workReqFulfTypeId}")
 	public ResponseEntity<Object> deleteWorkReqFulfTypeByIdUpdated(@PathVariable String workReqFulfTypeId) throws Exception {
 		DeleteWorkReqFulfType command = new DeleteWorkReqFulfType(workReqFulfTypeId);
 

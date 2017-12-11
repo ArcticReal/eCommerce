@@ -57,7 +57,7 @@ public class PaymentGatewayAuthorizeNetController {
 	 * @return a List with the PaymentGatewayAuthorizeNets
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPaymentGatewayAuthorizeNetsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentGatewayAuthorizeNetsBy query = new FindPaymentGatewayAuthorizeNetsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PaymentGatewayAuthorizeNetController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPaymentGatewayAuthorizeNet(HttpServletRequest request) throws Exception {
 
 		PaymentGatewayAuthorizeNet paymentGatewayAuthorizeNetToBeAdded = new PaymentGatewayAuthorizeNet();
@@ -129,7 +129,7 @@ public class PaymentGatewayAuthorizeNetController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePaymentGatewayAuthorizeNet(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PaymentGatewayAuthorizeNetController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{paymentGatewayAuthorizeNetId}")
+	@GetMapping("/{paymentGatewayAuthorizeNetId}")
 	public ResponseEntity<Object> findById(@PathVariable String paymentGatewayAuthorizeNetId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentGatewayAuthorizeNetId", paymentGatewayAuthorizeNetId);
@@ -207,7 +207,7 @@ public class PaymentGatewayAuthorizeNetController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{paymentGatewayAuthorizeNetId}")
+	@DeleteMapping("/{paymentGatewayAuthorizeNetId}")
 	public ResponseEntity<Object> deletePaymentGatewayAuthorizeNetByIdUpdated(@PathVariable String paymentGatewayAuthorizeNetId) throws Exception {
 		DeletePaymentGatewayAuthorizeNet command = new DeletePaymentGatewayAuthorizeNet(paymentGatewayAuthorizeNetId);
 

@@ -57,7 +57,7 @@ public class OrderPaymentPreferenceController {
 	 * @return a List with the OrderPaymentPreferences
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderPaymentPreferencesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderPaymentPreferencesBy query = new FindOrderPaymentPreferencesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderPaymentPreferenceController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderPaymentPreference(HttpServletRequest request) throws Exception {
 
 		OrderPaymentPreference orderPaymentPreferenceToBeAdded = new OrderPaymentPreference();
@@ -129,7 +129,7 @@ public class OrderPaymentPreferenceController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderPaymentPreference(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderPaymentPreferenceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderPaymentPreferenceId}")
+	@GetMapping("/{orderPaymentPreferenceId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderPaymentPreferenceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderPaymentPreferenceId", orderPaymentPreferenceId);
@@ -207,7 +207,7 @@ public class OrderPaymentPreferenceController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderPaymentPreferenceId}")
+	@DeleteMapping("/{orderPaymentPreferenceId}")
 	public ResponseEntity<Object> deleteOrderPaymentPreferenceByIdUpdated(@PathVariable String orderPaymentPreferenceId) throws Exception {
 		DeleteOrderPaymentPreference command = new DeleteOrderPaymentPreference(orderPaymentPreferenceId);
 

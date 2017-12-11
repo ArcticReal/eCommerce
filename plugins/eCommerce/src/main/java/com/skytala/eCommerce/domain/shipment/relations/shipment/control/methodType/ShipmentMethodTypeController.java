@@ -57,7 +57,7 @@ public class ShipmentMethodTypeController {
 	 * @return a List with the ShipmentMethodTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findShipmentMethodTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentMethodTypesBy query = new FindShipmentMethodTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ShipmentMethodTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createShipmentMethodType(HttpServletRequest request) throws Exception {
 
 		ShipmentMethodType shipmentMethodTypeToBeAdded = new ShipmentMethodType();
@@ -129,7 +129,7 @@ public class ShipmentMethodTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateShipmentMethodType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ShipmentMethodTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{shipmentMethodTypeId}")
+	@GetMapping("/{shipmentMethodTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String shipmentMethodTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentMethodTypeId", shipmentMethodTypeId);
@@ -207,7 +207,7 @@ public class ShipmentMethodTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{shipmentMethodTypeId}")
+	@DeleteMapping("/{shipmentMethodTypeId}")
 	public ResponseEntity<Object> deleteShipmentMethodTypeByIdUpdated(@PathVariable String shipmentMethodTypeId) throws Exception {
 		DeleteShipmentMethodType command = new DeleteShipmentMethodType(shipmentMethodTypeId);
 

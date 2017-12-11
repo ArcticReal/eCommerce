@@ -57,7 +57,7 @@ public class WorkEffortGoodStandardController {
 	 * @return a List with the WorkEffortGoodStandards
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWorkEffortGoodStandardsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortGoodStandardsBy query = new FindWorkEffortGoodStandardsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WorkEffortGoodStandardController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWorkEffortGoodStandard(HttpServletRequest request) throws Exception {
 
 		WorkEffortGoodStandard workEffortGoodStandardToBeAdded = new WorkEffortGoodStandard();
@@ -129,7 +129,7 @@ public class WorkEffortGoodStandardController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWorkEffortGoodStandard(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WorkEffortGoodStandardController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{workEffortGoodStandardId}")
+	@GetMapping("/{workEffortGoodStandardId}")
 	public ResponseEntity<Object> findById(@PathVariable String workEffortGoodStandardId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortGoodStandardId", workEffortGoodStandardId);
@@ -207,7 +207,7 @@ public class WorkEffortGoodStandardController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{workEffortGoodStandardId}")
+	@DeleteMapping("/{workEffortGoodStandardId}")
 	public ResponseEntity<Object> deleteWorkEffortGoodStandardByIdUpdated(@PathVariable String workEffortGoodStandardId) throws Exception {
 		DeleteWorkEffortGoodStandard command = new DeleteWorkEffortGoodStandard(workEffortGoodStandardId);
 

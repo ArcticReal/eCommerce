@@ -57,7 +57,7 @@ public class ReturnReasonController {
 	 * @return a List with the ReturnReasons
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findReturnReasonsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindReturnReasonsBy query = new FindReturnReasonsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ReturnReasonController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createReturnReason(HttpServletRequest request) throws Exception {
 
 		ReturnReason returnReasonToBeAdded = new ReturnReason();
@@ -129,7 +129,7 @@ public class ReturnReasonController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateReturnReason(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ReturnReasonController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{returnReasonId}")
+	@GetMapping("/{returnReasonId}")
 	public ResponseEntity<Object> findById(@PathVariable String returnReasonId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("returnReasonId", returnReasonId);
@@ -207,7 +207,7 @@ public class ReturnReasonController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{returnReasonId}")
+	@DeleteMapping("/{returnReasonId}")
 	public ResponseEntity<Object> deleteReturnReasonByIdUpdated(@PathVariable String returnReasonId) throws Exception {
 		DeleteReturnReason command = new DeleteReturnReason(returnReasonId);
 

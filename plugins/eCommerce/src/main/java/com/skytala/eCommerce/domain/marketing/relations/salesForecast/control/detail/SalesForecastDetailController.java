@@ -57,7 +57,7 @@ public class SalesForecastDetailController {
 	 * @return a List with the SalesForecastDetails
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSalesForecastDetailsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSalesForecastDetailsBy query = new FindSalesForecastDetailsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SalesForecastDetailController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSalesForecastDetail(HttpServletRequest request) throws Exception {
 
 		SalesForecastDetail salesForecastDetailToBeAdded = new SalesForecastDetail();
@@ -129,7 +129,7 @@ public class SalesForecastDetailController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSalesForecastDetail(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SalesForecastDetailController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{salesForecastDetailId}")
+	@GetMapping("/{salesForecastDetailId}")
 	public ResponseEntity<Object> findById(@PathVariable String salesForecastDetailId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("salesForecastDetailId", salesForecastDetailId);
@@ -207,7 +207,7 @@ public class SalesForecastDetailController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{salesForecastDetailId}")
+	@DeleteMapping("/{salesForecastDetailId}")
 	public ResponseEntity<Object> deleteSalesForecastDetailByIdUpdated(@PathVariable String salesForecastDetailId) throws Exception {
 		DeleteSalesForecastDetail command = new DeleteSalesForecastDetail(salesForecastDetailId);
 

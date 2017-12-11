@@ -57,7 +57,7 @@ public class InvoiceItemController {
 	 * @return a List with the InvoiceItems
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findInvoiceItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInvoiceItemsBy query = new FindInvoiceItemsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class InvoiceItemController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createInvoiceItem(HttpServletRequest request) throws Exception {
 
 		InvoiceItem invoiceItemToBeAdded = new InvoiceItem();
@@ -129,7 +129,7 @@ public class InvoiceItemController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateInvoiceItem(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class InvoiceItemController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{invoiceItemId}")
+	@GetMapping("/{invoiceItemId}")
 	public ResponseEntity<Object> findById(@PathVariable String invoiceItemId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("invoiceItemId", invoiceItemId);
@@ -207,7 +207,7 @@ public class InvoiceItemController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{invoiceItemId}")
+	@DeleteMapping("/{invoiceItemId}")
 	public ResponseEntity<Object> deleteInvoiceItemByIdUpdated(@PathVariable String invoiceItemId) throws Exception {
 		DeleteInvoiceItem command = new DeleteInvoiceItem(invoiceItemId);
 

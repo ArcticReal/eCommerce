@@ -57,7 +57,7 @@ public class PartyDataSourceController {
 	 * @return a List with the PartyDataSources
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyDataSourcesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyDataSourcesBy query = new FindPartyDataSourcesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyDataSourceController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyDataSource(HttpServletRequest request) throws Exception {
 
 		PartyDataSource partyDataSourceToBeAdded = new PartyDataSource();
@@ -129,7 +129,7 @@ public class PartyDataSourceController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyDataSource(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyDataSourceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyDataSourceId}")
+	@GetMapping("/{partyDataSourceId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyDataSourceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyDataSourceId", partyDataSourceId);
@@ -207,7 +207,7 @@ public class PartyDataSourceController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyDataSourceId}")
+	@DeleteMapping("/{partyDataSourceId}")
 	public ResponseEntity<Object> deletePartyDataSourceByIdUpdated(@PathVariable String partyDataSourceId) throws Exception {
 		DeletePartyDataSource command = new DeletePartyDataSource(partyDataSourceId);
 

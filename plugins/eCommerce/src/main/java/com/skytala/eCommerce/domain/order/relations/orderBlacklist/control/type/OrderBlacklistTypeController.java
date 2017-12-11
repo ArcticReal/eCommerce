@@ -57,7 +57,7 @@ public class OrderBlacklistTypeController {
 	 * @return a List with the OrderBlacklistTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderBlacklistTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderBlacklistTypesBy query = new FindOrderBlacklistTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderBlacklistTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderBlacklistType(HttpServletRequest request) throws Exception {
 
 		OrderBlacklistType orderBlacklistTypeToBeAdded = new OrderBlacklistType();
@@ -129,7 +129,7 @@ public class OrderBlacklistTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderBlacklistType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderBlacklistTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderBlacklistTypeId}")
+	@GetMapping("/{orderBlacklistTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderBlacklistTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderBlacklistTypeId", orderBlacklistTypeId);
@@ -207,7 +207,7 @@ public class OrderBlacklistTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderBlacklistTypeId}")
+	@DeleteMapping("/{orderBlacklistTypeId}")
 	public ResponseEntity<Object> deleteOrderBlacklistTypeByIdUpdated(@PathVariable String orderBlacklistTypeId) throws Exception {
 		DeleteOrderBlacklistType command = new DeleteOrderBlacklistType(orderBlacklistTypeId);
 

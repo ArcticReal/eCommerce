@@ -57,7 +57,7 @@ public class OrderTermController {
 	 * @return a List with the OrderTerms
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderTermsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderTermsBy query = new FindOrderTermsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderTermController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderTerm(HttpServletRequest request) throws Exception {
 
 		OrderTerm orderTermToBeAdded = new OrderTerm();
@@ -129,7 +129,7 @@ public class OrderTermController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderTerm(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderTermController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderTermId}")
+	@GetMapping("/{orderTermId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderTermId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderTermId", orderTermId);
@@ -207,7 +207,7 @@ public class OrderTermController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderTermId}")
+	@DeleteMapping("/{orderTermId}")
 	public ResponseEntity<Object> deleteOrderTermByIdUpdated(@PathVariable String orderTermId) throws Exception {
 		DeleteOrderTerm command = new DeleteOrderTerm(orderTermId);
 

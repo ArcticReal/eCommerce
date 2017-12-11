@@ -57,7 +57,7 @@ public class SalesOpportunityTrckCodeController {
 	 * @return a List with the SalesOpportunityTrckCodes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSalesOpportunityTrckCodesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSalesOpportunityTrckCodesBy query = new FindSalesOpportunityTrckCodesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SalesOpportunityTrckCodeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSalesOpportunityTrckCode(HttpServletRequest request) throws Exception {
 
 		SalesOpportunityTrckCode salesOpportunityTrckCodeToBeAdded = new SalesOpportunityTrckCode();
@@ -129,7 +129,7 @@ public class SalesOpportunityTrckCodeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSalesOpportunityTrckCode(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SalesOpportunityTrckCodeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{salesOpportunityTrckCodeId}")
+	@GetMapping("/{salesOpportunityTrckCodeId}")
 	public ResponseEntity<Object> findById(@PathVariable String salesOpportunityTrckCodeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("salesOpportunityTrckCodeId", salesOpportunityTrckCodeId);
@@ -207,7 +207,7 @@ public class SalesOpportunityTrckCodeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{salesOpportunityTrckCodeId}")
+	@DeleteMapping("/{salesOpportunityTrckCodeId}")
 	public ResponseEntity<Object> deleteSalesOpportunityTrckCodeByIdUpdated(@PathVariable String salesOpportunityTrckCodeId) throws Exception {
 		DeleteSalesOpportunityTrckCode command = new DeleteSalesOpportunityTrckCode(salesOpportunityTrckCodeId);
 

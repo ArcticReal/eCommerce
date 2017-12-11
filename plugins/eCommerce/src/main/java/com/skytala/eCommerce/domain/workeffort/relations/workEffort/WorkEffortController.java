@@ -57,7 +57,7 @@ public class WorkEffortController {
 	 * @return a List with the WorkEfforts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWorkEffortsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortsBy query = new FindWorkEffortsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WorkEffortController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWorkEffort(HttpServletRequest request) throws Exception {
 
 		WorkEffort workEffortToBeAdded = new WorkEffort();
@@ -129,7 +129,7 @@ public class WorkEffortController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWorkEffort(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WorkEffortController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{workEffortId}")
+	@GetMapping("/{workEffortId}")
 	public ResponseEntity<Object> findById(@PathVariable String workEffortId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortId", workEffortId);
@@ -207,7 +207,7 @@ public class WorkEffortController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{workEffortId}")
+	@DeleteMapping("/{workEffortId}")
 	public ResponseEntity<Object> deleteWorkEffortByIdUpdated(@PathVariable String workEffortId) throws Exception {
 		DeleteWorkEffort command = new DeleteWorkEffort(workEffortId);
 

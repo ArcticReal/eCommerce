@@ -57,7 +57,7 @@ public class TrackingCodeVisitController {
 	 * @return a List with the TrackingCodeVisits
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findTrackingCodeVisitsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTrackingCodeVisitsBy query = new FindTrackingCodeVisitsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class TrackingCodeVisitController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createTrackingCodeVisit(HttpServletRequest request) throws Exception {
 
 		TrackingCodeVisit trackingCodeVisitToBeAdded = new TrackingCodeVisit();
@@ -129,7 +129,7 @@ public class TrackingCodeVisitController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateTrackingCodeVisit(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class TrackingCodeVisitController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{trackingCodeVisitId}")
+	@GetMapping("/{trackingCodeVisitId}")
 	public ResponseEntity<Object> findById(@PathVariable String trackingCodeVisitId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("trackingCodeVisitId", trackingCodeVisitId);
@@ -207,7 +207,7 @@ public class TrackingCodeVisitController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{trackingCodeVisitId}")
+	@DeleteMapping("/{trackingCodeVisitId}")
 	public ResponseEntity<Object> deleteTrackingCodeVisitByIdUpdated(@PathVariable String trackingCodeVisitId) throws Exception {
 		DeleteTrackingCodeVisit command = new DeleteTrackingCodeVisit(trackingCodeVisitId);
 

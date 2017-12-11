@@ -57,7 +57,7 @@ public class WorkEffortTypeAttrController {
 	 * @return a List with the WorkEffortTypeAttrs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWorkEffortTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortTypeAttrsBy query = new FindWorkEffortTypeAttrsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WorkEffortTypeAttrController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWorkEffortTypeAttr(HttpServletRequest request) throws Exception {
 
 		WorkEffortTypeAttr workEffortTypeAttrToBeAdded = new WorkEffortTypeAttr();
@@ -129,7 +129,7 @@ public class WorkEffortTypeAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWorkEffortTypeAttr(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WorkEffortTypeAttrController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{workEffortTypeAttrId}")
+	@GetMapping("/{workEffortTypeAttrId}")
 	public ResponseEntity<Object> findById(@PathVariable String workEffortTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortTypeAttrId", workEffortTypeAttrId);
@@ -207,7 +207,7 @@ public class WorkEffortTypeAttrController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{workEffortTypeAttrId}")
+	@DeleteMapping("/{workEffortTypeAttrId}")
 	public ResponseEntity<Object> deleteWorkEffortTypeAttrByIdUpdated(@PathVariable String workEffortTypeAttrId) throws Exception {
 		DeleteWorkEffortTypeAttr command = new DeleteWorkEffortTypeAttr(workEffortTypeAttrId);
 

@@ -57,7 +57,7 @@ public class ContentRevisionItemController {
 	 * @return a List with the ContentRevisionItems
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findContentRevisionItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContentRevisionItemsBy query = new FindContentRevisionItemsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ContentRevisionItemController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createContentRevisionItem(HttpServletRequest request) throws Exception {
 
 		ContentRevisionItem contentRevisionItemToBeAdded = new ContentRevisionItem();
@@ -129,7 +129,7 @@ public class ContentRevisionItemController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateContentRevisionItem(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ContentRevisionItemController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{contentRevisionItemId}")
+	@GetMapping("/{contentRevisionItemId}")
 	public ResponseEntity<Object> findById(@PathVariable String contentRevisionItemId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contentRevisionItemId", contentRevisionItemId);
@@ -207,7 +207,7 @@ public class ContentRevisionItemController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{contentRevisionItemId}")
+	@DeleteMapping("/{contentRevisionItemId}")
 	public ResponseEntity<Object> deleteContentRevisionItemByIdUpdated(@PathVariable String contentRevisionItemId) throws Exception {
 		DeleteContentRevisionItem command = new DeleteContentRevisionItem(contentRevisionItemId);
 

@@ -57,7 +57,7 @@ public class BudgetReviewController {
 	 * @return a List with the BudgetReviews
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findBudgetReviewsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindBudgetReviewsBy query = new FindBudgetReviewsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class BudgetReviewController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createBudgetReview(HttpServletRequest request) throws Exception {
 
 		BudgetReview budgetReviewToBeAdded = new BudgetReview();
@@ -129,7 +129,7 @@ public class BudgetReviewController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateBudgetReview(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class BudgetReviewController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{budgetReviewId}")
+	@GetMapping("/{budgetReviewId}")
 	public ResponseEntity<Object> findById(@PathVariable String budgetReviewId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("budgetReviewId", budgetReviewId);
@@ -207,7 +207,7 @@ public class BudgetReviewController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{budgetReviewId}")
+	@DeleteMapping("/{budgetReviewId}")
 	public ResponseEntity<Object> deleteBudgetReviewByIdUpdated(@PathVariable String budgetReviewId) throws Exception {
 		DeleteBudgetReview command = new DeleteBudgetReview(budgetReviewId);
 

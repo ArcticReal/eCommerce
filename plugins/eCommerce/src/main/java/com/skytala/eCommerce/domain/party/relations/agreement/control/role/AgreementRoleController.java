@@ -57,7 +57,7 @@ public class AgreementRoleController {
 	 * @return a List with the AgreementRoles
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findAgreementRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAgreementRolesBy query = new FindAgreementRolesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class AgreementRoleController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createAgreementRole(HttpServletRequest request) throws Exception {
 
 		AgreementRole agreementRoleToBeAdded = new AgreementRole();
@@ -129,7 +129,7 @@ public class AgreementRoleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateAgreementRole(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class AgreementRoleController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{agreementRoleId}")
+	@GetMapping("/{agreementRoleId}")
 	public ResponseEntity<Object> findById(@PathVariable String agreementRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("agreementRoleId", agreementRoleId);
@@ -207,7 +207,7 @@ public class AgreementRoleController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{agreementRoleId}")
+	@DeleteMapping("/{agreementRoleId}")
 	public ResponseEntity<Object> deleteAgreementRoleByIdUpdated(@PathVariable String agreementRoleId) throws Exception {
 		DeleteAgreementRole command = new DeleteAgreementRole(agreementRoleId);
 

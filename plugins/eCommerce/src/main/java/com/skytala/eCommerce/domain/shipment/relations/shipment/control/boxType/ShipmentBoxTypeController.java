@@ -57,7 +57,7 @@ public class ShipmentBoxTypeController {
 	 * @return a List with the ShipmentBoxTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findShipmentBoxTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentBoxTypesBy query = new FindShipmentBoxTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ShipmentBoxTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createShipmentBoxType(HttpServletRequest request) throws Exception {
 
 		ShipmentBoxType shipmentBoxTypeToBeAdded = new ShipmentBoxType();
@@ -129,7 +129,7 @@ public class ShipmentBoxTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateShipmentBoxType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ShipmentBoxTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{shipmentBoxTypeId}")
+	@GetMapping("/{shipmentBoxTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String shipmentBoxTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentBoxTypeId", shipmentBoxTypeId);
@@ -207,7 +207,7 @@ public class ShipmentBoxTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{shipmentBoxTypeId}")
+	@DeleteMapping("/{shipmentBoxTypeId}")
 	public ResponseEntity<Object> deleteShipmentBoxTypeByIdUpdated(@PathVariable String shipmentBoxTypeId) throws Exception {
 		DeleteShipmentBoxType command = new DeleteShipmentBoxType(shipmentBoxTypeId);
 

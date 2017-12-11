@@ -57,7 +57,7 @@ public class ShoppingListTypeController {
 	 * @return a List with the ShoppingListTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findShoppingListTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShoppingListTypesBy query = new FindShoppingListTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ShoppingListTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createShoppingListType(HttpServletRequest request) throws Exception {
 
 		ShoppingListType shoppingListTypeToBeAdded = new ShoppingListType();
@@ -129,7 +129,7 @@ public class ShoppingListTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateShoppingListType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ShoppingListTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{shoppingListTypeId}")
+	@GetMapping("/{shoppingListTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String shoppingListTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shoppingListTypeId", shoppingListTypeId);
@@ -207,7 +207,7 @@ public class ShoppingListTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{shoppingListTypeId}")
+	@DeleteMapping("/{shoppingListTypeId}")
 	public ResponseEntity<Object> deleteShoppingListTypeByIdUpdated(@PathVariable String shoppingListTypeId) throws Exception {
 		DeleteShoppingListType command = new DeleteShoppingListType(shoppingListTypeId);
 

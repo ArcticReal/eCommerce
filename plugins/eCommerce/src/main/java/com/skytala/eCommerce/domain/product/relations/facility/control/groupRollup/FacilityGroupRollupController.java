@@ -57,7 +57,7 @@ public class FacilityGroupRollupController {
 	 * @return a List with the FacilityGroupRollups
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFacilityGroupRollupsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFacilityGroupRollupsBy query = new FindFacilityGroupRollupsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FacilityGroupRollupController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFacilityGroupRollup(HttpServletRequest request) throws Exception {
 
 		FacilityGroupRollup facilityGroupRollupToBeAdded = new FacilityGroupRollup();
@@ -129,7 +129,7 @@ public class FacilityGroupRollupController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFacilityGroupRollup(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FacilityGroupRollupController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{facilityGroupRollupId}")
+	@GetMapping("/{facilityGroupRollupId}")
 	public ResponseEntity<Object> findById(@PathVariable String facilityGroupRollupId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("facilityGroupRollupId", facilityGroupRollupId);
@@ -207,7 +207,7 @@ public class FacilityGroupRollupController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{facilityGroupRollupId}")
+	@DeleteMapping("/{facilityGroupRollupId}")
 	public ResponseEntity<Object> deleteFacilityGroupRollupByIdUpdated(@PathVariable String facilityGroupRollupId) throws Exception {
 		DeleteFacilityGroupRollup command = new DeleteFacilityGroupRollup(facilityGroupRollupId);
 

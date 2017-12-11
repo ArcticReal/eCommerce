@@ -57,7 +57,7 @@ public class TaxAuthorityGlAccountController {
 	 * @return a List with the TaxAuthorityGlAccounts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findTaxAuthorityGlAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTaxAuthorityGlAccountsBy query = new FindTaxAuthorityGlAccountsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class TaxAuthorityGlAccountController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createTaxAuthorityGlAccount(HttpServletRequest request) throws Exception {
 
 		TaxAuthorityGlAccount taxAuthorityGlAccountToBeAdded = new TaxAuthorityGlAccount();
@@ -129,7 +129,7 @@ public class TaxAuthorityGlAccountController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateTaxAuthorityGlAccount(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class TaxAuthorityGlAccountController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{taxAuthorityGlAccountId}")
+	@GetMapping("/{taxAuthorityGlAccountId}")
 	public ResponseEntity<Object> findById(@PathVariable String taxAuthorityGlAccountId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("taxAuthorityGlAccountId", taxAuthorityGlAccountId);
@@ -207,7 +207,7 @@ public class TaxAuthorityGlAccountController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{taxAuthorityGlAccountId}")
+	@DeleteMapping("/{taxAuthorityGlAccountId}")
 	public ResponseEntity<Object> deleteTaxAuthorityGlAccountByIdUpdated(@PathVariable String taxAuthorityGlAccountId) throws Exception {
 		DeleteTaxAuthorityGlAccount command = new DeleteTaxAuthorityGlAccount(taxAuthorityGlAccountId);
 

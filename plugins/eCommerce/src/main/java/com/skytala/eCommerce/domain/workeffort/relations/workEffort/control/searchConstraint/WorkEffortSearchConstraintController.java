@@ -57,7 +57,7 @@ public class WorkEffortSearchConstraintController {
 	 * @return a List with the WorkEffortSearchConstraints
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWorkEffortSearchConstraintsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortSearchConstraintsBy query = new FindWorkEffortSearchConstraintsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WorkEffortSearchConstraintController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWorkEffortSearchConstraint(HttpServletRequest request) throws Exception {
 
 		WorkEffortSearchConstraint workEffortSearchConstraintToBeAdded = new WorkEffortSearchConstraint();
@@ -129,7 +129,7 @@ public class WorkEffortSearchConstraintController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWorkEffortSearchConstraint(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WorkEffortSearchConstraintController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{workEffortSearchConstraintId}")
+	@GetMapping("/{workEffortSearchConstraintId}")
 	public ResponseEntity<Object> findById(@PathVariable String workEffortSearchConstraintId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortSearchConstraintId", workEffortSearchConstraintId);
@@ -207,7 +207,7 @@ public class WorkEffortSearchConstraintController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{workEffortSearchConstraintId}")
+	@DeleteMapping("/{workEffortSearchConstraintId}")
 	public ResponseEntity<Object> deleteWorkEffortSearchConstraintByIdUpdated(@PathVariable String workEffortSearchConstraintId) throws Exception {
 		DeleteWorkEffortSearchConstraint command = new DeleteWorkEffortSearchConstraint(workEffortSearchConstraintId);
 

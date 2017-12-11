@@ -57,7 +57,7 @@ public class CheckAccountController {
 	 * @return a List with the CheckAccounts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findCheckAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCheckAccountsBy query = new FindCheckAccountsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class CheckAccountController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createCheckAccount(HttpServletRequest request) throws Exception {
 
 		CheckAccount checkAccountToBeAdded = new CheckAccount();
@@ -129,7 +129,7 @@ public class CheckAccountController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateCheckAccount(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class CheckAccountController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{checkAccountId}")
+	@GetMapping("/{checkAccountId}")
 	public ResponseEntity<Object> findById(@PathVariable String checkAccountId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("checkAccountId", checkAccountId);
@@ -207,7 +207,7 @@ public class CheckAccountController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{checkAccountId}")
+	@DeleteMapping("/{checkAccountId}")
 	public ResponseEntity<Object> deleteCheckAccountByIdUpdated(@PathVariable String checkAccountId) throws Exception {
 		DeleteCheckAccount command = new DeleteCheckAccount(checkAccountId);
 

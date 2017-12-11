@@ -57,7 +57,7 @@ public class CreditCardTypeGlAccountController {
 	 * @return a List with the CreditCardTypeGlAccounts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findCreditCardTypeGlAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCreditCardTypeGlAccountsBy query = new FindCreditCardTypeGlAccountsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class CreditCardTypeGlAccountController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createCreditCardTypeGlAccount(HttpServletRequest request) throws Exception {
 
 		CreditCardTypeGlAccount creditCardTypeGlAccountToBeAdded = new CreditCardTypeGlAccount();
@@ -129,7 +129,7 @@ public class CreditCardTypeGlAccountController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateCreditCardTypeGlAccount(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class CreditCardTypeGlAccountController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{creditCardTypeGlAccountId}")
+	@GetMapping("/{creditCardTypeGlAccountId}")
 	public ResponseEntity<Object> findById(@PathVariable String creditCardTypeGlAccountId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("creditCardTypeGlAccountId", creditCardTypeGlAccountId);
@@ -207,7 +207,7 @@ public class CreditCardTypeGlAccountController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{creditCardTypeGlAccountId}")
+	@DeleteMapping("/{creditCardTypeGlAccountId}")
 	public ResponseEntity<Object> deleteCreditCardTypeGlAccountByIdUpdated(@PathVariable String creditCardTypeGlAccountId) throws Exception {
 		DeleteCreditCardTypeGlAccount command = new DeleteCreditCardTypeGlAccount(creditCardTypeGlAccountId);
 

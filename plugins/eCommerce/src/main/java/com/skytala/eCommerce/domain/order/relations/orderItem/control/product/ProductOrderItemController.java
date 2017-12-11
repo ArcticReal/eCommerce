@@ -57,7 +57,7 @@ public class ProductOrderItemController {
 	 * @return a List with the ProductOrderItems
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductOrderItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductOrderItemsBy query = new FindProductOrderItemsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductOrderItemController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductOrderItem(HttpServletRequest request) throws Exception {
 
 		ProductOrderItem productOrderItemToBeAdded = new ProductOrderItem();
@@ -129,7 +129,7 @@ public class ProductOrderItemController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductOrderItem(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductOrderItemController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productOrderItemId}")
+	@GetMapping("/{productOrderItemId}")
 	public ResponseEntity<Object> findById(@PathVariable String productOrderItemId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productOrderItemId", productOrderItemId);
@@ -207,7 +207,7 @@ public class ProductOrderItemController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productOrderItemId}")
+	@DeleteMapping("/{productOrderItemId}")
 	public ResponseEntity<Object> deleteProductOrderItemByIdUpdated(@PathVariable String productOrderItemId) throws Exception {
 		DeleteProductOrderItem command = new DeleteProductOrderItem(productOrderItemId);
 

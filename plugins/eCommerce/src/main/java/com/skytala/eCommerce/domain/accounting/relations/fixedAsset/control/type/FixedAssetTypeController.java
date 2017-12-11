@@ -57,7 +57,7 @@ public class FixedAssetTypeController {
 	 * @return a List with the FixedAssetTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFixedAssetTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFixedAssetTypesBy query = new FindFixedAssetTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FixedAssetTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFixedAssetType(HttpServletRequest request) throws Exception {
 
 		FixedAssetType fixedAssetTypeToBeAdded = new FixedAssetType();
@@ -129,7 +129,7 @@ public class FixedAssetTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFixedAssetType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FixedAssetTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{fixedAssetTypeId}")
+	@GetMapping("/{fixedAssetTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String fixedAssetTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("fixedAssetTypeId", fixedAssetTypeId);
@@ -207,7 +207,7 @@ public class FixedAssetTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{fixedAssetTypeId}")
+	@DeleteMapping("/{fixedAssetTypeId}")
 	public ResponseEntity<Object> deleteFixedAssetTypeByIdUpdated(@PathVariable String fixedAssetTypeId) throws Exception {
 		DeleteFixedAssetType command = new DeleteFixedAssetType(fixedAssetTypeId);
 

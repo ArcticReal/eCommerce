@@ -57,7 +57,7 @@ public class GiftCardController {
 	 * @return a List with the GiftCards
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findGiftCardsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGiftCardsBy query = new FindGiftCardsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class GiftCardController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createGiftCard(HttpServletRequest request) throws Exception {
 
 		GiftCard giftCardToBeAdded = new GiftCard();
@@ -129,7 +129,7 @@ public class GiftCardController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateGiftCard(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class GiftCardController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{giftCardId}")
+	@GetMapping("/{giftCardId}")
 	public ResponseEntity<Object> findById(@PathVariable String giftCardId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("giftCardId", giftCardId);
@@ -207,7 +207,7 @@ public class GiftCardController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{giftCardId}")
+	@DeleteMapping("/{giftCardId}")
 	public ResponseEntity<Object> deleteGiftCardByIdUpdated(@PathVariable String giftCardId) throws Exception {
 		DeleteGiftCard command = new DeleteGiftCard(giftCardId);
 

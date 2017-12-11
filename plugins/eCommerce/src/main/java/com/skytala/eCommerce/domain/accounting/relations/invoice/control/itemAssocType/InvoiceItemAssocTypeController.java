@@ -57,7 +57,7 @@ public class InvoiceItemAssocTypeController {
 	 * @return a List with the InvoiceItemAssocTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findInvoiceItemAssocTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInvoiceItemAssocTypesBy query = new FindInvoiceItemAssocTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class InvoiceItemAssocTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createInvoiceItemAssocType(HttpServletRequest request) throws Exception {
 
 		InvoiceItemAssocType invoiceItemAssocTypeToBeAdded = new InvoiceItemAssocType();
@@ -129,7 +129,7 @@ public class InvoiceItemAssocTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateInvoiceItemAssocType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class InvoiceItemAssocTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{invoiceItemAssocTypeId}")
+	@GetMapping("/{invoiceItemAssocTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String invoiceItemAssocTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("invoiceItemAssocTypeId", invoiceItemAssocTypeId);
@@ -207,7 +207,7 @@ public class InvoiceItemAssocTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{invoiceItemAssocTypeId}")
+	@DeleteMapping("/{invoiceItemAssocTypeId}")
 	public ResponseEntity<Object> deleteInvoiceItemAssocTypeByIdUpdated(@PathVariable String invoiceItemAssocTypeId) throws Exception {
 		DeleteInvoiceItemAssocType command = new DeleteInvoiceItemAssocType(invoiceItemAssocTypeId);
 

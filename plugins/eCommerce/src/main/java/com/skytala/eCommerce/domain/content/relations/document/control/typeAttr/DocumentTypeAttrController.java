@@ -57,7 +57,7 @@ public class DocumentTypeAttrController {
 	 * @return a List with the DocumentTypeAttrs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findDocumentTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDocumentTypeAttrsBy query = new FindDocumentTypeAttrsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class DocumentTypeAttrController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createDocumentTypeAttr(HttpServletRequest request) throws Exception {
 
 		DocumentTypeAttr documentTypeAttrToBeAdded = new DocumentTypeAttr();
@@ -129,7 +129,7 @@ public class DocumentTypeAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateDocumentTypeAttr(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class DocumentTypeAttrController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{documentTypeAttrId}")
+	@GetMapping("/{documentTypeAttrId}")
 	public ResponseEntity<Object> findById(@PathVariable String documentTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("documentTypeAttrId", documentTypeAttrId);
@@ -207,7 +207,7 @@ public class DocumentTypeAttrController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{documentTypeAttrId}")
+	@DeleteMapping("/{documentTypeAttrId}")
 	public ResponseEntity<Object> deleteDocumentTypeAttrByIdUpdated(@PathVariable String documentTypeAttrId) throws Exception {
 		DeleteDocumentTypeAttr command = new DeleteDocumentTypeAttr(documentTypeAttrId);
 

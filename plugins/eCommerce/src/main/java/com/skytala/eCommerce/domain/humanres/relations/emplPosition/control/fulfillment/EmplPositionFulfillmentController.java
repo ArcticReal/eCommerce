@@ -57,7 +57,7 @@ public class EmplPositionFulfillmentController {
 	 * @return a List with the EmplPositionFulfillments
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findEmplPositionFulfillmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindEmplPositionFulfillmentsBy query = new FindEmplPositionFulfillmentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class EmplPositionFulfillmentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createEmplPositionFulfillment(HttpServletRequest request) throws Exception {
 
 		EmplPositionFulfillment emplPositionFulfillmentToBeAdded = new EmplPositionFulfillment();
@@ -129,7 +129,7 @@ public class EmplPositionFulfillmentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateEmplPositionFulfillment(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class EmplPositionFulfillmentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{emplPositionFulfillmentId}")
+	@GetMapping("/{emplPositionFulfillmentId}")
 	public ResponseEntity<Object> findById(@PathVariable String emplPositionFulfillmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("emplPositionFulfillmentId", emplPositionFulfillmentId);
@@ -207,7 +207,7 @@ public class EmplPositionFulfillmentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{emplPositionFulfillmentId}")
+	@DeleteMapping("/{emplPositionFulfillmentId}")
 	public ResponseEntity<Object> deleteEmplPositionFulfillmentByIdUpdated(@PathVariable String emplPositionFulfillmentId) throws Exception {
 		DeleteEmplPositionFulfillment command = new DeleteEmplPositionFulfillment(emplPositionFulfillmentId);
 

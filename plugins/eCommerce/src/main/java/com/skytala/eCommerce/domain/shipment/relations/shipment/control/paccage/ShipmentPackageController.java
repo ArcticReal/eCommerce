@@ -57,7 +57,7 @@ public class ShipmentPackageController {
 	 * @return a List with the ShipmentPackages
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findShipmentPackagesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentPackagesBy query = new FindShipmentPackagesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ShipmentPackageController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createShipmentPackage(HttpServletRequest request) throws Exception {
 
 		ShipmentPackage shipmentPackageToBeAdded = new ShipmentPackage();
@@ -129,7 +129,7 @@ public class ShipmentPackageController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateShipmentPackage(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ShipmentPackageController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{shipmentPackageId}")
+	@GetMapping("/{shipmentPackageId}")
 	public ResponseEntity<Object> findById(@PathVariable String shipmentPackageId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentPackageId", shipmentPackageId);
@@ -207,7 +207,7 @@ public class ShipmentPackageController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{shipmentPackageId}")
+	@DeleteMapping("/{shipmentPackageId}")
 	public ResponseEntity<Object> deleteShipmentPackageByIdUpdated(@PathVariable String shipmentPackageId) throws Exception {
 		DeleteShipmentPackage command = new DeleteShipmentPackage(shipmentPackageId);
 

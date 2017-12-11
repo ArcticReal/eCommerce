@@ -57,7 +57,7 @@ public class ContentTypeAttrController {
 	 * @return a List with the ContentTypeAttrs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findContentTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContentTypeAttrsBy query = new FindContentTypeAttrsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ContentTypeAttrController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createContentTypeAttr(HttpServletRequest request) throws Exception {
 
 		ContentTypeAttr contentTypeAttrToBeAdded = new ContentTypeAttr();
@@ -129,7 +129,7 @@ public class ContentTypeAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateContentTypeAttr(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ContentTypeAttrController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{contentTypeAttrId}")
+	@GetMapping("/{contentTypeAttrId}")
 	public ResponseEntity<Object> findById(@PathVariable String contentTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contentTypeAttrId", contentTypeAttrId);
@@ -207,7 +207,7 @@ public class ContentTypeAttrController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{contentTypeAttrId}")
+	@DeleteMapping("/{contentTypeAttrId}")
 	public ResponseEntity<Object> deleteContentTypeAttrByIdUpdated(@PathVariable String contentTypeAttrId) throws Exception {
 		DeleteContentTypeAttr command = new DeleteContentTypeAttr(contentTypeAttrId);
 

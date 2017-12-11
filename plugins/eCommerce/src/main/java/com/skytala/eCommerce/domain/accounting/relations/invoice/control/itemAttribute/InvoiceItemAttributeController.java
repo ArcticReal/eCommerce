@@ -57,7 +57,7 @@ public class InvoiceItemAttributeController {
 	 * @return a List with the InvoiceItemAttributes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findInvoiceItemAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInvoiceItemAttributesBy query = new FindInvoiceItemAttributesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class InvoiceItemAttributeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createInvoiceItemAttribute(HttpServletRequest request) throws Exception {
 
 		InvoiceItemAttribute invoiceItemAttributeToBeAdded = new InvoiceItemAttribute();
@@ -129,7 +129,7 @@ public class InvoiceItemAttributeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateInvoiceItemAttribute(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class InvoiceItemAttributeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{invoiceItemAttributeId}")
+	@GetMapping("/{invoiceItemAttributeId}")
 	public ResponseEntity<Object> findById(@PathVariable String invoiceItemAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("invoiceItemAttributeId", invoiceItemAttributeId);
@@ -207,7 +207,7 @@ public class InvoiceItemAttributeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{invoiceItemAttributeId}")
+	@DeleteMapping("/{invoiceItemAttributeId}")
 	public ResponseEntity<Object> deleteInvoiceItemAttributeByIdUpdated(@PathVariable String invoiceItemAttributeId) throws Exception {
 		DeleteInvoiceItemAttribute command = new DeleteInvoiceItemAttribute(invoiceItemAttributeId);
 

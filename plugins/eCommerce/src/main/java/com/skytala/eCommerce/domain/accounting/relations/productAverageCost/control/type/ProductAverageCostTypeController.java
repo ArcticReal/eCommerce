@@ -57,7 +57,7 @@ public class ProductAverageCostTypeController {
 	 * @return a List with the ProductAverageCostTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductAverageCostTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductAverageCostTypesBy query = new FindProductAverageCostTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductAverageCostTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductAverageCostType(HttpServletRequest request) throws Exception {
 
 		ProductAverageCostType productAverageCostTypeToBeAdded = new ProductAverageCostType();
@@ -129,7 +129,7 @@ public class ProductAverageCostTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductAverageCostType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductAverageCostTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productAverageCostTypeId}")
+	@GetMapping("/{productAverageCostTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String productAverageCostTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productAverageCostTypeId", productAverageCostTypeId);
@@ -207,7 +207,7 @@ public class ProductAverageCostTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productAverageCostTypeId}")
+	@DeleteMapping("/{productAverageCostTypeId}")
 	public ResponseEntity<Object> deleteProductAverageCostTypeByIdUpdated(@PathVariable String productAverageCostTypeId) throws Exception {
 		DeleteProductAverageCostType command = new DeleteProductAverageCostType(productAverageCostTypeId);
 

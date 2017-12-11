@@ -57,7 +57,7 @@ public class SettlementTermController {
 	 * @return a List with the SettlementTerms
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSettlementTermsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSettlementTermsBy query = new FindSettlementTermsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SettlementTermController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSettlementTerm(HttpServletRequest request) throws Exception {
 
 		SettlementTerm settlementTermToBeAdded = new SettlementTerm();
@@ -129,7 +129,7 @@ public class SettlementTermController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSettlementTerm(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SettlementTermController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{settlementTermId}")
+	@GetMapping("/{settlementTermId}")
 	public ResponseEntity<Object> findById(@PathVariable String settlementTermId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("settlementTermId", settlementTermId);
@@ -207,7 +207,7 @@ public class SettlementTermController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{settlementTermId}")
+	@DeleteMapping("/{settlementTermId}")
 	public ResponseEntity<Object> deleteSettlementTermByIdUpdated(@PathVariable String settlementTermId) throws Exception {
 		DeleteSettlementTerm command = new DeleteSettlementTerm(settlementTermId);
 

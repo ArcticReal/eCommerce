@@ -57,7 +57,7 @@ public class PaymentTypeAttrController {
 	 * @return a List with the PaymentTypeAttrs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPaymentTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentTypeAttrsBy query = new FindPaymentTypeAttrsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PaymentTypeAttrController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPaymentTypeAttr(HttpServletRequest request) throws Exception {
 
 		PaymentTypeAttr paymentTypeAttrToBeAdded = new PaymentTypeAttr();
@@ -129,7 +129,7 @@ public class PaymentTypeAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePaymentTypeAttr(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PaymentTypeAttrController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{paymentTypeAttrId}")
+	@GetMapping("/{paymentTypeAttrId}")
 	public ResponseEntity<Object> findById(@PathVariable String paymentTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentTypeAttrId", paymentTypeAttrId);
@@ -207,7 +207,7 @@ public class PaymentTypeAttrController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{paymentTypeAttrId}")
+	@DeleteMapping("/{paymentTypeAttrId}")
 	public ResponseEntity<Object> deletePaymentTypeAttrByIdUpdated(@PathVariable String paymentTypeAttrId) throws Exception {
 		DeletePaymentTypeAttr command = new DeletePaymentTypeAttr(paymentTypeAttrId);
 

@@ -57,7 +57,7 @@ public class ContentSearchConstraintController {
 	 * @return a List with the ContentSearchConstraints
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findContentSearchConstraintsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContentSearchConstraintsBy query = new FindContentSearchConstraintsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ContentSearchConstraintController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createContentSearchConstraint(HttpServletRequest request) throws Exception {
 
 		ContentSearchConstraint contentSearchConstraintToBeAdded = new ContentSearchConstraint();
@@ -129,7 +129,7 @@ public class ContentSearchConstraintController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateContentSearchConstraint(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ContentSearchConstraintController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{contentSearchConstraintId}")
+	@GetMapping("/{contentSearchConstraintId}")
 	public ResponseEntity<Object> findById(@PathVariable String contentSearchConstraintId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contentSearchConstraintId", contentSearchConstraintId);
@@ -207,7 +207,7 @@ public class ContentSearchConstraintController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{contentSearchConstraintId}")
+	@DeleteMapping("/{contentSearchConstraintId}")
 	public ResponseEntity<Object> deleteContentSearchConstraintByIdUpdated(@PathVariable String contentSearchConstraintId) throws Exception {
 		DeleteContentSearchConstraint command = new DeleteContentSearchConstraint(contentSearchConstraintId);
 

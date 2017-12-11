@@ -57,7 +57,7 @@ public class TerminationTypeController {
 	 * @return a List with the TerminationTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findTerminationTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTerminationTypesBy query = new FindTerminationTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class TerminationTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createTerminationType(HttpServletRequest request) throws Exception {
 
 		TerminationType terminationTypeToBeAdded = new TerminationType();
@@ -129,7 +129,7 @@ public class TerminationTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateTerminationType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class TerminationTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{terminationTypeId}")
+	@GetMapping("/{terminationTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String terminationTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("terminationTypeId", terminationTypeId);
@@ -207,7 +207,7 @@ public class TerminationTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{terminationTypeId}")
+	@DeleteMapping("/{terminationTypeId}")
 	public ResponseEntity<Object> deleteTerminationTypeByIdUpdated(@PathVariable String terminationTypeId) throws Exception {
 		DeleteTerminationType command = new DeleteTerminationType(terminationTypeId);
 

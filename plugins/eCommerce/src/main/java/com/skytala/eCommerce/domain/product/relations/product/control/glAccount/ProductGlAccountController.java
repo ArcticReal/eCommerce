@@ -57,7 +57,7 @@ public class ProductGlAccountController {
 	 * @return a List with the ProductGlAccounts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductGlAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductGlAccountsBy query = new FindProductGlAccountsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductGlAccountController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductGlAccount(HttpServletRequest request) throws Exception {
 
 		ProductGlAccount productGlAccountToBeAdded = new ProductGlAccount();
@@ -129,7 +129,7 @@ public class ProductGlAccountController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductGlAccount(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductGlAccountController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productGlAccountId}")
+	@GetMapping("/{productGlAccountId}")
 	public ResponseEntity<Object> findById(@PathVariable String productGlAccountId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productGlAccountId", productGlAccountId);
@@ -207,7 +207,7 @@ public class ProductGlAccountController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productGlAccountId}")
+	@DeleteMapping("/{productGlAccountId}")
 	public ResponseEntity<Object> deleteProductGlAccountByIdUpdated(@PathVariable String productGlAccountId) throws Exception {
 		DeleteProductGlAccount command = new DeleteProductGlAccount(productGlAccountId);
 

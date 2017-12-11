@@ -57,7 +57,7 @@ public class BudgetStatusController {
 	 * @return a List with the BudgetStatuss
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findBudgetStatussBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindBudgetStatussBy query = new FindBudgetStatussBy(allRequestParams);
@@ -83,7 +83,7 @@ public class BudgetStatusController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createBudgetStatus(HttpServletRequest request) throws Exception {
 
 		BudgetStatus budgetStatusToBeAdded = new BudgetStatus();
@@ -129,7 +129,7 @@ public class BudgetStatusController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateBudgetStatus(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class BudgetStatusController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{budgetStatusId}")
+	@GetMapping("/{budgetStatusId}")
 	public ResponseEntity<Object> findById(@PathVariable String budgetStatusId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("budgetStatusId", budgetStatusId);
@@ -207,7 +207,7 @@ public class BudgetStatusController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{budgetStatusId}")
+	@DeleteMapping("/{budgetStatusId}")
 	public ResponseEntity<Object> deleteBudgetStatusByIdUpdated(@PathVariable String budgetStatusId) throws Exception {
 		DeleteBudgetStatus command = new DeleteBudgetStatus(budgetStatusId);
 

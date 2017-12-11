@@ -57,7 +57,7 @@ public class ProductStoreGroupMemberController {
 	 * @return a List with the ProductStoreGroupMembers
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductStoreGroupMembersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductStoreGroupMembersBy query = new FindProductStoreGroupMembersBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductStoreGroupMemberController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductStoreGroupMember(HttpServletRequest request) throws Exception {
 
 		ProductStoreGroupMember productStoreGroupMemberToBeAdded = new ProductStoreGroupMember();
@@ -129,7 +129,7 @@ public class ProductStoreGroupMemberController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductStoreGroupMember(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductStoreGroupMemberController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productStoreGroupMemberId}")
+	@GetMapping("/{productStoreGroupMemberId}")
 	public ResponseEntity<Object> findById(@PathVariable String productStoreGroupMemberId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productStoreGroupMemberId", productStoreGroupMemberId);
@@ -207,7 +207,7 @@ public class ProductStoreGroupMemberController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productStoreGroupMemberId}")
+	@DeleteMapping("/{productStoreGroupMemberId}")
 	public ResponseEntity<Object> deleteProductStoreGroupMemberByIdUpdated(@PathVariable String productStoreGroupMemberId) throws Exception {
 		DeleteProductStoreGroupMember command = new DeleteProductStoreGroupMember(productStoreGroupMemberId);
 

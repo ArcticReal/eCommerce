@@ -57,7 +57,7 @@ public class OrderHeaderWorkEffortController {
 	 * @return a List with the OrderHeaderWorkEfforts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderHeaderWorkEffortsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderHeaderWorkEffortsBy query = new FindOrderHeaderWorkEffortsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderHeaderWorkEffortController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderHeaderWorkEffort(HttpServletRequest request) throws Exception {
 
 		OrderHeaderWorkEffort orderHeaderWorkEffortToBeAdded = new OrderHeaderWorkEffort();
@@ -129,7 +129,7 @@ public class OrderHeaderWorkEffortController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderHeaderWorkEffort(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderHeaderWorkEffortController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderHeaderWorkEffortId}")
+	@GetMapping("/{orderHeaderWorkEffortId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderHeaderWorkEffortId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderHeaderWorkEffortId", orderHeaderWorkEffortId);
@@ -207,7 +207,7 @@ public class OrderHeaderWorkEffortController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderHeaderWorkEffortId}")
+	@DeleteMapping("/{orderHeaderWorkEffortId}")
 	public ResponseEntity<Object> deleteOrderHeaderWorkEffortByIdUpdated(@PathVariable String orderHeaderWorkEffortId) throws Exception {
 		DeleteOrderHeaderWorkEffort command = new DeleteOrderHeaderWorkEffort(orderHeaderWorkEffortId);
 

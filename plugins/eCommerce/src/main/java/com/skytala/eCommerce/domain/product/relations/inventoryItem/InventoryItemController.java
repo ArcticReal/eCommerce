@@ -57,7 +57,7 @@ public class InventoryItemController {
 	 * @return a List with the InventoryItems
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findInventoryItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInventoryItemsBy query = new FindInventoryItemsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class InventoryItemController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createInventoryItem(HttpServletRequest request) throws Exception {
 
 		InventoryItem inventoryItemToBeAdded = new InventoryItem();
@@ -129,7 +129,7 @@ public class InventoryItemController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateInventoryItem(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class InventoryItemController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{inventoryItemId}")
+	@GetMapping("/{inventoryItemId}")
 	public ResponseEntity<Object> findById(@PathVariable String inventoryItemId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("inventoryItemId", inventoryItemId);
@@ -207,7 +207,7 @@ public class InventoryItemController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{inventoryItemId}")
+	@DeleteMapping("/{inventoryItemId}")
 	public ResponseEntity<Object> deleteInventoryItemByIdUpdated(@PathVariable String inventoryItemId) throws Exception {
 		DeleteInventoryItem command = new DeleteInventoryItem(inventoryItemId);
 

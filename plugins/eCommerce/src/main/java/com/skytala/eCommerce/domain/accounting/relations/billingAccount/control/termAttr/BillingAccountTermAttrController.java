@@ -57,7 +57,7 @@ public class BillingAccountTermAttrController {
 	 * @return a List with the BillingAccountTermAttrs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findBillingAccountTermAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindBillingAccountTermAttrsBy query = new FindBillingAccountTermAttrsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class BillingAccountTermAttrController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createBillingAccountTermAttr(HttpServletRequest request) throws Exception {
 
 		BillingAccountTermAttr billingAccountTermAttrToBeAdded = new BillingAccountTermAttr();
@@ -129,7 +129,7 @@ public class BillingAccountTermAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateBillingAccountTermAttr(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class BillingAccountTermAttrController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{billingAccountTermAttrId}")
+	@GetMapping("/{billingAccountTermAttrId}")
 	public ResponseEntity<Object> findById(@PathVariable String billingAccountTermAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("billingAccountTermAttrId", billingAccountTermAttrId);
@@ -207,7 +207,7 @@ public class BillingAccountTermAttrController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{billingAccountTermAttrId}")
+	@DeleteMapping("/{billingAccountTermAttrId}")
 	public ResponseEntity<Object> deleteBillingAccountTermAttrByIdUpdated(@PathVariable String billingAccountTermAttrId) throws Exception {
 		DeleteBillingAccountTermAttr command = new DeleteBillingAccountTermAttr(billingAccountTermAttrId);
 

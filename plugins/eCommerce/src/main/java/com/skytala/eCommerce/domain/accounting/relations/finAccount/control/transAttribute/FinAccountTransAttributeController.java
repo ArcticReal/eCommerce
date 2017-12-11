@@ -57,7 +57,7 @@ public class FinAccountTransAttributeController {
 	 * @return a List with the FinAccountTransAttributes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFinAccountTransAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFinAccountTransAttributesBy query = new FindFinAccountTransAttributesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FinAccountTransAttributeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFinAccountTransAttribute(HttpServletRequest request) throws Exception {
 
 		FinAccountTransAttribute finAccountTransAttributeToBeAdded = new FinAccountTransAttribute();
@@ -129,7 +129,7 @@ public class FinAccountTransAttributeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFinAccountTransAttribute(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FinAccountTransAttributeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{finAccountTransAttributeId}")
+	@GetMapping("/{finAccountTransAttributeId}")
 	public ResponseEntity<Object> findById(@PathVariable String finAccountTransAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("finAccountTransAttributeId", finAccountTransAttributeId);
@@ -207,7 +207,7 @@ public class FinAccountTransAttributeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{finAccountTransAttributeId}")
+	@DeleteMapping("/{finAccountTransAttributeId}")
 	public ResponseEntity<Object> deleteFinAccountTransAttributeByIdUpdated(@PathVariable String finAccountTransAttributeId) throws Exception {
 		DeleteFinAccountTransAttribute command = new DeleteFinAccountTransAttribute(finAccountTransAttributeId);
 

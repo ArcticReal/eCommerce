@@ -57,7 +57,7 @@ public class DeductionTypeController {
 	 * @return a List with the DeductionTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findDeductionTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDeductionTypesBy query = new FindDeductionTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class DeductionTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createDeductionType(HttpServletRequest request) throws Exception {
 
 		DeductionType deductionTypeToBeAdded = new DeductionType();
@@ -129,7 +129,7 @@ public class DeductionTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateDeductionType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class DeductionTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{deductionTypeId}")
+	@GetMapping("/{deductionTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String deductionTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("deductionTypeId", deductionTypeId);
@@ -207,7 +207,7 @@ public class DeductionTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{deductionTypeId}")
+	@DeleteMapping("/{deductionTypeId}")
 	public ResponseEntity<Object> deleteDeductionTypeByIdUpdated(@PathVariable String deductionTypeId) throws Exception {
 		DeleteDeductionType command = new DeleteDeductionType(deductionTypeId);
 

@@ -57,7 +57,7 @@ public class ProductAssocController {
 	 * @return a List with the ProductAssocs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductAssocsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductAssocsBy query = new FindProductAssocsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductAssocController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductAssoc(HttpServletRequest request) throws Exception {
 
 		ProductAssoc productAssocToBeAdded = new ProductAssoc();
@@ -129,7 +129,7 @@ public class ProductAssocController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductAssoc(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductAssocController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productAssocId}")
+	@GetMapping("/{productAssocId}")
 	public ResponseEntity<Object> findById(@PathVariable String productAssocId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productAssocId", productAssocId);
@@ -207,7 +207,7 @@ public class ProductAssocController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productAssocId}")
+	@DeleteMapping("/{productAssocId}")
 	public ResponseEntity<Object> deleteProductAssocByIdUpdated(@PathVariable String productAssocId) throws Exception {
 		DeleteProductAssoc command = new DeleteProductAssoc(productAssocId);
 

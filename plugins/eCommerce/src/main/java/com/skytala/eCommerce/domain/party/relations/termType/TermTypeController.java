@@ -57,7 +57,7 @@ public class TermTypeController {
 	 * @return a List with the TermTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findTermTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTermTypesBy query = new FindTermTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class TermTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createTermType(HttpServletRequest request) throws Exception {
 
 		TermType termTypeToBeAdded = new TermType();
@@ -129,7 +129,7 @@ public class TermTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateTermType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class TermTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{termTypeId}")
+	@GetMapping("/{termTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String termTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("termTypeId", termTypeId);
@@ -207,7 +207,7 @@ public class TermTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{termTypeId}")
+	@DeleteMapping("/{termTypeId}")
 	public ResponseEntity<Object> deleteTermTypeByIdUpdated(@PathVariable String termTypeId) throws Exception {
 		DeleteTermType command = new DeleteTermType(termTypeId);
 

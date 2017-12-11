@@ -57,7 +57,7 @@ public class ValidResponsibilityController {
 	 * @return a List with the ValidResponsibilitys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findValidResponsibilitysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindValidResponsibilitysBy query = new FindValidResponsibilitysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ValidResponsibilityController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createValidResponsibility(HttpServletRequest request) throws Exception {
 
 		ValidResponsibility validResponsibilityToBeAdded = new ValidResponsibility();
@@ -129,7 +129,7 @@ public class ValidResponsibilityController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateValidResponsibility(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ValidResponsibilityController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{validResponsibilityId}")
+	@GetMapping("/{validResponsibilityId}")
 	public ResponseEntity<Object> findById(@PathVariable String validResponsibilityId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("validResponsibilityId", validResponsibilityId);
@@ -207,7 +207,7 @@ public class ValidResponsibilityController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{validResponsibilityId}")
+	@DeleteMapping("/{validResponsibilityId}")
 	public ResponseEntity<Object> deleteValidResponsibilityByIdUpdated(@PathVariable String validResponsibilityId) throws Exception {
 		DeleteValidResponsibility command = new DeleteValidResponsibility(validResponsibilityId);
 

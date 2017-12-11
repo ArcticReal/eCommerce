@@ -57,7 +57,7 @@ public class OrderItemAssocController {
 	 * @return a List with the OrderItemAssocs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderItemAssocsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderItemAssocsBy query = new FindOrderItemAssocsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderItemAssocController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderItemAssoc(HttpServletRequest request) throws Exception {
 
 		OrderItemAssoc orderItemAssocToBeAdded = new OrderItemAssoc();
@@ -129,7 +129,7 @@ public class OrderItemAssocController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderItemAssoc(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderItemAssocController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderItemAssocId}")
+	@GetMapping("/{orderItemAssocId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderItemAssocId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderItemAssocId", orderItemAssocId);
@@ -207,7 +207,7 @@ public class OrderItemAssocController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderItemAssocId}")
+	@DeleteMapping("/{orderItemAssocId}")
 	public ResponseEntity<Object> deleteOrderItemAssocByIdUpdated(@PathVariable String orderItemAssocId) throws Exception {
 		DeleteOrderItemAssoc command = new DeleteOrderItemAssoc(orderItemAssocId);
 

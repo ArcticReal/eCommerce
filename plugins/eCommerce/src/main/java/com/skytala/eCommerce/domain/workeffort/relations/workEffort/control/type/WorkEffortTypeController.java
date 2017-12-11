@@ -57,7 +57,7 @@ public class WorkEffortTypeController {
 	 * @return a List with the WorkEffortTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWorkEffortTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortTypesBy query = new FindWorkEffortTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WorkEffortTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWorkEffortType(HttpServletRequest request) throws Exception {
 
 		WorkEffortType workEffortTypeToBeAdded = new WorkEffortType();
@@ -129,7 +129,7 @@ public class WorkEffortTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWorkEffortType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WorkEffortTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{workEffortTypeId}")
+	@GetMapping("/{workEffortTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String workEffortTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortTypeId", workEffortTypeId);
@@ -207,7 +207,7 @@ public class WorkEffortTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{workEffortTypeId}")
+	@DeleteMapping("/{workEffortTypeId}")
 	public ResponseEntity<Object> deleteWorkEffortTypeByIdUpdated(@PathVariable String workEffortTypeId) throws Exception {
 		DeleteWorkEffortType command = new DeleteWorkEffortType(workEffortTypeId);
 

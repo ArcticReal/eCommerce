@@ -57,7 +57,7 @@ public class PerfRatingTypeController {
 	 * @return a List with the PerfRatingTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPerfRatingTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPerfRatingTypesBy query = new FindPerfRatingTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PerfRatingTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPerfRatingType(HttpServletRequest request) throws Exception {
 
 		PerfRatingType perfRatingTypeToBeAdded = new PerfRatingType();
@@ -129,7 +129,7 @@ public class PerfRatingTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePerfRatingType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PerfRatingTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{perfRatingTypeId}")
+	@GetMapping("/{perfRatingTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String perfRatingTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("perfRatingTypeId", perfRatingTypeId);
@@ -207,7 +207,7 @@ public class PerfRatingTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{perfRatingTypeId}")
+	@DeleteMapping("/{perfRatingTypeId}")
 	public ResponseEntity<Object> deletePerfRatingTypeByIdUpdated(@PathVariable String perfRatingTypeId) throws Exception {
 		DeletePerfRatingType command = new DeletePerfRatingType(perfRatingTypeId);
 

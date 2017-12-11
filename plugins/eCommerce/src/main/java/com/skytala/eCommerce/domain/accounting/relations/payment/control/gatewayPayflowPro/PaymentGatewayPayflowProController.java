@@ -57,7 +57,7 @@ public class PaymentGatewayPayflowProController {
 	 * @return a List with the PaymentGatewayPayflowPros
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPaymentGatewayPayflowProsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentGatewayPayflowProsBy query = new FindPaymentGatewayPayflowProsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PaymentGatewayPayflowProController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPaymentGatewayPayflowPro(HttpServletRequest request) throws Exception {
 
 		PaymentGatewayPayflowPro paymentGatewayPayflowProToBeAdded = new PaymentGatewayPayflowPro();
@@ -129,7 +129,7 @@ public class PaymentGatewayPayflowProController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePaymentGatewayPayflowPro(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PaymentGatewayPayflowProController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{paymentGatewayPayflowProId}")
+	@GetMapping("/{paymentGatewayPayflowProId}")
 	public ResponseEntity<Object> findById(@PathVariable String paymentGatewayPayflowProId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentGatewayPayflowProId", paymentGatewayPayflowProId);
@@ -207,7 +207,7 @@ public class PaymentGatewayPayflowProController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{paymentGatewayPayflowProId}")
+	@DeleteMapping("/{paymentGatewayPayflowProId}")
 	public ResponseEntity<Object> deletePaymentGatewayPayflowProByIdUpdated(@PathVariable String paymentGatewayPayflowProId) throws Exception {
 		DeletePaymentGatewayPayflowPro command = new DeletePaymentGatewayPayflowPro(paymentGatewayPayflowProId);
 

@@ -57,7 +57,7 @@ public class PartyFixedAssetAssignmentController {
 	 * @return a List with the PartyFixedAssetAssignments
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyFixedAssetAssignmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyFixedAssetAssignmentsBy query = new FindPartyFixedAssetAssignmentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyFixedAssetAssignmentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyFixedAssetAssignment(HttpServletRequest request) throws Exception {
 
 		PartyFixedAssetAssignment partyFixedAssetAssignmentToBeAdded = new PartyFixedAssetAssignment();
@@ -129,7 +129,7 @@ public class PartyFixedAssetAssignmentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyFixedAssetAssignment(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyFixedAssetAssignmentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyFixedAssetAssignmentId}")
+	@GetMapping("/{partyFixedAssetAssignmentId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyFixedAssetAssignmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyFixedAssetAssignmentId", partyFixedAssetAssignmentId);
@@ -207,7 +207,7 @@ public class PartyFixedAssetAssignmentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyFixedAssetAssignmentId}")
+	@DeleteMapping("/{partyFixedAssetAssignmentId}")
 	public ResponseEntity<Object> deletePartyFixedAssetAssignmentByIdUpdated(@PathVariable String partyFixedAssetAssignmentId) throws Exception {
 		DeletePartyFixedAssetAssignment command = new DeletePartyFixedAssetAssignment(partyFixedAssetAssignmentId);
 

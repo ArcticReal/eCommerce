@@ -57,7 +57,7 @@ public class CommEventContentAssocController {
 	 * @return a List with the CommEventContentAssocs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findCommEventContentAssocsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCommEventContentAssocsBy query = new FindCommEventContentAssocsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class CommEventContentAssocController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createCommEventContentAssoc(HttpServletRequest request) throws Exception {
 
 		CommEventContentAssoc commEventContentAssocToBeAdded = new CommEventContentAssoc();
@@ -129,7 +129,7 @@ public class CommEventContentAssocController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateCommEventContentAssoc(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class CommEventContentAssocController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{commEventContentAssocId}")
+	@GetMapping("/{commEventContentAssocId}")
 	public ResponseEntity<Object> findById(@PathVariable String commEventContentAssocId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("commEventContentAssocId", commEventContentAssocId);
@@ -207,7 +207,7 @@ public class CommEventContentAssocController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{commEventContentAssocId}")
+	@DeleteMapping("/{commEventContentAssocId}")
 	public ResponseEntity<Object> deleteCommEventContentAssocByIdUpdated(@PathVariable String commEventContentAssocId) throws Exception {
 		DeleteCommEventContentAssoc command = new DeleteCommEventContentAssoc(commEventContentAssocId);
 

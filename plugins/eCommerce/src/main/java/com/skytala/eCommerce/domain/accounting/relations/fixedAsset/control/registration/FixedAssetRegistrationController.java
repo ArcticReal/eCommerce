@@ -57,7 +57,7 @@ public class FixedAssetRegistrationController {
 	 * @return a List with the FixedAssetRegistrations
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFixedAssetRegistrationsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFixedAssetRegistrationsBy query = new FindFixedAssetRegistrationsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FixedAssetRegistrationController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFixedAssetRegistration(HttpServletRequest request) throws Exception {
 
 		FixedAssetRegistration fixedAssetRegistrationToBeAdded = new FixedAssetRegistration();
@@ -129,7 +129,7 @@ public class FixedAssetRegistrationController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFixedAssetRegistration(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FixedAssetRegistrationController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{fixedAssetRegistrationId}")
+	@GetMapping("/{fixedAssetRegistrationId}")
 	public ResponseEntity<Object> findById(@PathVariable String fixedAssetRegistrationId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("fixedAssetRegistrationId", fixedAssetRegistrationId);
@@ -207,7 +207,7 @@ public class FixedAssetRegistrationController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{fixedAssetRegistrationId}")
+	@DeleteMapping("/{fixedAssetRegistrationId}")
 	public ResponseEntity<Object> deleteFixedAssetRegistrationByIdUpdated(@PathVariable String fixedAssetRegistrationId) throws Exception {
 		DeleteFixedAssetRegistration command = new DeleteFixedAssetRegistration(fixedAssetRegistrationId);
 

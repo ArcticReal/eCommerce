@@ -57,7 +57,7 @@ public class InvoiceItemTypeController {
 	 * @return a List with the InvoiceItemTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findInvoiceItemTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInvoiceItemTypesBy query = new FindInvoiceItemTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class InvoiceItemTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createInvoiceItemType(HttpServletRequest request) throws Exception {
 
 		InvoiceItemType invoiceItemTypeToBeAdded = new InvoiceItemType();
@@ -129,7 +129,7 @@ public class InvoiceItemTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateInvoiceItemType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class InvoiceItemTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{invoiceItemTypeId}")
+	@GetMapping("/{invoiceItemTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String invoiceItemTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("invoiceItemTypeId", invoiceItemTypeId);
@@ -207,7 +207,7 @@ public class InvoiceItemTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{invoiceItemTypeId}")
+	@DeleteMapping("/{invoiceItemTypeId}")
 	public ResponseEntity<Object> deleteInvoiceItemTypeByIdUpdated(@PathVariable String invoiceItemTypeId) throws Exception {
 		DeleteInvoiceItemType command = new DeleteInvoiceItemType(invoiceItemTypeId);
 

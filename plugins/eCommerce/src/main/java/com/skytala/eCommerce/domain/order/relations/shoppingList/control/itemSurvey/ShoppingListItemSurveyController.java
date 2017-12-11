@@ -57,7 +57,7 @@ public class ShoppingListItemSurveyController {
 	 * @return a List with the ShoppingListItemSurveys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findShoppingListItemSurveysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShoppingListItemSurveysBy query = new FindShoppingListItemSurveysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ShoppingListItemSurveyController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createShoppingListItemSurvey(HttpServletRequest request) throws Exception {
 
 		ShoppingListItemSurvey shoppingListItemSurveyToBeAdded = new ShoppingListItemSurvey();
@@ -129,7 +129,7 @@ public class ShoppingListItemSurveyController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateShoppingListItemSurvey(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ShoppingListItemSurveyController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{shoppingListItemSurveyId}")
+	@GetMapping("/{shoppingListItemSurveyId}")
 	public ResponseEntity<Object> findById(@PathVariable String shoppingListItemSurveyId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shoppingListItemSurveyId", shoppingListItemSurveyId);
@@ -207,7 +207,7 @@ public class ShoppingListItemSurveyController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{shoppingListItemSurveyId}")
+	@DeleteMapping("/{shoppingListItemSurveyId}")
 	public ResponseEntity<Object> deleteShoppingListItemSurveyByIdUpdated(@PathVariable String shoppingListItemSurveyId) throws Exception {
 		DeleteShoppingListItemSurvey command = new DeleteShoppingListItemSurvey(shoppingListItemSurveyId);
 

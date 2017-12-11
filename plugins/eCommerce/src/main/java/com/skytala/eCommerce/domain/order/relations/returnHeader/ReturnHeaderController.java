@@ -57,7 +57,7 @@ public class ReturnHeaderController {
 	 * @return a List with the ReturnHeaders
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findReturnHeadersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindReturnHeadersBy query = new FindReturnHeadersBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ReturnHeaderController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createReturnHeader(HttpServletRequest request) throws Exception {
 
 		ReturnHeader returnHeaderToBeAdded = new ReturnHeader();
@@ -129,7 +129,7 @@ public class ReturnHeaderController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateReturnHeader(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ReturnHeaderController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{returnHeaderId}")
+	@GetMapping("/{returnHeaderId}")
 	public ResponseEntity<Object> findById(@PathVariable String returnHeaderId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("returnHeaderId", returnHeaderId);
@@ -207,7 +207,7 @@ public class ReturnHeaderController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{returnHeaderId}")
+	@DeleteMapping("/{returnHeaderId}")
 	public ResponseEntity<Object> deleteReturnHeaderByIdUpdated(@PathVariable String returnHeaderId) throws Exception {
 		DeleteReturnHeader command = new DeleteReturnHeader(returnHeaderId);
 

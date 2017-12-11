@@ -57,7 +57,7 @@ public class GlXbrlClassController {
 	 * @return a List with the GlXbrlClasss
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findGlXbrlClasssBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGlXbrlClasssBy query = new FindGlXbrlClasssBy(allRequestParams);
@@ -83,7 +83,7 @@ public class GlXbrlClassController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createGlXbrlClass(HttpServletRequest request) throws Exception {
 
 		GlXbrlClass glXbrlClassToBeAdded = new GlXbrlClass();
@@ -129,7 +129,7 @@ public class GlXbrlClassController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateGlXbrlClass(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class GlXbrlClassController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{glXbrlClassId}")
+	@GetMapping("/{glXbrlClassId}")
 	public ResponseEntity<Object> findById(@PathVariable String glXbrlClassId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("glXbrlClassId", glXbrlClassId);
@@ -207,7 +207,7 @@ public class GlXbrlClassController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{glXbrlClassId}")
+	@DeleteMapping("/{glXbrlClassId}")
 	public ResponseEntity<Object> deleteGlXbrlClassByIdUpdated(@PathVariable String glXbrlClassId) throws Exception {
 		DeleteGlXbrlClass command = new DeleteGlXbrlClass(glXbrlClassId);
 

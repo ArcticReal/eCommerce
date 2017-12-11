@@ -57,7 +57,7 @@ public class ValueLinkKeyController {
 	 * @return a List with the ValueLinkKeys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findValueLinkKeysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindValueLinkKeysBy query = new FindValueLinkKeysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ValueLinkKeyController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createValueLinkKey(HttpServletRequest request) throws Exception {
 
 		ValueLinkKey valueLinkKeyToBeAdded = new ValueLinkKey();
@@ -129,7 +129,7 @@ public class ValueLinkKeyController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateValueLinkKey(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ValueLinkKeyController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{valueLinkKeyId}")
+	@GetMapping("/{valueLinkKeyId}")
 	public ResponseEntity<Object> findById(@PathVariable String valueLinkKeyId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("valueLinkKeyId", valueLinkKeyId);
@@ -207,7 +207,7 @@ public class ValueLinkKeyController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{valueLinkKeyId}")
+	@DeleteMapping("/{valueLinkKeyId}")
 	public ResponseEntity<Object> deleteValueLinkKeyByIdUpdated(@PathVariable String valueLinkKeyId) throws Exception {
 		DeleteValueLinkKey command = new DeleteValueLinkKey(valueLinkKeyId);
 

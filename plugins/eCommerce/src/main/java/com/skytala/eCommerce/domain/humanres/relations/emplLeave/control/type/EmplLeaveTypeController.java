@@ -57,7 +57,7 @@ public class EmplLeaveTypeController {
 	 * @return a List with the EmplLeaveTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findEmplLeaveTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindEmplLeaveTypesBy query = new FindEmplLeaveTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class EmplLeaveTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createEmplLeaveType(HttpServletRequest request) throws Exception {
 
 		EmplLeaveType emplLeaveTypeToBeAdded = new EmplLeaveType();
@@ -129,7 +129,7 @@ public class EmplLeaveTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateEmplLeaveType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class EmplLeaveTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{emplLeaveTypeId}")
+	@GetMapping("/{emplLeaveTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String emplLeaveTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("emplLeaveTypeId", emplLeaveTypeId);
@@ -207,7 +207,7 @@ public class EmplLeaveTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{emplLeaveTypeId}")
+	@DeleteMapping("/{emplLeaveTypeId}")
 	public ResponseEntity<Object> deleteEmplLeaveTypeByIdUpdated(@PathVariable String emplLeaveTypeId) throws Exception {
 		DeleteEmplLeaveType command = new DeleteEmplLeaveType(emplLeaveTypeId);
 

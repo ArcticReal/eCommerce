@@ -57,7 +57,7 @@ public class WebPreferenceTypeController {
 	 * @return a List with the WebPreferenceTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWebPreferenceTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWebPreferenceTypesBy query = new FindWebPreferenceTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WebPreferenceTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWebPreferenceType(HttpServletRequest request) throws Exception {
 
 		WebPreferenceType webPreferenceTypeToBeAdded = new WebPreferenceType();
@@ -129,7 +129,7 @@ public class WebPreferenceTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWebPreferenceType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WebPreferenceTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{webPreferenceTypeId}")
+	@GetMapping("/{webPreferenceTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String webPreferenceTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("webPreferenceTypeId", webPreferenceTypeId);
@@ -207,7 +207,7 @@ public class WebPreferenceTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{webPreferenceTypeId}")
+	@DeleteMapping("/{webPreferenceTypeId}")
 	public ResponseEntity<Object> deleteWebPreferenceTypeByIdUpdated(@PathVariable String webPreferenceTypeId) throws Exception {
 		DeleteWebPreferenceType command = new DeleteWebPreferenceType(webPreferenceTypeId);
 

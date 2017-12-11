@@ -57,7 +57,7 @@ public class DeliverableTypeController {
 	 * @return a List with the DeliverableTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findDeliverableTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDeliverableTypesBy query = new FindDeliverableTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class DeliverableTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createDeliverableType(HttpServletRequest request) throws Exception {
 
 		DeliverableType deliverableTypeToBeAdded = new DeliverableType();
@@ -129,7 +129,7 @@ public class DeliverableTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateDeliverableType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class DeliverableTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{deliverableTypeId}")
+	@GetMapping("/{deliverableTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String deliverableTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("deliverableTypeId", deliverableTypeId);
@@ -207,7 +207,7 @@ public class DeliverableTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{deliverableTypeId}")
+	@DeleteMapping("/{deliverableTypeId}")
 	public ResponseEntity<Object> deleteDeliverableTypeByIdUpdated(@PathVariable String deliverableTypeId) throws Exception {
 		DeleteDeliverableType command = new DeleteDeliverableType(deliverableTypeId);
 

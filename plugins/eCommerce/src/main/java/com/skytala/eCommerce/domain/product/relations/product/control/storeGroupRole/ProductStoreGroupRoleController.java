@@ -57,7 +57,7 @@ public class ProductStoreGroupRoleController {
 	 * @return a List with the ProductStoreGroupRoles
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductStoreGroupRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductStoreGroupRolesBy query = new FindProductStoreGroupRolesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductStoreGroupRoleController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductStoreGroupRole(HttpServletRequest request) throws Exception {
 
 		ProductStoreGroupRole productStoreGroupRoleToBeAdded = new ProductStoreGroupRole();
@@ -129,7 +129,7 @@ public class ProductStoreGroupRoleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductStoreGroupRole(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductStoreGroupRoleController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productStoreGroupRoleId}")
+	@GetMapping("/{productStoreGroupRoleId}")
 	public ResponseEntity<Object> findById(@PathVariable String productStoreGroupRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productStoreGroupRoleId", productStoreGroupRoleId);
@@ -207,7 +207,7 @@ public class ProductStoreGroupRoleController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productStoreGroupRoleId}")
+	@DeleteMapping("/{productStoreGroupRoleId}")
 	public ResponseEntity<Object> deleteProductStoreGroupRoleByIdUpdated(@PathVariable String productStoreGroupRoleId) throws Exception {
 		DeleteProductStoreGroupRole command = new DeleteProductStoreGroupRole(productStoreGroupRoleId);
 

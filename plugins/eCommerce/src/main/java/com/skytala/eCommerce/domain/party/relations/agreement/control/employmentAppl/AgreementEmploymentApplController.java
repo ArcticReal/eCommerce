@@ -57,7 +57,7 @@ public class AgreementEmploymentApplController {
 	 * @return a List with the AgreementEmploymentAppls
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findAgreementEmploymentApplsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAgreementEmploymentApplsBy query = new FindAgreementEmploymentApplsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class AgreementEmploymentApplController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createAgreementEmploymentAppl(HttpServletRequest request) throws Exception {
 
 		AgreementEmploymentAppl agreementEmploymentApplToBeAdded = new AgreementEmploymentAppl();
@@ -129,7 +129,7 @@ public class AgreementEmploymentApplController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateAgreementEmploymentAppl(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class AgreementEmploymentApplController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{agreementEmploymentApplId}")
+	@GetMapping("/{agreementEmploymentApplId}")
 	public ResponseEntity<Object> findById(@PathVariable String agreementEmploymentApplId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("agreementEmploymentApplId", agreementEmploymentApplId);
@@ -207,7 +207,7 @@ public class AgreementEmploymentApplController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{agreementEmploymentApplId}")
+	@DeleteMapping("/{agreementEmploymentApplId}")
 	public ResponseEntity<Object> deleteAgreementEmploymentApplByIdUpdated(@PathVariable String agreementEmploymentApplId) throws Exception {
 		DeleteAgreementEmploymentAppl command = new DeleteAgreementEmploymentAppl(agreementEmploymentApplId);
 

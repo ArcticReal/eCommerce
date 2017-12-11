@@ -57,7 +57,7 @@ public class ContactMechTypePurposeController {
 	 * @return a List with the ContactMechTypePurposes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findContactMechTypePurposesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContactMechTypePurposesBy query = new FindContactMechTypePurposesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ContactMechTypePurposeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createContactMechTypePurpose(HttpServletRequest request) throws Exception {
 
 		ContactMechTypePurpose contactMechTypePurposeToBeAdded = new ContactMechTypePurpose();
@@ -129,7 +129,7 @@ public class ContactMechTypePurposeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateContactMechTypePurpose(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ContactMechTypePurposeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{contactMechTypePurposeId}")
+	@GetMapping("/{contactMechTypePurposeId}")
 	public ResponseEntity<Object> findById(@PathVariable String contactMechTypePurposeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contactMechTypePurposeId", contactMechTypePurposeId);
@@ -207,7 +207,7 @@ public class ContactMechTypePurposeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{contactMechTypePurposeId}")
+	@DeleteMapping("/{contactMechTypePurposeId}")
 	public ResponseEntity<Object> deleteContactMechTypePurposeByIdUpdated(@PathVariable String contactMechTypePurposeId) throws Exception {
 		DeleteContactMechTypePurpose command = new DeleteContactMechTypePurpose(contactMechTypePurposeId);
 

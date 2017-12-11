@@ -57,7 +57,7 @@ public class ReturnItemController {
 	 * @return a List with the ReturnItems
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findReturnItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindReturnItemsBy query = new FindReturnItemsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ReturnItemController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createReturnItem(HttpServletRequest request) throws Exception {
 
 		ReturnItem returnItemToBeAdded = new ReturnItem();
@@ -129,7 +129,7 @@ public class ReturnItemController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateReturnItem(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ReturnItemController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{returnItemId}")
+	@GetMapping("/{returnItemId}")
 	public ResponseEntity<Object> findById(@PathVariable String returnItemId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("returnItemId", returnItemId);
@@ -207,7 +207,7 @@ public class ReturnItemController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{returnItemId}")
+	@DeleteMapping("/{returnItemId}")
 	public ResponseEntity<Object> deleteReturnItemByIdUpdated(@PathVariable String returnItemId) throws Exception {
 		DeleteReturnItem command = new DeleteReturnItem(returnItemId);
 

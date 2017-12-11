@@ -57,7 +57,7 @@ public class JobRequisitionController {
 	 * @return a List with the JobRequisitions
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findJobRequisitionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindJobRequisitionsBy query = new FindJobRequisitionsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class JobRequisitionController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createJobRequisition(HttpServletRequest request) throws Exception {
 
 		JobRequisition jobRequisitionToBeAdded = new JobRequisition();
@@ -129,7 +129,7 @@ public class JobRequisitionController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateJobRequisition(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class JobRequisitionController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{jobRequisitionId}")
+	@GetMapping("/{jobRequisitionId}")
 	public ResponseEntity<Object> findById(@PathVariable String jobRequisitionId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("jobRequisitionId", jobRequisitionId);
@@ -207,7 +207,7 @@ public class JobRequisitionController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{jobRequisitionId}")
+	@DeleteMapping("/{jobRequisitionId}")
 	public ResponseEntity<Object> deleteJobRequisitionByIdUpdated(@PathVariable String jobRequisitionId) throws Exception {
 		DeleteJobRequisition command = new DeleteJobRequisition(jobRequisitionId);
 

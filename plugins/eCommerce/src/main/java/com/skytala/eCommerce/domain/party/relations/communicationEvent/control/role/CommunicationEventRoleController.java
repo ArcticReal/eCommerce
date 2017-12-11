@@ -57,7 +57,7 @@ public class CommunicationEventRoleController {
 	 * @return a List with the CommunicationEventRoles
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findCommunicationEventRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCommunicationEventRolesBy query = new FindCommunicationEventRolesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class CommunicationEventRoleController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createCommunicationEventRole(HttpServletRequest request) throws Exception {
 
 		CommunicationEventRole communicationEventRoleToBeAdded = new CommunicationEventRole();
@@ -129,7 +129,7 @@ public class CommunicationEventRoleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateCommunicationEventRole(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class CommunicationEventRoleController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{communicationEventRoleId}")
+	@GetMapping("/{communicationEventRoleId}")
 	public ResponseEntity<Object> findById(@PathVariable String communicationEventRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("communicationEventRoleId", communicationEventRoleId);
@@ -207,7 +207,7 @@ public class CommunicationEventRoleController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{communicationEventRoleId}")
+	@DeleteMapping("/{communicationEventRoleId}")
 	public ResponseEntity<Object> deleteCommunicationEventRoleByIdUpdated(@PathVariable String communicationEventRoleId) throws Exception {
 		DeleteCommunicationEventRole command = new DeleteCommunicationEventRole(communicationEventRoleId);
 

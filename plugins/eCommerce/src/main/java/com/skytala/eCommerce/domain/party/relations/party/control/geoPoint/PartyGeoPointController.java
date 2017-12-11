@@ -57,7 +57,7 @@ public class PartyGeoPointController {
 	 * @return a List with the PartyGeoPoints
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyGeoPointsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyGeoPointsBy query = new FindPartyGeoPointsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyGeoPointController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyGeoPoint(HttpServletRequest request) throws Exception {
 
 		PartyGeoPoint partyGeoPointToBeAdded = new PartyGeoPoint();
@@ -129,7 +129,7 @@ public class PartyGeoPointController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyGeoPoint(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyGeoPointController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyGeoPointId}")
+	@GetMapping("/{partyGeoPointId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyGeoPointId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyGeoPointId", partyGeoPointId);
@@ -207,7 +207,7 @@ public class PartyGeoPointController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyGeoPointId}")
+	@DeleteMapping("/{partyGeoPointId}")
 	public ResponseEntity<Object> deletePartyGeoPointByIdUpdated(@PathVariable String partyGeoPointId) throws Exception {
 		DeletePartyGeoPoint command = new DeletePartyGeoPoint(partyGeoPointId);
 

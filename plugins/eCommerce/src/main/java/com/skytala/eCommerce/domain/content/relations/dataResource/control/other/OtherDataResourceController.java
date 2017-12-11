@@ -57,7 +57,7 @@ public class OtherDataResourceController {
 	 * @return a List with the OtherDataResources
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOtherDataResourcesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOtherDataResourcesBy query = new FindOtherDataResourcesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OtherDataResourceController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOtherDataResource(HttpServletRequest request) throws Exception {
 
 		OtherDataResource otherDataResourceToBeAdded = new OtherDataResource();
@@ -129,7 +129,7 @@ public class OtherDataResourceController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOtherDataResource(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OtherDataResourceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{otherDataResourceId}")
+	@GetMapping("/{otherDataResourceId}")
 	public ResponseEntity<Object> findById(@PathVariable String otherDataResourceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("otherDataResourceId", otherDataResourceId);
@@ -207,7 +207,7 @@ public class OtherDataResourceController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{otherDataResourceId}")
+	@DeleteMapping("/{otherDataResourceId}")
 	public ResponseEntity<Object> deleteOtherDataResourceByIdUpdated(@PathVariable String otherDataResourceId) throws Exception {
 		DeleteOtherDataResource command = new DeleteOtherDataResource(otherDataResourceId);
 

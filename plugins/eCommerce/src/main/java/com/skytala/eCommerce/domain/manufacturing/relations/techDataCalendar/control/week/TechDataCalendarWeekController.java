@@ -57,7 +57,7 @@ public class TechDataCalendarWeekController {
 	 * @return a List with the TechDataCalendarWeeks
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findTechDataCalendarWeeksBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTechDataCalendarWeeksBy query = new FindTechDataCalendarWeeksBy(allRequestParams);
@@ -83,7 +83,7 @@ public class TechDataCalendarWeekController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createTechDataCalendarWeek(HttpServletRequest request) throws Exception {
 
 		TechDataCalendarWeek techDataCalendarWeekToBeAdded = new TechDataCalendarWeek();
@@ -129,7 +129,7 @@ public class TechDataCalendarWeekController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateTechDataCalendarWeek(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class TechDataCalendarWeekController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{techDataCalendarWeekId}")
+	@GetMapping("/{techDataCalendarWeekId}")
 	public ResponseEntity<Object> findById(@PathVariable String techDataCalendarWeekId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("techDataCalendarWeekId", techDataCalendarWeekId);
@@ -207,7 +207,7 @@ public class TechDataCalendarWeekController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{techDataCalendarWeekId}")
+	@DeleteMapping("/{techDataCalendarWeekId}")
 	public ResponseEntity<Object> deleteTechDataCalendarWeekByIdUpdated(@PathVariable String techDataCalendarWeekId) throws Exception {
 		DeleteTechDataCalendarWeek command = new DeleteTechDataCalendarWeek(techDataCalendarWeekId);
 

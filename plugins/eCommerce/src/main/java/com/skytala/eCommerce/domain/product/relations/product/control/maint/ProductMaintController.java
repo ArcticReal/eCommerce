@@ -57,7 +57,7 @@ public class ProductMaintController {
 	 * @return a List with the ProductMaints
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductMaintsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductMaintsBy query = new FindProductMaintsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductMaintController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductMaint(HttpServletRequest request) throws Exception {
 
 		ProductMaint productMaintToBeAdded = new ProductMaint();
@@ -129,7 +129,7 @@ public class ProductMaintController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductMaint(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductMaintController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productMaintId}")
+	@GetMapping("/{productMaintId}")
 	public ResponseEntity<Object> findById(@PathVariable String productMaintId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productMaintId", productMaintId);
@@ -207,7 +207,7 @@ public class ProductMaintController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productMaintId}")
+	@DeleteMapping("/{productMaintId}")
 	public ResponseEntity<Object> deleteProductMaintByIdUpdated(@PathVariable String productMaintId) throws Exception {
 		DeleteProductMaint command = new DeleteProductMaint(productMaintId);
 

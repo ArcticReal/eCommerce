@@ -57,7 +57,7 @@ public class RejectionReasonController {
 	 * @return a List with the RejectionReasons
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findRejectionReasonsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindRejectionReasonsBy query = new FindRejectionReasonsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class RejectionReasonController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createRejectionReason(HttpServletRequest request) throws Exception {
 
 		RejectionReason rejectionReasonToBeAdded = new RejectionReason();
@@ -129,7 +129,7 @@ public class RejectionReasonController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateRejectionReason(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class RejectionReasonController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{rejectionReasonId}")
+	@GetMapping("/{rejectionReasonId}")
 	public ResponseEntity<Object> findById(@PathVariable String rejectionReasonId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("rejectionReasonId", rejectionReasonId);
@@ -207,7 +207,7 @@ public class RejectionReasonController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{rejectionReasonId}")
+	@DeleteMapping("/{rejectionReasonId}")
 	public ResponseEntity<Object> deleteRejectionReasonByIdUpdated(@PathVariable String rejectionReasonId) throws Exception {
 		DeleteRejectionReason command = new DeleteRejectionReason(rejectionReasonId);
 

@@ -57,7 +57,7 @@ public class ProductStoreController {
 	 * @return a List with the ProductStores
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductStoresBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductStoresBy query = new FindProductStoresBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductStoreController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductStore(HttpServletRequest request) throws Exception {
 
 		ProductStore productStoreToBeAdded = new ProductStore();
@@ -129,7 +129,7 @@ public class ProductStoreController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductStore(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductStoreController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productStoreId}")
+	@GetMapping("/{productStoreId}")
 	public ResponseEntity<Object> findById(@PathVariable String productStoreId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productStoreId", productStoreId);
@@ -207,7 +207,7 @@ public class ProductStoreController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productStoreId}")
+	@DeleteMapping("/{productStoreId}")
 	public ResponseEntity<Object> deleteProductStoreByIdUpdated(@PathVariable String productStoreId) throws Exception {
 		DeleteProductStore command = new DeleteProductStore(productStoreId);
 

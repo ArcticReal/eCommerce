@@ -57,7 +57,7 @@ public class ContainerTypeController {
 	 * @return a List with the ContainerTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findContainerTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContainerTypesBy query = new FindContainerTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ContainerTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createContainerType(HttpServletRequest request) throws Exception {
 
 		ContainerType containerTypeToBeAdded = new ContainerType();
@@ -129,7 +129,7 @@ public class ContainerTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateContainerType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ContainerTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{containerTypeId}")
+	@GetMapping("/{containerTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String containerTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("containerTypeId", containerTypeId);
@@ -207,7 +207,7 @@ public class ContainerTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{containerTypeId}")
+	@DeleteMapping("/{containerTypeId}")
 	public ResponseEntity<Object> deleteContainerTypeByIdUpdated(@PathVariable String containerTypeId) throws Exception {
 		DeleteContainerType command = new DeleteContainerType(containerTypeId);
 

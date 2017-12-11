@@ -57,7 +57,7 @@ public class DesiredFeatureController {
 	 * @return a List with the DesiredFeatures
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findDesiredFeaturesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDesiredFeaturesBy query = new FindDesiredFeaturesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class DesiredFeatureController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createDesiredFeature(HttpServletRequest request) throws Exception {
 
 		DesiredFeature desiredFeatureToBeAdded = new DesiredFeature();
@@ -129,7 +129,7 @@ public class DesiredFeatureController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateDesiredFeature(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class DesiredFeatureController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{desiredFeatureId}")
+	@GetMapping("/{desiredFeatureId}")
 	public ResponseEntity<Object> findById(@PathVariable String desiredFeatureId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("desiredFeatureId", desiredFeatureId);
@@ -207,7 +207,7 @@ public class DesiredFeatureController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{desiredFeatureId}")
+	@DeleteMapping("/{desiredFeatureId}")
 	public ResponseEntity<Object> deleteDesiredFeatureByIdUpdated(@PathVariable String desiredFeatureId) throws Exception {
 		DeleteDesiredFeature command = new DeleteDesiredFeature(desiredFeatureId);
 

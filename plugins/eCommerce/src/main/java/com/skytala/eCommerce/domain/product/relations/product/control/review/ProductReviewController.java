@@ -57,7 +57,7 @@ public class ProductReviewController {
 	 * @return a List with the ProductReviews
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductReviewsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductReviewsBy query = new FindProductReviewsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductReviewController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductReview(HttpServletRequest request) throws Exception {
 
 		ProductReview productReviewToBeAdded = new ProductReview();
@@ -129,7 +129,7 @@ public class ProductReviewController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductReview(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductReviewController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productReviewId}")
+	@GetMapping("/{productReviewId}")
 	public ResponseEntity<Object> findById(@PathVariable String productReviewId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productReviewId", productReviewId);
@@ -207,7 +207,7 @@ public class ProductReviewController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productReviewId}")
+	@DeleteMapping("/{productReviewId}")
 	public ResponseEntity<Object> deleteProductReviewByIdUpdated(@PathVariable String productReviewId) throws Exception {
 		DeleteProductReview command = new DeleteProductReview(productReviewId);
 

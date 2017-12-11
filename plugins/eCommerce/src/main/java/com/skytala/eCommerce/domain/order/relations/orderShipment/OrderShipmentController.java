@@ -57,7 +57,7 @@ public class OrderShipmentController {
 	 * @return a List with the OrderShipments
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderShipmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderShipmentsBy query = new FindOrderShipmentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderShipmentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderShipment(HttpServletRequest request) throws Exception {
 
 		OrderShipment orderShipmentToBeAdded = new OrderShipment();
@@ -129,7 +129,7 @@ public class OrderShipmentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderShipment(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderShipmentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderShipmentId}")
+	@GetMapping("/{orderShipmentId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderShipmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderShipmentId", orderShipmentId);
@@ -207,7 +207,7 @@ public class OrderShipmentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderShipmentId}")
+	@DeleteMapping("/{orderShipmentId}")
 	public ResponseEntity<Object> deleteOrderShipmentByIdUpdated(@PathVariable String orderShipmentId) throws Exception {
 		DeleteOrderShipment command = new DeleteOrderShipment(orderShipmentId);
 

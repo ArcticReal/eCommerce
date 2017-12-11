@@ -57,7 +57,7 @@ public class TimeEntryController {
 	 * @return a List with the TimeEntrys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findTimeEntrysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTimeEntrysBy query = new FindTimeEntrysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class TimeEntryController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createTimeEntry(HttpServletRequest request) throws Exception {
 
 		TimeEntry timeEntryToBeAdded = new TimeEntry();
@@ -129,7 +129,7 @@ public class TimeEntryController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateTimeEntry(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class TimeEntryController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{timeEntryId}")
+	@GetMapping("/{timeEntryId}")
 	public ResponseEntity<Object> findById(@PathVariable String timeEntryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("timeEntryId", timeEntryId);
@@ -207,7 +207,7 @@ public class TimeEntryController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{timeEntryId}")
+	@DeleteMapping("/{timeEntryId}")
 	public ResponseEntity<Object> deleteTimeEntryByIdUpdated(@PathVariable String timeEntryId) throws Exception {
 		DeleteTimeEntry command = new DeleteTimeEntry(timeEntryId);
 

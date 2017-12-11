@@ -57,7 +57,7 @@ public class SurveyController {
 	 * @return a List with the Surveys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSurveysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSurveysBy query = new FindSurveysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SurveyController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSurvey(HttpServletRequest request) throws Exception {
 
 		Survey surveyToBeAdded = new Survey();
@@ -129,7 +129,7 @@ public class SurveyController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSurvey(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SurveyController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{surveyId}")
+	@GetMapping("/{surveyId}")
 	public ResponseEntity<Object> findById(@PathVariable String surveyId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("surveyId", surveyId);
@@ -207,7 +207,7 @@ public class SurveyController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{surveyId}")
+	@DeleteMapping("/{surveyId}")
 	public ResponseEntity<Object> deleteSurveyByIdUpdated(@PathVariable String surveyId) throws Exception {
 		DeleteSurvey command = new DeleteSurvey(surveyId);
 

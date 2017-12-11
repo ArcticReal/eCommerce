@@ -57,7 +57,7 @@ public class PartyProfileDefaultController {
 	 * @return a List with the PartyProfileDefaults
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyProfileDefaultsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyProfileDefaultsBy query = new FindPartyProfileDefaultsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyProfileDefaultController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyProfileDefault(HttpServletRequest request) throws Exception {
 
 		PartyProfileDefault partyProfileDefaultToBeAdded = new PartyProfileDefault();
@@ -129,7 +129,7 @@ public class PartyProfileDefaultController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyProfileDefault(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyProfileDefaultController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyProfileDefaultId}")
+	@GetMapping("/{partyProfileDefaultId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyProfileDefaultId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyProfileDefaultId", partyProfileDefaultId);
@@ -207,7 +207,7 @@ public class PartyProfileDefaultController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyProfileDefaultId}")
+	@DeleteMapping("/{partyProfileDefaultId}")
 	public ResponseEntity<Object> deletePartyProfileDefaultByIdUpdated(@PathVariable String partyProfileDefaultId) throws Exception {
 		DeletePartyProfileDefault command = new DeletePartyProfileDefault(partyProfileDefaultId);
 

@@ -57,7 +57,7 @@ public class ShipmentGatewayFedexController {
 	 * @return a List with the ShipmentGatewayFedexs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findShipmentGatewayFedexsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentGatewayFedexsBy query = new FindShipmentGatewayFedexsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ShipmentGatewayFedexController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createShipmentGatewayFedex(HttpServletRequest request) throws Exception {
 
 		ShipmentGatewayFedex shipmentGatewayFedexToBeAdded = new ShipmentGatewayFedex();
@@ -129,7 +129,7 @@ public class ShipmentGatewayFedexController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateShipmentGatewayFedex(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ShipmentGatewayFedexController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{shipmentGatewayFedexId}")
+	@GetMapping("/{shipmentGatewayFedexId}")
 	public ResponseEntity<Object> findById(@PathVariable String shipmentGatewayFedexId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentGatewayFedexId", shipmentGatewayFedexId);
@@ -207,7 +207,7 @@ public class ShipmentGatewayFedexController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{shipmentGatewayFedexId}")
+	@DeleteMapping("/{shipmentGatewayFedexId}")
 	public ResponseEntity<Object> deleteShipmentGatewayFedexByIdUpdated(@PathVariable String shipmentGatewayFedexId) throws Exception {
 		DeleteShipmentGatewayFedex command = new DeleteShipmentGatewayFedex(shipmentGatewayFedexId);
 

@@ -57,7 +57,7 @@ public class OrderContentTypeController {
 	 * @return a List with the OrderContentTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderContentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderContentTypesBy query = new FindOrderContentTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderContentTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderContentType(HttpServletRequest request) throws Exception {
 
 		OrderContentType orderContentTypeToBeAdded = new OrderContentType();
@@ -129,7 +129,7 @@ public class OrderContentTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderContentType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderContentTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderContentTypeId}")
+	@GetMapping("/{orderContentTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderContentTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderContentTypeId", orderContentTypeId);
@@ -207,7 +207,7 @@ public class OrderContentTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderContentTypeId}")
+	@DeleteMapping("/{orderContentTypeId}")
 	public ResponseEntity<Object> deleteOrderContentTypeByIdUpdated(@PathVariable String orderContentTypeId) throws Exception {
 		DeleteOrderContentType command = new DeleteOrderContentType(orderContentTypeId);
 

@@ -57,7 +57,7 @@ public class ContactListTypeController {
 	 * @return a List with the ContactListTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findContactListTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContactListTypesBy query = new FindContactListTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ContactListTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createContactListType(HttpServletRequest request) throws Exception {
 
 		ContactListType contactListTypeToBeAdded = new ContactListType();
@@ -129,7 +129,7 @@ public class ContactListTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateContactListType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ContactListTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{contactListTypeId}")
+	@GetMapping("/{contactListTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String contactListTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contactListTypeId", contactListTypeId);
@@ -207,7 +207,7 @@ public class ContactListTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{contactListTypeId}")
+	@DeleteMapping("/{contactListTypeId}")
 	public ResponseEntity<Object> deleteContactListTypeByIdUpdated(@PathVariable String contactListTypeId) throws Exception {
 		DeleteContactListType command = new DeleteContactListType(contactListTypeId);
 

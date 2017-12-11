@@ -57,7 +57,7 @@ public class PartyContentTypeController {
 	 * @return a List with the PartyContentTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyContentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyContentTypesBy query = new FindPartyContentTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyContentTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyContentType(HttpServletRequest request) throws Exception {
 
 		PartyContentType partyContentTypeToBeAdded = new PartyContentType();
@@ -129,7 +129,7 @@ public class PartyContentTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyContentType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyContentTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyContentTypeId}")
+	@GetMapping("/{partyContentTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyContentTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyContentTypeId", partyContentTypeId);
@@ -207,7 +207,7 @@ public class PartyContentTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyContentTypeId}")
+	@DeleteMapping("/{partyContentTypeId}")
 	public ResponseEntity<Object> deletePartyContentTypeByIdUpdated(@PathVariable String partyContentTypeId) throws Exception {
 		DeletePartyContentType command = new DeletePartyContentType(partyContentTypeId);
 

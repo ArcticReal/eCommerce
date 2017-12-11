@@ -57,7 +57,7 @@ public class FixedAssetMeterController {
 	 * @return a List with the FixedAssetMeters
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFixedAssetMetersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFixedAssetMetersBy query = new FindFixedAssetMetersBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FixedAssetMeterController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFixedAssetMeter(HttpServletRequest request) throws Exception {
 
 		FixedAssetMeter fixedAssetMeterToBeAdded = new FixedAssetMeter();
@@ -129,7 +129,7 @@ public class FixedAssetMeterController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFixedAssetMeter(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FixedAssetMeterController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{fixedAssetMeterId}")
+	@GetMapping("/{fixedAssetMeterId}")
 	public ResponseEntity<Object> findById(@PathVariable String fixedAssetMeterId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("fixedAssetMeterId", fixedAssetMeterId);
@@ -207,7 +207,7 @@ public class FixedAssetMeterController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{fixedAssetMeterId}")
+	@DeleteMapping("/{fixedAssetMeterId}")
 	public ResponseEntity<Object> deleteFixedAssetMeterByIdUpdated(@PathVariable String fixedAssetMeterId) throws Exception {
 		DeleteFixedAssetMeter command = new DeleteFixedAssetMeter(fixedAssetMeterId);
 

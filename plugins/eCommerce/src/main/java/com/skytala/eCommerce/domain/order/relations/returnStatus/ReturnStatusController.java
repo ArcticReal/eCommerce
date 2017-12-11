@@ -57,7 +57,7 @@ public class ReturnStatusController {
 	 * @return a List with the ReturnStatuss
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findReturnStatussBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindReturnStatussBy query = new FindReturnStatussBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ReturnStatusController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createReturnStatus(HttpServletRequest request) throws Exception {
 
 		ReturnStatus returnStatusToBeAdded = new ReturnStatus();
@@ -129,7 +129,7 @@ public class ReturnStatusController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateReturnStatus(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ReturnStatusController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{returnStatusId}")
+	@GetMapping("/{returnStatusId}")
 	public ResponseEntity<Object> findById(@PathVariable String returnStatusId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("returnStatusId", returnStatusId);
@@ -207,7 +207,7 @@ public class ReturnStatusController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{returnStatusId}")
+	@DeleteMapping("/{returnStatusId}")
 	public ResponseEntity<Object> deleteReturnStatusByIdUpdated(@PathVariable String returnStatusId) throws Exception {
 		DeleteReturnStatus command = new DeleteReturnStatus(returnStatusId);
 

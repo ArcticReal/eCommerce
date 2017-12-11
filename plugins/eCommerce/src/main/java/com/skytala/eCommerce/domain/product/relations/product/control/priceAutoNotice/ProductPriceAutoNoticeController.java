@@ -57,7 +57,7 @@ public class ProductPriceAutoNoticeController {
 	 * @return a List with the ProductPriceAutoNotices
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductPriceAutoNoticesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductPriceAutoNoticesBy query = new FindProductPriceAutoNoticesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductPriceAutoNoticeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductPriceAutoNotice(HttpServletRequest request) throws Exception {
 
 		ProductPriceAutoNotice productPriceAutoNoticeToBeAdded = new ProductPriceAutoNotice();
@@ -129,7 +129,7 @@ public class ProductPriceAutoNoticeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductPriceAutoNotice(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductPriceAutoNoticeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productPriceAutoNoticeId}")
+	@GetMapping("/{productPriceAutoNoticeId}")
 	public ResponseEntity<Object> findById(@PathVariable String productPriceAutoNoticeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productPriceAutoNoticeId", productPriceAutoNoticeId);
@@ -207,7 +207,7 @@ public class ProductPriceAutoNoticeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productPriceAutoNoticeId}")
+	@DeleteMapping("/{productPriceAutoNoticeId}")
 	public ResponseEntity<Object> deleteProductPriceAutoNoticeByIdUpdated(@PathVariable String productPriceAutoNoticeId) throws Exception {
 		DeleteProductPriceAutoNotice command = new DeleteProductPriceAutoNotice(productPriceAutoNoticeId);
 

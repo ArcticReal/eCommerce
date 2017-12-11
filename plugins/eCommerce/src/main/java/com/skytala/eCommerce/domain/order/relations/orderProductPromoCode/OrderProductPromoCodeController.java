@@ -57,7 +57,7 @@ public class OrderProductPromoCodeController {
 	 * @return a List with the OrderProductPromoCodes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderProductPromoCodesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderProductPromoCodesBy query = new FindOrderProductPromoCodesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderProductPromoCodeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderProductPromoCode(HttpServletRequest request) throws Exception {
 
 		OrderProductPromoCode orderProductPromoCodeToBeAdded = new OrderProductPromoCode();
@@ -129,7 +129,7 @@ public class OrderProductPromoCodeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderProductPromoCode(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderProductPromoCodeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderProductPromoCodeId}")
+	@GetMapping("/{orderProductPromoCodeId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderProductPromoCodeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderProductPromoCodeId", orderProductPromoCodeId);
@@ -207,7 +207,7 @@ public class OrderProductPromoCodeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderProductPromoCodeId}")
+	@DeleteMapping("/{orderProductPromoCodeId}")
 	public ResponseEntity<Object> deleteOrderProductPromoCodeByIdUpdated(@PathVariable String orderProductPromoCodeId) throws Exception {
 		DeleteOrderProductPromoCode command = new DeleteOrderProductPromoCode(orderProductPromoCodeId);
 

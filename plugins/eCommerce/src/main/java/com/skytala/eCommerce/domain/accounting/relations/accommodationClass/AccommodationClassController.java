@@ -57,7 +57,7 @@ public class AccommodationClassController {
 	 * @return a List with the AccommodationClasss
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findAccommodationClasssBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAccommodationClasssBy query = new FindAccommodationClasssBy(allRequestParams);
@@ -83,7 +83,7 @@ public class AccommodationClassController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createAccommodationClass(HttpServletRequest request) throws Exception {
 
 		AccommodationClass accommodationClassToBeAdded = new AccommodationClass();
@@ -129,7 +129,7 @@ public class AccommodationClassController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateAccommodationClass(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class AccommodationClassController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{accommodationClassId}")
+	@GetMapping("/{accommodationClassId}")
 	public ResponseEntity<Object> findById(@PathVariable String accommodationClassId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("accommodationClassId", accommodationClassId);
@@ -207,7 +207,7 @@ public class AccommodationClassController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{accommodationClassId}")
+	@DeleteMapping("/{accommodationClassId}")
 	public ResponseEntity<Object> deleteAccommodationClassByIdUpdated(@PathVariable String accommodationClassId) throws Exception {
 		DeleteAccommodationClass command = new DeleteAccommodationClass(accommodationClassId);
 

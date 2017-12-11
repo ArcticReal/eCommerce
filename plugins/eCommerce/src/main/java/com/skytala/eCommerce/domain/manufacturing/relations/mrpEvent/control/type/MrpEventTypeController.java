@@ -57,7 +57,7 @@ public class MrpEventTypeController {
 	 * @return a List with the MrpEventTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findMrpEventTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindMrpEventTypesBy query = new FindMrpEventTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class MrpEventTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createMrpEventType(HttpServletRequest request) throws Exception {
 
 		MrpEventType mrpEventTypeToBeAdded = new MrpEventType();
@@ -129,7 +129,7 @@ public class MrpEventTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateMrpEventType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class MrpEventTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{mrpEventTypeId}")
+	@GetMapping("/{mrpEventTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String mrpEventTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("mrpEventTypeId", mrpEventTypeId);
@@ -207,7 +207,7 @@ public class MrpEventTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{mrpEventTypeId}")
+	@DeleteMapping("/{mrpEventTypeId}")
 	public ResponseEntity<Object> deleteMrpEventTypeByIdUpdated(@PathVariable String mrpEventTypeId) throws Exception {
 		DeleteMrpEventType command = new DeleteMrpEventType(mrpEventTypeId);
 

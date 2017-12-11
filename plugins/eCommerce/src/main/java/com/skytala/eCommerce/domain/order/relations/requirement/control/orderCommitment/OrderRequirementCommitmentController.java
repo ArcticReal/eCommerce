@@ -57,7 +57,7 @@ public class OrderRequirementCommitmentController {
 	 * @return a List with the OrderRequirementCommitments
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderRequirementCommitmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderRequirementCommitmentsBy query = new FindOrderRequirementCommitmentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderRequirementCommitmentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderRequirementCommitment(HttpServletRequest request) throws Exception {
 
 		OrderRequirementCommitment orderRequirementCommitmentToBeAdded = new OrderRequirementCommitment();
@@ -129,7 +129,7 @@ public class OrderRequirementCommitmentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderRequirementCommitment(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderRequirementCommitmentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderRequirementCommitmentId}")
+	@GetMapping("/{orderRequirementCommitmentId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderRequirementCommitmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderRequirementCommitmentId", orderRequirementCommitmentId);
@@ -207,7 +207,7 @@ public class OrderRequirementCommitmentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderRequirementCommitmentId}")
+	@DeleteMapping("/{orderRequirementCommitmentId}")
 	public ResponseEntity<Object> deleteOrderRequirementCommitmentByIdUpdated(@PathVariable String orderRequirementCommitmentId) throws Exception {
 		DeleteOrderRequirementCommitment command = new DeleteOrderRequirementCommitment(orderRequirementCommitmentId);
 

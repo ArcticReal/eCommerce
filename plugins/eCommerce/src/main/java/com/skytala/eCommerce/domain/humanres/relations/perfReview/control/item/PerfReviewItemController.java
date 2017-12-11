@@ -57,7 +57,7 @@ public class PerfReviewItemController {
 	 * @return a List with the PerfReviewItems
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPerfReviewItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPerfReviewItemsBy query = new FindPerfReviewItemsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PerfReviewItemController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPerfReviewItem(HttpServletRequest request) throws Exception {
 
 		PerfReviewItem perfReviewItemToBeAdded = new PerfReviewItem();
@@ -129,7 +129,7 @@ public class PerfReviewItemController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePerfReviewItem(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PerfReviewItemController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{perfReviewItemId}")
+	@GetMapping("/{perfReviewItemId}")
 	public ResponseEntity<Object> findById(@PathVariable String perfReviewItemId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("perfReviewItemId", perfReviewItemId);
@@ -207,7 +207,7 @@ public class PerfReviewItemController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{perfReviewItemId}")
+	@DeleteMapping("/{perfReviewItemId}")
 	public ResponseEntity<Object> deletePerfReviewItemByIdUpdated(@PathVariable String perfReviewItemId) throws Exception {
 		DeletePerfReviewItem command = new DeletePerfReviewItem(perfReviewItemId);
 

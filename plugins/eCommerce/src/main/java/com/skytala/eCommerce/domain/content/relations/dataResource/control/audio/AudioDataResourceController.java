@@ -57,7 +57,7 @@ public class AudioDataResourceController {
 	 * @return a List with the AudioDataResources
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findAudioDataResourcesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAudioDataResourcesBy query = new FindAudioDataResourcesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class AudioDataResourceController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createAudioDataResource(HttpServletRequest request) throws Exception {
 
 		AudioDataResource audioDataResourceToBeAdded = new AudioDataResource();
@@ -129,7 +129,7 @@ public class AudioDataResourceController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateAudioDataResource(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class AudioDataResourceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{audioDataResourceId}")
+	@GetMapping("/{audioDataResourceId}")
 	public ResponseEntity<Object> findById(@PathVariable String audioDataResourceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("audioDataResourceId", audioDataResourceId);
@@ -207,7 +207,7 @@ public class AudioDataResourceController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{audioDataResourceId}")
+	@DeleteMapping("/{audioDataResourceId}")
 	public ResponseEntity<Object> deleteAudioDataResourceByIdUpdated(@PathVariable String audioDataResourceId) throws Exception {
 		DeleteAudioDataResource command = new DeleteAudioDataResource(audioDataResourceId);
 

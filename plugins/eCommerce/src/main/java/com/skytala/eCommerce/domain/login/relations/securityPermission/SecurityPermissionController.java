@@ -57,7 +57,7 @@ public class SecurityPermissionController {
 	 * @return a List with the SecurityPermissions
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSecurityPermissionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSecurityPermissionsBy query = new FindSecurityPermissionsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SecurityPermissionController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSecurityPermission(HttpServletRequest request) throws Exception {
 
 		SecurityPermission securityPermissionToBeAdded = new SecurityPermission();
@@ -129,7 +129,7 @@ public class SecurityPermissionController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSecurityPermission(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SecurityPermissionController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{securityPermissionId}")
+	@GetMapping("/{securityPermissionId}")
 	public ResponseEntity<Object> findById(@PathVariable String securityPermissionId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("securityPermissionId", securityPermissionId);
@@ -207,7 +207,7 @@ public class SecurityPermissionController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{securityPermissionId}")
+	@DeleteMapping("/{securityPermissionId}")
 	public ResponseEntity<Object> deleteSecurityPermissionByIdUpdated(@PathVariable String securityPermissionId) throws Exception {
 		DeleteSecurityPermission command = new DeleteSecurityPermission(securityPermissionId);
 

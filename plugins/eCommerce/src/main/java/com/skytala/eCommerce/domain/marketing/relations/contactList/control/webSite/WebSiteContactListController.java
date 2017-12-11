@@ -57,7 +57,7 @@ public class WebSiteContactListController {
 	 * @return a List with the WebSiteContactLists
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWebSiteContactListsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWebSiteContactListsBy query = new FindWebSiteContactListsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WebSiteContactListController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWebSiteContactList(HttpServletRequest request) throws Exception {
 
 		WebSiteContactList webSiteContactListToBeAdded = new WebSiteContactList();
@@ -129,7 +129,7 @@ public class WebSiteContactListController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWebSiteContactList(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WebSiteContactListController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{webSiteContactListId}")
+	@GetMapping("/{webSiteContactListId}")
 	public ResponseEntity<Object> findById(@PathVariable String webSiteContactListId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("webSiteContactListId", webSiteContactListId);
@@ -207,7 +207,7 @@ public class WebSiteContactListController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{webSiteContactListId}")
+	@DeleteMapping("/{webSiteContactListId}")
 	public ResponseEntity<Object> deleteWebSiteContactListByIdUpdated(@PathVariable String webSiteContactListId) throws Exception {
 		DeleteWebSiteContactList command = new DeleteWebSiteContactList(webSiteContactListId);
 

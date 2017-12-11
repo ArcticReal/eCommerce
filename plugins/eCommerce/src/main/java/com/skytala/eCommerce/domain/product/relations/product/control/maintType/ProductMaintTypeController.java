@@ -57,7 +57,7 @@ public class ProductMaintTypeController {
 	 * @return a List with the ProductMaintTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductMaintTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductMaintTypesBy query = new FindProductMaintTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductMaintTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductMaintType(HttpServletRequest request) throws Exception {
 
 		ProductMaintType productMaintTypeToBeAdded = new ProductMaintType();
@@ -129,7 +129,7 @@ public class ProductMaintTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductMaintType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductMaintTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productMaintTypeId}")
+	@GetMapping("/{productMaintTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String productMaintTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productMaintTypeId", productMaintTypeId);
@@ -207,7 +207,7 @@ public class ProductMaintTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productMaintTypeId}")
+	@DeleteMapping("/{productMaintTypeId}")
 	public ResponseEntity<Object> deleteProductMaintTypeByIdUpdated(@PathVariable String productMaintTypeId) throws Exception {
 		DeleteProductMaintType command = new DeleteProductMaintType(productMaintTypeId);
 

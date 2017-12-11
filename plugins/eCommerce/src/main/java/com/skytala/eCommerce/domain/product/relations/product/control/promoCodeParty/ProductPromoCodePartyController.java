@@ -57,7 +57,7 @@ public class ProductPromoCodePartyController {
 	 * @return a List with the ProductPromoCodePartys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductPromoCodePartysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductPromoCodePartysBy query = new FindProductPromoCodePartysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductPromoCodePartyController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductPromoCodeParty(HttpServletRequest request) throws Exception {
 
 		ProductPromoCodeParty productPromoCodePartyToBeAdded = new ProductPromoCodeParty();
@@ -129,7 +129,7 @@ public class ProductPromoCodePartyController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductPromoCodeParty(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductPromoCodePartyController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productPromoCodePartyId}")
+	@GetMapping("/{productPromoCodePartyId}")
 	public ResponseEntity<Object> findById(@PathVariable String productPromoCodePartyId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productPromoCodePartyId", productPromoCodePartyId);
@@ -207,7 +207,7 @@ public class ProductPromoCodePartyController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productPromoCodePartyId}")
+	@DeleteMapping("/{productPromoCodePartyId}")
 	public ResponseEntity<Object> deleteProductPromoCodePartyByIdUpdated(@PathVariable String productPromoCodePartyId) throws Exception {
 		DeleteProductPromoCodeParty command = new DeleteProductPromoCodeParty(productPromoCodePartyId);
 

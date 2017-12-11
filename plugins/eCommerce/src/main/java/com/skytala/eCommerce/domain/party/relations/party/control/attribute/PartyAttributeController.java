@@ -57,7 +57,7 @@ public class PartyAttributeController {
 	 * @return a List with the PartyAttributes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyAttributesBy query = new FindPartyAttributesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyAttributeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyAttribute(HttpServletRequest request) throws Exception {
 
 		PartyAttribute partyAttributeToBeAdded = new PartyAttribute();
@@ -129,7 +129,7 @@ public class PartyAttributeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyAttribute(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyAttributeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyAttributeId}")
+	@GetMapping("/{partyAttributeId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyAttributeId", partyAttributeId);
@@ -207,7 +207,7 @@ public class PartyAttributeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyAttributeId}")
+	@DeleteMapping("/{partyAttributeId}")
 	public ResponseEntity<Object> deletePartyAttributeByIdUpdated(@PathVariable String partyAttributeId) throws Exception {
 		DeletePartyAttribute command = new DeletePartyAttribute(partyAttributeId);
 

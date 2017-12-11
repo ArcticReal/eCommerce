@@ -57,7 +57,7 @@ public class BudgetScenarioController {
 	 * @return a List with the BudgetScenarios
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findBudgetScenariosBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindBudgetScenariosBy query = new FindBudgetScenariosBy(allRequestParams);
@@ -83,7 +83,7 @@ public class BudgetScenarioController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createBudgetScenario(HttpServletRequest request) throws Exception {
 
 		BudgetScenario budgetScenarioToBeAdded = new BudgetScenario();
@@ -129,7 +129,7 @@ public class BudgetScenarioController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateBudgetScenario(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class BudgetScenarioController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{budgetScenarioId}")
+	@GetMapping("/{budgetScenarioId}")
 	public ResponseEntity<Object> findById(@PathVariable String budgetScenarioId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("budgetScenarioId", budgetScenarioId);
@@ -207,7 +207,7 @@ public class BudgetScenarioController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{budgetScenarioId}")
+	@DeleteMapping("/{budgetScenarioId}")
 	public ResponseEntity<Object> deleteBudgetScenarioByIdUpdated(@PathVariable String budgetScenarioId) throws Exception {
 		DeleteBudgetScenario command = new DeleteBudgetScenario(budgetScenarioId);
 

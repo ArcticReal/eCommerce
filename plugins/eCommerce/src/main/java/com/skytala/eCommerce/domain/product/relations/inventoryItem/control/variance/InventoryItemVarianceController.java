@@ -57,7 +57,7 @@ public class InventoryItemVarianceController {
 	 * @return a List with the InventoryItemVariances
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findInventoryItemVariancesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInventoryItemVariancesBy query = new FindInventoryItemVariancesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class InventoryItemVarianceController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createInventoryItemVariance(HttpServletRequest request) throws Exception {
 
 		InventoryItemVariance inventoryItemVarianceToBeAdded = new InventoryItemVariance();
@@ -129,7 +129,7 @@ public class InventoryItemVarianceController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateInventoryItemVariance(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class InventoryItemVarianceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{inventoryItemVarianceId}")
+	@GetMapping("/{inventoryItemVarianceId}")
 	public ResponseEntity<Object> findById(@PathVariable String inventoryItemVarianceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("inventoryItemVarianceId", inventoryItemVarianceId);
@@ -207,7 +207,7 @@ public class InventoryItemVarianceController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{inventoryItemVarianceId}")
+	@DeleteMapping("/{inventoryItemVarianceId}")
 	public ResponseEntity<Object> deleteInventoryItemVarianceByIdUpdated(@PathVariable String inventoryItemVarianceId) throws Exception {
 		DeleteInventoryItemVariance command = new DeleteInventoryItemVariance(inventoryItemVarianceId);
 

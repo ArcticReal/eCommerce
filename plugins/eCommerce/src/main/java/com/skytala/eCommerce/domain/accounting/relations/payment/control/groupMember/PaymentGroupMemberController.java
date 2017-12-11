@@ -57,7 +57,7 @@ public class PaymentGroupMemberController {
 	 * @return a List with the PaymentGroupMembers
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPaymentGroupMembersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentGroupMembersBy query = new FindPaymentGroupMembersBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PaymentGroupMemberController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPaymentGroupMember(HttpServletRequest request) throws Exception {
 
 		PaymentGroupMember paymentGroupMemberToBeAdded = new PaymentGroupMember();
@@ -129,7 +129,7 @@ public class PaymentGroupMemberController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePaymentGroupMember(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PaymentGroupMemberController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{paymentGroupMemberId}")
+	@GetMapping("/{paymentGroupMemberId}")
 	public ResponseEntity<Object> findById(@PathVariable String paymentGroupMemberId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentGroupMemberId", paymentGroupMemberId);
@@ -207,7 +207,7 @@ public class PaymentGroupMemberController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{paymentGroupMemberId}")
+	@DeleteMapping("/{paymentGroupMemberId}")
 	public ResponseEntity<Object> deletePaymentGroupMemberByIdUpdated(@PathVariable String paymentGroupMemberId) throws Exception {
 		DeletePaymentGroupMember command = new DeletePaymentGroupMember(paymentGroupMemberId);
 

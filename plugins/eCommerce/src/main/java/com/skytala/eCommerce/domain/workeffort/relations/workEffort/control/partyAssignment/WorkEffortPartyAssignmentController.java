@@ -57,7 +57,7 @@ public class WorkEffortPartyAssignmentController {
 	 * @return a List with the WorkEffortPartyAssignments
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWorkEffortPartyAssignmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortPartyAssignmentsBy query = new FindWorkEffortPartyAssignmentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WorkEffortPartyAssignmentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWorkEffortPartyAssignment(HttpServletRequest request) throws Exception {
 
 		WorkEffortPartyAssignment workEffortPartyAssignmentToBeAdded = new WorkEffortPartyAssignment();
@@ -129,7 +129,7 @@ public class WorkEffortPartyAssignmentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWorkEffortPartyAssignment(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WorkEffortPartyAssignmentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{workEffortPartyAssignmentId}")
+	@GetMapping("/{workEffortPartyAssignmentId}")
 	public ResponseEntity<Object> findById(@PathVariable String workEffortPartyAssignmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortPartyAssignmentId", workEffortPartyAssignmentId);
@@ -207,7 +207,7 @@ public class WorkEffortPartyAssignmentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{workEffortPartyAssignmentId}")
+	@DeleteMapping("/{workEffortPartyAssignmentId}")
 	public ResponseEntity<Object> deleteWorkEffortPartyAssignmentByIdUpdated(@PathVariable String workEffortPartyAssignmentId) throws Exception {
 		DeleteWorkEffortPartyAssignment command = new DeleteWorkEffortPartyAssignment(workEffortPartyAssignmentId);
 

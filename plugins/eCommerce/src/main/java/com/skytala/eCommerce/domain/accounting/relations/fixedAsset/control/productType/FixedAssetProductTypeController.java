@@ -57,7 +57,7 @@ public class FixedAssetProductTypeController {
 	 * @return a List with the FixedAssetProductTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFixedAssetProductTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFixedAssetProductTypesBy query = new FindFixedAssetProductTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FixedAssetProductTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFixedAssetProductType(HttpServletRequest request) throws Exception {
 
 		FixedAssetProductType fixedAssetProductTypeToBeAdded = new FixedAssetProductType();
@@ -129,7 +129,7 @@ public class FixedAssetProductTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFixedAssetProductType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FixedAssetProductTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{fixedAssetProductTypeId}")
+	@GetMapping("/{fixedAssetProductTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String fixedAssetProductTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("fixedAssetProductTypeId", fixedAssetProductTypeId);
@@ -207,7 +207,7 @@ public class FixedAssetProductTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{fixedAssetProductTypeId}")
+	@DeleteMapping("/{fixedAssetProductTypeId}")
 	public ResponseEntity<Object> deleteFixedAssetProductTypeByIdUpdated(@PathVariable String fixedAssetProductTypeId) throws Exception {
 		DeleteFixedAssetProductType command = new DeleteFixedAssetProductType(fixedAssetProductTypeId);
 

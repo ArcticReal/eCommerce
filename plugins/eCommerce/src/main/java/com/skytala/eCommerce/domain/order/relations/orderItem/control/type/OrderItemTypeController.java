@@ -57,7 +57,7 @@ public class OrderItemTypeController {
 	 * @return a List with the OrderItemTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderItemTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderItemTypesBy query = new FindOrderItemTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderItemTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderItemType(HttpServletRequest request) throws Exception {
 
 		OrderItemType orderItemTypeToBeAdded = new OrderItemType();
@@ -129,7 +129,7 @@ public class OrderItemTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderItemType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderItemTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderItemTypeId}")
+	@GetMapping("/{orderItemTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderItemTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderItemTypeId", orderItemTypeId);
@@ -207,7 +207,7 @@ public class OrderItemTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderItemTypeId}")
+	@DeleteMapping("/{orderItemTypeId}")
 	public ResponseEntity<Object> deleteOrderItemTypeByIdUpdated(@PathVariable String orderItemTypeId) throws Exception {
 		DeleteOrderItemType command = new DeleteOrderItemType(orderItemTypeId);
 

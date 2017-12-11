@@ -57,7 +57,7 @@ public class WorkEffortReviewController {
 	 * @return a List with the WorkEffortReviews
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWorkEffortReviewsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortReviewsBy query = new FindWorkEffortReviewsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WorkEffortReviewController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWorkEffortReview(HttpServletRequest request) throws Exception {
 
 		WorkEffortReview workEffortReviewToBeAdded = new WorkEffortReview();
@@ -129,7 +129,7 @@ public class WorkEffortReviewController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWorkEffortReview(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WorkEffortReviewController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{workEffortReviewId}")
+	@GetMapping("/{workEffortReviewId}")
 	public ResponseEntity<Object> findById(@PathVariable String workEffortReviewId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortReviewId", workEffortReviewId);
@@ -207,7 +207,7 @@ public class WorkEffortReviewController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{workEffortReviewId}")
+	@DeleteMapping("/{workEffortReviewId}")
 	public ResponseEntity<Object> deleteWorkEffortReviewByIdUpdated(@PathVariable String workEffortReviewId) throws Exception {
 		DeleteWorkEffortReview command = new DeleteWorkEffortReview(workEffortReviewId);
 

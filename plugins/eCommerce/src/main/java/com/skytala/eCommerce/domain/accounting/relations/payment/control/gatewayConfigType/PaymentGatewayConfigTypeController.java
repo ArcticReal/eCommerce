@@ -57,7 +57,7 @@ public class PaymentGatewayConfigTypeController {
 	 * @return a List with the PaymentGatewayConfigTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPaymentGatewayConfigTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentGatewayConfigTypesBy query = new FindPaymentGatewayConfigTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PaymentGatewayConfigTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPaymentGatewayConfigType(HttpServletRequest request) throws Exception {
 
 		PaymentGatewayConfigType paymentGatewayConfigTypeToBeAdded = new PaymentGatewayConfigType();
@@ -129,7 +129,7 @@ public class PaymentGatewayConfigTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePaymentGatewayConfigType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PaymentGatewayConfigTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{paymentGatewayConfigTypeId}")
+	@GetMapping("/{paymentGatewayConfigTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String paymentGatewayConfigTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentGatewayConfigTypeId", paymentGatewayConfigTypeId);
@@ -207,7 +207,7 @@ public class PaymentGatewayConfigTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{paymentGatewayConfigTypeId}")
+	@DeleteMapping("/{paymentGatewayConfigTypeId}")
 	public ResponseEntity<Object> deletePaymentGatewayConfigTypeByIdUpdated(@PathVariable String paymentGatewayConfigTypeId) throws Exception {
 		DeletePaymentGatewayConfigType command = new DeletePaymentGatewayConfigType(paymentGatewayConfigTypeId);
 

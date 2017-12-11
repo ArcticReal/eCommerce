@@ -57,7 +57,7 @@ public class BillingAccountTermController {
 	 * @return a List with the BillingAccountTerms
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findBillingAccountTermsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindBillingAccountTermsBy query = new FindBillingAccountTermsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class BillingAccountTermController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createBillingAccountTerm(HttpServletRequest request) throws Exception {
 
 		BillingAccountTerm billingAccountTermToBeAdded = new BillingAccountTerm();
@@ -129,7 +129,7 @@ public class BillingAccountTermController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateBillingAccountTerm(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class BillingAccountTermController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{billingAccountTermId}")
+	@GetMapping("/{billingAccountTermId}")
 	public ResponseEntity<Object> findById(@PathVariable String billingAccountTermId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("billingAccountTermId", billingAccountTermId);
@@ -207,7 +207,7 @@ public class BillingAccountTermController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{billingAccountTermId}")
+	@DeleteMapping("/{billingAccountTermId}")
 	public ResponseEntity<Object> deleteBillingAccountTermByIdUpdated(@PathVariable String billingAccountTermId) throws Exception {
 		DeleteBillingAccountTerm command = new DeleteBillingAccountTerm(billingAccountTermId);
 

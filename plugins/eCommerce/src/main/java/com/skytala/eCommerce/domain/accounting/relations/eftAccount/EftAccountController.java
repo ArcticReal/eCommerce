@@ -57,7 +57,7 @@ public class EftAccountController {
 	 * @return a List with the EftAccounts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findEftAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindEftAccountsBy query = new FindEftAccountsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class EftAccountController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createEftAccount(HttpServletRequest request) throws Exception {
 
 		EftAccount eftAccountToBeAdded = new EftAccount();
@@ -129,7 +129,7 @@ public class EftAccountController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateEftAccount(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class EftAccountController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{eftAccountId}")
+	@GetMapping("/{eftAccountId}")
 	public ResponseEntity<Object> findById(@PathVariable String eftAccountId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("eftAccountId", eftAccountId);
@@ -207,7 +207,7 @@ public class EftAccountController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{eftAccountId}")
+	@DeleteMapping("/{eftAccountId}")
 	public ResponseEntity<Object> deleteEftAccountByIdUpdated(@PathVariable String eftAccountId) throws Exception {
 		DeleteEftAccount command = new DeleteEftAccount(eftAccountId);
 

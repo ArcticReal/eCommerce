@@ -57,7 +57,7 @@ public class RequirementTypeController {
 	 * @return a List with the RequirementTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findRequirementTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindRequirementTypesBy query = new FindRequirementTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class RequirementTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createRequirementType(HttpServletRequest request) throws Exception {
 
 		RequirementType requirementTypeToBeAdded = new RequirementType();
@@ -129,7 +129,7 @@ public class RequirementTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateRequirementType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class RequirementTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{requirementTypeId}")
+	@GetMapping("/{requirementTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String requirementTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("requirementTypeId", requirementTypeId);
@@ -207,7 +207,7 @@ public class RequirementTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{requirementTypeId}")
+	@DeleteMapping("/{requirementTypeId}")
 	public ResponseEntity<Object> deleteRequirementTypeByIdUpdated(@PathVariable String requirementTypeId) throws Exception {
 		DeleteRequirementType command = new DeleteRequirementType(requirementTypeId);
 

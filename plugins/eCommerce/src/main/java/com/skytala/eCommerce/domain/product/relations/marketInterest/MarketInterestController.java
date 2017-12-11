@@ -57,7 +57,7 @@ public class MarketInterestController {
 	 * @return a List with the MarketInterests
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findMarketInterestsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindMarketInterestsBy query = new FindMarketInterestsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class MarketInterestController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createMarketInterest(HttpServletRequest request) throws Exception {
 
 		MarketInterest marketInterestToBeAdded = new MarketInterest();
@@ -129,7 +129,7 @@ public class MarketInterestController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateMarketInterest(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class MarketInterestController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{marketInterestId}")
+	@GetMapping("/{marketInterestId}")
 	public ResponseEntity<Object> findById(@PathVariable String marketInterestId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("marketInterestId", marketInterestId);
@@ -207,7 +207,7 @@ public class MarketInterestController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{marketInterestId}")
+	@DeleteMapping("/{marketInterestId}")
 	public ResponseEntity<Object> deleteMarketInterestByIdUpdated(@PathVariable String marketInterestId) throws Exception {
 		DeleteMarketInterest command = new DeleteMarketInterest(marketInterestId);
 

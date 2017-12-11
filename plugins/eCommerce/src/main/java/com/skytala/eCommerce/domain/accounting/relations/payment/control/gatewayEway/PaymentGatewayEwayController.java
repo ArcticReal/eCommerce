@@ -57,7 +57,7 @@ public class PaymentGatewayEwayController {
 	 * @return a List with the PaymentGatewayEways
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPaymentGatewayEwaysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentGatewayEwaysBy query = new FindPaymentGatewayEwaysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PaymentGatewayEwayController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPaymentGatewayEway(HttpServletRequest request) throws Exception {
 
 		PaymentGatewayEway paymentGatewayEwayToBeAdded = new PaymentGatewayEway();
@@ -129,7 +129,7 @@ public class PaymentGatewayEwayController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePaymentGatewayEway(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PaymentGatewayEwayController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{paymentGatewayEwayId}")
+	@GetMapping("/{paymentGatewayEwayId}")
 	public ResponseEntity<Object> findById(@PathVariable String paymentGatewayEwayId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentGatewayEwayId", paymentGatewayEwayId);
@@ -207,7 +207,7 @@ public class PaymentGatewayEwayController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{paymentGatewayEwayId}")
+	@DeleteMapping("/{paymentGatewayEwayId}")
 	public ResponseEntity<Object> deletePaymentGatewayEwayByIdUpdated(@PathVariable String paymentGatewayEwayId) throws Exception {
 		DeletePaymentGatewayEway command = new DeletePaymentGatewayEway(paymentGatewayEwayId);
 

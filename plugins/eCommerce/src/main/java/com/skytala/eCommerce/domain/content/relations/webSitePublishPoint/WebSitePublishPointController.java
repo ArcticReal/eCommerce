@@ -57,7 +57,7 @@ public class WebSitePublishPointController {
 	 * @return a List with the WebSitePublishPoints
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWebSitePublishPointsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWebSitePublishPointsBy query = new FindWebSitePublishPointsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WebSitePublishPointController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWebSitePublishPoint(HttpServletRequest request) throws Exception {
 
 		WebSitePublishPoint webSitePublishPointToBeAdded = new WebSitePublishPoint();
@@ -129,7 +129,7 @@ public class WebSitePublishPointController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWebSitePublishPoint(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WebSitePublishPointController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{webSitePublishPointId}")
+	@GetMapping("/{webSitePublishPointId}")
 	public ResponseEntity<Object> findById(@PathVariable String webSitePublishPointId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("webSitePublishPointId", webSitePublishPointId);
@@ -207,7 +207,7 @@ public class WebSitePublishPointController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{webSitePublishPointId}")
+	@DeleteMapping("/{webSitePublishPointId}")
 	public ResponseEntity<Object> deleteWebSitePublishPointByIdUpdated(@PathVariable String webSitePublishPointId) throws Exception {
 		DeleteWebSitePublishPoint command = new DeleteWebSitePublishPoint(webSitePublishPointId);
 

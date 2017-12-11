@@ -57,7 +57,7 @@ public class ReturnItemTypeMapController {
 	 * @return a List with the ReturnItemTypeMaps
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findReturnItemTypeMapsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindReturnItemTypeMapsBy query = new FindReturnItemTypeMapsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ReturnItemTypeMapController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createReturnItemTypeMap(HttpServletRequest request) throws Exception {
 
 		ReturnItemTypeMap returnItemTypeMapToBeAdded = new ReturnItemTypeMap();
@@ -129,7 +129,7 @@ public class ReturnItemTypeMapController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateReturnItemTypeMap(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ReturnItemTypeMapController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{returnItemTypeMapId}")
+	@GetMapping("/{returnItemTypeMapId}")
 	public ResponseEntity<Object> findById(@PathVariable String returnItemTypeMapId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("returnItemTypeMapId", returnItemTypeMapId);
@@ -207,7 +207,7 @@ public class ReturnItemTypeMapController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{returnItemTypeMapId}")
+	@DeleteMapping("/{returnItemTypeMapId}")
 	public ResponseEntity<Object> deleteReturnItemTypeMapByIdUpdated(@PathVariable String returnItemTypeMapId) throws Exception {
 		DeleteReturnItemTypeMap command = new DeleteReturnItemTypeMap(returnItemTypeMapId);
 

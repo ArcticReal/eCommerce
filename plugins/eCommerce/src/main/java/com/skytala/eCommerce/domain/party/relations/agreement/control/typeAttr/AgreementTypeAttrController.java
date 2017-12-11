@@ -57,7 +57,7 @@ public class AgreementTypeAttrController {
 	 * @return a List with the AgreementTypeAttrs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findAgreementTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAgreementTypeAttrsBy query = new FindAgreementTypeAttrsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class AgreementTypeAttrController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createAgreementTypeAttr(HttpServletRequest request) throws Exception {
 
 		AgreementTypeAttr agreementTypeAttrToBeAdded = new AgreementTypeAttr();
@@ -129,7 +129,7 @@ public class AgreementTypeAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateAgreementTypeAttr(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class AgreementTypeAttrController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{agreementTypeAttrId}")
+	@GetMapping("/{agreementTypeAttrId}")
 	public ResponseEntity<Object> findById(@PathVariable String agreementTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("agreementTypeAttrId", agreementTypeAttrId);
@@ -207,7 +207,7 @@ public class AgreementTypeAttrController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{agreementTypeAttrId}")
+	@DeleteMapping("/{agreementTypeAttrId}")
 	public ResponseEntity<Object> deleteAgreementTypeAttrByIdUpdated(@PathVariable String agreementTypeAttrId) throws Exception {
 		DeleteAgreementTypeAttr command = new DeleteAgreementTypeAttr(agreementTypeAttrId);
 

@@ -57,7 +57,7 @@ public class PartyTypeAttrController {
 	 * @return a List with the PartyTypeAttrs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyTypeAttrsBy query = new FindPartyTypeAttrsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyTypeAttrController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyTypeAttr(HttpServletRequest request) throws Exception {
 
 		PartyTypeAttr partyTypeAttrToBeAdded = new PartyTypeAttr();
@@ -129,7 +129,7 @@ public class PartyTypeAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyTypeAttr(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyTypeAttrController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyTypeAttrId}")
+	@GetMapping("/{partyTypeAttrId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyTypeAttrId", partyTypeAttrId);
@@ -207,7 +207,7 @@ public class PartyTypeAttrController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyTypeAttrId}")
+	@DeleteMapping("/{partyTypeAttrId}")
 	public ResponseEntity<Object> deletePartyTypeAttrByIdUpdated(@PathVariable String partyTypeAttrId) throws Exception {
 		DeletePartyTypeAttr command = new DeletePartyTypeAttr(partyTypeAttrId);
 

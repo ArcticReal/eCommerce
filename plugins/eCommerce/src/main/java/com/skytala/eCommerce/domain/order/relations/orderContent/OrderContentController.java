@@ -57,7 +57,7 @@ public class OrderContentController {
 	 * @return a List with the OrderContents
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderContentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderContentsBy query = new FindOrderContentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderContentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderContent(HttpServletRequest request) throws Exception {
 
 		OrderContent orderContentToBeAdded = new OrderContent();
@@ -129,7 +129,7 @@ public class OrderContentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderContent(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderContentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderContentId}")
+	@GetMapping("/{orderContentId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderContentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderContentId", orderContentId);
@@ -207,7 +207,7 @@ public class OrderContentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderContentId}")
+	@DeleteMapping("/{orderContentId}")
 	public ResponseEntity<Object> deleteOrderContentByIdUpdated(@PathVariable String orderContentId) throws Exception {
 		DeleteOrderContent command = new DeleteOrderContent(orderContentId);
 

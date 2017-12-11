@@ -57,7 +57,7 @@ public class PartyRelationshipController {
 	 * @return a List with the PartyRelationships
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyRelationshipsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyRelationshipsBy query = new FindPartyRelationshipsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyRelationshipController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyRelationship(HttpServletRequest request) throws Exception {
 
 		PartyRelationship partyRelationshipToBeAdded = new PartyRelationship();
@@ -129,7 +129,7 @@ public class PartyRelationshipController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyRelationship(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyRelationshipController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyRelationshipId}")
+	@GetMapping("/{partyRelationshipId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyRelationshipId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyRelationshipId", partyRelationshipId);
@@ -207,7 +207,7 @@ public class PartyRelationshipController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyRelationshipId}")
+	@DeleteMapping("/{partyRelationshipId}")
 	public ResponseEntity<Object> deletePartyRelationshipByIdUpdated(@PathVariable String partyRelationshipId) throws Exception {
 		DeletePartyRelationship command = new DeletePartyRelationship(partyRelationshipId);
 

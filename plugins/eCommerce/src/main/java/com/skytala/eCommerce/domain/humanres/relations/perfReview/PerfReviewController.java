@@ -57,7 +57,7 @@ public class PerfReviewController {
 	 * @return a List with the PerfReviews
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPerfReviewsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPerfReviewsBy query = new FindPerfReviewsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PerfReviewController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPerfReview(HttpServletRequest request) throws Exception {
 
 		PerfReview perfReviewToBeAdded = new PerfReview();
@@ -129,7 +129,7 @@ public class PerfReviewController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePerfReview(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PerfReviewController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{perfReviewId}")
+	@GetMapping("/{perfReviewId}")
 	public ResponseEntity<Object> findById(@PathVariable String perfReviewId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("perfReviewId", perfReviewId);
@@ -207,7 +207,7 @@ public class PerfReviewController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{perfReviewId}")
+	@DeleteMapping("/{perfReviewId}")
 	public ResponseEntity<Object> deletePerfReviewByIdUpdated(@PathVariable String perfReviewId) throws Exception {
 		DeletePerfReview command = new DeletePerfReview(perfReviewId);
 

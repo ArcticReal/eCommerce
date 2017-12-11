@@ -57,7 +57,7 @@ public class ReturnItemResponseController {
 	 * @return a List with the ReturnItemResponses
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findReturnItemResponsesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindReturnItemResponsesBy query = new FindReturnItemResponsesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ReturnItemResponseController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createReturnItemResponse(HttpServletRequest request) throws Exception {
 
 		ReturnItemResponse returnItemResponseToBeAdded = new ReturnItemResponse();
@@ -129,7 +129,7 @@ public class ReturnItemResponseController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateReturnItemResponse(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ReturnItemResponseController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{returnItemResponseId}")
+	@GetMapping("/{returnItemResponseId}")
 	public ResponseEntity<Object> findById(@PathVariable String returnItemResponseId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("returnItemResponseId", returnItemResponseId);
@@ -207,7 +207,7 @@ public class ReturnItemResponseController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{returnItemResponseId}")
+	@DeleteMapping("/{returnItemResponseId}")
 	public ResponseEntity<Object> deleteReturnItemResponseByIdUpdated(@PathVariable String returnItemResponseId) throws Exception {
 		DeleteReturnItemResponse command = new DeleteReturnItemResponse(returnItemResponseId);
 

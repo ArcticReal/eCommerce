@@ -57,7 +57,7 @@ public class PayHistoryController {
 	 * @return a List with the PayHistorys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPayHistorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPayHistorysBy query = new FindPayHistorysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PayHistoryController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPayHistory(HttpServletRequest request) throws Exception {
 
 		PayHistory payHistoryToBeAdded = new PayHistory();
@@ -129,7 +129,7 @@ public class PayHistoryController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePayHistory(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PayHistoryController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{payHistoryId}")
+	@GetMapping("/{payHistoryId}")
 	public ResponseEntity<Object> findById(@PathVariable String payHistoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("payHistoryId", payHistoryId);
@@ -207,7 +207,7 @@ public class PayHistoryController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{payHistoryId}")
+	@DeleteMapping("/{payHistoryId}")
 	public ResponseEntity<Object> deletePayHistoryByIdUpdated(@PathVariable String payHistoryId) throws Exception {
 		DeletePayHistory command = new DeletePayHistory(payHistoryId);
 

@@ -57,7 +57,7 @@ public class WebAnalyticsConfigController {
 	 * @return a List with the WebAnalyticsConfigs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWebAnalyticsConfigsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWebAnalyticsConfigsBy query = new FindWebAnalyticsConfigsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WebAnalyticsConfigController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWebAnalyticsConfig(HttpServletRequest request) throws Exception {
 
 		WebAnalyticsConfig webAnalyticsConfigToBeAdded = new WebAnalyticsConfig();
@@ -129,7 +129,7 @@ public class WebAnalyticsConfigController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWebAnalyticsConfig(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WebAnalyticsConfigController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{webAnalyticsConfigId}")
+	@GetMapping("/{webAnalyticsConfigId}")
 	public ResponseEntity<Object> findById(@PathVariable String webAnalyticsConfigId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("webAnalyticsConfigId", webAnalyticsConfigId);
@@ -207,7 +207,7 @@ public class WebAnalyticsConfigController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{webAnalyticsConfigId}")
+	@DeleteMapping("/{webAnalyticsConfigId}")
 	public ResponseEntity<Object> deleteWebAnalyticsConfigByIdUpdated(@PathVariable String webAnalyticsConfigId) throws Exception {
 		DeleteWebAnalyticsConfig command = new DeleteWebAnalyticsConfig(webAnalyticsConfigId);
 

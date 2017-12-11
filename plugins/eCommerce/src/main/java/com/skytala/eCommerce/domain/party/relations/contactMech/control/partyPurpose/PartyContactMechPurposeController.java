@@ -57,7 +57,7 @@ public class PartyContactMechPurposeController {
 	 * @return a List with the PartyContactMechPurposes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyContactMechPurposesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyContactMechPurposesBy query = new FindPartyContactMechPurposesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyContactMechPurposeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyContactMechPurpose(HttpServletRequest request) throws Exception {
 
 		PartyContactMechPurpose partyContactMechPurposeToBeAdded = new PartyContactMechPurpose();
@@ -129,7 +129,7 @@ public class PartyContactMechPurposeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyContactMechPurpose(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyContactMechPurposeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyContactMechPurposeId}")
+	@GetMapping("/{partyContactMechPurposeId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyContactMechPurposeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyContactMechPurposeId", partyContactMechPurposeId);
@@ -207,7 +207,7 @@ public class PartyContactMechPurposeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyContactMechPurposeId}")
+	@DeleteMapping("/{partyContactMechPurposeId}")
 	public ResponseEntity<Object> deletePartyContactMechPurposeByIdUpdated(@PathVariable String partyContactMechPurposeId) throws Exception {
 		DeletePartyContactMechPurpose command = new DeletePartyContactMechPurpose(partyContactMechPurposeId);
 

@@ -57,7 +57,7 @@ public class BudgetReviewResultTypeController {
 	 * @return a List with the BudgetReviewResultTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findBudgetReviewResultTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindBudgetReviewResultTypesBy query = new FindBudgetReviewResultTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class BudgetReviewResultTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createBudgetReviewResultType(HttpServletRequest request) throws Exception {
 
 		BudgetReviewResultType budgetReviewResultTypeToBeAdded = new BudgetReviewResultType();
@@ -129,7 +129,7 @@ public class BudgetReviewResultTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateBudgetReviewResultType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class BudgetReviewResultTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{budgetReviewResultTypeId}")
+	@GetMapping("/{budgetReviewResultTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String budgetReviewResultTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("budgetReviewResultTypeId", budgetReviewResultTypeId);
@@ -207,7 +207,7 @@ public class BudgetReviewResultTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{budgetReviewResultTypeId}")
+	@DeleteMapping("/{budgetReviewResultTypeId}")
 	public ResponseEntity<Object> deleteBudgetReviewResultTypeByIdUpdated(@PathVariable String budgetReviewResultTypeId) throws Exception {
 		DeleteBudgetReviewResultType command = new DeleteBudgetReviewResultType(budgetReviewResultTypeId);
 

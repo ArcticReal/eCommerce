@@ -57,7 +57,7 @@ public class ProductStoreVendorShipmentController {
 	 * @return a List with the ProductStoreVendorShipments
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductStoreVendorShipmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductStoreVendorShipmentsBy query = new FindProductStoreVendorShipmentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductStoreVendorShipmentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductStoreVendorShipment(HttpServletRequest request) throws Exception {
 
 		ProductStoreVendorShipment productStoreVendorShipmentToBeAdded = new ProductStoreVendorShipment();
@@ -129,7 +129,7 @@ public class ProductStoreVendorShipmentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductStoreVendorShipment(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductStoreVendorShipmentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productStoreVendorShipmentId}")
+	@GetMapping("/{productStoreVendorShipmentId}")
 	public ResponseEntity<Object> findById(@PathVariable String productStoreVendorShipmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productStoreVendorShipmentId", productStoreVendorShipmentId);
@@ -207,7 +207,7 @@ public class ProductStoreVendorShipmentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productStoreVendorShipmentId}")
+	@DeleteMapping("/{productStoreVendorShipmentId}")
 	public ResponseEntity<Object> deleteProductStoreVendorShipmentByIdUpdated(@PathVariable String productStoreVendorShipmentId) throws Exception {
 		DeleteProductStoreVendorShipment command = new DeleteProductStoreVendorShipment(productStoreVendorShipmentId);
 

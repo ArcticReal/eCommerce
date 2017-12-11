@@ -57,7 +57,7 @@ public class ShipmentReceiptController {
 	 * @return a List with the ShipmentReceipts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findShipmentReceiptsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentReceiptsBy query = new FindShipmentReceiptsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ShipmentReceiptController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createShipmentReceipt(HttpServletRequest request) throws Exception {
 
 		ShipmentReceipt shipmentReceiptToBeAdded = new ShipmentReceipt();
@@ -129,7 +129,7 @@ public class ShipmentReceiptController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateShipmentReceipt(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ShipmentReceiptController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{shipmentReceiptId}")
+	@GetMapping("/{shipmentReceiptId}")
 	public ResponseEntity<Object> findById(@PathVariable String shipmentReceiptId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentReceiptId", shipmentReceiptId);
@@ -207,7 +207,7 @@ public class ShipmentReceiptController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{shipmentReceiptId}")
+	@DeleteMapping("/{shipmentReceiptId}")
 	public ResponseEntity<Object> deleteShipmentReceiptByIdUpdated(@PathVariable String shipmentReceiptId) throws Exception {
 		DeleteShipmentReceipt command = new DeleteShipmentReceipt(shipmentReceiptId);
 

@@ -57,7 +57,7 @@ public class FacilityGroupTypeController {
 	 * @return a List with the FacilityGroupTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFacilityGroupTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFacilityGroupTypesBy query = new FindFacilityGroupTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FacilityGroupTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFacilityGroupType(HttpServletRequest request) throws Exception {
 
 		FacilityGroupType facilityGroupTypeToBeAdded = new FacilityGroupType();
@@ -129,7 +129,7 @@ public class FacilityGroupTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFacilityGroupType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FacilityGroupTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{facilityGroupTypeId}")
+	@GetMapping("/{facilityGroupTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String facilityGroupTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("facilityGroupTypeId", facilityGroupTypeId);
@@ -207,7 +207,7 @@ public class FacilityGroupTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{facilityGroupTypeId}")
+	@DeleteMapping("/{facilityGroupTypeId}")
 	public ResponseEntity<Object> deleteFacilityGroupTypeByIdUpdated(@PathVariable String facilityGroupTypeId) throws Exception {
 		DeleteFacilityGroupType command = new DeleteFacilityGroupType(facilityGroupTypeId);
 

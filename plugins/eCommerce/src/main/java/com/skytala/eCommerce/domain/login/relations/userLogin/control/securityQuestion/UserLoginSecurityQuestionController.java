@@ -57,7 +57,7 @@ public class UserLoginSecurityQuestionController {
 	 * @return a List with the UserLoginSecurityQuestions
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findUserLoginSecurityQuestionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindUserLoginSecurityQuestionsBy query = new FindUserLoginSecurityQuestionsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class UserLoginSecurityQuestionController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createUserLoginSecurityQuestion(HttpServletRequest request) throws Exception {
 
 		UserLoginSecurityQuestion userLoginSecurityQuestionToBeAdded = new UserLoginSecurityQuestion();
@@ -129,7 +129,7 @@ public class UserLoginSecurityQuestionController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateUserLoginSecurityQuestion(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class UserLoginSecurityQuestionController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{userLoginSecurityQuestionId}")
+	@GetMapping("/{userLoginSecurityQuestionId}")
 	public ResponseEntity<Object> findById(@PathVariable String userLoginSecurityQuestionId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("userLoginSecurityQuestionId", userLoginSecurityQuestionId);
@@ -207,7 +207,7 @@ public class UserLoginSecurityQuestionController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{userLoginSecurityQuestionId}")
+	@DeleteMapping("/{userLoginSecurityQuestionId}")
 	public ResponseEntity<Object> deleteUserLoginSecurityQuestionByIdUpdated(@PathVariable String userLoginSecurityQuestionId) throws Exception {
 		DeleteUserLoginSecurityQuestion command = new DeleteUserLoginSecurityQuestion(userLoginSecurityQuestionId);
 

@@ -57,7 +57,7 @@ public class PartyInvitationGroupAssocController {
 	 * @return a List with the PartyInvitationGroupAssocs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyInvitationGroupAssocsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyInvitationGroupAssocsBy query = new FindPartyInvitationGroupAssocsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyInvitationGroupAssocController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyInvitationGroupAssoc(HttpServletRequest request) throws Exception {
 
 		PartyInvitationGroupAssoc partyInvitationGroupAssocToBeAdded = new PartyInvitationGroupAssoc();
@@ -129,7 +129,7 @@ public class PartyInvitationGroupAssocController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyInvitationGroupAssoc(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyInvitationGroupAssocController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyInvitationGroupAssocId}")
+	@GetMapping("/{partyInvitationGroupAssocId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyInvitationGroupAssocId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyInvitationGroupAssocId", partyInvitationGroupAssocId);
@@ -207,7 +207,7 @@ public class PartyInvitationGroupAssocController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyInvitationGroupAssocId}")
+	@DeleteMapping("/{partyInvitationGroupAssocId}")
 	public ResponseEntity<Object> deletePartyInvitationGroupAssocByIdUpdated(@PathVariable String partyInvitationGroupAssocId) throws Exception {
 		DeletePartyInvitationGroupAssoc command = new DeletePartyInvitationGroupAssoc(partyInvitationGroupAssocId);
 

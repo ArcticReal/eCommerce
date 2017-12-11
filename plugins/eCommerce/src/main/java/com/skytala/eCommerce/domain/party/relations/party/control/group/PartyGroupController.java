@@ -57,7 +57,7 @@ public class PartyGroupController {
 	 * @return a List with the PartyGroups
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyGroupsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyGroupsBy query = new FindPartyGroupsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyGroupController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyGroup(HttpServletRequest request) throws Exception {
 
 		PartyGroup partyGroupToBeAdded = new PartyGroup();
@@ -129,7 +129,7 @@ public class PartyGroupController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyGroup(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyGroupController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyGroupId}")
+	@GetMapping("/{partyGroupId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyGroupId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyGroupId", partyGroupId);
@@ -207,7 +207,7 @@ public class PartyGroupController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyGroupId}")
+	@DeleteMapping("/{partyGroupId}")
 	public ResponseEntity<Object> deletePartyGroupByIdUpdated(@PathVariable String partyGroupId) throws Exception {
 		DeletePartyGroup command = new DeletePartyGroup(partyGroupId);
 

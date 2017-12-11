@@ -57,7 +57,7 @@ public class FinAccountRoleController {
 	 * @return a List with the FinAccountRoles
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFinAccountRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFinAccountRolesBy query = new FindFinAccountRolesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FinAccountRoleController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFinAccountRole(HttpServletRequest request) throws Exception {
 
 		FinAccountRole finAccountRoleToBeAdded = new FinAccountRole();
@@ -129,7 +129,7 @@ public class FinAccountRoleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFinAccountRole(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FinAccountRoleController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{finAccountRoleId}")
+	@GetMapping("/{finAccountRoleId}")
 	public ResponseEntity<Object> findById(@PathVariable String finAccountRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("finAccountRoleId", finAccountRoleId);
@@ -207,7 +207,7 @@ public class FinAccountRoleController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{finAccountRoleId}")
+	@DeleteMapping("/{finAccountRoleId}")
 	public ResponseEntity<Object> deleteFinAccountRoleByIdUpdated(@PathVariable String finAccountRoleId) throws Exception {
 		DeleteFinAccountRole command = new DeleteFinAccountRole(finAccountRoleId);
 

@@ -57,7 +57,7 @@ public class ProductSearchConstraintController {
 	 * @return a List with the ProductSearchConstraints
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductSearchConstraintsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductSearchConstraintsBy query = new FindProductSearchConstraintsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductSearchConstraintController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductSearchConstraint(HttpServletRequest request) throws Exception {
 
 		ProductSearchConstraint productSearchConstraintToBeAdded = new ProductSearchConstraint();
@@ -129,7 +129,7 @@ public class ProductSearchConstraintController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductSearchConstraint(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductSearchConstraintController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productSearchConstraintId}")
+	@GetMapping("/{productSearchConstraintId}")
 	public ResponseEntity<Object> findById(@PathVariable String productSearchConstraintId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productSearchConstraintId", productSearchConstraintId);
@@ -207,7 +207,7 @@ public class ProductSearchConstraintController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productSearchConstraintId}")
+	@DeleteMapping("/{productSearchConstraintId}")
 	public ResponseEntity<Object> deleteProductSearchConstraintByIdUpdated(@PathVariable String productSearchConstraintId) throws Exception {
 		DeleteProductSearchConstraint command = new DeleteProductSearchConstraint(productSearchConstraintId);
 

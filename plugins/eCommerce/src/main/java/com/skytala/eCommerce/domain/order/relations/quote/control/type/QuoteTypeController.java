@@ -57,7 +57,7 @@ public class QuoteTypeController {
 	 * @return a List with the QuoteTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findQuoteTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindQuoteTypesBy query = new FindQuoteTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class QuoteTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createQuoteType(HttpServletRequest request) throws Exception {
 
 		QuoteType quoteTypeToBeAdded = new QuoteType();
@@ -129,7 +129,7 @@ public class QuoteTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateQuoteType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class QuoteTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{quoteTypeId}")
+	@GetMapping("/{quoteTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String quoteTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("quoteTypeId", quoteTypeId);
@@ -207,7 +207,7 @@ public class QuoteTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{quoteTypeId}")
+	@DeleteMapping("/{quoteTypeId}")
 	public ResponseEntity<Object> deleteQuoteTypeByIdUpdated(@PathVariable String quoteTypeId) throws Exception {
 		DeleteQuoteType command = new DeleteQuoteType(quoteTypeId);
 

@@ -57,7 +57,7 @@ public class SurveyMultiRespController {
 	 * @return a List with the SurveyMultiResps
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSurveyMultiRespsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSurveyMultiRespsBy query = new FindSurveyMultiRespsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SurveyMultiRespController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSurveyMultiResp(HttpServletRequest request) throws Exception {
 
 		SurveyMultiResp surveyMultiRespToBeAdded = new SurveyMultiResp();
@@ -129,7 +129,7 @@ public class SurveyMultiRespController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSurveyMultiResp(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SurveyMultiRespController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{surveyMultiRespId}")
+	@GetMapping("/{surveyMultiRespId}")
 	public ResponseEntity<Object> findById(@PathVariable String surveyMultiRespId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("surveyMultiRespId", surveyMultiRespId);
@@ -207,7 +207,7 @@ public class SurveyMultiRespController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{surveyMultiRespId}")
+	@DeleteMapping("/{surveyMultiRespId}")
 	public ResponseEntity<Object> deleteSurveyMultiRespByIdUpdated(@PathVariable String surveyMultiRespId) throws Exception {
 		DeleteSurveyMultiResp command = new DeleteSurveyMultiResp(surveyMultiRespId);
 

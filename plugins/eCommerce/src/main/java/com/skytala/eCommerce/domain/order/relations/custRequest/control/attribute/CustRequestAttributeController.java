@@ -57,7 +57,7 @@ public class CustRequestAttributeController {
 	 * @return a List with the CustRequestAttributes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findCustRequestAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCustRequestAttributesBy query = new FindCustRequestAttributesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class CustRequestAttributeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createCustRequestAttribute(HttpServletRequest request) throws Exception {
 
 		CustRequestAttribute custRequestAttributeToBeAdded = new CustRequestAttribute();
@@ -129,7 +129,7 @@ public class CustRequestAttributeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateCustRequestAttribute(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class CustRequestAttributeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{custRequestAttributeId}")
+	@GetMapping("/{custRequestAttributeId}")
 	public ResponseEntity<Object> findById(@PathVariable String custRequestAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("custRequestAttributeId", custRequestAttributeId);
@@ -207,7 +207,7 @@ public class CustRequestAttributeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{custRequestAttributeId}")
+	@DeleteMapping("/{custRequestAttributeId}")
 	public ResponseEntity<Object> deleteCustRequestAttributeByIdUpdated(@PathVariable String custRequestAttributeId) throws Exception {
 		DeleteCustRequestAttribute command = new DeleteCustRequestAttribute(custRequestAttributeId);
 

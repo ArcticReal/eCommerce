@@ -57,7 +57,7 @@ public class OrderItemShipGroupAssocController {
 	 * @return a List with the OrderItemShipGroupAssocs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderItemShipGroupAssocsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderItemShipGroupAssocsBy query = new FindOrderItemShipGroupAssocsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderItemShipGroupAssocController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderItemShipGroupAssoc(HttpServletRequest request) throws Exception {
 
 		OrderItemShipGroupAssoc orderItemShipGroupAssocToBeAdded = new OrderItemShipGroupAssoc();
@@ -129,7 +129,7 @@ public class OrderItemShipGroupAssocController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderItemShipGroupAssoc(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderItemShipGroupAssocController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderItemShipGroupAssocId}")
+	@GetMapping("/{orderItemShipGroupAssocId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderItemShipGroupAssocId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderItemShipGroupAssocId", orderItemShipGroupAssocId);
@@ -207,7 +207,7 @@ public class OrderItemShipGroupAssocController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderItemShipGroupAssocId}")
+	@DeleteMapping("/{orderItemShipGroupAssocId}")
 	public ResponseEntity<Object> deleteOrderItemShipGroupAssocByIdUpdated(@PathVariable String orderItemShipGroupAssocId) throws Exception {
 		DeleteOrderItemShipGroupAssoc command = new DeleteOrderItemShipGroupAssoc(orderItemShipGroupAssocId);
 

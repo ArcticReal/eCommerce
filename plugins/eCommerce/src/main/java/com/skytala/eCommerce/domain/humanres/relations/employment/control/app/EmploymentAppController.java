@@ -57,7 +57,7 @@ public class EmploymentAppController {
 	 * @return a List with the EmploymentApps
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findEmploymentAppsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindEmploymentAppsBy query = new FindEmploymentAppsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class EmploymentAppController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createEmploymentApp(HttpServletRequest request) throws Exception {
 
 		EmploymentApp employmentAppToBeAdded = new EmploymentApp();
@@ -129,7 +129,7 @@ public class EmploymentAppController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateEmploymentApp(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class EmploymentAppController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{employmentAppId}")
+	@GetMapping("/{employmentAppId}")
 	public ResponseEntity<Object> findById(@PathVariable String employmentAppId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("employmentAppId", employmentAppId);
@@ -207,7 +207,7 @@ public class EmploymentAppController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{employmentAppId}")
+	@DeleteMapping("/{employmentAppId}")
 	public ResponseEntity<Object> deleteEmploymentAppByIdUpdated(@PathVariable String employmentAppId) throws Exception {
 		DeleteEmploymentApp command = new DeleteEmploymentApp(employmentAppId);
 

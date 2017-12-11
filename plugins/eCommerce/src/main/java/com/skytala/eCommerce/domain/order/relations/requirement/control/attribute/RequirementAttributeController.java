@@ -57,7 +57,7 @@ public class RequirementAttributeController {
 	 * @return a List with the RequirementAttributes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findRequirementAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindRequirementAttributesBy query = new FindRequirementAttributesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class RequirementAttributeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createRequirementAttribute(HttpServletRequest request) throws Exception {
 
 		RequirementAttribute requirementAttributeToBeAdded = new RequirementAttribute();
@@ -129,7 +129,7 @@ public class RequirementAttributeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateRequirementAttribute(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class RequirementAttributeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{requirementAttributeId}")
+	@GetMapping("/{requirementAttributeId}")
 	public ResponseEntity<Object> findById(@PathVariable String requirementAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("requirementAttributeId", requirementAttributeId);
@@ -207,7 +207,7 @@ public class RequirementAttributeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{requirementAttributeId}")
+	@DeleteMapping("/{requirementAttributeId}")
 	public ResponseEntity<Object> deleteRequirementAttributeByIdUpdated(@PathVariable String requirementAttributeId) throws Exception {
 		DeleteRequirementAttribute command = new DeleteRequirementAttribute(requirementAttributeId);
 

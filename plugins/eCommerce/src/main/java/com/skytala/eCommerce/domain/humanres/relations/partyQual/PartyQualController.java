@@ -57,7 +57,7 @@ public class PartyQualController {
 	 * @return a List with the PartyQuals
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyQualsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyQualsBy query = new FindPartyQualsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyQualController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyQual(HttpServletRequest request) throws Exception {
 
 		PartyQual partyQualToBeAdded = new PartyQual();
@@ -129,7 +129,7 @@ public class PartyQualController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyQual(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyQualController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyQualId}")
+	@GetMapping("/{partyQualId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyQualId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyQualId", partyQualId);
@@ -207,7 +207,7 @@ public class PartyQualController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyQualId}")
+	@DeleteMapping("/{partyQualId}")
 	public ResponseEntity<Object> deletePartyQualByIdUpdated(@PathVariable String partyQualId) throws Exception {
 		DeletePartyQual command = new DeletePartyQual(partyQualId);
 

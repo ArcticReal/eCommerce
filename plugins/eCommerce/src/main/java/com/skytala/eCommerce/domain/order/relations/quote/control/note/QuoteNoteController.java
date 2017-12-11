@@ -57,7 +57,7 @@ public class QuoteNoteController {
 	 * @return a List with the QuoteNotes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findQuoteNotesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindQuoteNotesBy query = new FindQuoteNotesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class QuoteNoteController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createQuoteNote(HttpServletRequest request) throws Exception {
 
 		QuoteNote quoteNoteToBeAdded = new QuoteNote();
@@ -129,7 +129,7 @@ public class QuoteNoteController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateQuoteNote(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class QuoteNoteController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{quoteNoteId}")
+	@GetMapping("/{quoteNoteId}")
 	public ResponseEntity<Object> findById(@PathVariable String quoteNoteId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("quoteNoteId", quoteNoteId);
@@ -207,7 +207,7 @@ public class QuoteNoteController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{quoteNoteId}")
+	@DeleteMapping("/{quoteNoteId}")
 	public ResponseEntity<Object> deleteQuoteNoteByIdUpdated(@PathVariable String quoteNoteId) throws Exception {
 		DeleteQuoteNote command = new DeleteQuoteNote(quoteNoteId);
 

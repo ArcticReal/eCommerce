@@ -57,7 +57,7 @@ public class RespondingPartyController {
 	 * @return a List with the RespondingPartys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findRespondingPartysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindRespondingPartysBy query = new FindRespondingPartysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class RespondingPartyController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createRespondingParty(HttpServletRequest request) throws Exception {
 
 		RespondingParty respondingPartyToBeAdded = new RespondingParty();
@@ -129,7 +129,7 @@ public class RespondingPartyController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateRespondingParty(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class RespondingPartyController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{respondingPartyId}")
+	@GetMapping("/{respondingPartyId}")
 	public ResponseEntity<Object> findById(@PathVariable String respondingPartyId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("respondingPartyId", respondingPartyId);
@@ -207,7 +207,7 @@ public class RespondingPartyController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{respondingPartyId}")
+	@DeleteMapping("/{respondingPartyId}")
 	public ResponseEntity<Object> deleteRespondingPartyByIdUpdated(@PathVariable String respondingPartyId) throws Exception {
 		DeleteRespondingParty command = new DeleteRespondingParty(respondingPartyId);
 

@@ -57,7 +57,7 @@ public class EmploymentAppSourceTypeController {
 	 * @return a List with the EmploymentAppSourceTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findEmploymentAppSourceTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindEmploymentAppSourceTypesBy query = new FindEmploymentAppSourceTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class EmploymentAppSourceTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createEmploymentAppSourceType(HttpServletRequest request) throws Exception {
 
 		EmploymentAppSourceType employmentAppSourceTypeToBeAdded = new EmploymentAppSourceType();
@@ -129,7 +129,7 @@ public class EmploymentAppSourceTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateEmploymentAppSourceType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class EmploymentAppSourceTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{employmentAppSourceTypeId}")
+	@GetMapping("/{employmentAppSourceTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String employmentAppSourceTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("employmentAppSourceTypeId", employmentAppSourceTypeId);
@@ -207,7 +207,7 @@ public class EmploymentAppSourceTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{employmentAppSourceTypeId}")
+	@DeleteMapping("/{employmentAppSourceTypeId}")
 	public ResponseEntity<Object> deleteEmploymentAppSourceTypeByIdUpdated(@PathVariable String employmentAppSourceTypeId) throws Exception {
 		DeleteEmploymentAppSourceType command = new DeleteEmploymentAppSourceType(employmentAppSourceTypeId);
 

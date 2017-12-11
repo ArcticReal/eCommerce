@@ -57,7 +57,7 @@ public class ContainerController {
 	 * @return a List with the Containers
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findContainersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContainersBy query = new FindContainersBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ContainerController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createContainer(HttpServletRequest request) throws Exception {
 
 		Container containerToBeAdded = new Container();
@@ -129,7 +129,7 @@ public class ContainerController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateContainer(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ContainerController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{containerId}")
+	@GetMapping("/{containerId}")
 	public ResponseEntity<Object> findById(@PathVariable String containerId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("containerId", containerId);
@@ -207,7 +207,7 @@ public class ContainerController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{containerId}")
+	@DeleteMapping("/{containerId}")
 	public ResponseEntity<Object> deleteContainerByIdUpdated(@PathVariable String containerId) throws Exception {
 		DeleteContainer command = new DeleteContainer(containerId);
 

@@ -57,7 +57,7 @@ public class QuoteItemController {
 	 * @return a List with the QuoteItems
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findQuoteItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindQuoteItemsBy query = new FindQuoteItemsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class QuoteItemController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createQuoteItem(HttpServletRequest request) throws Exception {
 
 		QuoteItem quoteItemToBeAdded = new QuoteItem();
@@ -129,7 +129,7 @@ public class QuoteItemController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateQuoteItem(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class QuoteItemController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{quoteItemId}")
+	@GetMapping("/{quoteItemId}")
 	public ResponseEntity<Object> findById(@PathVariable String quoteItemId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("quoteItemId", quoteItemId);
@@ -207,7 +207,7 @@ public class QuoteItemController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{quoteItemId}")
+	@DeleteMapping("/{quoteItemId}")
 	public ResponseEntity<Object> deleteQuoteItemByIdUpdated(@PathVariable String quoteItemId) throws Exception {
 		DeleteQuoteItem command = new DeleteQuoteItem(quoteItemId);
 

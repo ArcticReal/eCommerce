@@ -57,7 +57,7 @@ public class SegmentGroupTypeController {
 	 * @return a List with the SegmentGroupTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSegmentGroupTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSegmentGroupTypesBy query = new FindSegmentGroupTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SegmentGroupTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSegmentGroupType(HttpServletRequest request) throws Exception {
 
 		SegmentGroupType segmentGroupTypeToBeAdded = new SegmentGroupType();
@@ -129,7 +129,7 @@ public class SegmentGroupTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSegmentGroupType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SegmentGroupTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{segmentGroupTypeId}")
+	@GetMapping("/{segmentGroupTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String segmentGroupTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("segmentGroupTypeId", segmentGroupTypeId);
@@ -207,7 +207,7 @@ public class SegmentGroupTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{segmentGroupTypeId}")
+	@DeleteMapping("/{segmentGroupTypeId}")
 	public ResponseEntity<Object> deleteSegmentGroupTypeByIdUpdated(@PathVariable String segmentGroupTypeId) throws Exception {
 		DeleteSegmentGroupType command = new DeleteSegmentGroupType(segmentGroupTypeId);
 

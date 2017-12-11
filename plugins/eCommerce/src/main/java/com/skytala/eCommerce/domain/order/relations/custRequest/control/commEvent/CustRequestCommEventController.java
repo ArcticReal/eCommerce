@@ -57,7 +57,7 @@ public class CustRequestCommEventController {
 	 * @return a List with the CustRequestCommEvents
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findCustRequestCommEventsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCustRequestCommEventsBy query = new FindCustRequestCommEventsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class CustRequestCommEventController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createCustRequestCommEvent(HttpServletRequest request) throws Exception {
 
 		CustRequestCommEvent custRequestCommEventToBeAdded = new CustRequestCommEvent();
@@ -129,7 +129,7 @@ public class CustRequestCommEventController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateCustRequestCommEvent(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class CustRequestCommEventController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{custRequestCommEventId}")
+	@GetMapping("/{custRequestCommEventId}")
 	public ResponseEntity<Object> findById(@PathVariable String custRequestCommEventId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("custRequestCommEventId", custRequestCommEventId);
@@ -207,7 +207,7 @@ public class CustRequestCommEventController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{custRequestCommEventId}")
+	@DeleteMapping("/{custRequestCommEventId}")
 	public ResponseEntity<Object> deleteCustRequestCommEventByIdUpdated(@PathVariable String custRequestCommEventId) throws Exception {
 		DeleteCustRequestCommEvent command = new DeleteCustRequestCommEvent(custRequestCommEventId);
 

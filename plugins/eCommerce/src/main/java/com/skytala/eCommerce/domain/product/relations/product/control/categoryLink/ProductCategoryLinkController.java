@@ -57,7 +57,7 @@ public class ProductCategoryLinkController {
 	 * @return a List with the ProductCategoryLinks
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductCategoryLinksBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductCategoryLinksBy query = new FindProductCategoryLinksBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductCategoryLinkController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductCategoryLink(HttpServletRequest request) throws Exception {
 
 		ProductCategoryLink productCategoryLinkToBeAdded = new ProductCategoryLink();
@@ -129,7 +129,7 @@ public class ProductCategoryLinkController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductCategoryLink(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductCategoryLinkController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productCategoryLinkId}")
+	@GetMapping("/{productCategoryLinkId}")
 	public ResponseEntity<Object> findById(@PathVariable String productCategoryLinkId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productCategoryLinkId", productCategoryLinkId);
@@ -207,7 +207,7 @@ public class ProductCategoryLinkController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productCategoryLinkId}")
+	@DeleteMapping("/{productCategoryLinkId}")
 	public ResponseEntity<Object> deleteProductCategoryLinkByIdUpdated(@PathVariable String productCategoryLinkId) throws Exception {
 		DeleteProductCategoryLink command = new DeleteProductCategoryLink(productCategoryLinkId);
 

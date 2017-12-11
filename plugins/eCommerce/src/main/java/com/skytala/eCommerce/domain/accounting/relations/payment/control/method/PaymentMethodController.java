@@ -57,7 +57,7 @@ public class PaymentMethodController {
 	 * @return a List with the PaymentMethods
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPaymentMethodsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentMethodsBy query = new FindPaymentMethodsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PaymentMethodController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPaymentMethod(HttpServletRequest request) throws Exception {
 
 		PaymentMethod paymentMethodToBeAdded = new PaymentMethod();
@@ -129,7 +129,7 @@ public class PaymentMethodController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePaymentMethod(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PaymentMethodController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{paymentMethodId}")
+	@GetMapping("/{paymentMethodId}")
 	public ResponseEntity<Object> findById(@PathVariable String paymentMethodId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentMethodId", paymentMethodId);
@@ -207,7 +207,7 @@ public class PaymentMethodController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{paymentMethodId}")
+	@DeleteMapping("/{paymentMethodId}")
 	public ResponseEntity<Object> deletePaymentMethodByIdUpdated(@PathVariable String paymentMethodId) throws Exception {
 		DeletePaymentMethod command = new DeletePaymentMethod(paymentMethodId);
 

@@ -57,7 +57,7 @@ public class ProductSubscriptionResourceController {
 	 * @return a List with the ProductSubscriptionResources
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductSubscriptionResourcesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductSubscriptionResourcesBy query = new FindProductSubscriptionResourcesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductSubscriptionResourceController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductSubscriptionResource(HttpServletRequest request) throws Exception {
 
 		ProductSubscriptionResource productSubscriptionResourceToBeAdded = new ProductSubscriptionResource();
@@ -129,7 +129,7 @@ public class ProductSubscriptionResourceController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductSubscriptionResource(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductSubscriptionResourceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productSubscriptionResourceId}")
+	@GetMapping("/{productSubscriptionResourceId}")
 	public ResponseEntity<Object> findById(@PathVariable String productSubscriptionResourceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productSubscriptionResourceId", productSubscriptionResourceId);
@@ -207,7 +207,7 @@ public class ProductSubscriptionResourceController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productSubscriptionResourceId}")
+	@DeleteMapping("/{productSubscriptionResourceId}")
 	public ResponseEntity<Object> deleteProductSubscriptionResourceByIdUpdated(@PathVariable String productSubscriptionResourceId) throws Exception {
 		DeleteProductSubscriptionResource command = new DeleteProductSubscriptionResource(productSubscriptionResourceId);
 

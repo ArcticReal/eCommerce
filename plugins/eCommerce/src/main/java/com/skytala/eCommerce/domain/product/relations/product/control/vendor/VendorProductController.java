@@ -57,7 +57,7 @@ public class VendorProductController {
 	 * @return a List with the VendorProducts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findVendorProductsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindVendorProductsBy query = new FindVendorProductsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class VendorProductController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createVendorProduct(HttpServletRequest request) throws Exception {
 
 		VendorProduct vendorProductToBeAdded = new VendorProduct();
@@ -129,7 +129,7 @@ public class VendorProductController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateVendorProduct(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class VendorProductController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{vendorProductId}")
+	@GetMapping("/{vendorProductId}")
 	public ResponseEntity<Object> findById(@PathVariable String vendorProductId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("vendorProductId", vendorProductId);
@@ -207,7 +207,7 @@ public class VendorProductController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{vendorProductId}")
+	@DeleteMapping("/{vendorProductId}")
 	public ResponseEntity<Object> deleteVendorProductByIdUpdated(@PathVariable String vendorProductId) throws Exception {
 		DeleteVendorProduct command = new DeleteVendorProduct(vendorProductId);
 

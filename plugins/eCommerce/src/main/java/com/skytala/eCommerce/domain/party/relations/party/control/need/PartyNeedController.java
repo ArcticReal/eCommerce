@@ -57,7 +57,7 @@ public class PartyNeedController {
 	 * @return a List with the PartyNeeds
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyNeedsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyNeedsBy query = new FindPartyNeedsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyNeedController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyNeed(HttpServletRequest request) throws Exception {
 
 		PartyNeed partyNeedToBeAdded = new PartyNeed();
@@ -129,7 +129,7 @@ public class PartyNeedController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyNeed(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyNeedController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyNeedId}")
+	@GetMapping("/{partyNeedId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyNeedId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyNeedId", partyNeedId);
@@ -207,7 +207,7 @@ public class PartyNeedController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyNeedId}")
+	@DeleteMapping("/{partyNeedId}")
 	public ResponseEntity<Object> deletePartyNeedByIdUpdated(@PathVariable String partyNeedId) throws Exception {
 		DeletePartyNeed command = new DeletePartyNeed(partyNeedId);
 

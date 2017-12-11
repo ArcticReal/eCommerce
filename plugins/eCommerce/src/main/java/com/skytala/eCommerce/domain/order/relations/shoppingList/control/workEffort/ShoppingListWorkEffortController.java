@@ -57,7 +57,7 @@ public class ShoppingListWorkEffortController {
 	 * @return a List with the ShoppingListWorkEfforts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findShoppingListWorkEffortsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShoppingListWorkEffortsBy query = new FindShoppingListWorkEffortsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ShoppingListWorkEffortController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createShoppingListWorkEffort(HttpServletRequest request) throws Exception {
 
 		ShoppingListWorkEffort shoppingListWorkEffortToBeAdded = new ShoppingListWorkEffort();
@@ -129,7 +129,7 @@ public class ShoppingListWorkEffortController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateShoppingListWorkEffort(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ShoppingListWorkEffortController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{shoppingListWorkEffortId}")
+	@GetMapping("/{shoppingListWorkEffortId}")
 	public ResponseEntity<Object> findById(@PathVariable String shoppingListWorkEffortId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shoppingListWorkEffortId", shoppingListWorkEffortId);
@@ -207,7 +207,7 @@ public class ShoppingListWorkEffortController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{shoppingListWorkEffortId}")
+	@DeleteMapping("/{shoppingListWorkEffortId}")
 	public ResponseEntity<Object> deleteShoppingListWorkEffortByIdUpdated(@PathVariable String shoppingListWorkEffortId) throws Exception {
 		DeleteShoppingListWorkEffort command = new DeleteShoppingListWorkEffort(shoppingListWorkEffortId);
 

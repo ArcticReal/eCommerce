@@ -57,7 +57,7 @@ public class WorkEffortContactMechController {
 	 * @return a List with the WorkEffortContactMechs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWorkEffortContactMechsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortContactMechsBy query = new FindWorkEffortContactMechsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WorkEffortContactMechController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWorkEffortContactMech(HttpServletRequest request) throws Exception {
 
 		WorkEffortContactMech workEffortContactMechToBeAdded = new WorkEffortContactMech();
@@ -129,7 +129,7 @@ public class WorkEffortContactMechController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWorkEffortContactMech(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WorkEffortContactMechController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{workEffortContactMechId}")
+	@GetMapping("/{workEffortContactMechId}")
 	public ResponseEntity<Object> findById(@PathVariable String workEffortContactMechId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortContactMechId", workEffortContactMechId);
@@ -207,7 +207,7 @@ public class WorkEffortContactMechController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{workEffortContactMechId}")
+	@DeleteMapping("/{workEffortContactMechId}")
 	public ResponseEntity<Object> deleteWorkEffortContactMechByIdUpdated(@PathVariable String workEffortContactMechId) throws Exception {
 		DeleteWorkEffortContactMech command = new DeleteWorkEffortContactMech(workEffortContactMechId);
 

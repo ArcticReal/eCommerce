@@ -57,7 +57,7 @@ public class OrderItemBillingController {
 	 * @return a List with the OrderItemBillings
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderItemBillingsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderItemBillingsBy query = new FindOrderItemBillingsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderItemBillingController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderItemBilling(HttpServletRequest request) throws Exception {
 
 		OrderItemBilling orderItemBillingToBeAdded = new OrderItemBilling();
@@ -129,7 +129,7 @@ public class OrderItemBillingController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderItemBilling(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderItemBillingController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderItemBillingId}")
+	@GetMapping("/{orderItemBillingId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderItemBillingId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderItemBillingId", orderItemBillingId);
@@ -207,7 +207,7 @@ public class OrderItemBillingController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderItemBillingId}")
+	@DeleteMapping("/{orderItemBillingId}")
 	public ResponseEntity<Object> deleteOrderItemBillingByIdUpdated(@PathVariable String orderItemBillingId) throws Exception {
 		DeleteOrderItemBilling command = new DeleteOrderItemBilling(orderItemBillingId);
 

@@ -57,7 +57,7 @@ public class QuoteTermController {
 	 * @return a List with the QuoteTerms
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findQuoteTermsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindQuoteTermsBy query = new FindQuoteTermsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class QuoteTermController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createQuoteTerm(HttpServletRequest request) throws Exception {
 
 		QuoteTerm quoteTermToBeAdded = new QuoteTerm();
@@ -129,7 +129,7 @@ public class QuoteTermController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateQuoteTerm(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class QuoteTermController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{quoteTermId}")
+	@GetMapping("/{quoteTermId}")
 	public ResponseEntity<Object> findById(@PathVariable String quoteTermId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("quoteTermId", quoteTermId);
@@ -207,7 +207,7 @@ public class QuoteTermController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{quoteTermId}")
+	@DeleteMapping("/{quoteTermId}")
 	public ResponseEntity<Object> deleteQuoteTermByIdUpdated(@PathVariable String quoteTermId) throws Exception {
 		DeleteQuoteTerm command = new DeleteQuoteTerm(quoteTermId);
 

@@ -57,7 +57,7 @@ public class RoleTypeController {
 	 * @return a List with the RoleTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findRoleTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindRoleTypesBy query = new FindRoleTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class RoleTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createRoleType(HttpServletRequest request) throws Exception {
 
 		RoleType roleTypeToBeAdded = new RoleType();
@@ -129,7 +129,7 @@ public class RoleTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateRoleType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class RoleTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{roleTypeId}")
+	@GetMapping("/{roleTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String roleTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("roleTypeId", roleTypeId);
@@ -207,7 +207,7 @@ public class RoleTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{roleTypeId}")
+	@DeleteMapping("/{roleTypeId}")
 	public ResponseEntity<Object> deleteRoleTypeByIdUpdated(@PathVariable String roleTypeId) throws Exception {
 		DeleteRoleType command = new DeleteRoleType(roleTypeId);
 

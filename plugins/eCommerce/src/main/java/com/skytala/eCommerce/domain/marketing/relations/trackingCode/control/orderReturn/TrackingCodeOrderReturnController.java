@@ -57,7 +57,7 @@ public class TrackingCodeOrderReturnController {
 	 * @return a List with the TrackingCodeOrderReturns
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findTrackingCodeOrderReturnsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTrackingCodeOrderReturnsBy query = new FindTrackingCodeOrderReturnsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class TrackingCodeOrderReturnController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createTrackingCodeOrderReturn(HttpServletRequest request) throws Exception {
 
 		TrackingCodeOrderReturn trackingCodeOrderReturnToBeAdded = new TrackingCodeOrderReturn();
@@ -129,7 +129,7 @@ public class TrackingCodeOrderReturnController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateTrackingCodeOrderReturn(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class TrackingCodeOrderReturnController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{trackingCodeOrderReturnId}")
+	@GetMapping("/{trackingCodeOrderReturnId}")
 	public ResponseEntity<Object> findById(@PathVariable String trackingCodeOrderReturnId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("trackingCodeOrderReturnId", trackingCodeOrderReturnId);
@@ -207,7 +207,7 @@ public class TrackingCodeOrderReturnController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{trackingCodeOrderReturnId}")
+	@DeleteMapping("/{trackingCodeOrderReturnId}")
 	public ResponseEntity<Object> deleteTrackingCodeOrderReturnByIdUpdated(@PathVariable String trackingCodeOrderReturnId) throws Exception {
 		DeleteTrackingCodeOrderReturn command = new DeleteTrackingCodeOrderReturn(trackingCodeOrderReturnId);
 

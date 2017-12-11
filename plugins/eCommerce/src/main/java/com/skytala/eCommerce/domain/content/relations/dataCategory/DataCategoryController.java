@@ -57,7 +57,7 @@ public class DataCategoryController {
 	 * @return a List with the DataCategorys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findDataCategorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDataCategorysBy query = new FindDataCategorysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class DataCategoryController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createDataCategory(HttpServletRequest request) throws Exception {
 
 		DataCategory dataCategoryToBeAdded = new DataCategory();
@@ -129,7 +129,7 @@ public class DataCategoryController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateDataCategory(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class DataCategoryController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{dataCategoryId}")
+	@GetMapping("/{dataCategoryId}")
 	public ResponseEntity<Object> findById(@PathVariable String dataCategoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("dataCategoryId", dataCategoryId);
@@ -207,7 +207,7 @@ public class DataCategoryController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{dataCategoryId}")
+	@DeleteMapping("/{dataCategoryId}")
 	public ResponseEntity<Object> deleteDataCategoryByIdUpdated(@PathVariable String dataCategoryId) throws Exception {
 		DeleteDataCategory command = new DeleteDataCategory(dataCategoryId);
 

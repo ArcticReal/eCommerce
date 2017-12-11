@@ -57,7 +57,7 @@ public class QuoteCoefficientController {
 	 * @return a List with the QuoteCoefficients
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findQuoteCoefficientsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindQuoteCoefficientsBy query = new FindQuoteCoefficientsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class QuoteCoefficientController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createQuoteCoefficient(HttpServletRequest request) throws Exception {
 
 		QuoteCoefficient quoteCoefficientToBeAdded = new QuoteCoefficient();
@@ -129,7 +129,7 @@ public class QuoteCoefficientController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateQuoteCoefficient(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class QuoteCoefficientController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{quoteCoefficientId}")
+	@GetMapping("/{quoteCoefficientId}")
 	public ResponseEntity<Object> findById(@PathVariable String quoteCoefficientId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("quoteCoefficientId", quoteCoefficientId);
@@ -207,7 +207,7 @@ public class QuoteCoefficientController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{quoteCoefficientId}")
+	@DeleteMapping("/{quoteCoefficientId}")
 	public ResponseEntity<Object> deleteQuoteCoefficientByIdUpdated(@PathVariable String quoteCoefficientId) throws Exception {
 		DeleteQuoteCoefficient command = new DeleteQuoteCoefficient(quoteCoefficientId);
 

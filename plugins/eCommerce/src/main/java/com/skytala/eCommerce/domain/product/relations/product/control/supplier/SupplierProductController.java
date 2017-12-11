@@ -57,7 +57,7 @@ public class SupplierProductController {
 	 * @return a List with the SupplierProducts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSupplierProductsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSupplierProductsBy query = new FindSupplierProductsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SupplierProductController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSupplierProduct(HttpServletRequest request) throws Exception {
 
 		SupplierProduct supplierProductToBeAdded = new SupplierProduct();
@@ -129,7 +129,7 @@ public class SupplierProductController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSupplierProduct(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SupplierProductController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{supplierProductId}")
+	@GetMapping("/{supplierProductId}")
 	public ResponseEntity<Object> findById(@PathVariable String supplierProductId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("supplierProductId", supplierProductId);
@@ -207,7 +207,7 @@ public class SupplierProductController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{supplierProductId}")
+	@DeleteMapping("/{supplierProductId}")
 	public ResponseEntity<Object> deleteSupplierProductByIdUpdated(@PathVariable String supplierProductId) throws Exception {
 		DeleteSupplierProduct command = new DeleteSupplierProduct(supplierProductId);
 

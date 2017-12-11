@@ -57,7 +57,7 @@ public class ProductPriceActionController {
 	 * @return a List with the ProductPriceActions
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductPriceActionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductPriceActionsBy query = new FindProductPriceActionsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductPriceActionController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductPriceAction(HttpServletRequest request) throws Exception {
 
 		ProductPriceAction productPriceActionToBeAdded = new ProductPriceAction();
@@ -129,7 +129,7 @@ public class ProductPriceActionController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductPriceAction(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductPriceActionController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productPriceActionId}")
+	@GetMapping("/{productPriceActionId}")
 	public ResponseEntity<Object> findById(@PathVariable String productPriceActionId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productPriceActionId", productPriceActionId);
@@ -207,7 +207,7 @@ public class ProductPriceActionController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productPriceActionId}")
+	@DeleteMapping("/{productPriceActionId}")
 	public ResponseEntity<Object> deleteProductPriceActionByIdUpdated(@PathVariable String productPriceActionId) throws Exception {
 		DeleteProductPriceAction command = new DeleteProductPriceAction(productPriceActionId);
 

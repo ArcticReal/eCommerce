@@ -57,7 +57,7 @@ public class FixedAssetTypeGlAccountController {
 	 * @return a List with the FixedAssetTypeGlAccounts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFixedAssetTypeGlAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFixedAssetTypeGlAccountsBy query = new FindFixedAssetTypeGlAccountsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FixedAssetTypeGlAccountController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFixedAssetTypeGlAccount(HttpServletRequest request) throws Exception {
 
 		FixedAssetTypeGlAccount fixedAssetTypeGlAccountToBeAdded = new FixedAssetTypeGlAccount();
@@ -129,7 +129,7 @@ public class FixedAssetTypeGlAccountController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFixedAssetTypeGlAccount(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FixedAssetTypeGlAccountController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{fixedAssetTypeGlAccountId}")
+	@GetMapping("/{fixedAssetTypeGlAccountId}")
 	public ResponseEntity<Object> findById(@PathVariable String fixedAssetTypeGlAccountId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("fixedAssetTypeGlAccountId", fixedAssetTypeGlAccountId);
@@ -207,7 +207,7 @@ public class FixedAssetTypeGlAccountController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{fixedAssetTypeGlAccountId}")
+	@DeleteMapping("/{fixedAssetTypeGlAccountId}")
 	public ResponseEntity<Object> deleteFixedAssetTypeGlAccountByIdUpdated(@PathVariable String fixedAssetTypeGlAccountId) throws Exception {
 		DeleteFixedAssetTypeGlAccount command = new DeleteFixedAssetTypeGlAccount(fixedAssetTypeGlAccountId);
 

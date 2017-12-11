@@ -57,7 +57,7 @@ public class WorkEffortEventReminderController {
 	 * @return a List with the WorkEffortEventReminders
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWorkEffortEventRemindersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortEventRemindersBy query = new FindWorkEffortEventRemindersBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WorkEffortEventReminderController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWorkEffortEventReminder(HttpServletRequest request) throws Exception {
 
 		WorkEffortEventReminder workEffortEventReminderToBeAdded = new WorkEffortEventReminder();
@@ -129,7 +129,7 @@ public class WorkEffortEventReminderController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWorkEffortEventReminder(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WorkEffortEventReminderController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{workEffortEventReminderId}")
+	@GetMapping("/{workEffortEventReminderId}")
 	public ResponseEntity<Object> findById(@PathVariable String workEffortEventReminderId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortEventReminderId", workEffortEventReminderId);
@@ -207,7 +207,7 @@ public class WorkEffortEventReminderController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{workEffortEventReminderId}")
+	@DeleteMapping("/{workEffortEventReminderId}")
 	public ResponseEntity<Object> deleteWorkEffortEventReminderByIdUpdated(@PathVariable String workEffortEventReminderId) throws Exception {
 		DeleteWorkEffortEventReminder command = new DeleteWorkEffortEventReminder(workEffortEventReminderId);
 

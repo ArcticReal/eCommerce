@@ -57,7 +57,7 @@ public class TelecomNumberController {
 	 * @return a List with the TelecomNumbers
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findTelecomNumbersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTelecomNumbersBy query = new FindTelecomNumbersBy(allRequestParams);
@@ -83,7 +83,7 @@ public class TelecomNumberController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createTelecomNumber(HttpServletRequest request) throws Exception {
 
 		TelecomNumber telecomNumberToBeAdded = new TelecomNumber();
@@ -129,7 +129,7 @@ public class TelecomNumberController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateTelecomNumber(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class TelecomNumberController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{telecomNumberId}")
+	@GetMapping("/{telecomNumberId}")
 	public ResponseEntity<Object> findById(@PathVariable String telecomNumberId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("telecomNumberId", telecomNumberId);
@@ -207,7 +207,7 @@ public class TelecomNumberController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{telecomNumberId}")
+	@DeleteMapping("/{telecomNumberId}")
 	public ResponseEntity<Object> deleteTelecomNumberByIdUpdated(@PathVariable String telecomNumberId) throws Exception {
 		DeleteTelecomNumber command = new DeleteTelecomNumber(telecomNumberId);
 

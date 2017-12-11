@@ -57,7 +57,7 @@ public class ProductPromoContentController {
 	 * @return a List with the ProductPromoContents
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductPromoContentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductPromoContentsBy query = new FindProductPromoContentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductPromoContentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductPromoContent(HttpServletRequest request) throws Exception {
 
 		ProductPromoContent productPromoContentToBeAdded = new ProductPromoContent();
@@ -129,7 +129,7 @@ public class ProductPromoContentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductPromoContent(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductPromoContentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productPromoContentId}")
+	@GetMapping("/{productPromoContentId}")
 	public ResponseEntity<Object> findById(@PathVariable String productPromoContentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productPromoContentId", productPromoContentId);
@@ -207,7 +207,7 @@ public class ProductPromoContentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productPromoContentId}")
+	@DeleteMapping("/{productPromoContentId}")
 	public ResponseEntity<Object> deleteProductPromoContentByIdUpdated(@PathVariable String productPromoContentId) throws Exception {
 		DeleteProductPromoContent command = new DeleteProductPromoContent(productPromoContentId);
 

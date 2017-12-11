@@ -57,7 +57,7 @@ public class InvoiceRoleController {
 	 * @return a List with the InvoiceRoles
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findInvoiceRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInvoiceRolesBy query = new FindInvoiceRolesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class InvoiceRoleController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createInvoiceRole(HttpServletRequest request) throws Exception {
 
 		InvoiceRole invoiceRoleToBeAdded = new InvoiceRole();
@@ -129,7 +129,7 @@ public class InvoiceRoleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateInvoiceRole(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class InvoiceRoleController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{invoiceRoleId}")
+	@GetMapping("/{invoiceRoleId}")
 	public ResponseEntity<Object> findById(@PathVariable String invoiceRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("invoiceRoleId", invoiceRoleId);
@@ -207,7 +207,7 @@ public class InvoiceRoleController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{invoiceRoleId}")
+	@DeleteMapping("/{invoiceRoleId}")
 	public ResponseEntity<Object> deleteInvoiceRoleByIdUpdated(@PathVariable String invoiceRoleId) throws Exception {
 		DeleteInvoiceRole command = new DeleteInvoiceRole(invoiceRoleId);
 

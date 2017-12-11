@@ -57,7 +57,7 @@ public class TechDataCalendarExcDayController {
 	 * @return a List with the TechDataCalendarExcDays
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findTechDataCalendarExcDaysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTechDataCalendarExcDaysBy query = new FindTechDataCalendarExcDaysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class TechDataCalendarExcDayController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createTechDataCalendarExcDay(HttpServletRequest request) throws Exception {
 
 		TechDataCalendarExcDay techDataCalendarExcDayToBeAdded = new TechDataCalendarExcDay();
@@ -129,7 +129,7 @@ public class TechDataCalendarExcDayController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateTechDataCalendarExcDay(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class TechDataCalendarExcDayController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{techDataCalendarExcDayId}")
+	@GetMapping("/{techDataCalendarExcDayId}")
 	public ResponseEntity<Object> findById(@PathVariable String techDataCalendarExcDayId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("techDataCalendarExcDayId", techDataCalendarExcDayId);
@@ -207,7 +207,7 @@ public class TechDataCalendarExcDayController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{techDataCalendarExcDayId}")
+	@DeleteMapping("/{techDataCalendarExcDayId}")
 	public ResponseEntity<Object> deleteTechDataCalendarExcDayByIdUpdated(@PathVariable String techDataCalendarExcDayId) throws Exception {
 		DeleteTechDataCalendarExcDay command = new DeleteTechDataCalendarExcDay(techDataCalendarExcDayId);
 

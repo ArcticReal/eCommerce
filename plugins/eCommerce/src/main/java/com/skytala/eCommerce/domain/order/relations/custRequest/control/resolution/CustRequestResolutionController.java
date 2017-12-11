@@ -57,7 +57,7 @@ public class CustRequestResolutionController {
 	 * @return a List with the CustRequestResolutions
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findCustRequestResolutionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCustRequestResolutionsBy query = new FindCustRequestResolutionsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class CustRequestResolutionController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createCustRequestResolution(HttpServletRequest request) throws Exception {
 
 		CustRequestResolution custRequestResolutionToBeAdded = new CustRequestResolution();
@@ -129,7 +129,7 @@ public class CustRequestResolutionController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateCustRequestResolution(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class CustRequestResolutionController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{custRequestResolutionId}")
+	@GetMapping("/{custRequestResolutionId}")
 	public ResponseEntity<Object> findById(@PathVariable String custRequestResolutionId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("custRequestResolutionId", custRequestResolutionId);
@@ -207,7 +207,7 @@ public class CustRequestResolutionController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{custRequestResolutionId}")
+	@DeleteMapping("/{custRequestResolutionId}")
 	public ResponseEntity<Object> deleteCustRequestResolutionByIdUpdated(@PathVariable String custRequestResolutionId) throws Exception {
 		DeleteCustRequestResolution command = new DeleteCustRequestResolution(custRequestResolutionId);
 

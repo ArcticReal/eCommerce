@@ -57,7 +57,7 @@ public class ContactListCommStatusController {
 	 * @return a List with the ContactListCommStatuss
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findContactListCommStatussBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContactListCommStatussBy query = new FindContactListCommStatussBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ContactListCommStatusController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createContactListCommStatus(HttpServletRequest request) throws Exception {
 
 		ContactListCommStatus contactListCommStatusToBeAdded = new ContactListCommStatus();
@@ -129,7 +129,7 @@ public class ContactListCommStatusController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateContactListCommStatus(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ContactListCommStatusController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{contactListCommStatusId}")
+	@GetMapping("/{contactListCommStatusId}")
 	public ResponseEntity<Object> findById(@PathVariable String contactListCommStatusId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contactListCommStatusId", contactListCommStatusId);
@@ -207,7 +207,7 @@ public class ContactListCommStatusController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{contactListCommStatusId}")
+	@DeleteMapping("/{contactListCommStatusId}")
 	public ResponseEntity<Object> deleteContactListCommStatusByIdUpdated(@PathVariable String contactListCommStatusId) throws Exception {
 		DeleteContactListCommStatus command = new DeleteContactListCommStatus(contactListCommStatusId);
 

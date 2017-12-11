@@ -57,7 +57,7 @@ public class ProductStoreVendorPaymentController {
 	 * @return a List with the ProductStoreVendorPayments
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductStoreVendorPaymentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductStoreVendorPaymentsBy query = new FindProductStoreVendorPaymentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductStoreVendorPaymentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductStoreVendorPayment(HttpServletRequest request) throws Exception {
 
 		ProductStoreVendorPayment productStoreVendorPaymentToBeAdded = new ProductStoreVendorPayment();
@@ -129,7 +129,7 @@ public class ProductStoreVendorPaymentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductStoreVendorPayment(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductStoreVendorPaymentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productStoreVendorPaymentId}")
+	@GetMapping("/{productStoreVendorPaymentId}")
 	public ResponseEntity<Object> findById(@PathVariable String productStoreVendorPaymentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productStoreVendorPaymentId", productStoreVendorPaymentId);
@@ -207,7 +207,7 @@ public class ProductStoreVendorPaymentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productStoreVendorPaymentId}")
+	@DeleteMapping("/{productStoreVendorPaymentId}")
 	public ResponseEntity<Object> deleteProductStoreVendorPaymentByIdUpdated(@PathVariable String productStoreVendorPaymentId) throws Exception {
 		DeleteProductStoreVendorPayment command = new DeleteProductStoreVendorPayment(productStoreVendorPaymentId);
 

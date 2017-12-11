@@ -57,7 +57,7 @@ public class PartyContentController {
 	 * @return a List with the PartyContents
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyContentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyContentsBy query = new FindPartyContentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyContentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyContent(HttpServletRequest request) throws Exception {
 
 		PartyContent partyContentToBeAdded = new PartyContent();
@@ -129,7 +129,7 @@ public class PartyContentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyContent(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyContentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyContentId}")
+	@GetMapping("/{partyContentId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyContentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyContentId", partyContentId);
@@ -207,7 +207,7 @@ public class PartyContentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyContentId}")
+	@DeleteMapping("/{partyContentId}")
 	public ResponseEntity<Object> deletePartyContentByIdUpdated(@PathVariable String partyContentId) throws Exception {
 		DeletePartyContent command = new DeletePartyContent(partyContentId);
 

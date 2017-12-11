@@ -57,7 +57,7 @@ public class ProductPromoCategoryController {
 	 * @return a List with the ProductPromoCategorys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductPromoCategorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductPromoCategorysBy query = new FindProductPromoCategorysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductPromoCategoryController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductPromoCategory(HttpServletRequest request) throws Exception {
 
 		ProductPromoCategory productPromoCategoryToBeAdded = new ProductPromoCategory();
@@ -129,7 +129,7 @@ public class ProductPromoCategoryController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductPromoCategory(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductPromoCategoryController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productPromoCategoryId}")
+	@GetMapping("/{productPromoCategoryId}")
 	public ResponseEntity<Object> findById(@PathVariable String productPromoCategoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productPromoCategoryId", productPromoCategoryId);
@@ -207,7 +207,7 @@ public class ProductPromoCategoryController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productPromoCategoryId}")
+	@DeleteMapping("/{productPromoCategoryId}")
 	public ResponseEntity<Object> deleteProductPromoCategoryByIdUpdated(@PathVariable String productPromoCategoryId) throws Exception {
 		DeleteProductPromoCategory command = new DeleteProductPromoCategory(productPromoCategoryId);
 

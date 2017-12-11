@@ -57,7 +57,7 @@ public class ContactListController {
 	 * @return a List with the ContactLists
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findContactListsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContactListsBy query = new FindContactListsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ContactListController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createContactList(HttpServletRequest request) throws Exception {
 
 		ContactList contactListToBeAdded = new ContactList();
@@ -129,7 +129,7 @@ public class ContactListController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateContactList(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ContactListController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{contactListId}")
+	@GetMapping("/{contactListId}")
 	public ResponseEntity<Object> findById(@PathVariable String contactListId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contactListId", contactListId);
@@ -207,7 +207,7 @@ public class ContactListController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{contactListId}")
+	@DeleteMapping("/{contactListId}")
 	public ResponseEntity<Object> deleteContactListByIdUpdated(@PathVariable String contactListId) throws Exception {
 		DeleteContactList command = new DeleteContactList(contactListId);
 

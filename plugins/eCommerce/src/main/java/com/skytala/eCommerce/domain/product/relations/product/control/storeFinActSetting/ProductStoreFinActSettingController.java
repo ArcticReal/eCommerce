@@ -57,7 +57,7 @@ public class ProductStoreFinActSettingController {
 	 * @return a List with the ProductStoreFinActSettings
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductStoreFinActSettingsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductStoreFinActSettingsBy query = new FindProductStoreFinActSettingsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductStoreFinActSettingController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductStoreFinActSetting(HttpServletRequest request) throws Exception {
 
 		ProductStoreFinActSetting productStoreFinActSettingToBeAdded = new ProductStoreFinActSetting();
@@ -129,7 +129,7 @@ public class ProductStoreFinActSettingController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductStoreFinActSetting(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductStoreFinActSettingController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productStoreFinActSettingId}")
+	@GetMapping("/{productStoreFinActSettingId}")
 	public ResponseEntity<Object> findById(@PathVariable String productStoreFinActSettingId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productStoreFinActSettingId", productStoreFinActSettingId);
@@ -207,7 +207,7 @@ public class ProductStoreFinActSettingController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productStoreFinActSettingId}")
+	@DeleteMapping("/{productStoreFinActSettingId}")
 	public ResponseEntity<Object> deleteProductStoreFinActSettingByIdUpdated(@PathVariable String productStoreFinActSettingId) throws Exception {
 		DeleteProductStoreFinActSetting command = new DeleteProductStoreFinActSetting(productStoreFinActSettingId);
 

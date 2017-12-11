@@ -57,7 +57,7 @@ public class WorkEffortKeywordController {
 	 * @return a List with the WorkEffortKeywords
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWorkEffortKeywordsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortKeywordsBy query = new FindWorkEffortKeywordsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WorkEffortKeywordController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWorkEffortKeyword(HttpServletRequest request) throws Exception {
 
 		WorkEffortKeyword workEffortKeywordToBeAdded = new WorkEffortKeyword();
@@ -129,7 +129,7 @@ public class WorkEffortKeywordController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWorkEffortKeyword(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WorkEffortKeywordController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{workEffortKeywordId}")
+	@GetMapping("/{workEffortKeywordId}")
 	public ResponseEntity<Object> findById(@PathVariable String workEffortKeywordId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortKeywordId", workEffortKeywordId);
@@ -207,7 +207,7 @@ public class WorkEffortKeywordController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{workEffortKeywordId}")
+	@DeleteMapping("/{workEffortKeywordId}")
 	public ResponseEntity<Object> deleteWorkEffortKeywordByIdUpdated(@PathVariable String workEffortKeywordId) throws Exception {
 		DeleteWorkEffortKeyword command = new DeleteWorkEffortKeyword(workEffortKeywordId);
 

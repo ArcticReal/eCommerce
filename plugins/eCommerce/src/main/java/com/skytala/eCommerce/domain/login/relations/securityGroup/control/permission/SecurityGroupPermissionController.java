@@ -57,7 +57,7 @@ public class SecurityGroupPermissionController {
 	 * @return a List with the SecurityGroupPermissions
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSecurityGroupPermissionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSecurityGroupPermissionsBy query = new FindSecurityGroupPermissionsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SecurityGroupPermissionController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSecurityGroupPermission(HttpServletRequest request) throws Exception {
 
 		SecurityGroupPermission securityGroupPermissionToBeAdded = new SecurityGroupPermission();
@@ -129,7 +129,7 @@ public class SecurityGroupPermissionController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSecurityGroupPermission(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SecurityGroupPermissionController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{securityGroupPermissionId}")
+	@GetMapping("/{securityGroupPermissionId}")
 	public ResponseEntity<Object> findById(@PathVariable String securityGroupPermissionId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("securityGroupPermissionId", securityGroupPermissionId);
@@ -207,7 +207,7 @@ public class SecurityGroupPermissionController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{securityGroupPermissionId}")
+	@DeleteMapping("/{securityGroupPermissionId}")
 	public ResponseEntity<Object> deleteSecurityGroupPermissionByIdUpdated(@PathVariable String securityGroupPermissionId) throws Exception {
 		DeleteSecurityGroupPermission command = new DeleteSecurityGroupPermission(securityGroupPermissionId);
 

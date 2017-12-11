@@ -57,7 +57,7 @@ public class ProductCategoryRoleController {
 	 * @return a List with the ProductCategoryRoles
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductCategoryRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductCategoryRolesBy query = new FindProductCategoryRolesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductCategoryRoleController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductCategoryRole(HttpServletRequest request) throws Exception {
 
 		ProductCategoryRole productCategoryRoleToBeAdded = new ProductCategoryRole();
@@ -129,7 +129,7 @@ public class ProductCategoryRoleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductCategoryRole(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductCategoryRoleController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productCategoryRoleId}")
+	@GetMapping("/{productCategoryRoleId}")
 	public ResponseEntity<Object> findById(@PathVariable String productCategoryRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productCategoryRoleId", productCategoryRoleId);
@@ -207,7 +207,7 @@ public class ProductCategoryRoleController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productCategoryRoleId}")
+	@DeleteMapping("/{productCategoryRoleId}")
 	public ResponseEntity<Object> deleteProductCategoryRoleByIdUpdated(@PathVariable String productCategoryRoleId) throws Exception {
 		DeleteProductCategoryRole command = new DeleteProductCategoryRole(productCategoryRoleId);
 

@@ -57,7 +57,7 @@ public class PartyRateController {
 	 * @return a List with the PartyRates
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyRatesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyRatesBy query = new FindPartyRatesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyRateController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyRate(HttpServletRequest request) throws Exception {
 
 		PartyRate partyRateToBeAdded = new PartyRate();
@@ -129,7 +129,7 @@ public class PartyRateController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyRate(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyRateController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyRateId}")
+	@GetMapping("/{partyRateId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyRateId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyRateId", partyRateId);
@@ -207,7 +207,7 @@ public class PartyRateController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyRateId}")
+	@DeleteMapping("/{partyRateId}")
 	public ResponseEntity<Object> deletePartyRateByIdUpdated(@PathVariable String partyRateId) throws Exception {
 		DeletePartyRate command = new DeletePartyRate(partyRateId);
 

@@ -57,7 +57,7 @@ public class PartyBenefitController {
 	 * @return a List with the PartyBenefits
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyBenefitsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyBenefitsBy query = new FindPartyBenefitsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyBenefitController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyBenefit(HttpServletRequest request) throws Exception {
 
 		PartyBenefit partyBenefitToBeAdded = new PartyBenefit();
@@ -129,7 +129,7 @@ public class PartyBenefitController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyBenefit(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyBenefitController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyBenefitId}")
+	@GetMapping("/{partyBenefitId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyBenefitId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyBenefitId", partyBenefitId);
@@ -207,7 +207,7 @@ public class PartyBenefitController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyBenefitId}")
+	@DeleteMapping("/{partyBenefitId}")
 	public ResponseEntity<Object> deletePartyBenefitByIdUpdated(@PathVariable String partyBenefitId) throws Exception {
 		DeletePartyBenefit command = new DeletePartyBenefit(partyBenefitId);
 

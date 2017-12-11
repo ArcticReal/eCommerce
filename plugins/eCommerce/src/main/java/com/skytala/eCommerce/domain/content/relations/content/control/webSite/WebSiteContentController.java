@@ -57,7 +57,7 @@ public class WebSiteContentController {
 	 * @return a List with the WebSiteContents
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWebSiteContentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWebSiteContentsBy query = new FindWebSiteContentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WebSiteContentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWebSiteContent(HttpServletRequest request) throws Exception {
 
 		WebSiteContent webSiteContentToBeAdded = new WebSiteContent();
@@ -129,7 +129,7 @@ public class WebSiteContentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWebSiteContent(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WebSiteContentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{webSiteContentId}")
+	@GetMapping("/{webSiteContentId}")
 	public ResponseEntity<Object> findById(@PathVariable String webSiteContentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("webSiteContentId", webSiteContentId);
@@ -207,7 +207,7 @@ public class WebSiteContentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{webSiteContentId}")
+	@DeleteMapping("/{webSiteContentId}")
 	public ResponseEntity<Object> deleteWebSiteContentByIdUpdated(@PathVariable String webSiteContentId) throws Exception {
 		DeleteWebSiteContent command = new DeleteWebSiteContent(webSiteContentId);
 

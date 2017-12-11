@@ -57,7 +57,7 @@ public class ShipmentItemController {
 	 * @return a List with the ShipmentItems
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findShipmentItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentItemsBy query = new FindShipmentItemsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ShipmentItemController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createShipmentItem(HttpServletRequest request) throws Exception {
 
 		ShipmentItem shipmentItemToBeAdded = new ShipmentItem();
@@ -129,7 +129,7 @@ public class ShipmentItemController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateShipmentItem(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ShipmentItemController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{shipmentItemId}")
+	@GetMapping("/{shipmentItemId}")
 	public ResponseEntity<Object> findById(@PathVariable String shipmentItemId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentItemId", shipmentItemId);
@@ -207,7 +207,7 @@ public class ShipmentItemController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{shipmentItemId}")
+	@DeleteMapping("/{shipmentItemId}")
 	public ResponseEntity<Object> deleteShipmentItemByIdUpdated(@PathVariable String shipmentItemId) throws Exception {
 		DeleteShipmentItem command = new DeleteShipmentItem(shipmentItemId);
 

@@ -57,7 +57,7 @@ public class InvoiceContentController {
 	 * @return a List with the InvoiceContents
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findInvoiceContentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInvoiceContentsBy query = new FindInvoiceContentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class InvoiceContentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createInvoiceContent(HttpServletRequest request) throws Exception {
 
 		InvoiceContent invoiceContentToBeAdded = new InvoiceContent();
@@ -129,7 +129,7 @@ public class InvoiceContentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateInvoiceContent(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class InvoiceContentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{invoiceContentId}")
+	@GetMapping("/{invoiceContentId}")
 	public ResponseEntity<Object> findById(@PathVariable String invoiceContentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("invoiceContentId", invoiceContentId);
@@ -207,7 +207,7 @@ public class InvoiceContentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{invoiceContentId}")
+	@DeleteMapping("/{invoiceContentId}")
 	public ResponseEntity<Object> deleteInvoiceContentByIdUpdated(@PathVariable String invoiceContentId) throws Exception {
 		DeleteInvoiceContent command = new DeleteInvoiceContent(invoiceContentId);
 

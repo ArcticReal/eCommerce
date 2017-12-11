@@ -57,7 +57,7 @@ public class CustRequestItemWorkEffortController {
 	 * @return a List with the CustRequestItemWorkEfforts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findCustRequestItemWorkEffortsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCustRequestItemWorkEffortsBy query = new FindCustRequestItemWorkEffortsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class CustRequestItemWorkEffortController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createCustRequestItemWorkEffort(HttpServletRequest request) throws Exception {
 
 		CustRequestItemWorkEffort custRequestItemWorkEffortToBeAdded = new CustRequestItemWorkEffort();
@@ -129,7 +129,7 @@ public class CustRequestItemWorkEffortController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateCustRequestItemWorkEffort(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class CustRequestItemWorkEffortController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{custRequestItemWorkEffortId}")
+	@GetMapping("/{custRequestItemWorkEffortId}")
 	public ResponseEntity<Object> findById(@PathVariable String custRequestItemWorkEffortId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("custRequestItemWorkEffortId", custRequestItemWorkEffortId);
@@ -207,7 +207,7 @@ public class CustRequestItemWorkEffortController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{custRequestItemWorkEffortId}")
+	@DeleteMapping("/{custRequestItemWorkEffortId}")
 	public ResponseEntity<Object> deleteCustRequestItemWorkEffortByIdUpdated(@PathVariable String custRequestItemWorkEffortId) throws Exception {
 		DeleteCustRequestItemWorkEffort command = new DeleteCustRequestItemWorkEffort(custRequestItemWorkEffortId);
 

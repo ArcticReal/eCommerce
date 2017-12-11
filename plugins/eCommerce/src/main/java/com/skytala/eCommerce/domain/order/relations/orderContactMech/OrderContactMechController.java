@@ -57,7 +57,7 @@ public class OrderContactMechController {
 	 * @return a List with the OrderContactMechs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderContactMechsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderContactMechsBy query = new FindOrderContactMechsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderContactMechController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderContactMech(HttpServletRequest request) throws Exception {
 
 		OrderContactMech orderContactMechToBeAdded = new OrderContactMech();
@@ -129,7 +129,7 @@ public class OrderContactMechController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderContactMech(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderContactMechController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderContactMechId}")
+	@GetMapping("/{orderContactMechId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderContactMechId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderContactMechId", orderContactMechId);
@@ -207,7 +207,7 @@ public class OrderContactMechController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderContactMechId}")
+	@DeleteMapping("/{orderContactMechId}")
 	public ResponseEntity<Object> deleteOrderContactMechByIdUpdated(@PathVariable String orderContactMechId) throws Exception {
 		DeleteOrderContactMech command = new DeleteOrderContactMech(orderContactMechId);
 

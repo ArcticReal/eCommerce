@@ -57,7 +57,7 @@ public class FinAccountAttributeController {
 	 * @return a List with the FinAccountAttributes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFinAccountAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFinAccountAttributesBy query = new FindFinAccountAttributesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FinAccountAttributeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFinAccountAttribute(HttpServletRequest request) throws Exception {
 
 		FinAccountAttribute finAccountAttributeToBeAdded = new FinAccountAttribute();
@@ -129,7 +129,7 @@ public class FinAccountAttributeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFinAccountAttribute(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FinAccountAttributeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{finAccountAttributeId}")
+	@GetMapping("/{finAccountAttributeId}")
 	public ResponseEntity<Object> findById(@PathVariable String finAccountAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("finAccountAttributeId", finAccountAttributeId);
@@ -207,7 +207,7 @@ public class FinAccountAttributeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{finAccountAttributeId}")
+	@DeleteMapping("/{finAccountAttributeId}")
 	public ResponseEntity<Object> deleteFinAccountAttributeByIdUpdated(@PathVariable String finAccountAttributeId) throws Exception {
 		DeleteFinAccountAttribute command = new DeleteFinAccountAttribute(finAccountAttributeId);
 

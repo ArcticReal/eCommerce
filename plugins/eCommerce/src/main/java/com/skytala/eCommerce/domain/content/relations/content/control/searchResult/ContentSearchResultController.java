@@ -57,7 +57,7 @@ public class ContentSearchResultController {
 	 * @return a List with the ContentSearchResults
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findContentSearchResultsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContentSearchResultsBy query = new FindContentSearchResultsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ContentSearchResultController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createContentSearchResult(HttpServletRequest request) throws Exception {
 
 		ContentSearchResult contentSearchResultToBeAdded = new ContentSearchResult();
@@ -129,7 +129,7 @@ public class ContentSearchResultController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateContentSearchResult(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ContentSearchResultController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{contentSearchResultId}")
+	@GetMapping("/{contentSearchResultId}")
 	public ResponseEntity<Object> findById(@PathVariable String contentSearchResultId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contentSearchResultId", contentSearchResultId);
@@ -207,7 +207,7 @@ public class ContentSearchResultController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{contentSearchResultId}")
+	@DeleteMapping("/{contentSearchResultId}")
 	public ResponseEntity<Object> deleteContentSearchResultByIdUpdated(@PathVariable String contentSearchResultId) throws Exception {
 		DeleteContentSearchResult command = new DeleteContentSearchResult(contentSearchResultId);
 

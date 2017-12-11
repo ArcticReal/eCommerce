@@ -57,7 +57,7 @@ public class TaxAuthorityAssocController {
 	 * @return a List with the TaxAuthorityAssocs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findTaxAuthorityAssocsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTaxAuthorityAssocsBy query = new FindTaxAuthorityAssocsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class TaxAuthorityAssocController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createTaxAuthorityAssoc(HttpServletRequest request) throws Exception {
 
 		TaxAuthorityAssoc taxAuthorityAssocToBeAdded = new TaxAuthorityAssoc();
@@ -129,7 +129,7 @@ public class TaxAuthorityAssocController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateTaxAuthorityAssoc(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class TaxAuthorityAssocController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{taxAuthorityAssocId}")
+	@GetMapping("/{taxAuthorityAssocId}")
 	public ResponseEntity<Object> findById(@PathVariable String taxAuthorityAssocId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("taxAuthorityAssocId", taxAuthorityAssocId);
@@ -207,7 +207,7 @@ public class TaxAuthorityAssocController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{taxAuthorityAssocId}")
+	@DeleteMapping("/{taxAuthorityAssocId}")
 	public ResponseEntity<Object> deleteTaxAuthorityAssocByIdUpdated(@PathVariable String taxAuthorityAssocId) throws Exception {
 		DeleteTaxAuthorityAssoc command = new DeleteTaxAuthorityAssoc(taxAuthorityAssocId);
 

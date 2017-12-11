@@ -57,7 +57,7 @@ public class JobInterviewController {
 	 * @return a List with the JobInterviews
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findJobInterviewsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindJobInterviewsBy query = new FindJobInterviewsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class JobInterviewController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createJobInterview(HttpServletRequest request) throws Exception {
 
 		JobInterview jobInterviewToBeAdded = new JobInterview();
@@ -129,7 +129,7 @@ public class JobInterviewController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateJobInterview(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class JobInterviewController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{jobInterviewId}")
+	@GetMapping("/{jobInterviewId}")
 	public ResponseEntity<Object> findById(@PathVariable String jobInterviewId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("jobInterviewId", jobInterviewId);
@@ -207,7 +207,7 @@ public class JobInterviewController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{jobInterviewId}")
+	@DeleteMapping("/{jobInterviewId}")
 	public ResponseEntity<Object> deleteJobInterviewByIdUpdated(@PathVariable String jobInterviewId) throws Exception {
 		DeleteJobInterview command = new DeleteJobInterview(jobInterviewId);
 

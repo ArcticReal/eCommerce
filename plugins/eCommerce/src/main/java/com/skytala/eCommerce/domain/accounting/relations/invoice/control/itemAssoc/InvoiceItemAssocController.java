@@ -57,7 +57,7 @@ public class InvoiceItemAssocController {
 	 * @return a List with the InvoiceItemAssocs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findInvoiceItemAssocsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInvoiceItemAssocsBy query = new FindInvoiceItemAssocsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class InvoiceItemAssocController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createInvoiceItemAssoc(HttpServletRequest request) throws Exception {
 
 		InvoiceItemAssoc invoiceItemAssocToBeAdded = new InvoiceItemAssoc();
@@ -129,7 +129,7 @@ public class InvoiceItemAssocController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateInvoiceItemAssoc(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class InvoiceItemAssocController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{invoiceItemAssocId}")
+	@GetMapping("/{invoiceItemAssocId}")
 	public ResponseEntity<Object> findById(@PathVariable String invoiceItemAssocId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("invoiceItemAssocId", invoiceItemAssocId);
@@ -207,7 +207,7 @@ public class InvoiceItemAssocController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{invoiceItemAssocId}")
+	@DeleteMapping("/{invoiceItemAssocId}")
 	public ResponseEntity<Object> deleteInvoiceItemAssocByIdUpdated(@PathVariable String invoiceItemAssocId) throws Exception {
 		DeleteInvoiceItemAssoc command = new DeleteInvoiceItemAssoc(invoiceItemAssocId);
 

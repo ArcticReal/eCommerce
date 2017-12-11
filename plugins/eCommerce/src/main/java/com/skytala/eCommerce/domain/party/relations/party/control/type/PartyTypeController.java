@@ -57,7 +57,7 @@ public class PartyTypeController {
 	 * @return a List with the PartyTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyTypesBy query = new FindPartyTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyType(HttpServletRequest request) throws Exception {
 
 		PartyType partyTypeToBeAdded = new PartyType();
@@ -129,7 +129,7 @@ public class PartyTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyTypeId}")
+	@GetMapping("/{partyTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyTypeId", partyTypeId);
@@ -207,7 +207,7 @@ public class PartyTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyTypeId}")
+	@DeleteMapping("/{partyTypeId}")
 	public ResponseEntity<Object> deletePartyTypeByIdUpdated(@PathVariable String partyTypeId) throws Exception {
 		DeletePartyType command = new DeletePartyType(partyTypeId);
 

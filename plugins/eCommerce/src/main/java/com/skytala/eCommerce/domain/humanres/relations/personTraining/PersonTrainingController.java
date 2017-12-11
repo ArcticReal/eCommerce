@@ -57,7 +57,7 @@ public class PersonTrainingController {
 	 * @return a List with the PersonTrainings
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPersonTrainingsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPersonTrainingsBy query = new FindPersonTrainingsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PersonTrainingController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPersonTraining(HttpServletRequest request) throws Exception {
 
 		PersonTraining personTrainingToBeAdded = new PersonTraining();
@@ -129,7 +129,7 @@ public class PersonTrainingController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePersonTraining(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PersonTrainingController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{personTrainingId}")
+	@GetMapping("/{personTrainingId}")
 	public ResponseEntity<Object> findById(@PathVariable String personTrainingId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("personTrainingId", personTrainingId);
@@ -207,7 +207,7 @@ public class PersonTrainingController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{personTrainingId}")
+	@DeleteMapping("/{personTrainingId}")
 	public ResponseEntity<Object> deletePersonTrainingByIdUpdated(@PathVariable String personTrainingId) throws Exception {
 		DeletePersonTraining command = new DeletePersonTraining(personTrainingId);
 

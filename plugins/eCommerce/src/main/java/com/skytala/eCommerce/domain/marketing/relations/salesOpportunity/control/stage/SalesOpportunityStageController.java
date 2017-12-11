@@ -57,7 +57,7 @@ public class SalesOpportunityStageController {
 	 * @return a List with the SalesOpportunityStages
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSalesOpportunityStagesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSalesOpportunityStagesBy query = new FindSalesOpportunityStagesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SalesOpportunityStageController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSalesOpportunityStage(HttpServletRequest request) throws Exception {
 
 		SalesOpportunityStage salesOpportunityStageToBeAdded = new SalesOpportunityStage();
@@ -129,7 +129,7 @@ public class SalesOpportunityStageController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSalesOpportunityStage(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SalesOpportunityStageController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{salesOpportunityStageId}")
+	@GetMapping("/{salesOpportunityStageId}")
 	public ResponseEntity<Object> findById(@PathVariable String salesOpportunityStageId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("salesOpportunityStageId", salesOpportunityStageId);
@@ -207,7 +207,7 @@ public class SalesOpportunityStageController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{salesOpportunityStageId}")
+	@DeleteMapping("/{salesOpportunityStageId}")
 	public ResponseEntity<Object> deleteSalesOpportunityStageByIdUpdated(@PathVariable String salesOpportunityStageId) throws Exception {
 		DeleteSalesOpportunityStage command = new DeleteSalesOpportunityStage(salesOpportunityStageId);
 

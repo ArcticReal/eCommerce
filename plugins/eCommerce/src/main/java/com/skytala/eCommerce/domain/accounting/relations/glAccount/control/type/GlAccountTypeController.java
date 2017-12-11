@@ -57,7 +57,7 @@ public class GlAccountTypeController {
 	 * @return a List with the GlAccountTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findGlAccountTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGlAccountTypesBy query = new FindGlAccountTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class GlAccountTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createGlAccountType(HttpServletRequest request) throws Exception {
 
 		GlAccountType glAccountTypeToBeAdded = new GlAccountType();
@@ -129,7 +129,7 @@ public class GlAccountTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateGlAccountType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class GlAccountTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{glAccountTypeId}")
+	@GetMapping("/{glAccountTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String glAccountTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("glAccountTypeId", glAccountTypeId);
@@ -207,7 +207,7 @@ public class GlAccountTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{glAccountTypeId}")
+	@DeleteMapping("/{glAccountTypeId}")
 	public ResponseEntity<Object> deleteGlAccountTypeByIdUpdated(@PathVariable String glAccountTypeId) throws Exception {
 		DeleteGlAccountType command = new DeleteGlAccountType(glAccountTypeId);
 

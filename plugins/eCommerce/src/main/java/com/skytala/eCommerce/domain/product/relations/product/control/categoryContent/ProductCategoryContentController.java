@@ -57,7 +57,7 @@ public class ProductCategoryContentController {
 	 * @return a List with the ProductCategoryContents
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductCategoryContentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductCategoryContentsBy query = new FindProductCategoryContentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductCategoryContentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductCategoryContent(HttpServletRequest request) throws Exception {
 
 		ProductCategoryContent productCategoryContentToBeAdded = new ProductCategoryContent();
@@ -129,7 +129,7 @@ public class ProductCategoryContentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductCategoryContent(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductCategoryContentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productCategoryContentId}")
+	@GetMapping("/{productCategoryContentId}")
 	public ResponseEntity<Object> findById(@PathVariable String productCategoryContentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productCategoryContentId", productCategoryContentId);
@@ -207,7 +207,7 @@ public class ProductCategoryContentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productCategoryContentId}")
+	@DeleteMapping("/{productCategoryContentId}")
 	public ResponseEntity<Object> deleteProductCategoryContentByIdUpdated(@PathVariable String productCategoryContentId) throws Exception {
 		DeleteProductCategoryContent command = new DeleteProductCategoryContent(productCategoryContentId);
 

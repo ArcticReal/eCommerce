@@ -57,7 +57,7 @@ public class OrderTypeController {
 	 * @return a List with the OrderTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderTypesBy query = new FindOrderTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderType(HttpServletRequest request) throws Exception {
 
 		OrderType orderTypeToBeAdded = new OrderType();
@@ -129,7 +129,7 @@ public class OrderTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderTypeId}")
+	@GetMapping("/{orderTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderTypeId", orderTypeId);
@@ -207,7 +207,7 @@ public class OrderTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderTypeId}")
+	@DeleteMapping("/{orderTypeId}")
 	public ResponseEntity<Object> deleteOrderTypeByIdUpdated(@PathVariable String orderTypeId) throws Exception {
 		DeleteOrderType command = new DeleteOrderType(orderTypeId);
 

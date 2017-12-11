@@ -57,7 +57,7 @@ public class CommunicationEventPurposeController {
 	 * @return a List with the CommunicationEventPurposes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findCommunicationEventPurposesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCommunicationEventPurposesBy query = new FindCommunicationEventPurposesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class CommunicationEventPurposeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createCommunicationEventPurpose(HttpServletRequest request) throws Exception {
 
 		CommunicationEventPurpose communicationEventPurposeToBeAdded = new CommunicationEventPurpose();
@@ -129,7 +129,7 @@ public class CommunicationEventPurposeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateCommunicationEventPurpose(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class CommunicationEventPurposeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{communicationEventPurposeId}")
+	@GetMapping("/{communicationEventPurposeId}")
 	public ResponseEntity<Object> findById(@PathVariable String communicationEventPurposeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("communicationEventPurposeId", communicationEventPurposeId);
@@ -207,7 +207,7 @@ public class CommunicationEventPurposeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{communicationEventPurposeId}")
+	@DeleteMapping("/{communicationEventPurposeId}")
 	public ResponseEntity<Object> deleteCommunicationEventPurposeByIdUpdated(@PathVariable String communicationEventPurposeId) throws Exception {
 		DeleteCommunicationEventPurpose command = new DeleteCommunicationEventPurpose(communicationEventPurposeId);
 

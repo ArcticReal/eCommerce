@@ -57,7 +57,7 @@ public class OrderItemTypeAttrController {
 	 * @return a List with the OrderItemTypeAttrs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderItemTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderItemTypeAttrsBy query = new FindOrderItemTypeAttrsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderItemTypeAttrController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderItemTypeAttr(HttpServletRequest request) throws Exception {
 
 		OrderItemTypeAttr orderItemTypeAttrToBeAdded = new OrderItemTypeAttr();
@@ -129,7 +129,7 @@ public class OrderItemTypeAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderItemTypeAttr(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderItemTypeAttrController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderItemTypeAttrId}")
+	@GetMapping("/{orderItemTypeAttrId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderItemTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderItemTypeAttrId", orderItemTypeAttrId);
@@ -207,7 +207,7 @@ public class OrderItemTypeAttrController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderItemTypeAttrId}")
+	@DeleteMapping("/{orderItemTypeAttrId}")
 	public ResponseEntity<Object> deleteOrderItemTypeAttrByIdUpdated(@PathVariable String orderItemTypeAttrId) throws Exception {
 		DeleteOrderItemTypeAttr command = new DeleteOrderItemTypeAttr(orderItemTypeAttrId);
 

@@ -57,7 +57,7 @@ public class ProductPricePurposeController {
 	 * @return a List with the ProductPricePurposes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductPricePurposesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductPricePurposesBy query = new FindProductPricePurposesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductPricePurposeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductPricePurpose(HttpServletRequest request) throws Exception {
 
 		ProductPricePurpose productPricePurposeToBeAdded = new ProductPricePurpose();
@@ -129,7 +129,7 @@ public class ProductPricePurposeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductPricePurpose(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductPricePurposeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productPricePurposeId}")
+	@GetMapping("/{productPricePurposeId}")
 	public ResponseEntity<Object> findById(@PathVariable String productPricePurposeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productPricePurposeId", productPricePurposeId);
@@ -207,7 +207,7 @@ public class ProductPricePurposeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productPricePurposeId}")
+	@DeleteMapping("/{productPricePurposeId}")
 	public ResponseEntity<Object> deleteProductPricePurposeByIdUpdated(@PathVariable String productPricePurposeId) throws Exception {
 		DeleteProductPricePurpose command = new DeleteProductPricePurpose(productPricePurposeId);
 

@@ -57,7 +57,7 @@ public class ImageDataResourceController {
 	 * @return a List with the ImageDataResources
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findImageDataResourcesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindImageDataResourcesBy query = new FindImageDataResourcesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ImageDataResourceController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createImageDataResource(HttpServletRequest request) throws Exception {
 
 		ImageDataResource imageDataResourceToBeAdded = new ImageDataResource();
@@ -129,7 +129,7 @@ public class ImageDataResourceController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateImageDataResource(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ImageDataResourceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{imageDataResourceId}")
+	@GetMapping("/{imageDataResourceId}")
 	public ResponseEntity<Object> findById(@PathVariable String imageDataResourceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("imageDataResourceId", imageDataResourceId);
@@ -207,7 +207,7 @@ public class ImageDataResourceController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{imageDataResourceId}")
+	@DeleteMapping("/{imageDataResourceId}")
 	public ResponseEntity<Object> deleteImageDataResourceByIdUpdated(@PathVariable String imageDataResourceId) throws Exception {
 		DeleteImageDataResource command = new DeleteImageDataResource(imageDataResourceId);
 

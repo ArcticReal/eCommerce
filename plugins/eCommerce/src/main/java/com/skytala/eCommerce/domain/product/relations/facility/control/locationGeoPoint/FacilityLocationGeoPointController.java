@@ -57,7 +57,7 @@ public class FacilityLocationGeoPointController {
 	 * @return a List with the FacilityLocationGeoPoints
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFacilityLocationGeoPointsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFacilityLocationGeoPointsBy query = new FindFacilityLocationGeoPointsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FacilityLocationGeoPointController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFacilityLocationGeoPoint(HttpServletRequest request) throws Exception {
 
 		FacilityLocationGeoPoint facilityLocationGeoPointToBeAdded = new FacilityLocationGeoPoint();
@@ -129,7 +129,7 @@ public class FacilityLocationGeoPointController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFacilityLocationGeoPoint(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FacilityLocationGeoPointController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{facilityLocationGeoPointId}")
+	@GetMapping("/{facilityLocationGeoPointId}")
 	public ResponseEntity<Object> findById(@PathVariable String facilityLocationGeoPointId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("facilityLocationGeoPointId", facilityLocationGeoPointId);
@@ -207,7 +207,7 @@ public class FacilityLocationGeoPointController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{facilityLocationGeoPointId}")
+	@DeleteMapping("/{facilityLocationGeoPointId}")
 	public ResponseEntity<Object> deleteFacilityLocationGeoPointByIdUpdated(@PathVariable String facilityLocationGeoPointId) throws Exception {
 		DeleteFacilityLocationGeoPoint command = new DeleteFacilityLocationGeoPoint(facilityLocationGeoPointId);
 

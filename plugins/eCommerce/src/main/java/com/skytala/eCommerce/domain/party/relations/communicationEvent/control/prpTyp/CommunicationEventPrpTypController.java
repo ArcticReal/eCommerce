@@ -57,7 +57,7 @@ public class CommunicationEventPrpTypController {
 	 * @return a List with the CommunicationEventPrpTyps
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findCommunicationEventPrpTypsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCommunicationEventPrpTypsBy query = new FindCommunicationEventPrpTypsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class CommunicationEventPrpTypController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createCommunicationEventPrpTyp(HttpServletRequest request) throws Exception {
 
 		CommunicationEventPrpTyp communicationEventPrpTypToBeAdded = new CommunicationEventPrpTyp();
@@ -129,7 +129,7 @@ public class CommunicationEventPrpTypController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateCommunicationEventPrpTyp(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class CommunicationEventPrpTypController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{communicationEventPrpTypId}")
+	@GetMapping("/{communicationEventPrpTypId}")
 	public ResponseEntity<Object> findById(@PathVariable String communicationEventPrpTypId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("communicationEventPrpTypId", communicationEventPrpTypId);
@@ -207,7 +207,7 @@ public class CommunicationEventPrpTypController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{communicationEventPrpTypId}")
+	@DeleteMapping("/{communicationEventPrpTypId}")
 	public ResponseEntity<Object> deleteCommunicationEventPrpTypByIdUpdated(@PathVariable String communicationEventPrpTypId) throws Exception {
 		DeleteCommunicationEventPrpTyp command = new DeleteCommunicationEventPrpTyp(communicationEventPrpTypId);
 

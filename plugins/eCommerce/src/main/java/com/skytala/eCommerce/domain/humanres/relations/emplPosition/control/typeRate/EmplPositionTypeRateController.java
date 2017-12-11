@@ -57,7 +57,7 @@ public class EmplPositionTypeRateController {
 	 * @return a List with the EmplPositionTypeRates
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findEmplPositionTypeRatesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindEmplPositionTypeRatesBy query = new FindEmplPositionTypeRatesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class EmplPositionTypeRateController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createEmplPositionTypeRate(HttpServletRequest request) throws Exception {
 
 		EmplPositionTypeRate emplPositionTypeRateToBeAdded = new EmplPositionTypeRate();
@@ -129,7 +129,7 @@ public class EmplPositionTypeRateController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateEmplPositionTypeRate(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class EmplPositionTypeRateController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{emplPositionTypeRateId}")
+	@GetMapping("/{emplPositionTypeRateId}")
 	public ResponseEntity<Object> findById(@PathVariable String emplPositionTypeRateId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("emplPositionTypeRateId", emplPositionTypeRateId);
@@ -207,7 +207,7 @@ public class EmplPositionTypeRateController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{emplPositionTypeRateId}")
+	@DeleteMapping("/{emplPositionTypeRateId}")
 	public ResponseEntity<Object> deleteEmplPositionTypeRateByIdUpdated(@PathVariable String emplPositionTypeRateId) throws Exception {
 		DeleteEmplPositionTypeRate command = new DeleteEmplPositionTypeRate(emplPositionTypeRateId);
 

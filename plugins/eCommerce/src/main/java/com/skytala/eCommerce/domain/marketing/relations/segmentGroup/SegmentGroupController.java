@@ -57,7 +57,7 @@ public class SegmentGroupController {
 	 * @return a List with the SegmentGroups
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSegmentGroupsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSegmentGroupsBy query = new FindSegmentGroupsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SegmentGroupController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSegmentGroup(HttpServletRequest request) throws Exception {
 
 		SegmentGroup segmentGroupToBeAdded = new SegmentGroup();
@@ -129,7 +129,7 @@ public class SegmentGroupController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSegmentGroup(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SegmentGroupController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{segmentGroupId}")
+	@GetMapping("/{segmentGroupId}")
 	public ResponseEntity<Object> findById(@PathVariable String segmentGroupId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("segmentGroupId", segmentGroupId);
@@ -207,7 +207,7 @@ public class SegmentGroupController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{segmentGroupId}")
+	@DeleteMapping("/{segmentGroupId}")
 	public ResponseEntity<Object> deleteSegmentGroupByIdUpdated(@PathVariable String segmentGroupId) throws Exception {
 		DeleteSegmentGroup command = new DeleteSegmentGroup(segmentGroupId);
 

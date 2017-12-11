@@ -57,7 +57,7 @@ public class SegmentGroupClassificationController {
 	 * @return a List with the SegmentGroupClassifications
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSegmentGroupClassificationsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSegmentGroupClassificationsBy query = new FindSegmentGroupClassificationsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SegmentGroupClassificationController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSegmentGroupClassification(HttpServletRequest request) throws Exception {
 
 		SegmentGroupClassification segmentGroupClassificationToBeAdded = new SegmentGroupClassification();
@@ -129,7 +129,7 @@ public class SegmentGroupClassificationController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSegmentGroupClassification(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SegmentGroupClassificationController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{segmentGroupClassificationId}")
+	@GetMapping("/{segmentGroupClassificationId}")
 	public ResponseEntity<Object> findById(@PathVariable String segmentGroupClassificationId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("segmentGroupClassificationId", segmentGroupClassificationId);
@@ -207,7 +207,7 @@ public class SegmentGroupClassificationController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{segmentGroupClassificationId}")
+	@DeleteMapping("/{segmentGroupClassificationId}")
 	public ResponseEntity<Object> deleteSegmentGroupClassificationByIdUpdated(@PathVariable String segmentGroupClassificationId) throws Exception {
 		DeleteSegmentGroupClassification command = new DeleteSegmentGroupClassification(segmentGroupClassificationId);
 

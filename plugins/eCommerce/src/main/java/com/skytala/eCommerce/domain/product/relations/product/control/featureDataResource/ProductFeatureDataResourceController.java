@@ -57,7 +57,7 @@ public class ProductFeatureDataResourceController {
 	 * @return a List with the ProductFeatureDataResources
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductFeatureDataResourcesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductFeatureDataResourcesBy query = new FindProductFeatureDataResourcesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductFeatureDataResourceController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductFeatureDataResource(HttpServletRequest request) throws Exception {
 
 		ProductFeatureDataResource productFeatureDataResourceToBeAdded = new ProductFeatureDataResource();
@@ -129,7 +129,7 @@ public class ProductFeatureDataResourceController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductFeatureDataResource(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductFeatureDataResourceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productFeatureDataResourceId}")
+	@GetMapping("/{productFeatureDataResourceId}")
 	public ResponseEntity<Object> findById(@PathVariable String productFeatureDataResourceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productFeatureDataResourceId", productFeatureDataResourceId);
@@ -207,7 +207,7 @@ public class ProductFeatureDataResourceController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productFeatureDataResourceId}")
+	@DeleteMapping("/{productFeatureDataResourceId}")
 	public ResponseEntity<Object> deleteProductFeatureDataResourceByIdUpdated(@PathVariable String productFeatureDataResourceId) throws Exception {
 		DeleteProductFeatureDataResource command = new DeleteProductFeatureDataResource(productFeatureDataResourceId);
 

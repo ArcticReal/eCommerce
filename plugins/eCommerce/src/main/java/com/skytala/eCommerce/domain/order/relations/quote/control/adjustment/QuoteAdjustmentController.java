@@ -57,7 +57,7 @@ public class QuoteAdjustmentController {
 	 * @return a List with the QuoteAdjustments
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findQuoteAdjustmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindQuoteAdjustmentsBy query = new FindQuoteAdjustmentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class QuoteAdjustmentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createQuoteAdjustment(HttpServletRequest request) throws Exception {
 
 		QuoteAdjustment quoteAdjustmentToBeAdded = new QuoteAdjustment();
@@ -129,7 +129,7 @@ public class QuoteAdjustmentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateQuoteAdjustment(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class QuoteAdjustmentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{quoteAdjustmentId}")
+	@GetMapping("/{quoteAdjustmentId}")
 	public ResponseEntity<Object> findById(@PathVariable String quoteAdjustmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("quoteAdjustmentId", quoteAdjustmentId);
@@ -207,7 +207,7 @@ public class QuoteAdjustmentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{quoteAdjustmentId}")
+	@DeleteMapping("/{quoteAdjustmentId}")
 	public ResponseEntity<Object> deleteQuoteAdjustmentByIdUpdated(@PathVariable String quoteAdjustmentId) throws Exception {
 		DeleteQuoteAdjustment command = new DeleteQuoteAdjustment(quoteAdjustmentId);
 

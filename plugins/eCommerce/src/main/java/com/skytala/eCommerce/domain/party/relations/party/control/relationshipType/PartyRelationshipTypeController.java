@@ -57,7 +57,7 @@ public class PartyRelationshipTypeController {
 	 * @return a List with the PartyRelationshipTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyRelationshipTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyRelationshipTypesBy query = new FindPartyRelationshipTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyRelationshipTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyRelationshipType(HttpServletRequest request) throws Exception {
 
 		PartyRelationshipType partyRelationshipTypeToBeAdded = new PartyRelationshipType();
@@ -129,7 +129,7 @@ public class PartyRelationshipTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyRelationshipType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyRelationshipTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyRelationshipTypeId}")
+	@GetMapping("/{partyRelationshipTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyRelationshipTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyRelationshipTypeId", partyRelationshipTypeId);
@@ -207,7 +207,7 @@ public class PartyRelationshipTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyRelationshipTypeId}")
+	@DeleteMapping("/{partyRelationshipTypeId}")
 	public ResponseEntity<Object> deletePartyRelationshipTypeByIdUpdated(@PathVariable String partyRelationshipTypeId) throws Exception {
 		DeletePartyRelationshipType command = new DeletePartyRelationshipType(partyRelationshipTypeId);
 

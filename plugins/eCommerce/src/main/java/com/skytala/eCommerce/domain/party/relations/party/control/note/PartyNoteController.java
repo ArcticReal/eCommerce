@@ -57,7 +57,7 @@ public class PartyNoteController {
 	 * @return a List with the PartyNotes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyNotesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyNotesBy query = new FindPartyNotesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyNoteController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyNote(HttpServletRequest request) throws Exception {
 
 		PartyNote partyNoteToBeAdded = new PartyNote();
@@ -129,7 +129,7 @@ public class PartyNoteController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyNote(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyNoteController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyNoteId}")
+	@GetMapping("/{partyNoteId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyNoteId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyNoteId", partyNoteId);
@@ -207,7 +207,7 @@ public class PartyNoteController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyNoteId}")
+	@DeleteMapping("/{partyNoteId}")
 	public ResponseEntity<Object> deletePartyNoteByIdUpdated(@PathVariable String partyNoteId) throws Exception {
 		DeletePartyNote command = new DeletePartyNote(partyNoteId);
 

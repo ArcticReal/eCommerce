@@ -57,7 +57,7 @@ public class BenefitTypeController {
 	 * @return a List with the BenefitTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findBenefitTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindBenefitTypesBy query = new FindBenefitTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class BenefitTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createBenefitType(HttpServletRequest request) throws Exception {
 
 		BenefitType benefitTypeToBeAdded = new BenefitType();
@@ -129,7 +129,7 @@ public class BenefitTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateBenefitType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class BenefitTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{benefitTypeId}")
+	@GetMapping("/{benefitTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String benefitTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("benefitTypeId", benefitTypeId);
@@ -207,7 +207,7 @@ public class BenefitTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{benefitTypeId}")
+	@DeleteMapping("/{benefitTypeId}")
 	public ResponseEntity<Object> deleteBenefitTypeByIdUpdated(@PathVariable String benefitTypeId) throws Exception {
 		DeleteBenefitType command = new DeleteBenefitType(benefitTypeId);
 

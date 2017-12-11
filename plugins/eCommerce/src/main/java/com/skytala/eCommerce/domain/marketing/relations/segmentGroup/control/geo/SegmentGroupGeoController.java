@@ -57,7 +57,7 @@ public class SegmentGroupGeoController {
 	 * @return a List with the SegmentGroupGeos
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSegmentGroupGeosBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSegmentGroupGeosBy query = new FindSegmentGroupGeosBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SegmentGroupGeoController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSegmentGroupGeo(HttpServletRequest request) throws Exception {
 
 		SegmentGroupGeo segmentGroupGeoToBeAdded = new SegmentGroupGeo();
@@ -129,7 +129,7 @@ public class SegmentGroupGeoController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSegmentGroupGeo(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SegmentGroupGeoController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{segmentGroupGeoId}")
+	@GetMapping("/{segmentGroupGeoId}")
 	public ResponseEntity<Object> findById(@PathVariable String segmentGroupGeoId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("segmentGroupGeoId", segmentGroupGeoId);
@@ -207,7 +207,7 @@ public class SegmentGroupGeoController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{segmentGroupGeoId}")
+	@DeleteMapping("/{segmentGroupGeoId}")
 	public ResponseEntity<Object> deleteSegmentGroupGeoByIdUpdated(@PathVariable String segmentGroupGeoId) throws Exception {
 		DeleteSegmentGroupGeo command = new DeleteSegmentGroupGeo(segmentGroupGeoId);
 

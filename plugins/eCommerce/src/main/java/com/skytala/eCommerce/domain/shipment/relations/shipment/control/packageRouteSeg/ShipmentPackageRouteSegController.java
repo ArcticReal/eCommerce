@@ -57,7 +57,7 @@ public class ShipmentPackageRouteSegController {
 	 * @return a List with the ShipmentPackageRouteSegs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findShipmentPackageRouteSegsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentPackageRouteSegsBy query = new FindShipmentPackageRouteSegsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ShipmentPackageRouteSegController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createShipmentPackageRouteSeg(HttpServletRequest request) throws Exception {
 
 		ShipmentPackageRouteSeg shipmentPackageRouteSegToBeAdded = new ShipmentPackageRouteSeg();
@@ -129,7 +129,7 @@ public class ShipmentPackageRouteSegController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateShipmentPackageRouteSeg(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ShipmentPackageRouteSegController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{shipmentPackageRouteSegId}")
+	@GetMapping("/{shipmentPackageRouteSegId}")
 	public ResponseEntity<Object> findById(@PathVariable String shipmentPackageRouteSegId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentPackageRouteSegId", shipmentPackageRouteSegId);
@@ -207,7 +207,7 @@ public class ShipmentPackageRouteSegController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{shipmentPackageRouteSegId}")
+	@DeleteMapping("/{shipmentPackageRouteSegId}")
 	public ResponseEntity<Object> deleteShipmentPackageRouteSegByIdUpdated(@PathVariable String shipmentPackageRouteSegId) throws Exception {
 		DeleteShipmentPackageRouteSeg command = new DeleteShipmentPackageRouteSeg(shipmentPackageRouteSegId);
 

@@ -57,7 +57,7 @@ public class AcctgTransTypeAttrController {
 	 * @return a List with the AcctgTransTypeAttrs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findAcctgTransTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAcctgTransTypeAttrsBy query = new FindAcctgTransTypeAttrsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class AcctgTransTypeAttrController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createAcctgTransTypeAttr(HttpServletRequest request) throws Exception {
 
 		AcctgTransTypeAttr acctgTransTypeAttrToBeAdded = new AcctgTransTypeAttr();
@@ -129,7 +129,7 @@ public class AcctgTransTypeAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateAcctgTransTypeAttr(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class AcctgTransTypeAttrController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{acctgTransTypeAttrId}")
+	@GetMapping("/{acctgTransTypeAttrId}")
 	public ResponseEntity<Object> findById(@PathVariable String acctgTransTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("acctgTransTypeAttrId", acctgTransTypeAttrId);
@@ -207,7 +207,7 @@ public class AcctgTransTypeAttrController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{acctgTransTypeAttrId}")
+	@DeleteMapping("/{acctgTransTypeAttrId}")
 	public ResponseEntity<Object> deleteAcctgTransTypeAttrByIdUpdated(@PathVariable String acctgTransTypeAttrId) throws Exception {
 		DeleteAcctgTransTypeAttr command = new DeleteAcctgTransTypeAttr(acctgTransTypeAttrId);
 

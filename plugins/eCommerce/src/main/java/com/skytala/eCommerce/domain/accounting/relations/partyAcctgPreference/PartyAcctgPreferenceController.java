@@ -57,7 +57,7 @@ public class PartyAcctgPreferenceController {
 	 * @return a List with the PartyAcctgPreferences
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyAcctgPreferencesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyAcctgPreferencesBy query = new FindPartyAcctgPreferencesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyAcctgPreferenceController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyAcctgPreference(HttpServletRequest request) throws Exception {
 
 		PartyAcctgPreference partyAcctgPreferenceToBeAdded = new PartyAcctgPreference();
@@ -129,7 +129,7 @@ public class PartyAcctgPreferenceController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyAcctgPreference(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyAcctgPreferenceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyAcctgPreferenceId}")
+	@GetMapping("/{partyAcctgPreferenceId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyAcctgPreferenceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyAcctgPreferenceId", partyAcctgPreferenceId);
@@ -207,7 +207,7 @@ public class PartyAcctgPreferenceController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyAcctgPreferenceId}")
+	@DeleteMapping("/{partyAcctgPreferenceId}")
 	public ResponseEntity<Object> deletePartyAcctgPreferenceByIdUpdated(@PathVariable String partyAcctgPreferenceId) throws Exception {
 		DeletePartyAcctgPreference command = new DeletePartyAcctgPreference(partyAcctgPreferenceId);
 

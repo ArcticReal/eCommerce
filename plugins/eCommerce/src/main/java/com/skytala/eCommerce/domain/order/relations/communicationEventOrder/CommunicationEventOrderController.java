@@ -57,7 +57,7 @@ public class CommunicationEventOrderController {
 	 * @return a List with the CommunicationEventOrders
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findCommunicationEventOrdersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCommunicationEventOrdersBy query = new FindCommunicationEventOrdersBy(allRequestParams);
@@ -83,7 +83,7 @@ public class CommunicationEventOrderController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createCommunicationEventOrder(HttpServletRequest request) throws Exception {
 
 		CommunicationEventOrder communicationEventOrderToBeAdded = new CommunicationEventOrder();
@@ -129,7 +129,7 @@ public class CommunicationEventOrderController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateCommunicationEventOrder(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class CommunicationEventOrderController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{communicationEventOrderId}")
+	@GetMapping("/{communicationEventOrderId}")
 	public ResponseEntity<Object> findById(@PathVariable String communicationEventOrderId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("communicationEventOrderId", communicationEventOrderId);
@@ -207,7 +207,7 @@ public class CommunicationEventOrderController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{communicationEventOrderId}")
+	@DeleteMapping("/{communicationEventOrderId}")
 	public ResponseEntity<Object> deleteCommunicationEventOrderByIdUpdated(@PathVariable String communicationEventOrderId) throws Exception {
 		DeleteCommunicationEventOrder command = new DeleteCommunicationEventOrder(communicationEventOrderId);
 

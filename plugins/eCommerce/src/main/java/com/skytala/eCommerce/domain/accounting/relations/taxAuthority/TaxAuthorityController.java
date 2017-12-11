@@ -57,7 +57,7 @@ public class TaxAuthorityController {
 	 * @return a List with the TaxAuthoritys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findTaxAuthoritysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTaxAuthoritysBy query = new FindTaxAuthoritysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class TaxAuthorityController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createTaxAuthority(HttpServletRequest request) throws Exception {
 
 		TaxAuthority taxAuthorityToBeAdded = new TaxAuthority();
@@ -129,7 +129,7 @@ public class TaxAuthorityController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateTaxAuthority(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class TaxAuthorityController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{taxAuthorityId}")
+	@GetMapping("/{taxAuthorityId}")
 	public ResponseEntity<Object> findById(@PathVariable String taxAuthorityId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("taxAuthorityId", taxAuthorityId);
@@ -207,7 +207,7 @@ public class TaxAuthorityController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{taxAuthorityId}")
+	@DeleteMapping("/{taxAuthorityId}")
 	public ResponseEntity<Object> deleteTaxAuthorityByIdUpdated(@PathVariable String taxAuthorityId) throws Exception {
 		DeleteTaxAuthority command = new DeleteTaxAuthority(taxAuthorityId);
 

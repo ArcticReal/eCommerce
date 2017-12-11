@@ -57,7 +57,7 @@ public class FixedAssetStdCostController {
 	 * @return a List with the FixedAssetStdCosts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFixedAssetStdCostsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFixedAssetStdCostsBy query = new FindFixedAssetStdCostsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FixedAssetStdCostController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFixedAssetStdCost(HttpServletRequest request) throws Exception {
 
 		FixedAssetStdCost fixedAssetStdCostToBeAdded = new FixedAssetStdCost();
@@ -129,7 +129,7 @@ public class FixedAssetStdCostController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFixedAssetStdCost(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FixedAssetStdCostController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{fixedAssetStdCostId}")
+	@GetMapping("/{fixedAssetStdCostId}")
 	public ResponseEntity<Object> findById(@PathVariable String fixedAssetStdCostId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("fixedAssetStdCostId", fixedAssetStdCostId);
@@ -207,7 +207,7 @@ public class FixedAssetStdCostController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{fixedAssetStdCostId}")
+	@DeleteMapping("/{fixedAssetStdCostId}")
 	public ResponseEntity<Object> deleteFixedAssetStdCostByIdUpdated(@PathVariable String fixedAssetStdCostId) throws Exception {
 		DeleteFixedAssetStdCost command = new DeleteFixedAssetStdCost(fixedAssetStdCostId);
 

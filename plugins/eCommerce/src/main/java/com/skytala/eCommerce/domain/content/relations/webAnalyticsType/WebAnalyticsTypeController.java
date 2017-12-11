@@ -57,7 +57,7 @@ public class WebAnalyticsTypeController {
 	 * @return a List with the WebAnalyticsTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWebAnalyticsTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWebAnalyticsTypesBy query = new FindWebAnalyticsTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WebAnalyticsTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWebAnalyticsType(HttpServletRequest request) throws Exception {
 
 		WebAnalyticsType webAnalyticsTypeToBeAdded = new WebAnalyticsType();
@@ -129,7 +129,7 @@ public class WebAnalyticsTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWebAnalyticsType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WebAnalyticsTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{webAnalyticsTypeId}")
+	@GetMapping("/{webAnalyticsTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String webAnalyticsTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("webAnalyticsTypeId", webAnalyticsTypeId);
@@ -207,7 +207,7 @@ public class WebAnalyticsTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{webAnalyticsTypeId}")
+	@DeleteMapping("/{webAnalyticsTypeId}")
 	public ResponseEntity<Object> deleteWebAnalyticsTypeByIdUpdated(@PathVariable String webAnalyticsTypeId) throws Exception {
 		DeleteWebAnalyticsType command = new DeleteWebAnalyticsType(webAnalyticsTypeId);
 

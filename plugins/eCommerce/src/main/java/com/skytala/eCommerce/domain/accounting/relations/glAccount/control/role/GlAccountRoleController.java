@@ -57,7 +57,7 @@ public class GlAccountRoleController {
 	 * @return a List with the GlAccountRoles
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findGlAccountRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGlAccountRolesBy query = new FindGlAccountRolesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class GlAccountRoleController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createGlAccountRole(HttpServletRequest request) throws Exception {
 
 		GlAccountRole glAccountRoleToBeAdded = new GlAccountRole();
@@ -129,7 +129,7 @@ public class GlAccountRoleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateGlAccountRole(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class GlAccountRoleController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{glAccountRoleId}")
+	@GetMapping("/{glAccountRoleId}")
 	public ResponseEntity<Object> findById(@PathVariable String glAccountRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("glAccountRoleId", glAccountRoleId);
@@ -207,7 +207,7 @@ public class GlAccountRoleController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{glAccountRoleId}")
+	@DeleteMapping("/{glAccountRoleId}")
 	public ResponseEntity<Object> deleteGlAccountRoleByIdUpdated(@PathVariable String glAccountRoleId) throws Exception {
 		DeleteGlAccountRole command = new DeleteGlAccountRole(glAccountRoleId);
 

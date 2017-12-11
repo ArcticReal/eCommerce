@@ -57,7 +57,7 @@ public class PerformanceNoteController {
 	 * @return a List with the PerformanceNotes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPerformanceNotesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPerformanceNotesBy query = new FindPerformanceNotesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PerformanceNoteController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPerformanceNote(HttpServletRequest request) throws Exception {
 
 		PerformanceNote performanceNoteToBeAdded = new PerformanceNote();
@@ -129,7 +129,7 @@ public class PerformanceNoteController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePerformanceNote(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PerformanceNoteController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{performanceNoteId}")
+	@GetMapping("/{performanceNoteId}")
 	public ResponseEntity<Object> findById(@PathVariable String performanceNoteId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("performanceNoteId", performanceNoteId);
@@ -207,7 +207,7 @@ public class PerformanceNoteController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{performanceNoteId}")
+	@DeleteMapping("/{performanceNoteId}")
 	public ResponseEntity<Object> deletePerformanceNoteByIdUpdated(@PathVariable String performanceNoteId) throws Exception {
 		DeletePerformanceNote command = new DeletePerformanceNote(performanceNoteId);
 

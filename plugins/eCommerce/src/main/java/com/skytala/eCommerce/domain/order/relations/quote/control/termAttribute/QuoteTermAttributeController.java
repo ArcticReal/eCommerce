@@ -57,7 +57,7 @@ public class QuoteTermAttributeController {
 	 * @return a List with the QuoteTermAttributes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findQuoteTermAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindQuoteTermAttributesBy query = new FindQuoteTermAttributesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class QuoteTermAttributeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createQuoteTermAttribute(HttpServletRequest request) throws Exception {
 
 		QuoteTermAttribute quoteTermAttributeToBeAdded = new QuoteTermAttribute();
@@ -129,7 +129,7 @@ public class QuoteTermAttributeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateQuoteTermAttribute(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class QuoteTermAttributeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{quoteTermAttributeId}")
+	@GetMapping("/{quoteTermAttributeId}")
 	public ResponseEntity<Object> findById(@PathVariable String quoteTermAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("quoteTermAttributeId", quoteTermAttributeId);
@@ -207,7 +207,7 @@ public class QuoteTermAttributeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{quoteTermAttributeId}")
+	@DeleteMapping("/{quoteTermAttributeId}")
 	public ResponseEntity<Object> deleteQuoteTermAttributeByIdUpdated(@PathVariable String quoteTermAttributeId) throws Exception {
 		DeleteQuoteTermAttribute command = new DeleteQuoteTermAttribute(quoteTermAttributeId);
 

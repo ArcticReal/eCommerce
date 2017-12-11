@@ -57,7 +57,7 @@ public class GlAccountController {
 	 * @return a List with the GlAccounts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findGlAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGlAccountsBy query = new FindGlAccountsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class GlAccountController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createGlAccount(HttpServletRequest request) throws Exception {
 
 		GlAccount glAccountToBeAdded = new GlAccount();
@@ -129,7 +129,7 @@ public class GlAccountController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateGlAccount(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class GlAccountController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{glAccountId}")
+	@GetMapping("/{glAccountId}")
 	public ResponseEntity<Object> findById(@PathVariable String glAccountId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("glAccountId", glAccountId);
@@ -207,7 +207,7 @@ public class GlAccountController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{glAccountId}")
+	@DeleteMapping("/{glAccountId}")
 	public ResponseEntity<Object> deleteGlAccountByIdUpdated(@PathVariable String glAccountId) throws Exception {
 		DeleteGlAccount command = new DeleteGlAccount(glAccountId);
 

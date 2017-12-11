@@ -57,7 +57,7 @@ public class TarpittedLoginViewController {
 	 * @return a List with the TarpittedLoginViews
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findTarpittedLoginViewsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTarpittedLoginViewsBy query = new FindTarpittedLoginViewsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class TarpittedLoginViewController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createTarpittedLoginView(HttpServletRequest request) throws Exception {
 
 		TarpittedLoginView tarpittedLoginViewToBeAdded = new TarpittedLoginView();
@@ -129,7 +129,7 @@ public class TarpittedLoginViewController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateTarpittedLoginView(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class TarpittedLoginViewController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{tarpittedLoginViewId}")
+	@GetMapping("/{tarpittedLoginViewId}")
 	public ResponseEntity<Object> findById(@PathVariable String tarpittedLoginViewId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("tarpittedLoginViewId", tarpittedLoginViewId);
@@ -207,7 +207,7 @@ public class TarpittedLoginViewController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{tarpittedLoginViewId}")
+	@DeleteMapping("/{tarpittedLoginViewId}")
 	public ResponseEntity<Object> deleteTarpittedLoginViewByIdUpdated(@PathVariable String tarpittedLoginViewId) throws Exception {
 		DeleteTarpittedLoginView command = new DeleteTarpittedLoginView(tarpittedLoginViewId);
 

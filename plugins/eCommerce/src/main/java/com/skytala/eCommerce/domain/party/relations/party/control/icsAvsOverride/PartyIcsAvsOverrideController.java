@@ -57,7 +57,7 @@ public class PartyIcsAvsOverrideController {
 	 * @return a List with the PartyIcsAvsOverrides
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyIcsAvsOverridesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyIcsAvsOverridesBy query = new FindPartyIcsAvsOverridesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyIcsAvsOverrideController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyIcsAvsOverride(HttpServletRequest request) throws Exception {
 
 		PartyIcsAvsOverride partyIcsAvsOverrideToBeAdded = new PartyIcsAvsOverride();
@@ -129,7 +129,7 @@ public class PartyIcsAvsOverrideController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyIcsAvsOverride(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyIcsAvsOverrideController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyIcsAvsOverrideId}")
+	@GetMapping("/{partyIcsAvsOverrideId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyIcsAvsOverrideId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyIcsAvsOverrideId", partyIcsAvsOverrideId);
@@ -207,7 +207,7 @@ public class PartyIcsAvsOverrideController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyIcsAvsOverrideId}")
+	@DeleteMapping("/{partyIcsAvsOverrideId}")
 	public ResponseEntity<Object> deletePartyIcsAvsOverrideByIdUpdated(@PathVariable String partyIcsAvsOverrideId) throws Exception {
 		DeletePartyIcsAvsOverride command = new DeletePartyIcsAvsOverride(partyIcsAvsOverrideId);
 

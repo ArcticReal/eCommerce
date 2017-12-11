@@ -57,7 +57,7 @@ public class OrderHeaderNoteController {
 	 * @return a List with the OrderHeaderNotes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findOrderHeaderNotesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderHeaderNotesBy query = new FindOrderHeaderNotesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class OrderHeaderNoteController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createOrderHeaderNote(HttpServletRequest request) throws Exception {
 
 		OrderHeaderNote orderHeaderNoteToBeAdded = new OrderHeaderNote();
@@ -129,7 +129,7 @@ public class OrderHeaderNoteController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateOrderHeaderNote(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class OrderHeaderNoteController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{orderHeaderNoteId}")
+	@GetMapping("/{orderHeaderNoteId}")
 	public ResponseEntity<Object> findById(@PathVariable String orderHeaderNoteId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderHeaderNoteId", orderHeaderNoteId);
@@ -207,7 +207,7 @@ public class OrderHeaderNoteController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{orderHeaderNoteId}")
+	@DeleteMapping("/{orderHeaderNoteId}")
 	public ResponseEntity<Object> deleteOrderHeaderNoteByIdUpdated(@PathVariable String orderHeaderNoteId) throws Exception {
 		DeleteOrderHeaderNote command = new DeleteOrderHeaderNote(orderHeaderNoteId);
 

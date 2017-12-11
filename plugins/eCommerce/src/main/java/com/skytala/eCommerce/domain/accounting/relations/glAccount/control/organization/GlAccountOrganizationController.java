@@ -57,7 +57,7 @@ public class GlAccountOrganizationController {
 	 * @return a List with the GlAccountOrganizations
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findGlAccountOrganizationsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGlAccountOrganizationsBy query = new FindGlAccountOrganizationsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class GlAccountOrganizationController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createGlAccountOrganization(HttpServletRequest request) throws Exception {
 
 		GlAccountOrganization glAccountOrganizationToBeAdded = new GlAccountOrganization();
@@ -129,7 +129,7 @@ public class GlAccountOrganizationController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateGlAccountOrganization(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class GlAccountOrganizationController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{glAccountOrganizationId}")
+	@GetMapping("/{glAccountOrganizationId}")
 	public ResponseEntity<Object> findById(@PathVariable String glAccountOrganizationId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("glAccountOrganizationId", glAccountOrganizationId);
@@ -207,7 +207,7 @@ public class GlAccountOrganizationController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{glAccountOrganizationId}")
+	@DeleteMapping("/{glAccountOrganizationId}")
 	public ResponseEntity<Object> deleteGlAccountOrganizationByIdUpdated(@PathVariable String glAccountOrganizationId) throws Exception {
 		DeleteGlAccountOrganization command = new DeleteGlAccountOrganization(glAccountOrganizationId);
 

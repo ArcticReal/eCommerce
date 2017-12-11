@@ -57,7 +57,7 @@ public class QuantityBreakTypeController {
 	 * @return a List with the QuantityBreakTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findQuantityBreakTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindQuantityBreakTypesBy query = new FindQuantityBreakTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class QuantityBreakTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createQuantityBreakType(HttpServletRequest request) throws Exception {
 
 		QuantityBreakType quantityBreakTypeToBeAdded = new QuantityBreakType();
@@ -129,7 +129,7 @@ public class QuantityBreakTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateQuantityBreakType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class QuantityBreakTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{quantityBreakTypeId}")
+	@GetMapping("/{quantityBreakTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String quantityBreakTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("quantityBreakTypeId", quantityBreakTypeId);
@@ -207,7 +207,7 @@ public class QuantityBreakTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{quantityBreakTypeId}")
+	@DeleteMapping("/{quantityBreakTypeId}")
 	public ResponseEntity<Object> deleteQuantityBreakTypeByIdUpdated(@PathVariable String quantityBreakTypeId) throws Exception {
 		DeleteQuantityBreakType command = new DeleteQuantityBreakType(quantityBreakTypeId);
 

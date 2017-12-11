@@ -57,7 +57,7 @@ public class InvoiceStatusController {
 	 * @return a List with the InvoiceStatuss
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findInvoiceStatussBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInvoiceStatussBy query = new FindInvoiceStatussBy(allRequestParams);
@@ -83,7 +83,7 @@ public class InvoiceStatusController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createInvoiceStatus(HttpServletRequest request) throws Exception {
 
 		InvoiceStatus invoiceStatusToBeAdded = new InvoiceStatus();
@@ -129,7 +129,7 @@ public class InvoiceStatusController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateInvoiceStatus(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class InvoiceStatusController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{invoiceStatusId}")
+	@GetMapping("/{invoiceStatusId}")
 	public ResponseEntity<Object> findById(@PathVariable String invoiceStatusId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("invoiceStatusId", invoiceStatusId);
@@ -207,7 +207,7 @@ public class InvoiceStatusController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{invoiceStatusId}")
+	@DeleteMapping("/{invoiceStatusId}")
 	public ResponseEntity<Object> deleteInvoiceStatusByIdUpdated(@PathVariable String invoiceStatusId) throws Exception {
 		DeleteInvoiceStatus command = new DeleteInvoiceStatus(invoiceStatusId);
 

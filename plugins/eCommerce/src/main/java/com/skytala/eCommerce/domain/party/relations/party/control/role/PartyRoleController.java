@@ -57,7 +57,7 @@ public class PartyRoleController {
 	 * @return a List with the PartyRoles
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyRolesBy query = new FindPartyRolesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyRoleController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyRole(HttpServletRequest request) throws Exception {
 
 		PartyRole partyRoleToBeAdded = new PartyRole();
@@ -129,7 +129,7 @@ public class PartyRoleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyRole(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyRoleController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyRoleId}")
+	@GetMapping("/{partyRoleId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyRoleId", partyRoleId);
@@ -207,7 +207,7 @@ public class PartyRoleController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyRoleId}")
+	@DeleteMapping("/{partyRoleId}")
 	public ResponseEntity<Object> deletePartyRoleByIdUpdated(@PathVariable String partyRoleId) throws Exception {
 		DeletePartyRole command = new DeletePartyRole(partyRoleId);
 

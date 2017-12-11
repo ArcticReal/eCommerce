@@ -57,7 +57,7 @@ public class SalesOpportunityQuoteController {
 	 * @return a List with the SalesOpportunityQuotes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSalesOpportunityQuotesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSalesOpportunityQuotesBy query = new FindSalesOpportunityQuotesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SalesOpportunityQuoteController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSalesOpportunityQuote(HttpServletRequest request) throws Exception {
 
 		SalesOpportunityQuote salesOpportunityQuoteToBeAdded = new SalesOpportunityQuote();
@@ -129,7 +129,7 @@ public class SalesOpportunityQuoteController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSalesOpportunityQuote(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SalesOpportunityQuoteController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{salesOpportunityQuoteId}")
+	@GetMapping("/{salesOpportunityQuoteId}")
 	public ResponseEntity<Object> findById(@PathVariable String salesOpportunityQuoteId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("salesOpportunityQuoteId", salesOpportunityQuoteId);
@@ -207,7 +207,7 @@ public class SalesOpportunityQuoteController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{salesOpportunityQuoteId}")
+	@DeleteMapping("/{salesOpportunityQuoteId}")
 	public ResponseEntity<Object> deleteSalesOpportunityQuoteByIdUpdated(@PathVariable String salesOpportunityQuoteId) throws Exception {
 		DeleteSalesOpportunityQuote command = new DeleteSalesOpportunityQuote(salesOpportunityQuoteId);
 

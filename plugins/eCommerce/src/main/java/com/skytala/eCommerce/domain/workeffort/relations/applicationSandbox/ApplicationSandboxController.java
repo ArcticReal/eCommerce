@@ -57,7 +57,7 @@ public class ApplicationSandboxController {
 	 * @return a List with the ApplicationSandboxs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findApplicationSandboxsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindApplicationSandboxsBy query = new FindApplicationSandboxsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ApplicationSandboxController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createApplicationSandbox(HttpServletRequest request) throws Exception {
 
 		ApplicationSandbox applicationSandboxToBeAdded = new ApplicationSandbox();
@@ -129,7 +129,7 @@ public class ApplicationSandboxController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateApplicationSandbox(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ApplicationSandboxController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{applicationSandboxId}")
+	@GetMapping("/{applicationSandboxId}")
 	public ResponseEntity<Object> findById(@PathVariable String applicationSandboxId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("applicationSandboxId", applicationSandboxId);
@@ -207,7 +207,7 @@ public class ApplicationSandboxController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{applicationSandboxId}")
+	@DeleteMapping("/{applicationSandboxId}")
 	public ResponseEntity<Object> deleteApplicationSandboxByIdUpdated(@PathVariable String applicationSandboxId) throws Exception {
 		DeleteApplicationSandbox command = new DeleteApplicationSandbox(applicationSandboxId);
 

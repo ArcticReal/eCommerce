@@ -57,7 +57,7 @@ public class QuoteRoleController {
 	 * @return a List with the QuoteRoles
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findQuoteRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindQuoteRolesBy query = new FindQuoteRolesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class QuoteRoleController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createQuoteRole(HttpServletRequest request) throws Exception {
 
 		QuoteRole quoteRoleToBeAdded = new QuoteRole();
@@ -129,7 +129,7 @@ public class QuoteRoleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateQuoteRole(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class QuoteRoleController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{quoteRoleId}")
+	@GetMapping("/{quoteRoleId}")
 	public ResponseEntity<Object> findById(@PathVariable String quoteRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("quoteRoleId", quoteRoleId);
@@ -207,7 +207,7 @@ public class QuoteRoleController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{quoteRoleId}")
+	@DeleteMapping("/{quoteRoleId}")
 	public ResponseEntity<Object> deleteQuoteRoleByIdUpdated(@PathVariable String quoteRoleId) throws Exception {
 		DeleteQuoteRole command = new DeleteQuoteRole(quoteRoleId);
 

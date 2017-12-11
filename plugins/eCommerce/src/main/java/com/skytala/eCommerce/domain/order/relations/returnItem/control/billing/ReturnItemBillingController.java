@@ -57,7 +57,7 @@ public class ReturnItemBillingController {
 	 * @return a List with the ReturnItemBillings
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findReturnItemBillingsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindReturnItemBillingsBy query = new FindReturnItemBillingsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ReturnItemBillingController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createReturnItemBilling(HttpServletRequest request) throws Exception {
 
 		ReturnItemBilling returnItemBillingToBeAdded = new ReturnItemBilling();
@@ -129,7 +129,7 @@ public class ReturnItemBillingController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateReturnItemBilling(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ReturnItemBillingController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{returnItemBillingId}")
+	@GetMapping("/{returnItemBillingId}")
 	public ResponseEntity<Object> findById(@PathVariable String returnItemBillingId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("returnItemBillingId", returnItemBillingId);
@@ -207,7 +207,7 @@ public class ReturnItemBillingController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{returnItemBillingId}")
+	@DeleteMapping("/{returnItemBillingId}")
 	public ResponseEntity<Object> deleteReturnItemBillingByIdUpdated(@PathVariable String returnItemBillingId) throws Exception {
 		DeleteReturnItemBilling command = new DeleteReturnItemBilling(returnItemBillingId);
 

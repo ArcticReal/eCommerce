@@ -57,7 +57,7 @@ public class SurveyQuestionCategoryController {
 	 * @return a List with the SurveyQuestionCategorys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSurveyQuestionCategorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSurveyQuestionCategorysBy query = new FindSurveyQuestionCategorysBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SurveyQuestionCategoryController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSurveyQuestionCategory(HttpServletRequest request) throws Exception {
 
 		SurveyQuestionCategory surveyQuestionCategoryToBeAdded = new SurveyQuestionCategory();
@@ -129,7 +129,7 @@ public class SurveyQuestionCategoryController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSurveyQuestionCategory(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SurveyQuestionCategoryController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{surveyQuestionCategoryId}")
+	@GetMapping("/{surveyQuestionCategoryId}")
 	public ResponseEntity<Object> findById(@PathVariable String surveyQuestionCategoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("surveyQuestionCategoryId", surveyQuestionCategoryId);
@@ -207,7 +207,7 @@ public class SurveyQuestionCategoryController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{surveyQuestionCategoryId}")
+	@DeleteMapping("/{surveyQuestionCategoryId}")
 	public ResponseEntity<Object> deleteSurveyQuestionCategoryByIdUpdated(@PathVariable String surveyQuestionCategoryId) throws Exception {
 		DeleteSurveyQuestionCategory command = new DeleteSurveyQuestionCategory(surveyQuestionCategoryId);
 

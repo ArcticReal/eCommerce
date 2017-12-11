@@ -57,7 +57,7 @@ public class AffiliateController {
 	 * @return a List with the Affiliates
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findAffiliatesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAffiliatesBy query = new FindAffiliatesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class AffiliateController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createAffiliate(HttpServletRequest request) throws Exception {
 
 		Affiliate affiliateToBeAdded = new Affiliate();
@@ -129,7 +129,7 @@ public class AffiliateController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateAffiliate(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class AffiliateController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{affiliateId}")
+	@GetMapping("/{affiliateId}")
 	public ResponseEntity<Object> findById(@PathVariable String affiliateId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("affiliateId", affiliateId);
@@ -207,7 +207,7 @@ public class AffiliateController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{affiliateId}")
+	@DeleteMapping("/{affiliateId}")
 	public ResponseEntity<Object> deleteAffiliateByIdUpdated(@PathVariable String affiliateId) throws Exception {
 		DeleteAffiliate command = new DeleteAffiliate(affiliateId);
 

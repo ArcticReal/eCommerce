@@ -57,7 +57,7 @@ public class MimeTypeHtmlTemplateController {
 	 * @return a List with the MimeTypeHtmlTemplates
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findMimeTypeHtmlTemplatesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindMimeTypeHtmlTemplatesBy query = new FindMimeTypeHtmlTemplatesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class MimeTypeHtmlTemplateController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createMimeTypeHtmlTemplate(HttpServletRequest request) throws Exception {
 
 		MimeTypeHtmlTemplate mimeTypeHtmlTemplateToBeAdded = new MimeTypeHtmlTemplate();
@@ -129,7 +129,7 @@ public class MimeTypeHtmlTemplateController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateMimeTypeHtmlTemplate(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class MimeTypeHtmlTemplateController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{mimeTypeHtmlTemplateId}")
+	@GetMapping("/{mimeTypeHtmlTemplateId}")
 	public ResponseEntity<Object> findById(@PathVariable String mimeTypeHtmlTemplateId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("mimeTypeHtmlTemplateId", mimeTypeHtmlTemplateId);
@@ -207,7 +207,7 @@ public class MimeTypeHtmlTemplateController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{mimeTypeHtmlTemplateId}")
+	@DeleteMapping("/{mimeTypeHtmlTemplateId}")
 	public ResponseEntity<Object> deleteMimeTypeHtmlTemplateByIdUpdated(@PathVariable String mimeTypeHtmlTemplateId) throws Exception {
 		DeleteMimeTypeHtmlTemplate command = new DeleteMimeTypeHtmlTemplate(mimeTypeHtmlTemplateId);
 

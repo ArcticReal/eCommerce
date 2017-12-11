@@ -57,7 +57,7 @@ public class AddendumController {
 	 * @return a List with the Addendums
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findAddendumsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAddendumsBy query = new FindAddendumsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class AddendumController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createAddendum(HttpServletRequest request) throws Exception {
 
 		Addendum addendumToBeAdded = new Addendum();
@@ -129,7 +129,7 @@ public class AddendumController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateAddendum(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class AddendumController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{addendumId}")
+	@GetMapping("/{addendumId}")
 	public ResponseEntity<Object> findById(@PathVariable String addendumId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("addendumId", addendumId);
@@ -207,7 +207,7 @@ public class AddendumController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{addendumId}")
+	@DeleteMapping("/{addendumId}")
 	public ResponseEntity<Object> deleteAddendumByIdUpdated(@PathVariable String addendumId) throws Exception {
 		DeleteAddendum command = new DeleteAddendum(addendumId);
 

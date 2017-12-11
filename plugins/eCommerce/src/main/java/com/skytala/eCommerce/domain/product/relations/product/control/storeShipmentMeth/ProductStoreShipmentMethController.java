@@ -57,7 +57,7 @@ public class ProductStoreShipmentMethController {
 	 * @return a List with the ProductStoreShipmentMeths
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductStoreShipmentMethsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductStoreShipmentMethsBy query = new FindProductStoreShipmentMethsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductStoreShipmentMethController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductStoreShipmentMeth(HttpServletRequest request) throws Exception {
 
 		ProductStoreShipmentMeth productStoreShipmentMethToBeAdded = new ProductStoreShipmentMeth();
@@ -129,7 +129,7 @@ public class ProductStoreShipmentMethController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductStoreShipmentMeth(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductStoreShipmentMethController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productStoreShipmentMethId}")
+	@GetMapping("/{productStoreShipmentMethId}")
 	public ResponseEntity<Object> findById(@PathVariable String productStoreShipmentMethId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productStoreShipmentMethId", productStoreShipmentMethId);
@@ -207,7 +207,7 @@ public class ProductStoreShipmentMethController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productStoreShipmentMethId}")
+	@DeleteMapping("/{productStoreShipmentMethId}")
 	public ResponseEntity<Object> deleteProductStoreShipmentMethByIdUpdated(@PathVariable String productStoreShipmentMethId) throws Exception {
 		DeleteProductStoreShipmentMeth command = new DeleteProductStoreShipmentMeth(productStoreShipmentMethId);
 

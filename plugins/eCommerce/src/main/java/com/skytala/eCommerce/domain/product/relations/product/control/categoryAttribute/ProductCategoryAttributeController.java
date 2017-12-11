@@ -57,7 +57,7 @@ public class ProductCategoryAttributeController {
 	 * @return a List with the ProductCategoryAttributes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductCategoryAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductCategoryAttributesBy query = new FindProductCategoryAttributesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductCategoryAttributeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductCategoryAttribute(HttpServletRequest request) throws Exception {
 
 		ProductCategoryAttribute productCategoryAttributeToBeAdded = new ProductCategoryAttribute();
@@ -129,7 +129,7 @@ public class ProductCategoryAttributeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductCategoryAttribute(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductCategoryAttributeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productCategoryAttributeId}")
+	@GetMapping("/{productCategoryAttributeId}")
 	public ResponseEntity<Object> findById(@PathVariable String productCategoryAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productCategoryAttributeId", productCategoryAttributeId);
@@ -207,7 +207,7 @@ public class ProductCategoryAttributeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productCategoryAttributeId}")
+	@DeleteMapping("/{productCategoryAttributeId}")
 	public ResponseEntity<Object> deleteProductCategoryAttributeByIdUpdated(@PathVariable String productCategoryAttributeId) throws Exception {
 		DeleteProductCategoryAttribute command = new DeleteProductCategoryAttribute(productCategoryAttributeId);
 

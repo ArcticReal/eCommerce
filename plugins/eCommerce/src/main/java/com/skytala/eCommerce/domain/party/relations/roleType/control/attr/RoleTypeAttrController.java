@@ -57,7 +57,7 @@ public class RoleTypeAttrController {
 	 * @return a List with the RoleTypeAttrs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findRoleTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindRoleTypeAttrsBy query = new FindRoleTypeAttrsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class RoleTypeAttrController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createRoleTypeAttr(HttpServletRequest request) throws Exception {
 
 		RoleTypeAttr roleTypeAttrToBeAdded = new RoleTypeAttr();
@@ -129,7 +129,7 @@ public class RoleTypeAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateRoleTypeAttr(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class RoleTypeAttrController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{roleTypeAttrId}")
+	@GetMapping("/{roleTypeAttrId}")
 	public ResponseEntity<Object> findById(@PathVariable String roleTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("roleTypeAttrId", roleTypeAttrId);
@@ -207,7 +207,7 @@ public class RoleTypeAttrController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{roleTypeAttrId}")
+	@DeleteMapping("/{roleTypeAttrId}")
 	public ResponseEntity<Object> deleteRoleTypeAttrByIdUpdated(@PathVariable String roleTypeAttrId) throws Exception {
 		DeleteRoleTypeAttr command = new DeleteRoleTypeAttr(roleTypeAttrId);
 

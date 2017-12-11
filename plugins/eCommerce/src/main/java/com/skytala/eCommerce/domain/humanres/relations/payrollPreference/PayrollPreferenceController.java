@@ -57,7 +57,7 @@ public class PayrollPreferenceController {
 	 * @return a List with the PayrollPreferences
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPayrollPreferencesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPayrollPreferencesBy query = new FindPayrollPreferencesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PayrollPreferenceController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPayrollPreference(HttpServletRequest request) throws Exception {
 
 		PayrollPreference payrollPreferenceToBeAdded = new PayrollPreference();
@@ -129,7 +129,7 @@ public class PayrollPreferenceController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePayrollPreference(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PayrollPreferenceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{payrollPreferenceId}")
+	@GetMapping("/{payrollPreferenceId}")
 	public ResponseEntity<Object> findById(@PathVariable String payrollPreferenceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("payrollPreferenceId", payrollPreferenceId);
@@ -207,7 +207,7 @@ public class PayrollPreferenceController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{payrollPreferenceId}")
+	@DeleteMapping("/{payrollPreferenceId}")
 	public ResponseEntity<Object> deletePayrollPreferenceByIdUpdated(@PathVariable String payrollPreferenceId) throws Exception {
 		DeletePayrollPreference command = new DeletePayrollPreference(payrollPreferenceId);
 

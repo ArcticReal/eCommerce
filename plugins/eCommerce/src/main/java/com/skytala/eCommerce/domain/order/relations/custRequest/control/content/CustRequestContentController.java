@@ -57,7 +57,7 @@ public class CustRequestContentController {
 	 * @return a List with the CustRequestContents
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findCustRequestContentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCustRequestContentsBy query = new FindCustRequestContentsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class CustRequestContentController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createCustRequestContent(HttpServletRequest request) throws Exception {
 
 		CustRequestContent custRequestContentToBeAdded = new CustRequestContent();
@@ -129,7 +129,7 @@ public class CustRequestContentController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateCustRequestContent(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class CustRequestContentController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{custRequestContentId}")
+	@GetMapping("/{custRequestContentId}")
 	public ResponseEntity<Object> findById(@PathVariable String custRequestContentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("custRequestContentId", custRequestContentId);
@@ -207,7 +207,7 @@ public class CustRequestContentController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{custRequestContentId}")
+	@DeleteMapping("/{custRequestContentId}")
 	public ResponseEntity<Object> deleteCustRequestContentByIdUpdated(@PathVariable String custRequestContentId) throws Exception {
 		DeleteCustRequestContent command = new DeleteCustRequestContent(custRequestContentId);
 

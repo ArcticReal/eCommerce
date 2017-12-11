@@ -57,7 +57,7 @@ public class ProductMeterController {
 	 * @return a List with the ProductMeters
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findProductMetersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductMetersBy query = new FindProductMetersBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ProductMeterController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createProductMeter(HttpServletRequest request) throws Exception {
 
 		ProductMeter productMeterToBeAdded = new ProductMeter();
@@ -129,7 +129,7 @@ public class ProductMeterController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductMeter(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ProductMeterController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productMeterId}")
+	@GetMapping("/{productMeterId}")
 	public ResponseEntity<Object> findById(@PathVariable String productMeterId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productMeterId", productMeterId);
@@ -207,7 +207,7 @@ public class ProductMeterController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productMeterId}")
+	@DeleteMapping("/{productMeterId}")
 	public ResponseEntity<Object> deleteProductMeterByIdUpdated(@PathVariable String productMeterId) throws Exception {
 		DeleteProductMeter command = new DeleteProductMeter(productMeterId);
 

@@ -57,7 +57,7 @@ public class RequirementTypeAttrController {
 	 * @return a List with the RequirementTypeAttrs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findRequirementTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindRequirementTypeAttrsBy query = new FindRequirementTypeAttrsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class RequirementTypeAttrController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createRequirementTypeAttr(HttpServletRequest request) throws Exception {
 
 		RequirementTypeAttr requirementTypeAttrToBeAdded = new RequirementTypeAttr();
@@ -129,7 +129,7 @@ public class RequirementTypeAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateRequirementTypeAttr(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class RequirementTypeAttrController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{requirementTypeAttrId}")
+	@GetMapping("/{requirementTypeAttrId}")
 	public ResponseEntity<Object> findById(@PathVariable String requirementTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("requirementTypeAttrId", requirementTypeAttrId);
@@ -207,7 +207,7 @@ public class RequirementTypeAttrController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{requirementTypeAttrId}")
+	@DeleteMapping("/{requirementTypeAttrId}")
 	public ResponseEntity<Object> deleteRequirementTypeAttrByIdUpdated(@PathVariable String requirementTypeAttrId) throws Exception {
 		DeleteRequirementTypeAttr command = new DeleteRequirementTypeAttr(requirementTypeAttrId);
 

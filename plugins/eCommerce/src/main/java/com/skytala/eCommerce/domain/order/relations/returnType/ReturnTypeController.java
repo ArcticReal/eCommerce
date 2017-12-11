@@ -57,7 +57,7 @@ public class ReturnTypeController {
 	 * @return a List with the ReturnTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findReturnTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindReturnTypesBy query = new FindReturnTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ReturnTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createReturnType(HttpServletRequest request) throws Exception {
 
 		ReturnType returnTypeToBeAdded = new ReturnType();
@@ -129,7 +129,7 @@ public class ReturnTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateReturnType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ReturnTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{returnTypeId}")
+	@GetMapping("/{returnTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String returnTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("returnTypeId", returnTypeId);
@@ -207,7 +207,7 @@ public class ReturnTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{returnTypeId}")
+	@DeleteMapping("/{returnTypeId}")
 	public ResponseEntity<Object> deleteReturnTypeByIdUpdated(@PathVariable String returnTypeId) throws Exception {
 		DeleteReturnType command = new DeleteReturnType(returnTypeId);
 

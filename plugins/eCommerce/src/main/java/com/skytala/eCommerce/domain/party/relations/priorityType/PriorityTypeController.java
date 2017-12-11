@@ -57,7 +57,7 @@ public class PriorityTypeController {
 	 * @return a List with the PriorityTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPriorityTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPriorityTypesBy query = new FindPriorityTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PriorityTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPriorityType(HttpServletRequest request) throws Exception {
 
 		PriorityType priorityTypeToBeAdded = new PriorityType();
@@ -129,7 +129,7 @@ public class PriorityTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePriorityType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PriorityTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{priorityTypeId}")
+	@GetMapping("/{priorityTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String priorityTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("priorityTypeId", priorityTypeId);
@@ -207,7 +207,7 @@ public class PriorityTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{priorityTypeId}")
+	@DeleteMapping("/{priorityTypeId}")
 	public ResponseEntity<Object> deletePriorityTypeByIdUpdated(@PathVariable String priorityTypeId) throws Exception {
 		DeletePriorityType command = new DeletePriorityType(priorityTypeId);
 

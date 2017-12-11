@@ -57,7 +57,7 @@ public class EmplPositionReportingStructController {
 	 * @return a List with the EmplPositionReportingStructs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findEmplPositionReportingStructsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindEmplPositionReportingStructsBy query = new FindEmplPositionReportingStructsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class EmplPositionReportingStructController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createEmplPositionReportingStruct(HttpServletRequest request) throws Exception {
 
 		EmplPositionReportingStruct emplPositionReportingStructToBeAdded = new EmplPositionReportingStruct();
@@ -129,7 +129,7 @@ public class EmplPositionReportingStructController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateEmplPositionReportingStruct(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class EmplPositionReportingStructController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{emplPositionReportingStructId}")
+	@GetMapping("/{emplPositionReportingStructId}")
 	public ResponseEntity<Object> findById(@PathVariable String emplPositionReportingStructId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("emplPositionReportingStructId", emplPositionReportingStructId);
@@ -207,7 +207,7 @@ public class EmplPositionReportingStructController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{emplPositionReportingStructId}")
+	@DeleteMapping("/{emplPositionReportingStructId}")
 	public ResponseEntity<Object> deleteEmplPositionReportingStructByIdUpdated(@PathVariable String emplPositionReportingStructId) throws Exception {
 		DeleteEmplPositionReportingStruct command = new DeleteEmplPositionReportingStruct(emplPositionReportingStructId);
 

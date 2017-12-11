@@ -57,7 +57,7 @@ public class EmplLeaveReasonTypeController {
 	 * @return a List with the EmplLeaveReasonTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findEmplLeaveReasonTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindEmplLeaveReasonTypesBy query = new FindEmplLeaveReasonTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class EmplLeaveReasonTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createEmplLeaveReasonType(HttpServletRequest request) throws Exception {
 
 		EmplLeaveReasonType emplLeaveReasonTypeToBeAdded = new EmplLeaveReasonType();
@@ -129,7 +129,7 @@ public class EmplLeaveReasonTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateEmplLeaveReasonType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class EmplLeaveReasonTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{emplLeaveReasonTypeId}")
+	@GetMapping("/{emplLeaveReasonTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String emplLeaveReasonTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("emplLeaveReasonTypeId", emplLeaveReasonTypeId);
@@ -207,7 +207,7 @@ public class EmplLeaveReasonTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{emplLeaveReasonTypeId}")
+	@DeleteMapping("/{emplLeaveReasonTypeId}")
 	public ResponseEntity<Object> deleteEmplLeaveReasonTypeByIdUpdated(@PathVariable String emplLeaveReasonTypeId) throws Exception {
 		DeleteEmplLeaveReasonType command = new DeleteEmplLeaveReasonType(emplLeaveReasonTypeId);
 

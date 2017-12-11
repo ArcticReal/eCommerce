@@ -57,7 +57,7 @@ public class WorkEffortFixedAssetAssignController {
 	 * @return a List with the WorkEffortFixedAssetAssigns
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWorkEffortFixedAssetAssignsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortFixedAssetAssignsBy query = new FindWorkEffortFixedAssetAssignsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WorkEffortFixedAssetAssignController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWorkEffortFixedAssetAssign(HttpServletRequest request) throws Exception {
 
 		WorkEffortFixedAssetAssign workEffortFixedAssetAssignToBeAdded = new WorkEffortFixedAssetAssign();
@@ -129,7 +129,7 @@ public class WorkEffortFixedAssetAssignController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWorkEffortFixedAssetAssign(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WorkEffortFixedAssetAssignController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{workEffortFixedAssetAssignId}")
+	@GetMapping("/{workEffortFixedAssetAssignId}")
 	public ResponseEntity<Object> findById(@PathVariable String workEffortFixedAssetAssignId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortFixedAssetAssignId", workEffortFixedAssetAssignId);
@@ -207,7 +207,7 @@ public class WorkEffortFixedAssetAssignController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{workEffortFixedAssetAssignId}")
+	@DeleteMapping("/{workEffortFixedAssetAssignId}")
 	public ResponseEntity<Object> deleteWorkEffortFixedAssetAssignByIdUpdated(@PathVariable String workEffortFixedAssetAssignId) throws Exception {
 		DeleteWorkEffortFixedAssetAssign command = new DeleteWorkEffortFixedAssetAssign(workEffortFixedAssetAssignId);
 

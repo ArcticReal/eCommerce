@@ -57,7 +57,7 @@ public class SurveyMultiRespColumnController {
 	 * @return a List with the SurveyMultiRespColumns
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSurveyMultiRespColumnsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSurveyMultiRespColumnsBy query = new FindSurveyMultiRespColumnsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SurveyMultiRespColumnController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSurveyMultiRespColumn(HttpServletRequest request) throws Exception {
 
 		SurveyMultiRespColumn surveyMultiRespColumnToBeAdded = new SurveyMultiRespColumn();
@@ -129,7 +129,7 @@ public class SurveyMultiRespColumnController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSurveyMultiRespColumn(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SurveyMultiRespColumnController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{surveyMultiRespColumnId}")
+	@GetMapping("/{surveyMultiRespColumnId}")
 	public ResponseEntity<Object> findById(@PathVariable String surveyMultiRespColumnId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("surveyMultiRespColumnId", surveyMultiRespColumnId);
@@ -207,7 +207,7 @@ public class SurveyMultiRespColumnController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{surveyMultiRespColumnId}")
+	@DeleteMapping("/{surveyMultiRespColumnId}")
 	public ResponseEntity<Object> deleteSurveyMultiRespColumnByIdUpdated(@PathVariable String surveyMultiRespColumnId) throws Exception {
 		DeleteSurveyMultiRespColumn command = new DeleteSurveyMultiRespColumn(surveyMultiRespColumnId);
 

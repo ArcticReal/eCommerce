@@ -57,7 +57,7 @@ public class WebUserPreferenceController {
 	 * @return a List with the WebUserPreferences
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findWebUserPreferencesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWebUserPreferencesBy query = new FindWebUserPreferencesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class WebUserPreferenceController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createWebUserPreference(HttpServletRequest request) throws Exception {
 
 		WebUserPreference webUserPreferenceToBeAdded = new WebUserPreference();
@@ -129,7 +129,7 @@ public class WebUserPreferenceController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateWebUserPreference(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class WebUserPreferenceController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{webUserPreferenceId}")
+	@GetMapping("/{webUserPreferenceId}")
 	public ResponseEntity<Object> findById(@PathVariable String webUserPreferenceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("webUserPreferenceId", webUserPreferenceId);
@@ -207,7 +207,7 @@ public class WebUserPreferenceController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{webUserPreferenceId}")
+	@DeleteMapping("/{webUserPreferenceId}")
 	public ResponseEntity<Object> deleteWebUserPreferenceByIdUpdated(@PathVariable String webUserPreferenceId) throws Exception {
 		DeleteWebUserPreference command = new DeleteWebUserPreference(webUserPreferenceId);
 

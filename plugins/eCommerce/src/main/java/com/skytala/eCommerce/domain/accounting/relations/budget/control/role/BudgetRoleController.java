@@ -57,7 +57,7 @@ public class BudgetRoleController {
 	 * @return a List with the BudgetRoles
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findBudgetRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindBudgetRolesBy query = new FindBudgetRolesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class BudgetRoleController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createBudgetRole(HttpServletRequest request) throws Exception {
 
 		BudgetRole budgetRoleToBeAdded = new BudgetRole();
@@ -129,7 +129,7 @@ public class BudgetRoleController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateBudgetRole(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class BudgetRoleController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{budgetRoleId}")
+	@GetMapping("/{budgetRoleId}")
 	public ResponseEntity<Object> findById(@PathVariable String budgetRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("budgetRoleId", budgetRoleId);
@@ -207,7 +207,7 @@ public class BudgetRoleController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{budgetRoleId}")
+	@DeleteMapping("/{budgetRoleId}")
 	public ResponseEntity<Object> deleteBudgetRoleByIdUpdated(@PathVariable String budgetRoleId) throws Exception {
 		DeleteBudgetRole command = new DeleteBudgetRole(budgetRoleId);
 

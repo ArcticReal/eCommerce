@@ -57,7 +57,7 @@ public class ReturnItemTypeController {
 	 * @return a List with the ReturnItemTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findReturnItemTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindReturnItemTypesBy query = new FindReturnItemTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class ReturnItemTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createReturnItemType(HttpServletRequest request) throws Exception {
 
 		ReturnItemType returnItemTypeToBeAdded = new ReturnItemType();
@@ -129,7 +129,7 @@ public class ReturnItemTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateReturnItemType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class ReturnItemTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{returnItemTypeId}")
+	@GetMapping("/{returnItemTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String returnItemTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("returnItemTypeId", returnItemTypeId);
@@ -207,7 +207,7 @@ public class ReturnItemTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{returnItemTypeId}")
+	@DeleteMapping("/{returnItemTypeId}")
 	public ResponseEntity<Object> deleteReturnItemTypeByIdUpdated(@PathVariable String returnItemTypeId) throws Exception {
 		DeleteReturnItemType command = new DeleteReturnItemType(returnItemTypeId);
 

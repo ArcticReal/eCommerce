@@ -57,7 +57,7 @@ public class PaymentTypeController {
 	 * @return a List with the PaymentTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPaymentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentTypesBy query = new FindPaymentTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PaymentTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPaymentType(HttpServletRequest request) throws Exception {
 
 		PaymentType paymentTypeToBeAdded = new PaymentType();
@@ -129,7 +129,7 @@ public class PaymentTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePaymentType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PaymentTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{paymentTypeId}")
+	@GetMapping("/{paymentTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String paymentTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentTypeId", paymentTypeId);
@@ -207,7 +207,7 @@ public class PaymentTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{paymentTypeId}")
+	@DeleteMapping("/{paymentTypeId}")
 	public ResponseEntity<Object> deletePaymentTypeByIdUpdated(@PathVariable String paymentTypeId) throws Exception {
 		DeletePaymentType command = new DeletePaymentType(paymentTypeId);
 

@@ -57,7 +57,7 @@ public class SkillTypeController {
 	 * @return a List with the SkillTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSkillTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSkillTypesBy query = new FindSkillTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SkillTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSkillType(HttpServletRequest request) throws Exception {
 
 		SkillType skillTypeToBeAdded = new SkillType();
@@ -129,7 +129,7 @@ public class SkillTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSkillType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SkillTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{skillTypeId}")
+	@GetMapping("/{skillTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String skillTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("skillTypeId", skillTypeId);
@@ -207,7 +207,7 @@ public class SkillTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{skillTypeId}")
+	@DeleteMapping("/{skillTypeId}")
 	public ResponseEntity<Object> deleteSkillTypeByIdUpdated(@PathVariable String skillTypeId) throws Exception {
 		DeleteSkillType command = new DeleteSkillType(skillTypeId);
 

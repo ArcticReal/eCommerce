@@ -57,7 +57,7 @@ public class PaymentBudgetAllocationController {
 	 * @return a List with the PaymentBudgetAllocations
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPaymentBudgetAllocationsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentBudgetAllocationsBy query = new FindPaymentBudgetAllocationsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PaymentBudgetAllocationController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPaymentBudgetAllocation(HttpServletRequest request) throws Exception {
 
 		PaymentBudgetAllocation paymentBudgetAllocationToBeAdded = new PaymentBudgetAllocation();
@@ -129,7 +129,7 @@ public class PaymentBudgetAllocationController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePaymentBudgetAllocation(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PaymentBudgetAllocationController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{paymentBudgetAllocationId}")
+	@GetMapping("/{paymentBudgetAllocationId}")
 	public ResponseEntity<Object> findById(@PathVariable String paymentBudgetAllocationId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentBudgetAllocationId", paymentBudgetAllocationId);
@@ -207,7 +207,7 @@ public class PaymentBudgetAllocationController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{paymentBudgetAllocationId}")
+	@DeleteMapping("/{paymentBudgetAllocationId}")
 	public ResponseEntity<Object> deletePaymentBudgetAllocationByIdUpdated(@PathVariable String paymentBudgetAllocationId) throws Exception {
 		DeletePaymentBudgetAllocation command = new DeletePaymentBudgetAllocation(paymentBudgetAllocationId);
 

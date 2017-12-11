@@ -57,7 +57,7 @@ public class SubscriptionController {
 	 * @return a List with the Subscriptions
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSubscriptionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSubscriptionsBy query = new FindSubscriptionsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SubscriptionController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSubscription(HttpServletRequest request) throws Exception {
 
 		Subscription subscriptionToBeAdded = new Subscription();
@@ -129,7 +129,7 @@ public class SubscriptionController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSubscription(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SubscriptionController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{subscriptionId}")
+	@GetMapping("/{subscriptionId}")
 	public ResponseEntity<Object> findById(@PathVariable String subscriptionId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("subscriptionId", subscriptionId);
@@ -207,7 +207,7 @@ public class SubscriptionController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{subscriptionId}")
+	@DeleteMapping("/{subscriptionId}")
 	public ResponseEntity<Object> deleteSubscriptionByIdUpdated(@PathVariable String subscriptionId) throws Exception {
 		DeleteSubscription command = new DeleteSubscription(subscriptionId);
 

@@ -57,7 +57,7 @@ public class QuoteTypeAttrController {
 	 * @return a List with the QuoteTypeAttrs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findQuoteTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindQuoteTypeAttrsBy query = new FindQuoteTypeAttrsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class QuoteTypeAttrController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createQuoteTypeAttr(HttpServletRequest request) throws Exception {
 
 		QuoteTypeAttr quoteTypeAttrToBeAdded = new QuoteTypeAttr();
@@ -129,7 +129,7 @@ public class QuoteTypeAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateQuoteTypeAttr(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class QuoteTypeAttrController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{quoteTypeAttrId}")
+	@GetMapping("/{quoteTypeAttrId}")
 	public ResponseEntity<Object> findById(@PathVariable String quoteTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("quoteTypeAttrId", quoteTypeAttrId);
@@ -207,7 +207,7 @@ public class QuoteTypeAttrController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{quoteTypeAttrId}")
+	@DeleteMapping("/{quoteTypeAttrId}")
 	public ResponseEntity<Object> deleteQuoteTypeAttrByIdUpdated(@PathVariable String quoteTypeAttrId) throws Exception {
 		DeleteQuoteTypeAttr command = new DeleteQuoteTypeAttr(quoteTypeAttrId);
 

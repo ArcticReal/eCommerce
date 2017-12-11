@@ -57,7 +57,7 @@ public class SalesForecastController {
 	 * @return a List with the SalesForecasts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSalesForecastsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSalesForecastsBy query = new FindSalesForecastsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SalesForecastController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSalesForecast(HttpServletRequest request) throws Exception {
 
 		SalesForecast salesForecastToBeAdded = new SalesForecast();
@@ -129,7 +129,7 @@ public class SalesForecastController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSalesForecast(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SalesForecastController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{salesForecastId}")
+	@GetMapping("/{salesForecastId}")
 	public ResponseEntity<Object> findById(@PathVariable String salesForecastId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("salesForecastId", salesForecastId);
@@ -207,7 +207,7 @@ public class SalesForecastController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{salesForecastId}")
+	@DeleteMapping("/{salesForecastId}")
 	public ResponseEntity<Object> deleteSalesForecastByIdUpdated(@PathVariable String salesForecastId) throws Exception {
 		DeleteSalesForecast command = new DeleteSalesForecast(salesForecastId);
 

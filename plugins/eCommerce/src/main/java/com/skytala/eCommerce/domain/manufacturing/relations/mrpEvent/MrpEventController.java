@@ -57,7 +57,7 @@ public class MrpEventController {
 	 * @return a List with the MrpEvents
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findMrpEventsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindMrpEventsBy query = new FindMrpEventsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class MrpEventController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createMrpEvent(HttpServletRequest request) throws Exception {
 
 		MrpEvent mrpEventToBeAdded = new MrpEvent();
@@ -129,7 +129,7 @@ public class MrpEventController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateMrpEvent(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class MrpEventController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{mrpEventId}")
+	@GetMapping("/{mrpEventId}")
 	public ResponseEntity<Object> findById(@PathVariable String mrpEventId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("mrpEventId", mrpEventId);
@@ -207,7 +207,7 @@ public class MrpEventController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{mrpEventId}")
+	@DeleteMapping("/{mrpEventId}")
 	public ResponseEntity<Object> deleteMrpEventByIdUpdated(@PathVariable String mrpEventId) throws Exception {
 		DeleteMrpEvent command = new DeleteMrpEvent(mrpEventId);
 

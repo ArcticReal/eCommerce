@@ -57,7 +57,7 @@ public class SupplierPrefOrderController {
 	 * @return a List with the SupplierPrefOrders
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSupplierPrefOrdersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSupplierPrefOrdersBy query = new FindSupplierPrefOrdersBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SupplierPrefOrderController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSupplierPrefOrder(HttpServletRequest request) throws Exception {
 
 		SupplierPrefOrder supplierPrefOrderToBeAdded = new SupplierPrefOrder();
@@ -129,7 +129,7 @@ public class SupplierPrefOrderController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSupplierPrefOrder(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SupplierPrefOrderController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{supplierPrefOrderId}")
+	@GetMapping("/{supplierPrefOrderId}")
 	public ResponseEntity<Object> findById(@PathVariable String supplierPrefOrderId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("supplierPrefOrderId", supplierPrefOrderId);
@@ -207,7 +207,7 @@ public class SupplierPrefOrderController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{supplierPrefOrderId}")
+	@DeleteMapping("/{supplierPrefOrderId}")
 	public ResponseEntity<Object> deleteSupplierPrefOrderByIdUpdated(@PathVariable String supplierPrefOrderId) throws Exception {
 		DeleteSupplierPrefOrder command = new DeleteSupplierPrefOrder(supplierPrefOrderId);
 

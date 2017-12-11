@@ -57,7 +57,7 @@ public class SalesOpportunityCompetitorController {
 	 * @return a List with the SalesOpportunityCompetitors
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findSalesOpportunityCompetitorsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSalesOpportunityCompetitorsBy query = new FindSalesOpportunityCompetitorsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class SalesOpportunityCompetitorController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createSalesOpportunityCompetitor(HttpServletRequest request) throws Exception {
 
 		SalesOpportunityCompetitor salesOpportunityCompetitorToBeAdded = new SalesOpportunityCompetitor();
@@ -129,7 +129,7 @@ public class SalesOpportunityCompetitorController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateSalesOpportunityCompetitor(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class SalesOpportunityCompetitorController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{salesOpportunityCompetitorId}")
+	@GetMapping("/{salesOpportunityCompetitorId}")
 	public ResponseEntity<Object> findById(@PathVariable String salesOpportunityCompetitorId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("salesOpportunityCompetitorId", salesOpportunityCompetitorId);
@@ -207,7 +207,7 @@ public class SalesOpportunityCompetitorController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{salesOpportunityCompetitorId}")
+	@DeleteMapping("/{salesOpportunityCompetitorId}")
 	public ResponseEntity<Object> deleteSalesOpportunityCompetitorByIdUpdated(@PathVariable String salesOpportunityCompetitorId) throws Exception {
 		DeleteSalesOpportunityCompetitor command = new DeleteSalesOpportunityCompetitor(salesOpportunityCompetitorId);
 

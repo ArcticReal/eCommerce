@@ -57,7 +57,7 @@ public class TermTypeAttrController {
 	 * @return a List with the TermTypeAttrs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findTermTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTermTypeAttrsBy query = new FindTermTypeAttrsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class TermTypeAttrController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createTermTypeAttr(HttpServletRequest request) throws Exception {
 
 		TermTypeAttr termTypeAttrToBeAdded = new TermTypeAttr();
@@ -129,7 +129,7 @@ public class TermTypeAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateTermTypeAttr(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class TermTypeAttrController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{termTypeAttrId}")
+	@GetMapping("/{termTypeAttrId}")
 	public ResponseEntity<Object> findById(@PathVariable String termTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("termTypeAttrId", termTypeAttrId);
@@ -207,7 +207,7 @@ public class TermTypeAttrController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{termTypeAttrId}")
+	@DeleteMapping("/{termTypeAttrId}")
 	public ResponseEntity<Object> deleteTermTypeAttrByIdUpdated(@PathVariable String termTypeAttrId) throws Exception {
 		DeleteTermTypeAttr command = new DeleteTermTypeAttr(termTypeAttrId);
 

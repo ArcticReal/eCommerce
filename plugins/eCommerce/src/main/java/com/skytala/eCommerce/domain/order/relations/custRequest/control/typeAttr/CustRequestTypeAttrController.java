@@ -57,7 +57,7 @@ public class CustRequestTypeAttrController {
 	 * @return a List with the CustRequestTypeAttrs
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findCustRequestTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCustRequestTypeAttrsBy query = new FindCustRequestTypeAttrsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class CustRequestTypeAttrController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createCustRequestTypeAttr(HttpServletRequest request) throws Exception {
 
 		CustRequestTypeAttr custRequestTypeAttrToBeAdded = new CustRequestTypeAttr();
@@ -129,7 +129,7 @@ public class CustRequestTypeAttrController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateCustRequestTypeAttr(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class CustRequestTypeAttrController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{custRequestTypeAttrId}")
+	@GetMapping("/{custRequestTypeAttrId}")
 	public ResponseEntity<Object> findById(@PathVariable String custRequestTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("custRequestTypeAttrId", custRequestTypeAttrId);
@@ -207,7 +207,7 @@ public class CustRequestTypeAttrController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{custRequestTypeAttrId}")
+	@DeleteMapping("/{custRequestTypeAttrId}")
 	public ResponseEntity<Object> deleteCustRequestTypeAttrByIdUpdated(@PathVariable String custRequestTypeAttrId) throws Exception {
 		DeleteCustRequestTypeAttr command = new DeleteCustRequestTypeAttr(custRequestTypeAttrId);
 

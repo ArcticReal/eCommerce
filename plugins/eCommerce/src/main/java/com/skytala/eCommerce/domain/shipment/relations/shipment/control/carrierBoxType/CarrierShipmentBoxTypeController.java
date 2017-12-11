@@ -57,7 +57,7 @@ public class CarrierShipmentBoxTypeController {
 	 * @return a List with the CarrierShipmentBoxTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findCarrierShipmentBoxTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCarrierShipmentBoxTypesBy query = new FindCarrierShipmentBoxTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class CarrierShipmentBoxTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createCarrierShipmentBoxType(HttpServletRequest request) throws Exception {
 
 		CarrierShipmentBoxType carrierShipmentBoxTypeToBeAdded = new CarrierShipmentBoxType();
@@ -129,7 +129,7 @@ public class CarrierShipmentBoxTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateCarrierShipmentBoxType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class CarrierShipmentBoxTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{carrierShipmentBoxTypeId}")
+	@GetMapping("/{carrierShipmentBoxTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String carrierShipmentBoxTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("carrierShipmentBoxTypeId", carrierShipmentBoxTypeId);
@@ -207,7 +207,7 @@ public class CarrierShipmentBoxTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{carrierShipmentBoxTypeId}")
+	@DeleteMapping("/{carrierShipmentBoxTypeId}")
 	public ResponseEntity<Object> deleteCarrierShipmentBoxTypeByIdUpdated(@PathVariable String carrierShipmentBoxTypeId) throws Exception {
 		DeleteCarrierShipmentBoxType command = new DeleteCarrierShipmentBoxType(carrierShipmentBoxTypeId);
 

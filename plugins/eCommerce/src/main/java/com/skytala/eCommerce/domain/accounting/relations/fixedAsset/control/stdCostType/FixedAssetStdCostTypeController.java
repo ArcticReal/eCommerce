@@ -57,7 +57,7 @@ public class FixedAssetStdCostTypeController {
 	 * @return a List with the FixedAssetStdCostTypes
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findFixedAssetStdCostTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFixedAssetStdCostTypesBy query = new FindFixedAssetStdCostTypesBy(allRequestParams);
@@ -83,7 +83,7 @@ public class FixedAssetStdCostTypeController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createFixedAssetStdCostType(HttpServletRequest request) throws Exception {
 
 		FixedAssetStdCostType fixedAssetStdCostTypeToBeAdded = new FixedAssetStdCostType();
@@ -129,7 +129,7 @@ public class FixedAssetStdCostTypeController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateFixedAssetStdCostType(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class FixedAssetStdCostTypeController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{fixedAssetStdCostTypeId}")
+	@GetMapping("/{fixedAssetStdCostTypeId}")
 	public ResponseEntity<Object> findById(@PathVariable String fixedAssetStdCostTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("fixedAssetStdCostTypeId", fixedAssetStdCostTypeId);
@@ -207,7 +207,7 @@ public class FixedAssetStdCostTypeController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{fixedAssetStdCostTypeId}")
+	@DeleteMapping("/{fixedAssetStdCostTypeId}")
 	public ResponseEntity<Object> deleteFixedAssetStdCostTypeByIdUpdated(@PathVariable String fixedAssetStdCostTypeId) throws Exception {
 		DeleteFixedAssetStdCostType command = new DeleteFixedAssetStdCostType(fixedAssetStdCostTypeId);
 

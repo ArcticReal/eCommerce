@@ -57,7 +57,7 @@ public class PartyGlAccountController {
 	 * @return a List with the PartyGlAccounts
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	public ResponseEntity<Object> findPartyGlAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyGlAccountsBy query = new FindPartyGlAccountsBy(allRequestParams);
@@ -83,7 +83,7 @@ public class PartyGlAccountController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<Object> createPartyGlAccount(HttpServletRequest request) throws Exception {
 
 		PartyGlAccount partyGlAccountToBeAdded = new PartyGlAccount();
@@ -129,7 +129,7 @@ public class PartyGlAccountController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updatePartyGlAccount(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -192,7 +192,7 @@ public class PartyGlAccountController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{partyGlAccountId}")
+	@GetMapping("/{partyGlAccountId}")
 	public ResponseEntity<Object> findById(@PathVariable String partyGlAccountId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyGlAccountId", partyGlAccountId);
@@ -207,7 +207,7 @@ public class PartyGlAccountController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{partyGlAccountId}")
+	@DeleteMapping("/{partyGlAccountId}")
 	public ResponseEntity<Object> deletePartyGlAccountByIdUpdated(@PathVariable String partyGlAccountId) throws Exception {
 		DeletePartyGlAccount command = new DeletePartyGlAccount(partyGlAccountId);
 
