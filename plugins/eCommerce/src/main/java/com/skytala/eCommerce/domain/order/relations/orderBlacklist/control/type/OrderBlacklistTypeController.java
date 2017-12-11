@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/orderBlacklistTypes")
+@RequestMapping("/order/orderBlacklist/orderBlacklistTypes")
 public class OrderBlacklistTypeController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

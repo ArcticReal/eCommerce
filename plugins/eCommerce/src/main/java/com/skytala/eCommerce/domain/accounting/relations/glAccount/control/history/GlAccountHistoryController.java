@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/glAccountHistorys")
+@RequestMapping("/accounting/glAccount/glAccountHistorys")
 public class GlAccountHistoryController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

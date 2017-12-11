@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/productConfigItems")
+@RequestMapping("/product/product/productConfigItems")
 public class ProductConfigItemController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

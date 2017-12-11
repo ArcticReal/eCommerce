@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/securityGroupPermissions")
+@RequestMapping("/login/securityGroup/securityGroupPermissions")
 public class SecurityGroupPermissionController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

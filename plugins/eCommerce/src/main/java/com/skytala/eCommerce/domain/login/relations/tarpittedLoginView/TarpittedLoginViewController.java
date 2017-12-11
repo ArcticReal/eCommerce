@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/tarpittedLoginViews")
+@RequestMapping("/login/tarpittedLoginViews")
 public class TarpittedLoginViewController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

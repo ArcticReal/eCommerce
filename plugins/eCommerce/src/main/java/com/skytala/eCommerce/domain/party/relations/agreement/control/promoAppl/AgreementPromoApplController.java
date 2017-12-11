@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/agreementPromoAppls")
+@RequestMapping("/party/agreement/agreementPromoAppls")
 public class AgreementPromoApplController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

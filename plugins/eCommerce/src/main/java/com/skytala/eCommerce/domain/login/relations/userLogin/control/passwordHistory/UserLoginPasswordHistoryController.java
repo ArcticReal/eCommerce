@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/userLoginPasswordHistorys")
+@RequestMapping("/login/userLogin/userLoginPasswordHistorys")
 public class UserLoginPasswordHistoryController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

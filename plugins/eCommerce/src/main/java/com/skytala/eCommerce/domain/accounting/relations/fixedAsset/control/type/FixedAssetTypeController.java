@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/fixedAssetTypes")
+@RequestMapping("/accounting/fixedAsset/fixedAssetTypes")
 public class FixedAssetTypeController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

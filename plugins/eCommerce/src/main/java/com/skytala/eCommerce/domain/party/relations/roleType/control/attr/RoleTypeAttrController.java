@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/roleTypeAttrs")
+@RequestMapping("/party/roleType/roleTypeAttrs")
 public class RoleTypeAttrController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

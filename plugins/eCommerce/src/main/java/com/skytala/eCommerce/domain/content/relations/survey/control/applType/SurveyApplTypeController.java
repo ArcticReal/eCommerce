@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/surveyApplTypes")
+@RequestMapping("/content/survey/surveyApplTypes")
 public class SurveyApplTypeController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

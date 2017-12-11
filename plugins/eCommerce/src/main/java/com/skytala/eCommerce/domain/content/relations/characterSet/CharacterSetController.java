@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/characterSets")
+@RequestMapping("/content/characterSets")
 public class CharacterSetController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

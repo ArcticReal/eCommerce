@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/paymentGatewayiDEALs")
+@RequestMapping("/accounting/payment/paymentGatewayiDEALs")
 public class PaymentGatewayiDEALController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

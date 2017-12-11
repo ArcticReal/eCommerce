@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/acctgTransTypeAttrs")
+@RequestMapping("/accounting/acctgTrans/acctgTransTypeAttrs")
 public class AcctgTransTypeAttrController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

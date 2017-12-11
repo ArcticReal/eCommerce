@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/webAnalyticsTypes")
+@RequestMapping("/content/webAnalyticsTypes")
 public class WebAnalyticsTypeController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

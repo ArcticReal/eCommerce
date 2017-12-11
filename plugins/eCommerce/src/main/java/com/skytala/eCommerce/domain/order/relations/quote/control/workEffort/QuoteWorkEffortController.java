@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/quoteWorkEfforts")
+@RequestMapping("/order/quote/quoteWorkEfforts")
 public class QuoteWorkEffortController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

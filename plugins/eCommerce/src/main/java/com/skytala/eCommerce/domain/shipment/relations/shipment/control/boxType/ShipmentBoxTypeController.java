@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/shipmentBoxTypes")
+@RequestMapping("/shipment/shipment/shipmentBoxTypes")
 public class ShipmentBoxTypeController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

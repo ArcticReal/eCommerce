@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/productAverageCosts")
+@RequestMapping("/accounting/productAverageCosts")
 public class ProductAverageCostController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

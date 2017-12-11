@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/emplPositions")
+@RequestMapping("/humanres/emplPositions")
 public class EmplPositionController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

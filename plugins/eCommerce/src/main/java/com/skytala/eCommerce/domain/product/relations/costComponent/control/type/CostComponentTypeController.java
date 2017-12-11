@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/costComponentTypes")
+@RequestMapping("/product/costComponent/costComponentTypes")
 public class CostComponentTypeController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

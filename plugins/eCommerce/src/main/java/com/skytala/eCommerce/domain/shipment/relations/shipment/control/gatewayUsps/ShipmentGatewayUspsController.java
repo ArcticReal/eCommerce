@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/shipmentGatewayUspss")
+@RequestMapping("/shipment/shipment/shipmentGatewayUspss")
 public class ShipmentGatewayUspsController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

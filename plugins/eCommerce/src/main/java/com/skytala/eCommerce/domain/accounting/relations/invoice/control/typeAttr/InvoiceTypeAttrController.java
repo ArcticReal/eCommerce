@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/invoiceTypeAttrs")
+@RequestMapping("/accounting/invoice/invoiceTypeAttrs")
 public class InvoiceTypeAttrController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

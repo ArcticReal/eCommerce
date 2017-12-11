@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/unemploymentClaims")
+@RequestMapping("/humanres/unemploymentClaims")
 public class UnemploymentClaimController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

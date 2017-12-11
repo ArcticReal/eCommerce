@@ -52,7 +52,7 @@ import static com.skytala.eCommerce.framework.util.AuthorizeMethods.HAS_USER_AUT
 import static com.skytala.eCommerce.framework.util.AuthorizeMethods.PERMIT_ALL;
 
 @RestController
-@RequestMapping("/productCategorys")
+@RequestMapping("/product/relations/product/productCategorys")
 @PreAuthorize(HAS_ADMIN_AUTHORITY)
 public class ProductCategoryController {
 

@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/webUserPreferences")
+@RequestMapping("/content/webUserPreferences")
 public class WebUserPreferenceController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

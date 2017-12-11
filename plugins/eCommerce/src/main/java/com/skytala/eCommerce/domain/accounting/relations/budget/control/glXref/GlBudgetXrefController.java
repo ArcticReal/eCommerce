@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/glBudgetXrefs")
+@RequestMapping("/accounting/budget/glBudgetXrefs")
 public class GlBudgetXrefController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

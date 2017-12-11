@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/audioDataResources")
+@RequestMapping("/content/dataResource/audioDataResources")
 public class AudioDataResourceController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

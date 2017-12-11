@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/termTypes")
+@RequestMapping("/party/termTypes")
 public class TermTypeController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

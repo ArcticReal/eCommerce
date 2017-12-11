@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/orderItemShipGroups")
+@RequestMapping("/order/orderItem/orderItemShipGroups")
 public class OrderItemShipGroupController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

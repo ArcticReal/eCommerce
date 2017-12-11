@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/paymentGatewaySagePays")
+@RequestMapping("/accounting/payment/paymentGatewaySagePays")
 public class PaymentGatewaySagePayController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

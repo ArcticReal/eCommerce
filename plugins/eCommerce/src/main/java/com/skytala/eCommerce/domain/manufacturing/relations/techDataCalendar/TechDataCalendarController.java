@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/techDataCalendars")
+@RequestMapping("/manufacturing/techDataCalendars")
 public class TechDataCalendarController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

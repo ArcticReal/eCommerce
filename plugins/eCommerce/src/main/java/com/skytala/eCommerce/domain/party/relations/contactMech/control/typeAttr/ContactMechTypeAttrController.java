@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/contactMechTypeAttrs")
+@RequestMapping("/party/contactMech/contactMechTypeAttrs")
 public class ContactMechTypeAttrController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

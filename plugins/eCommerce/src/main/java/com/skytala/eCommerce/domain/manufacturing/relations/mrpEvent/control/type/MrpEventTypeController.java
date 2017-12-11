@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/mrpEventTypes")
+@RequestMapping("/manufacturing/mrpEvent/mrpEventTypes")
 public class MrpEventTypeController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

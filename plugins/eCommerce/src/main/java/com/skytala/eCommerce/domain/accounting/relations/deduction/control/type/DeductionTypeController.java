@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/deductionTypes")
+@RequestMapping("/accounting/deduction/deductionTypes")
 public class DeductionTypeController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

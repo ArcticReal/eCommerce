@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/metaDataPredicates")
+@RequestMapping("/content/metaDataPredicates")
 public class MetaDataPredicateController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

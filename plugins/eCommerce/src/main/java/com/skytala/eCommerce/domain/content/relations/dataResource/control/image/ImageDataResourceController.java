@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/imageDataResources")
+@RequestMapping("/content/dataResource/imageDataResources")
 public class ImageDataResourceController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

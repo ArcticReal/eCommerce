@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/partyAttributes")
+@RequestMapping("/party/party/partyAttributes")
 public class PartyAttributeController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

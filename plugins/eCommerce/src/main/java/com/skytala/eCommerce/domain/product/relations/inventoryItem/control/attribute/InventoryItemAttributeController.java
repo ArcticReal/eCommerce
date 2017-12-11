@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/inventoryItemAttributes")
+@RequestMapping("/product/inventoryItem/inventoryItemAttributes")
 public class InventoryItemAttributeController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

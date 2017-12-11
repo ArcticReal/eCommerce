@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/x509IssuerProvisions")
+@RequestMapping("/login/x509IssuerProvision/x509IssuerProvisions")
 public class X509IssuerProvisionController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

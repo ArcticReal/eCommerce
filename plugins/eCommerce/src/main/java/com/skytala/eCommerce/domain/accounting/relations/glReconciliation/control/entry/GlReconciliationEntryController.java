@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/glReconciliationEntrys")
+@RequestMapping("/accounting/glReconciliation/glReconciliationEntrys")
 public class GlReconciliationEntryController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

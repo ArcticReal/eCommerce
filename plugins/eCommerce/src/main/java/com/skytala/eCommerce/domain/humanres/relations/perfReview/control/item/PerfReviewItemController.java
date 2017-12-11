@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/perfReviewItems")
+@RequestMapping("/humanres/perfReview/perfReviewItems")
 public class PerfReviewItemController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

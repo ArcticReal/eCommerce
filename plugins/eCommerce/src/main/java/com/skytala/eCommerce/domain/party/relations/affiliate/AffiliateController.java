@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/affiliates")
+@RequestMapping("/party/affiliates")
 public class AffiliateController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

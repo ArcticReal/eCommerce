@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/zipSalesTaxLookups")
+@RequestMapping("/accounting/zipSalesTaxLookups")
 public class ZipSalesTaxLookupController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

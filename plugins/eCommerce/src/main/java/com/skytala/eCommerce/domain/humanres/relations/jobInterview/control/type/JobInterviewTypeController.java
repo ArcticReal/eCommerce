@@ -37,7 +37,7 @@ import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
 @RestController
-@RequestMapping("/jobInterviewTypes")
+@RequestMapping("/humanres/jobInterview/jobInterviewTypes")
 public class JobInterviewTypeController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();
