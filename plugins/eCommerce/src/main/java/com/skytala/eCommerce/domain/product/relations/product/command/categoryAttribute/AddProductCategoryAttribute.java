@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 ProductCategoryAttribute addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("ProductCategoryAttribute"));
 GenericValue newValue = delegator.makeValue("ProductCategoryAttribute", elementToBeAdded.mapAttributeField());
 addedElement = ProductCategoryAttributeMapper.map(delegator.create(newValue));
 success = true;

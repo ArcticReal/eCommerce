@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 BillingAccountRole addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setRoleTypeId(delegator.getNextSeqId("BillingAccountRole"));
 GenericValue newValue = delegator.makeValue("BillingAccountRole", elementToBeAdded.mapAttributeField());
 addedElement = BillingAccountRoleMapper.map(delegator.create(newValue));
 success = true;

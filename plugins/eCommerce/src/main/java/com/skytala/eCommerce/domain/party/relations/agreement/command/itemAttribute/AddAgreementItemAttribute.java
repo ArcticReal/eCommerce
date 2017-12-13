@@ -27,7 +27,6 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 AgreementItemAttribute addedElement = null;
 boolean success = false;
 try {
-elementToBeAdded.setAgreementItemSeqId(delegator.getNextSeqId("AgreementItemAttribute"));
 GenericValue newValue = delegator.makeValue("AgreementItemAttribute", elementToBeAdded.mapAttributeField());
 addedElement = AgreementItemAttributeMapper.map(delegator.create(newValue));
 success = true;

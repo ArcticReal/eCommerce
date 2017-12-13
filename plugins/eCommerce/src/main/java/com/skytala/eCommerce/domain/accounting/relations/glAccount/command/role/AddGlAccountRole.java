@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 GlAccountRole addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setRoleTypeId(delegator.getNextSeqId("GlAccountRole"));
 GenericValue newValue = delegator.makeValue("GlAccountRole", elementToBeAdded.mapAttributeField());
 addedElement = GlAccountRoleMapper.map(delegator.create(newValue));
 success = true;

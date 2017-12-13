@@ -39,7 +39,7 @@ import com.skytala.eCommerce.framework.pubsub.Scheduler;
 import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
 
 @RestController
-@RequestMapping("/userLogins")
+@RequestMapping("/login/userLogins")
 public class UserLoginController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

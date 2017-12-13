@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 QuoteRole addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setRoleTypeId(delegator.getNextSeqId("QuoteRole"));
 GenericValue newValue = delegator.makeValue("QuoteRole", elementToBeAdded.mapAttributeField());
 addedElement = QuoteRoleMapper.map(delegator.create(newValue));
 success = true;

@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 CostComponentAttribute addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("CostComponentAttribute"));
 GenericValue newValue = delegator.makeValue("CostComponentAttribute", elementToBeAdded.mapAttributeField());
 addedElement = CostComponentAttributeMapper.map(delegator.create(newValue));
 success = true;

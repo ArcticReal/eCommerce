@@ -100,7 +100,7 @@ public class LoginServicesController {
     DataSource dataSource;
 
 
-    @RequestMapping("/register")
+    @PostMapping("/register")
     public ResponseEntity registerUserAccount(HttpSession session,
                                               @RequestBody @Valid UserDetailsDTO userDetails) throws Exception {
 
@@ -188,7 +188,7 @@ public class LoginServicesController {
 
     }
 
-    @RequestMapping("/userDetails/update/{partyId}")
+    @PutMapping("/userDetails/update/{partyId}")
     @PreAuthorize(HAS_USER_AUTHORITY)
     public ResponseEntity updateUserDetails(@PathVariable("partyId") String partyId,
                                             @RequestBody UserDetailsDTO userDetails,
@@ -300,7 +300,7 @@ public class LoginServicesController {
         emailAddress.sendEmail(session, email , null, null);
     }
 
-    @RequestMapping("/account/verify/{verificationHash}")
+    @GetMapping("/account/verify/{verificationHash}")
     public ResponseEntity verifyAccount(@PathVariable("verificationHash") String verificationHash) throws Exception {
 
         EmailAddressVerification verification = verificationController.findByHash(verificationHash).getBody();
@@ -357,7 +357,7 @@ public class LoginServicesController {
 
     }
 
-    @RequestMapping("/resendVerificationMail/{oldHash}")
+    @GetMapping("/resendVerificationMail/{oldHash}")
     public ResponseEntity resendVerificationMail(HttpSession session,
                                                  @PathVariable("oldHash") String oldHash) throws Exception {
 
@@ -373,22 +373,22 @@ public class LoginServicesController {
         return successful();
     }
 
-    @RequestMapping("/loginNeeded")
+    @GetMapping("/loginNeeded")
     public ResponseEntity loginNeeded(){
         return unauthorized(LoginMessages.LOGIN_NEEDED);
     }
 
-    @RequestMapping("/loginFailed/badCredentials")
+    @GetMapping("/loginFailed/badCredentials")
     public ResponseEntity loginFailedBadCredentials(){
         return unauthorized(LoginMessages.BAD_CREDENTIALS);
     }
 
-    @RequestMapping("/loginFailed/userIsDisabled")
+    @GetMapping("/loginFailed/userIsDisabled")
     public ResponseEntity loginFailedDisabled(){
         return unauthorized(LoginMessages.USER_DISABLED);
     }
 
-    @RequestMapping("/successfulLogin")
+    @GetMapping("/successfulLogin")
     public ResponseEntity successfulLogin(HttpSession session) throws GenericEntityException, GenericServiceException {
 
         Object userLogin = commonsServiceController.userLogin(session,
@@ -402,7 +402,7 @@ public class LoginServicesController {
         return successful(LoginMessages.LOGIN_SUCCESSFUL);
     }
 
-    @RequestMapping("/successfulLogout")
+    @GetMapping("/successfulLogout")
     public ResponseEntity successfulLogout(){
         return successful(LoginMessages.LOGOUT_SUCCESSFUL);
     }
@@ -440,57 +440,6 @@ public class LoginServicesController {
         return successful(dto);
 
     }
-
-
-    //TODO: remove
-    @RequestMapping("/queryyy")
-    public ResponseEntity processQuery(String query) throws SQLException {
-        ResultSet result = dataSource.getConnection().prepareStatement(query).executeQuery();
-
-        List<Object> resultList = new LinkedList<>();
-        List<List<Object>> listList = new LinkedList<>();
-        while(result.next()){
-
-            for(int i = 0; i < 10; i++){
-
-                try{
-
-                    resultList.add(result.getObject(i+1));
-                }catch(Exception e){
-                    break;
-                }
-
-            }
-            listList.add(resultList);
-            resultList = new LinkedList<>();
-        }
-
-        return successful(listList);
-    }
-
-    //TODO: remove
-    @RequestMapping("/testMail")
-    public void testMail(HttpSession session,
-                         @RequestParam String emailAddress,
-                         @RequestParam boolean send) throws Exception {
-
-
-        WebShopEmailUtil.reset();
-        System.out.println(WebShopEmailUtil.ACCOUNT_VERIFICATION_EMAIL.getBody());
-        if(send){
-
-            ContactMech mech = new ContactMech();
-            mech.setInfoString(emailAddress);
-            sendVerificationMail(session, "someHash", mech);
-        }else{
-
-            System.out.println(TimestampUtil.currentTime());
-            System.out.println(TimestampUtil.emailVerificationExpireTime());
-        }
-
-
-    }
-
 
 
 }

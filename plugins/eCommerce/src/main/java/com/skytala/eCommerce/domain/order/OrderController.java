@@ -80,7 +80,7 @@ public class OrderController {
     private LoginServicesController loginServicesController;
 
 
-    @RequestMapping("/listOwn")
+    @GetMapping("/listOwn")
     @PreAuthorize(HAS_USER_AUTHORITY)
     public ResponseEntity<List<OrderListItemDTO>> getUserOrderList(Principal principal) throws Exception {
 
@@ -131,7 +131,7 @@ public class OrderController {
         return headers;
     }
 
-    @RequestMapping("/{orderHeaderId}/details")
+    @GetMapping("/{orderHeaderId}/details")
     @PreAuthorize(HAS_USER_AUTHORITY+" or " + HAS_ADMIN_AUTHORITY)
     public ResponseEntity<OrderDetailsDTO> getOrderDetails(Principal principal,
                                                            @PathVariable("orderHeaderId") String orderHeaderId) throws Exception {
@@ -236,7 +236,7 @@ public class OrderController {
 
 
 
-    @RequestMapping("/finish")
+    @PostMapping("/finish")
     @PreAuthorize(HAS_USER_AUTHORITY)
     public ResponseEntity<OrderDetailsDTO> finishOrder(HttpSession session,
                                                        Principal principal,
@@ -325,7 +325,7 @@ public class OrderController {
         return successful(OrderDetailsDTO.create(addedHeader, address, eMailContactMech, products, cart.getGrandTotal()));
     }
 
-    @RequestMapping("/{orderId}/cancel")
+    @PutMapping("/{orderId}/cancel")
     @PreAuthorize(HAS_USER_AUTHORITY)
     public ResponseEntity cancelOrder(Principal principal, @PathVariable("orderId") String orderId) throws Exception {
 
@@ -351,7 +351,7 @@ public class OrderController {
         return orderHeaderController.updateOrderHeader(header, header.getOrderId());
     }
 
-    @RequestMapping("/{orderId}/approve")
+    @PutMapping("/{orderId}/approve")
     @PreAuthorize(HAS_ADMIN_AUTHORITY)
     public ResponseEntity approveOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
 
@@ -370,7 +370,7 @@ public class OrderController {
     }
 
 
-    @RequestMapping("/{orderId}/reject")
+    @PutMapping("/{orderId}/reject")
     @PreAuthorize(HAS_ADMIN_AUTHORITY)
     public ResponseEntity rejectOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
 
@@ -387,7 +387,7 @@ public class OrderController {
 
     }
 
-    @RequestMapping("/{orderId}/hold")
+    @PutMapping("/{orderId}/hold")
     @PreAuthorize(HAS_ADMIN_AUTHORITY)
     public ResponseEntity holdOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
 
@@ -404,7 +404,7 @@ public class OrderController {
 
     }
 
-    @RequestMapping("/{orderId}/create")
+    @PutMapping("/{orderId}/create")
     @PreAuthorize(HAS_ADMIN_AUTHORITY)
     public ResponseEntity createOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
 
@@ -422,7 +422,7 @@ public class OrderController {
 
     }
 
-    @RequestMapping("/{orderId}/send")
+    @PutMapping("/{orderId}/send")
     @PreAuthorize(HAS_ADMIN_AUTHORITY)
     public ResponseEntity sendOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
 
@@ -440,7 +440,7 @@ public class OrderController {
 
     }
 
-    @RequestMapping("/{orderId}/complete")
+    @PutMapping("/{orderId}/complete")
     @PreAuthorize(HAS_ADMIN_AUTHORITY + " or " + HAS_USER_AUTHORITY)
     public ResponseEntity completeOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
 

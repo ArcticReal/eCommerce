@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 PicklistRole addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setRoleTypeId(delegator.getNextSeqId("PicklistRole"));
 GenericValue newValue = delegator.makeValue("PicklistRole", elementToBeAdded.mapAttributeField());
 addedElement = PicklistRoleMapper.map(delegator.create(newValue));
 success = true;

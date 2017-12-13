@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 ContentTypeAttr addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("ContentTypeAttr"));
 GenericValue newValue = delegator.makeValue("ContentTypeAttr", elementToBeAdded.mapAttributeField());
 addedElement = ContentTypeAttrMapper.map(delegator.create(newValue));
 success = true;

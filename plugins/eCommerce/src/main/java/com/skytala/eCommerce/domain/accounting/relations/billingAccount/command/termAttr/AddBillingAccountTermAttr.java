@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 BillingAccountTermAttr addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("BillingAccountTermAttr"));
 GenericValue newValue = delegator.makeValue("BillingAccountTermAttr", elementToBeAdded.mapAttributeField());
 addedElement = BillingAccountTermAttrMapper.map(delegator.create(newValue));
 success = true;

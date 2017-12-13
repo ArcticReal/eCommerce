@@ -90,7 +90,7 @@ public class ProductController {
 	 * @return a List with the Products
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	@PreAuthorize(PERMIT_ALL)
 	public ResponseEntity<List<Product>> findProductsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
@@ -113,7 +113,7 @@ public class ProductController {
 	 *            the Product thats to be added
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@PreAuthorize(HAS_ADMIN_AUTHORITY)
 	public ResponseEntity<Product> createProduct(@RequestBody Product productToBeAdded) throws Exception {
 
@@ -133,7 +133,7 @@ public class ProductController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/{productId}")
+	@PutMapping("/{productId}")
 	@PreAuthorize(HAS_ADMIN_AUTHORITY)
 	public ResponseEntity<Object> updateProduct(@RequestBody Product productToBeUpdated,
 			@PathVariable String productId) throws Exception {

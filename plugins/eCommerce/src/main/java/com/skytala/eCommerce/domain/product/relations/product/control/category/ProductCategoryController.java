@@ -23,13 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.google.common.base.Splitter;
 import com.skytala.eCommerce.domain.product.relations.product.command.category.AddProductCategory;
@@ -52,7 +46,7 @@ import static com.skytala.eCommerce.framework.util.AuthorizeMethods.HAS_USER_AUT
 import static com.skytala.eCommerce.framework.util.AuthorizeMethods.PERMIT_ALL;
 
 @RestController
-@RequestMapping("/product/relations/product/productCategorys")
+@RequestMapping("/product/product/productCategorys")
 @PreAuthorize(HAS_ADMIN_AUTHORITY)
 public class ProductCategoryController {
 
@@ -78,7 +72,7 @@ public class ProductCategoryController {
 	 * @return a List with the ProductCategorys
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/find")
+	@GetMapping("/find")
 	@PreAuthorize(PERMIT_ALL)
 	public ResponseEntity<List<ProductCategory>> findProductCategorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
@@ -101,7 +95,7 @@ public class ProductCategoryController {
 	 *            HttpServletRequest
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ProductCategory> createProductCategory(HttpServletRequest request) throws Exception {
 
 		ProductCategory productCategoryToBeAdded = new ProductCategory();
@@ -124,7 +118,7 @@ public class ProductCategoryController {
 	 *            the ProductCategory thats to be added
 	 * @return true on success; false on fail
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@PreAuthorize("hasAuthority('"+SecurityGroups.ADMIN+"')")
 	public ResponseEntity<ProductCategory> createProductCategory(@RequestBody ProductCategory productCategoryToBeAdded) throws Exception {
 
@@ -149,7 +143,7 @@ public class ProductCategoryController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
+	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
 	public boolean updateProductCategory(HttpServletRequest request) throws Exception {
 
 		BufferedReader br;
@@ -194,7 +188,7 @@ public class ProductCategoryController {
 	 * @return true on success, false on fail
 	 * @throws Exception 
 	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/{productCategoryId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@PutMapping(value = "/{productCategoryId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public ResponseEntity<ProductCategory> updateProductCategory(@RequestBody ProductCategory productCategoryToBeUpdated,
 			@PathVariable String productCategoryId) throws Exception {
 
@@ -212,7 +206,7 @@ public class ProductCategoryController {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{productCategoryId}")
+	@GetMapping("/{productCategoryId}")
 	@PreAuthorize(PERMIT_ALL)
 	public ResponseEntity<ProductCategory> findById(@PathVariable String productCategoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
@@ -231,7 +225,7 @@ public class ProductCategoryController {
 
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, value = "/{productCategoryId}")
+	@DeleteMapping("/{productCategoryId}")
 	public ResponseEntity<Object> deleteProductCategoryById(@PathVariable String productCategoryId) throws Exception {
 
 		categoryMemberController.deleteProductCategoryMemberByCategoryId(productCategoryId);
@@ -248,7 +242,7 @@ public class ProductCategoryController {
 
 	}
 
-	@RequestMapping("/listAll")
+	@GetMapping("/listAll")
 	@PreAuthorize(PERMIT_ALL)
 	public ResponseEntity<List<CategoryListItemDTO>> listAllProductCategories() throws Exception {
 		List<ProductCategory> categories = findProductCategorysBy(new HashMap<>()).getBody();

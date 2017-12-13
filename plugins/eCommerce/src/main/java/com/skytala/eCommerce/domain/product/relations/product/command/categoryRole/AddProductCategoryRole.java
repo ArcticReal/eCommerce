@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 ProductCategoryRole addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setRoleTypeId(delegator.getNextSeqId("ProductCategoryRole"));
 GenericValue newValue = delegator.makeValue("ProductCategoryRole", elementToBeAdded.mapAttributeField());
 addedElement = ProductCategoryRoleMapper.map(delegator.create(newValue));
 success = true;

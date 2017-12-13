@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 DataResourceAttribute addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("DataResourceAttribute"));
 GenericValue newValue = delegator.makeValue("DataResourceAttribute", elementToBeAdded.mapAttributeField());
 addedElement = DataResourceAttributeMapper.map(delegator.create(newValue));
 success = true;

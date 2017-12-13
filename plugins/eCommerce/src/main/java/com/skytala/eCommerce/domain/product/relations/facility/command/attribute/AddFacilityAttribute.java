@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 FacilityAttribute addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("FacilityAttribute"));
 GenericValue newValue = delegator.makeValue("FacilityAttribute", elementToBeAdded.mapAttributeField());
 addedElement = FacilityAttributeMapper.map(delegator.create(newValue));
 success = true;

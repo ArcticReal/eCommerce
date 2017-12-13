@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 RequirementTypeAttr addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("RequirementTypeAttr"));
 GenericValue newValue = delegator.makeValue("RequirementTypeAttr", elementToBeAdded.mapAttributeField());
 addedElement = RequirementTypeAttrMapper.map(delegator.create(newValue));
 success = true;

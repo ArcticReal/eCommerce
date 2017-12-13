@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 InvoiceTypeAttr addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("InvoiceTypeAttr"));
 GenericValue newValue = delegator.makeValue("InvoiceTypeAttr", elementToBeAdded.mapAttributeField());
 addedElement = InvoiceTypeAttrMapper.map(delegator.create(newValue));
 success = true;

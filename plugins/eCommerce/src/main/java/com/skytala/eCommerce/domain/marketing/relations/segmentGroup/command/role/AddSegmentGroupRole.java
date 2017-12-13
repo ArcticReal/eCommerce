@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 SegmentGroupRole addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setRoleTypeId(delegator.getNextSeqId("SegmentGroupRole"));
 GenericValue newValue = delegator.makeValue("SegmentGroupRole", elementToBeAdded.mapAttributeField());
 addedElement = SegmentGroupRoleMapper.map(delegator.create(newValue));
 success = true;

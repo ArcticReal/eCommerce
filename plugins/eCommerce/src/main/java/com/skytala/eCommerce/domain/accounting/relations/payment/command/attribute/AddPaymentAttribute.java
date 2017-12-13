@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 PaymentAttribute addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("PaymentAttribute"));
 GenericValue newValue = delegator.makeValue("PaymentAttribute", elementToBeAdded.mapAttributeField());
 addedElement = PaymentAttributeMapper.map(delegator.create(newValue));
 success = true;

@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 AcctgTransTypeAttr addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("AcctgTransTypeAttr"));
 GenericValue newValue = delegator.makeValue("AcctgTransTypeAttr", elementToBeAdded.mapAttributeField());
 addedElement = AcctgTransTypeAttrMapper.map(delegator.create(newValue));
 success = true;

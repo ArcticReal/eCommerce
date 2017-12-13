@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 FacilityGroupRole addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setRoleTypeId(delegator.getNextSeqId("FacilityGroupRole"));
 GenericValue newValue = delegator.makeValue("FacilityGroupRole", elementToBeAdded.mapAttributeField());
 addedElement = FacilityGroupRoleMapper.map(delegator.create(newValue));
 success = true;

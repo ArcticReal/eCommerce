@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 RoleTypeAttr addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("RoleTypeAttr"));
 GenericValue newValue = delegator.makeValue("RoleTypeAttr", elementToBeAdded.mapAttributeField());
 addedElement = RoleTypeAttrMapper.map(delegator.create(newValue));
 success = true;

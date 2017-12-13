@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 InvoiceTermAttribute addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("InvoiceTermAttribute"));
 GenericValue newValue = delegator.makeValue("InvoiceTermAttribute", elementToBeAdded.mapAttributeField());
 addedElement = InvoiceTermAttributeMapper.map(delegator.create(newValue));
 success = true;

@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 ProductTypeAttr addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("ProductTypeAttr"));
 GenericValue newValue = delegator.makeValue("ProductTypeAttr", elementToBeAdded.mapAttributeField());
 addedElement = ProductTypeAttrMapper.map(delegator.create(newValue));
 success = true;

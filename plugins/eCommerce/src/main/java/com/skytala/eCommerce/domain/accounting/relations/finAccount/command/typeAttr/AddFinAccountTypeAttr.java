@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 FinAccountTypeAttr addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("FinAccountTypeAttr"));
 GenericValue newValue = delegator.makeValue("FinAccountTypeAttr", elementToBeAdded.mapAttributeField());
 addedElement = FinAccountTypeAttrMapper.map(delegator.create(newValue));
 success = true;

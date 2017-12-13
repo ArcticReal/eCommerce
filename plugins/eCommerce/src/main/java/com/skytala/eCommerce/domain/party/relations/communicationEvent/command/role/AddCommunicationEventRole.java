@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 CommunicationEventRole addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setRoleTypeId(delegator.getNextSeqId("CommunicationEventRole"));
 GenericValue newValue = delegator.makeValue("CommunicationEventRole", elementToBeAdded.mapAttributeField());
 addedElement = CommunicationEventRoleMapper.map(delegator.create(newValue));
 success = true;

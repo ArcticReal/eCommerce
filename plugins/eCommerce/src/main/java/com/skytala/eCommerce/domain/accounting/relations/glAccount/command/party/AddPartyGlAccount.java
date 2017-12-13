@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 PartyGlAccount addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setRoleTypeId(delegator.getNextSeqId("PartyGlAccount"));
 GenericValue newValue = delegator.makeValue("PartyGlAccount", elementToBeAdded.mapAttributeField());
 addedElement = PartyGlAccountMapper.map(delegator.create(newValue));
 success = true;

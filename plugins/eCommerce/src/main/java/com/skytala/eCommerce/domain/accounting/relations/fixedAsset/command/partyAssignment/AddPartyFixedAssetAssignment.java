@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 PartyFixedAssetAssignment addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setRoleTypeId(delegator.getNextSeqId("PartyFixedAssetAssignment"));
 GenericValue newValue = delegator.makeValue("PartyFixedAssetAssignment", elementToBeAdded.mapAttributeField());
 addedElement = PartyFixedAssetAssignmentMapper.map(delegator.create(newValue));
 success = true;

@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 WorkEffortPartyAssignment addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setRoleTypeId(delegator.getNextSeqId("WorkEffortPartyAssignment"));
 GenericValue newValue = delegator.makeValue("WorkEffortPartyAssignment", elementToBeAdded.mapAttributeField());
 addedElement = WorkEffortPartyAssignmentMapper.map(delegator.create(newValue));
 success = true;

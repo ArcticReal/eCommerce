@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 DocumentAttribute addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("DocumentAttribute"));
 GenericValue newValue = delegator.makeValue("DocumentAttribute", elementToBeAdded.mapAttributeField());
 addedElement = DocumentAttributeMapper.map(delegator.create(newValue));
 success = true;

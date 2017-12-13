@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 QuoteTypeAttr addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("QuoteTypeAttr"));
 GenericValue newValue = delegator.makeValue("QuoteTypeAttr", elementToBeAdded.mapAttributeField());
 addedElement = QuoteTypeAttrMapper.map(delegator.create(newValue));
 success = true;

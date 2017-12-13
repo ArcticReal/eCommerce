@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 ContactMechAttribute addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("ContactMechAttribute"));
 GenericValue newValue = delegator.makeValue("ContactMechAttribute", elementToBeAdded.mapAttributeField());
 addedElement = ContactMechAttributeMapper.map(delegator.create(newValue));
 success = true;

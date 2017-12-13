@@ -21,9 +21,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.badRequest;
-import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.serverError;
-
 @RestController
 @RequestMapping("/service/commons")
 public class CommonsServiceController{
@@ -1792,7 +1789,7 @@ public class CommonsServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/userLogin")
-	public ResponseEntity<Map> userLogin(HttpSession session, @RequestParam(value="login.username") String loginusername, @RequestParam(value="login.password") String loginpassword, @RequestParam(value="visitId", required=false) String visitId, @RequestParam(value="isServiceAuth", required=false) Boolean isServiceAuth) {
+	public ResponseEntity<Object> userLogin(HttpSession session, @RequestParam(value="login.username") String loginusername, @RequestParam(value="login.password") String loginpassword, @RequestParam(value="visitId", required=false) String visitId, @RequestParam(value="isServiceAuth", required=false) Boolean isServiceAuth) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("login.username",loginusername);
@@ -1811,10 +1808,10 @@ public class CommonsServiceController{
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 
 		} catch (ServiceValidationException e) {
-			return serverError();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return badRequest();
+			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
 		}
 		if(result.get("responseMessage").equals("error")) {
 			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
@@ -3964,9 +3961,6 @@ public class CommonsServiceController{
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
-	@RequestMapping(value = (" * "))
-	public ResponseEntity<Object> returnErrorPage(HttpSession session) {
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Requested service does not exist. JSESSIONID=" + session.getId());
-	}
+
 
 }

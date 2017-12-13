@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 BudgetAttribute addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("BudgetAttribute"));
 GenericValue newValue = delegator.makeValue("BudgetAttribute", elementToBeAdded.mapAttributeField());
 addedElement = BudgetAttributeMapper.map(delegator.create(newValue));
 success = true;

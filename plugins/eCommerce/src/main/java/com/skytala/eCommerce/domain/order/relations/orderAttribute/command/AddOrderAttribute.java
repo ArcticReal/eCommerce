@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 OrderAttribute addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("OrderAttribute"));
 GenericValue newValue = delegator.makeValue("OrderAttribute", elementToBeAdded.mapAttributeField());
 addedElement = OrderAttributeMapper.map(delegator.create(newValue));
 success = true;

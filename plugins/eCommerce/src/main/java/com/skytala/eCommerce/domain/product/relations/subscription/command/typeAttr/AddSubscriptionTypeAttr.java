@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 SubscriptionTypeAttr addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("SubscriptionTypeAttr"));
 GenericValue newValue = delegator.makeValue("SubscriptionTypeAttr", elementToBeAdded.mapAttributeField());
 addedElement = SubscriptionTypeAttrMapper.map(delegator.create(newValue));
 success = true;

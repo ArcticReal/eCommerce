@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 TimesheetRole addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setRoleTypeId(delegator.getNextSeqId("TimesheetRole"));
 GenericValue newValue = delegator.makeValue("TimesheetRole", elementToBeAdded.mapAttributeField());
 addedElement = TimesheetRoleMapper.map(delegator.create(newValue));
 success = true;

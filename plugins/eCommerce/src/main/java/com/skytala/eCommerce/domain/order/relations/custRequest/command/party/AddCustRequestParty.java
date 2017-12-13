@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 CustRequestParty addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setRoleTypeId(delegator.getNextSeqId("CustRequestParty"));
 GenericValue newValue = delegator.makeValue("CustRequestParty", elementToBeAdded.mapAttributeField());
 addedElement = CustRequestPartyMapper.map(delegator.create(newValue));
 success = true;

@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 InventoryItemAttribute addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("InventoryItemAttribute"));
 GenericValue newValue = delegator.makeValue("InventoryItemAttribute", elementToBeAdded.mapAttributeField());
 addedElement = InventoryItemAttributeMapper.map(delegator.create(newValue));
 success = true;

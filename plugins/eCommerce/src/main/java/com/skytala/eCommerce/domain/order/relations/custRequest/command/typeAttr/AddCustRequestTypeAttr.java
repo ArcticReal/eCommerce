@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 CustRequestTypeAttr addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("CustRequestTypeAttr"));
 GenericValue newValue = delegator.makeValue("CustRequestTypeAttr", elementToBeAdded.mapAttributeField());
 addedElement = CustRequestTypeAttrMapper.map(delegator.create(newValue));
 success = true;

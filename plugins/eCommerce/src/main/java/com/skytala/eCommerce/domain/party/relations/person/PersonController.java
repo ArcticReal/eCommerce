@@ -40,7 +40,7 @@ import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.notFound;
 import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.successful;
 
 @RestController
-@RequestMapping("/persons")
+@RequestMapping("/party/persons")
 public class PersonController {
 
 	private static Map<String, RequestMethod> validRequests = new HashMap<>();

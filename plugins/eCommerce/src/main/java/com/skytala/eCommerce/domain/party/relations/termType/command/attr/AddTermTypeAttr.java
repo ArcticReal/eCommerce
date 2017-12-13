@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 TermTypeAttr addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("TermTypeAttr"));
 GenericValue newValue = delegator.makeValue("TermTypeAttr", elementToBeAdded.mapAttributeField());
 addedElement = TermTypeAttrMapper.map(delegator.create(newValue));
 success = true;

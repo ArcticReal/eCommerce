@@ -45,7 +45,7 @@ import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.notFound;
 import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.successful;
 
 @RestController
-@RequestMapping("/contactMechs")
+@RequestMapping("/party/contactMechs")
 public class ContactMechController {
 
     @Resource

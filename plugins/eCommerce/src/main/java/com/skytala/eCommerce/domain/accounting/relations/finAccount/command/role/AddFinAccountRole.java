@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 FinAccountRole addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setRoleTypeId(delegator.getNextSeqId("FinAccountRole"));
 GenericValue newValue = delegator.makeValue("FinAccountRole", elementToBeAdded.mapAttributeField());
 addedElement = FinAccountRoleMapper.map(delegator.create(newValue));
 success = true;

@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 WorkEffortAttribute addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("WorkEffortAttribute"));
 GenericValue newValue = delegator.makeValue("WorkEffortAttribute", elementToBeAdded.mapAttributeField());
 addedElement = WorkEffortAttributeMapper.map(delegator.create(newValue));
 success = true;

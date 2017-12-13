@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 MarketingCampaignRole addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setRoleTypeId(delegator.getNextSeqId("MarketingCampaignRole"));
 GenericValue newValue = delegator.makeValue("MarketingCampaignRole", elementToBeAdded.mapAttributeField());
 addedElement = MarketingCampaignRoleMapper.map(delegator.create(newValue));
 success = true;

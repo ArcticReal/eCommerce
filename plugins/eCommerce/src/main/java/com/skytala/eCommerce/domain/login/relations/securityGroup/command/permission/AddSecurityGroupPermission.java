@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 SecurityGroupPermission addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setPermissionId(delegator.getNextSeqId("SecurityGroupPermission"));
 GenericValue newValue = delegator.makeValue("SecurityGroupPermission", elementToBeAdded.mapAttributeField());
 addedElement = SecurityGroupPermissionMapper.map(delegator.create(newValue));
 success = true;

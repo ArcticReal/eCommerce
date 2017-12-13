@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 BudgetItemTypeAttr addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("BudgetItemTypeAttr"));
 GenericValue newValue = delegator.makeValue("BudgetItemTypeAttr", elementToBeAdded.mapAttributeField());
 addedElement = BudgetItemTypeAttrMapper.map(delegator.create(newValue));
 success = true;

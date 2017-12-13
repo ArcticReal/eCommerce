@@ -4229,9 +4229,6 @@ public class AccountingLedgerServiceController{
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
-	@RequestMapping(value = (" * "))
-	public ResponseEntity<Object> returnErrorPage(HttpSession session) {
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Requested service does not exist. JSESSIONID=" + session.getId());
-	}
+
 
 }

@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 WebSiteRole addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setRoleTypeId(delegator.getNextSeqId("WebSiteRole"));
 GenericValue newValue = delegator.makeValue("WebSiteRole", elementToBeAdded.mapAttributeField());
 addedElement = WebSiteRoleMapper.map(delegator.create(newValue));
 success = true;

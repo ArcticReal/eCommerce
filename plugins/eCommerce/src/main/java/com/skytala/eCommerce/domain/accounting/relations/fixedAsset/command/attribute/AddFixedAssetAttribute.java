@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 FixedAssetAttribute addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("FixedAssetAttribute"));
 GenericValue newValue = delegator.makeValue("FixedAssetAttribute", elementToBeAdded.mapAttributeField());
 addedElement = FixedAssetAttributeMapper.map(delegator.create(newValue));
 success = true;

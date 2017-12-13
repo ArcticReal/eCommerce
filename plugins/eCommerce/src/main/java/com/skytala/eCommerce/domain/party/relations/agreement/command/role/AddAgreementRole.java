@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 AgreementRole addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setRoleTypeId(delegator.getNextSeqId("AgreementRole"));
 GenericValue newValue = delegator.makeValue("AgreementRole", elementToBeAdded.mapAttributeField());
 addedElement = AgreementRoleMapper.map(delegator.create(newValue));
 success = true;

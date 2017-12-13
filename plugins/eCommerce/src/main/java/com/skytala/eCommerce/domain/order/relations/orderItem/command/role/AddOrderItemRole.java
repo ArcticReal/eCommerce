@@ -27,7 +27,6 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 OrderItemRole addedElement = null;
 boolean success = false;
 try {
-elementToBeAdded.setOrderItemSeqId(delegator.getNextSeqId("OrderItemRole"));
 GenericValue newValue = delegator.makeValue("OrderItemRole", elementToBeAdded.mapAttributeField());
 addedElement = OrderItemRoleMapper.map(delegator.create(newValue));
 success = true;

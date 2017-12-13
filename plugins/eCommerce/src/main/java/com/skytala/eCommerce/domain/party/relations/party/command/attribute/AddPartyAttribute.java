@@ -27,6 +27,7 @@ Delegator delegator = DelegatorFactory.getDelegator("default");
 PartyAttribute addedElement = null;
 boolean success = false;
 try {
+elementToBeAdded.setAttrName(delegator.getNextSeqId("PartyAttribute"));
 GenericValue newValue = delegator.makeValue("PartyAttribute", elementToBeAdded.mapAttributeField());
 addedElement = PartyAttributeMapper.map(delegator.create(newValue));
 success = true;
