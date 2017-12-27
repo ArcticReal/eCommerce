@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.shipment.relations.shipment.query.gatewayFed
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/shipment/shipment/shipmentGatewayFedexs")
 public class ShipmentGatewayFedexController {
@@ -52,7 +54,7 @@ public class ShipmentGatewayFedexController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findShipmentGatewayFedexsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ShipmentGatewayFedex>> findShipmentGatewayFedexsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentGatewayFedexsBy query = new FindShipmentGatewayFedexsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ShipmentGatewayFedexController {
 		}
 
 		List<ShipmentGatewayFedex> shipmentGatewayFedexs =((ShipmentGatewayFedexFound) Scheduler.execute(query).data()).getShipmentGatewayFedexs();
-
-		if (shipmentGatewayFedexs.size() == 1) {
-			return ResponseEntity.ok().body(shipmentGatewayFedexs.get(0));
-		}
 
 		return ResponseEntity.ok().body(shipmentGatewayFedexs);
 
@@ -78,7 +76,7 @@ public class ShipmentGatewayFedexController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createShipmentGatewayFedex(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ShipmentGatewayFedex> createShipmentGatewayFedex(HttpServletRequest request) throws Exception {
 
 		ShipmentGatewayFedex shipmentGatewayFedexToBeAdded = new ShipmentGatewayFedex();
 		try {
@@ -86,7 +84,7 @@ public class ShipmentGatewayFedexController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createShipmentGatewayFedex(shipmentGatewayFedexToBeAdded);
@@ -101,63 +99,15 @@ public class ShipmentGatewayFedexController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createShipmentGatewayFedex(@RequestBody ShipmentGatewayFedex shipmentGatewayFedexToBeAdded) throws Exception {
+	public ResponseEntity<ShipmentGatewayFedex> createShipmentGatewayFedex(@RequestBody ShipmentGatewayFedex shipmentGatewayFedexToBeAdded) throws Exception {
 
 		AddShipmentGatewayFedex command = new AddShipmentGatewayFedex(shipmentGatewayFedexToBeAdded);
 		ShipmentGatewayFedex shipmentGatewayFedex = ((ShipmentGatewayFedexAdded) Scheduler.execute(command).data()).getAddedShipmentGatewayFedex();
 		
 		if (shipmentGatewayFedex != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(shipmentGatewayFedex);
+			return successful(shipmentGatewayFedex);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ShipmentGatewayFedex could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateShipmentGatewayFedex(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ShipmentGatewayFedex shipmentGatewayFedexToBeUpdated = new ShipmentGatewayFedex();
-
-		try {
-			shipmentGatewayFedexToBeUpdated = ShipmentGatewayFedexMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateShipmentGatewayFedex(shipmentGatewayFedexToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ShipmentGatewayFedexController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateShipmentGatewayFedex(@RequestBody ShipmentGatewayFedex shipmentGatewayFedexToBeUpdated,
+	public ResponseEntity<String> updateShipmentGatewayFedex(@RequestBody ShipmentGatewayFedex shipmentGatewayFedexToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		shipmentGatewayFedexToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ShipmentGatewayFedexController {
 
 		try {
 			if(((ShipmentGatewayFedexUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{shipmentGatewayFedexId}")
-	public ResponseEntity<Object> findById(@PathVariable String shipmentGatewayFedexId) throws Exception {
+	public ResponseEntity<ShipmentGatewayFedex> findById(@PathVariable String shipmentGatewayFedexId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentGatewayFedexId", shipmentGatewayFedexId);
 		try {
 
-			Object foundShipmentGatewayFedex = findShipmentGatewayFedexsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundShipmentGatewayFedex);
+			List<ShipmentGatewayFedex> foundShipmentGatewayFedex = findShipmentGatewayFedexsBy(requestParams).getBody();
+			if(foundShipmentGatewayFedex.size()==1){				return successful(foundShipmentGatewayFedex.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{shipmentGatewayFedexId}")
-	public ResponseEntity<Object> deleteShipmentGatewayFedexByIdUpdated(@PathVariable String shipmentGatewayFedexId) throws Exception {
+	public ResponseEntity<String> deleteShipmentGatewayFedexByIdUpdated(@PathVariable String shipmentGatewayFedexId) throws Exception {
 		DeleteShipmentGatewayFedex command = new DeleteShipmentGatewayFedex(shipmentGatewayFedexId);
 
 		try {
 			if (((ShipmentGatewayFedexDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ShipmentGatewayFedex could not be deleted");
+		return conflict();
 
 	}
 

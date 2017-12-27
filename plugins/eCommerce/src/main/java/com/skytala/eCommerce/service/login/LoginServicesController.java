@@ -101,7 +101,7 @@ public class LoginServicesController {
 
 
     @PostMapping("/register")
-    public ResponseEntity registerUserAccount(HttpSession session,
+    public ResponseEntity<UserDetailsDTO> registerUserAccount(HttpSession session,
                                               @RequestBody @Valid UserDetailsDTO userDetails) throws Exception {
 
 
@@ -190,7 +190,7 @@ public class LoginServicesController {
 
     @PutMapping("/userDetails/update/{partyId}")
     @PreAuthorize(HAS_USER_AUTHORITY)
-    public ResponseEntity updateUserDetails(@PathVariable("partyId") String partyId,
+    public ResponseEntity<String> updateUserDetails(@PathVariable("partyId") String partyId,
                                             @RequestBody UserDetailsDTO userDetails,
                                             Errors errors) throws Exception {
 
@@ -301,7 +301,7 @@ public class LoginServicesController {
     }
 
     @GetMapping("/account/verify/{verificationHash}")
-    public ResponseEntity verifyAccount(@PathVariable("verificationHash") String verificationHash) throws Exception {
+    public ResponseEntity<String> verifyAccount(@PathVariable("verificationHash") String verificationHash) throws Exception {
 
         EmailAddressVerification verification = verificationController.findByHash(verificationHash).getBody();
 
@@ -358,7 +358,7 @@ public class LoginServicesController {
     }
 
     @GetMapping("/resendVerificationMail/{oldHash}")
-    public ResponseEntity resendVerificationMail(HttpSession session,
+    public ResponseEntity<String> resendVerificationMail(HttpSession session,
                                                  @PathVariable("oldHash") String oldHash) throws Exception {
 
         EmailAddressVerification verification = verificationController.findByHash(oldHash).getBody();
@@ -374,36 +374,40 @@ public class LoginServicesController {
     }
 
     @GetMapping("/loginNeeded")
-    public ResponseEntity loginNeeded(){
+    public ResponseEntity<String> loginNeeded(){
         return unauthorized(LoginMessages.LOGIN_NEEDED);
     }
 
     @GetMapping("/loginFailed/badCredentials")
-    public ResponseEntity loginFailedBadCredentials(){
+    public ResponseEntity<String> loginFailedBadCredentials(){
         return unauthorized(LoginMessages.BAD_CREDENTIALS);
     }
 
     @GetMapping("/loginFailed/userIsDisabled")
-    public ResponseEntity loginFailedDisabled(){
+    public ResponseEntity<String> loginFailedDisabled(){
         return unauthorized(LoginMessages.USER_DISABLED);
     }
 
     @GetMapping("/successfulLogin")
-    public ResponseEntity successfulLogin(HttpSession session) throws GenericEntityException, GenericServiceException {
+    public ResponseEntity<String> successfulLogin(HttpSession session) throws GenericEntityException, GenericServiceException {
 
-        Object userLogin = commonsServiceController.userLogin(session,
+        Map resultMap = commonsServiceController.userLogin(session,
                 "flexadmin",
                 "ofbiz",
                 "1000",
-                true).getBody().get("userLogin");
+                true).getBody();
 
-        session.setAttribute("userLogin", userLogin);
+        if(resultMap!=null)
+            session.setAttribute("userLogin", resultMap.get("userLogin"));
+        else
+            serverError();
+
 
         return successful(LoginMessages.LOGIN_SUCCESSFUL);
     }
 
     @GetMapping("/successfulLogout")
-    public ResponseEntity successfulLogout(){
+    public ResponseEntity<String> successfulLogout(){
         return successful(LoginMessages.LOGOUT_SUCCESSFUL);
     }
 

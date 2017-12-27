@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.varianceReason.query.FindV
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/varianceReasons")
 public class VarianceReasonController {
@@ -52,7 +54,7 @@ public class VarianceReasonController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findVarianceReasonsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<VarianceReason>> findVarianceReasonsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindVarianceReasonsBy query = new FindVarianceReasonsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class VarianceReasonController {
 		}
 
 		List<VarianceReason> varianceReasons =((VarianceReasonFound) Scheduler.execute(query).data()).getVarianceReasons();
-
-		if (varianceReasons.size() == 1) {
-			return ResponseEntity.ok().body(varianceReasons.get(0));
-		}
 
 		return ResponseEntity.ok().body(varianceReasons);
 
@@ -78,7 +76,7 @@ public class VarianceReasonController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createVarianceReason(HttpServletRequest request) throws Exception {
+	public ResponseEntity<VarianceReason> createVarianceReason(HttpServletRequest request) throws Exception {
 
 		VarianceReason varianceReasonToBeAdded = new VarianceReason();
 		try {
@@ -86,7 +84,7 @@ public class VarianceReasonController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createVarianceReason(varianceReasonToBeAdded);
@@ -101,63 +99,15 @@ public class VarianceReasonController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createVarianceReason(@RequestBody VarianceReason varianceReasonToBeAdded) throws Exception {
+	public ResponseEntity<VarianceReason> createVarianceReason(@RequestBody VarianceReason varianceReasonToBeAdded) throws Exception {
 
 		AddVarianceReason command = new AddVarianceReason(varianceReasonToBeAdded);
 		VarianceReason varianceReason = ((VarianceReasonAdded) Scheduler.execute(command).data()).getAddedVarianceReason();
 		
 		if (varianceReason != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(varianceReason);
+			return successful(varianceReason);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("VarianceReason could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateVarianceReason(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		VarianceReason varianceReasonToBeUpdated = new VarianceReason();
-
-		try {
-			varianceReasonToBeUpdated = VarianceReasonMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateVarianceReason(varianceReasonToBeUpdated, varianceReasonToBeUpdated.getVarianceReasonId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class VarianceReasonController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{varianceReasonId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateVarianceReason(@RequestBody VarianceReason varianceReasonToBeUpdated,
+	public ResponseEntity<String> updateVarianceReason(@RequestBody VarianceReason varianceReasonToBeUpdated,
 			@PathVariable String varianceReasonId) throws Exception {
 
 		varianceReasonToBeUpdated.setVarianceReasonId(varianceReasonId);
@@ -178,41 +128,44 @@ public class VarianceReasonController {
 
 		try {
 			if(((VarianceReasonUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{varianceReasonId}")
-	public ResponseEntity<Object> findById(@PathVariable String varianceReasonId) throws Exception {
+	public ResponseEntity<VarianceReason> findById(@PathVariable String varianceReasonId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("varianceReasonId", varianceReasonId);
 		try {
 
-			Object foundVarianceReason = findVarianceReasonsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundVarianceReason);
+			List<VarianceReason> foundVarianceReason = findVarianceReasonsBy(requestParams).getBody();
+			if(foundVarianceReason.size()==1){				return successful(foundVarianceReason.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{varianceReasonId}")
-	public ResponseEntity<Object> deleteVarianceReasonByIdUpdated(@PathVariable String varianceReasonId) throws Exception {
+	public ResponseEntity<String> deleteVarianceReasonByIdUpdated(@PathVariable String varianceReasonId) throws Exception {
 		DeleteVarianceReason command = new DeleteVarianceReason(varianceReasonId);
 
 		try {
 			if (((VarianceReasonDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("VarianceReason could not be deleted");
+		return conflict();
 
 	}
 

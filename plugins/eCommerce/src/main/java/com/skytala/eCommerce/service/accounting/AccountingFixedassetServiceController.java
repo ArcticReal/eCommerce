@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/accountingFixedasset")
 public class AccountingFixedassetServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateFixedAssetGeoPoint")
-	public ResponseEntity<Object> updateFixedAssetGeoPoint(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="geoPointId") String geoPointId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateFixedAssetGeoPoint(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="geoPointId") String geoPointId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -42,23 +44,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createMaintsFromTimeInterval")
-	public ResponseEntity<Object> createMaintsFromTimeInterval(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> createMaintsFromTimeInterval(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -70,23 +72,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createPartyFixedAssetAssignment")
-	public ResponseEntity<Object> createPartyFixedAssetAssignment(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="partyId") String partyId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="allocatedDate", required=false) Timestamp allocatedDate, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createPartyFixedAssetAssignment(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="partyId") String partyId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="allocatedDate", required=false) Timestamp allocatedDate, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("roleTypeId",roleTypeId);
@@ -106,23 +108,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFixedAssetMaint")
-	public ResponseEntity<Object> createFixedAssetMaint(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="intervalUomId", required=false) String intervalUomId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="maintTemplateWorkEffortId", required=false) String maintTemplateWorkEffortId, @RequestParam(value="purchaseOrderId", required=false) String purchaseOrderId, @RequestParam(value="estimatedStartDate", required=false) Timestamp estimatedStartDate, @RequestParam(value="scheduleWorkEffortId", required=false) String scheduleWorkEffortId, @RequestParam(value="intervalQuantity", required=false) BigDecimal intervalQuantity, @RequestParam(value="productMaintTypeId", required=false) String productMaintTypeId, @RequestParam(value="intervalMeterTypeId", required=false) String intervalMeterTypeId, @RequestParam(value="productMaintSeqId", required=false) String productMaintSeqId, @RequestParam(value="estimatedCompletionDate", required=false) Timestamp estimatedCompletionDate) {
+	public ResponseEntity<Map<String, Object>> createFixedAssetMaint(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="intervalUomId", required=false) String intervalUomId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="maintTemplateWorkEffortId", required=false) String maintTemplateWorkEffortId, @RequestParam(value="purchaseOrderId", required=false) String purchaseOrderId, @RequestParam(value="estimatedStartDate", required=false) Timestamp estimatedStartDate, @RequestParam(value="scheduleWorkEffortId", required=false) String scheduleWorkEffortId, @RequestParam(value="intervalQuantity", required=false) BigDecimal intervalQuantity, @RequestParam(value="productMaintTypeId", required=false) String productMaintTypeId, @RequestParam(value="intervalMeterTypeId", required=false) String intervalMeterTypeId, @RequestParam(value="productMaintSeqId", required=false) String productMaintSeqId, @RequestParam(value="estimatedCompletionDate", required=false) Timestamp estimatedCompletionDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetId",fixedAssetId);
@@ -146,23 +148,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFixedAssetTypeAttr")
-	public ResponseEntity<Object> createFixedAssetTypeAttr(HttpSession session, @RequestParam(value="fixedAssetTypeId") String fixedAssetTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createFixedAssetTypeAttr(HttpSession session, @RequestParam(value="fixedAssetTypeId") String fixedAssetTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetTypeId",fixedAssetTypeId);
@@ -177,23 +179,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateFixedAssetIdent")
-	public ResponseEntity<Object> updateFixedAssetIdent(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="fixedAssetIdentTypeId") String fixedAssetIdentTypeId, @RequestParam(value="idValue", required=false) String idValue) {
+	public ResponseEntity<Map<String, Object>> updateFixedAssetIdent(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="fixedAssetIdentTypeId") String fixedAssetIdentTypeId, @RequestParam(value="idValue", required=false) String idValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetId",fixedAssetId);
@@ -208,23 +210,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteFixedAssetIdentType")
-	public ResponseEntity<Object> deleteFixedAssetIdentType(HttpSession session, @RequestParam(value="fixedAssetIdentTypeId") String fixedAssetIdentTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteFixedAssetIdentType(HttpSession session, @RequestParam(value="fixedAssetIdentTypeId") String fixedAssetIdentTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetIdentTypeId",fixedAssetIdentTypeId);
@@ -237,23 +239,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateFixedAssetIdentType")
-	public ResponseEntity<Object> updateFixedAssetIdentType(HttpSession session, @RequestParam(value="fixedAssetIdentTypeId") String fixedAssetIdentTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateFixedAssetIdentType(HttpSession session, @RequestParam(value="fixedAssetIdentTypeId") String fixedAssetIdentTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetIdentTypeId",fixedAssetIdentTypeId);
@@ -267,23 +269,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateAccommodationMap")
-	public ResponseEntity<Object> updateAccommodationMap(HttpSession session, @RequestParam(value="accommodationMapId") String accommodationMapId, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="numberOfSpaces", required=false) Long numberOfSpaces, @RequestParam(value="accommodationClassId", required=false) String accommodationClassId, @RequestParam(value="accommodationMapTypeId", required=false) String accommodationMapTypeId) {
+	public ResponseEntity<Map<String, Object>> updateAccommodationMap(HttpSession session, @RequestParam(value="accommodationMapId") String accommodationMapId, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="numberOfSpaces", required=false) Long numberOfSpaces, @RequestParam(value="accommodationClassId", required=false) String accommodationClassId, @RequestParam(value="accommodationMapTypeId", required=false) String accommodationMapTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("accommodationMapId",accommodationMapId);
@@ -300,23 +302,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFixedAsset")
-	public ResponseEntity<Object> createFixedAsset(HttpSession session, @RequestParam(value="fixedAssetTypeId") String fixedAssetTypeId, @RequestParam(value="dateNextService", required=false) Timestamp dateNextService, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="dateAcquired", required=false) Timestamp dateAcquired, @RequestParam(value="purchaseCost", required=false) BigDecimal purchaseCost, @RequestParam(value="purchaseCostUomId", required=false) String purchaseCostUomId, @RequestParam(value="productionCapacity", required=false) BigDecimal productionCapacity, @RequestParam(value="serialNumber", required=false) String serialNumber, @RequestParam(value="classEnumId", required=false) String classEnumId, @RequestParam(value="fixedAssetName", required=false) String fixedAssetName, @RequestParam(value="acquireOrderId", required=false) String acquireOrderId, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="locatedAtLocationSeqId", required=false) String locatedAtLocationSeqId, @RequestParam(value="actualEndOfLife", required=false) Timestamp actualEndOfLife, @RequestParam(value="dateLastServiced", required=false) Timestamp dateLastServiced, @RequestParam(value="acquireOrderItemSeqId", required=false) String acquireOrderItemSeqId, @RequestParam(value="calendarId", required=false) String calendarId, @RequestParam(value="salvageValue", required=false) BigDecimal salvageValue, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="parentFixedAssetId", required=false) String parentFixedAssetId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="expectedEndOfLife", required=false) Timestamp expectedEndOfLife, @RequestParam(value="locatedAtFacilityId", required=false) String locatedAtFacilityId, @RequestParam(value="instanceOfProductId", required=false) String instanceOfProductId, @RequestParam(value="depreciation", required=false) BigDecimal depreciation) {
+	public ResponseEntity<Map<String, Object>> createFixedAsset(HttpSession session, @RequestParam(value="fixedAssetTypeId") String fixedAssetTypeId, @RequestParam(value="dateNextService", required=false) Timestamp dateNextService, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="dateAcquired", required=false) Timestamp dateAcquired, @RequestParam(value="purchaseCost", required=false) BigDecimal purchaseCost, @RequestParam(value="purchaseCostUomId", required=false) String purchaseCostUomId, @RequestParam(value="productionCapacity", required=false) BigDecimal productionCapacity, @RequestParam(value="serialNumber", required=false) String serialNumber, @RequestParam(value="classEnumId", required=false) String classEnumId, @RequestParam(value="fixedAssetName", required=false) String fixedAssetName, @RequestParam(value="acquireOrderId", required=false) String acquireOrderId, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="locatedAtLocationSeqId", required=false) String locatedAtLocationSeqId, @RequestParam(value="actualEndOfLife", required=false) Timestamp actualEndOfLife, @RequestParam(value="dateLastServiced", required=false) Timestamp dateLastServiced, @RequestParam(value="acquireOrderItemSeqId", required=false) String acquireOrderItemSeqId, @RequestParam(value="calendarId", required=false) String calendarId, @RequestParam(value="salvageValue", required=false) BigDecimal salvageValue, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="parentFixedAssetId", required=false) String parentFixedAssetId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="expectedEndOfLife", required=false) Timestamp expectedEndOfLife, @RequestParam(value="locatedAtFacilityId", required=false) String locatedAtFacilityId, @RequestParam(value="instanceOfProductId", required=false) String instanceOfProductId, @RequestParam(value="depreciation", required=false) BigDecimal depreciation) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetTypeId",fixedAssetTypeId);
@@ -353,23 +355,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createAccommodationClass")
-	public ResponseEntity<Object> createAccommodationClass(HttpSession session, @RequestParam(value="parentClassId", required=false) String parentClassId, @RequestParam(value="description", required=false) String description, @RequestParam(value="accommodationClassId", required=false) String accommodationClassId) {
+	public ResponseEntity<Map<String, Object>> createAccommodationClass(HttpSession session, @RequestParam(value="parentClassId", required=false) String parentClassId, @RequestParam(value="description", required=false) String description, @RequestParam(value="accommodationClassId", required=false) String accommodationClassId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("parentClassId",parentClassId);
@@ -384,23 +386,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFixedAssetTypeGlAccount")
-	public ResponseEntity<Object> createFixedAssetTypeGlAccount(HttpSession session, @RequestParam(value="organizationPartyId") String organizationPartyId, @RequestParam(value="depGlAccountId", required=false) String depGlAccountId, @RequestParam(value="fixedAssetTypeId", required=false) String fixedAssetTypeId, @RequestParam(value="profitGlAccountId", required=false) String profitGlAccountId, @RequestParam(value="lossGlAccountId", required=false) String lossGlAccountId, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="accDepGlAccountId", required=false) String accDepGlAccountId, @RequestParam(value="assetGlAccountId", required=false) String assetGlAccountId) {
+	public ResponseEntity<Map<String, Object>> createFixedAssetTypeGlAccount(HttpSession session, @RequestParam(value="organizationPartyId") String organizationPartyId, @RequestParam(value="depGlAccountId", required=false) String depGlAccountId, @RequestParam(value="fixedAssetTypeId", required=false) String fixedAssetTypeId, @RequestParam(value="profitGlAccountId", required=false) String profitGlAccountId, @RequestParam(value="lossGlAccountId", required=false) String lossGlAccountId, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="accDepGlAccountId", required=false) String accDepGlAccountId, @RequestParam(value="assetGlAccountId", required=false) String assetGlAccountId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("organizationPartyId",organizationPartyId);
@@ -420,23 +422,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteAccommodationMap")
-	public ResponseEntity<Object> deleteAccommodationMap(HttpSession session, @RequestParam(value="accommodationMapId") String accommodationMapId) {
+	public ResponseEntity<Map<String, Object>> deleteAccommodationMap(HttpSession session, @RequestParam(value="accommodationMapId") String accommodationMapId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("accommodationMapId",accommodationMapId);
@@ -449,23 +451,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateFixedAssetMeter")
-	public ResponseEntity<Object> updateFixedAssetMeter(HttpSession session, @RequestParam(value="productMeterTypeId") String productMeterTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="readingDate") Timestamp readingDate, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="readingReasonEnumId", required=false) String readingReasonEnumId, @RequestParam(value="maintHistSeqId", required=false) String maintHistSeqId, @RequestParam(value="meterValue", required=false) BigDecimal meterValue) {
+	public ResponseEntity<Map<String, Object>> updateFixedAssetMeter(HttpSession session, @RequestParam(value="productMeterTypeId") String productMeterTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="readingDate") Timestamp readingDate, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="readingReasonEnumId", required=false) String readingReasonEnumId, @RequestParam(value="maintHistSeqId", required=false) String maintHistSeqId, @RequestParam(value="meterValue", required=false) BigDecimal meterValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productMeterTypeId",productMeterTypeId);
@@ -484,23 +486,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateFixedAssetTypeGlAccount")
-	public ResponseEntity<Object> updateFixedAssetTypeGlAccount(HttpSession session, @RequestParam(value="fixedAssetTypeId") String fixedAssetTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="organizationPartyId") String organizationPartyId) {
+	public ResponseEntity<Map<String, Object>> updateFixedAssetTypeGlAccount(HttpSession session, @RequestParam(value="fixedAssetTypeId") String fixedAssetTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="organizationPartyId") String organizationPartyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetTypeId",fixedAssetTypeId);
@@ -515,23 +517,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addFixedAssetProduct")
-	public ResponseEntity<Object> addFixedAssetProduct(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="fixedAssetProductTypeId") String fixedAssetProductTypeId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="quantityUomId", required=false) String quantityUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> addFixedAssetProduct(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="fixedAssetProductTypeId") String fixedAssetProductTypeId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="quantityUomId", required=false) String quantityUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -552,23 +554,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeFixedAssetIdent")
-	public ResponseEntity<Object> removeFixedAssetIdent(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="fixedAssetIdentTypeId") String fixedAssetIdentTypeId) {
+	public ResponseEntity<Map<String, Object>> removeFixedAssetIdent(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="fixedAssetIdentTypeId") String fixedAssetIdentTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetId",fixedAssetId);
@@ -582,23 +584,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteFixedAssetMaintOrder")
-	public ResponseEntity<Object> deleteFixedAssetMaintOrder(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="orderId") String orderId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="maintHistSeqId") String maintHistSeqId) {
+	public ResponseEntity<Map<String, Object>> deleteFixedAssetMaintOrder(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="orderId") String orderId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="maintHistSeqId") String maintHistSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderItemSeqId",orderItemSeqId);
@@ -614,23 +616,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteFixedAssetAttribute")
-	public ResponseEntity<Object> deleteFixedAssetAttribute(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="attrName") String attrName) {
+	public ResponseEntity<Map<String, Object>> deleteFixedAssetAttribute(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="attrName") String attrName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetId",fixedAssetId);
@@ -644,23 +646,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteAccommodationClass")
-	public ResponseEntity<Object> deleteAccommodationClass(HttpSession session, @RequestParam(value="accommodationClassId") String accommodationClassId) {
+	public ResponseEntity<Map<String, Object>> deleteAccommodationClass(HttpSession session, @RequestParam(value="accommodationClassId") String accommodationClassId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("accommodationClassId",accommodationClassId);
@@ -673,23 +675,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateFixedAsset")
-	public ResponseEntity<Object> updateFixedAsset(HttpSession session, @RequestParam(value="fixedAssetTypeId") String fixedAssetTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="dateNextService", required=false) Timestamp dateNextService, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="dateAcquired", required=false) Timestamp dateAcquired, @RequestParam(value="purchaseCost", required=false) BigDecimal purchaseCost, @RequestParam(value="purchaseCostUomId", required=false) String purchaseCostUomId, @RequestParam(value="productionCapacity", required=false) BigDecimal productionCapacity, @RequestParam(value="serialNumber", required=false) String serialNumber, @RequestParam(value="classEnumId", required=false) String classEnumId, @RequestParam(value="fixedAssetName", required=false) String fixedAssetName, @RequestParam(value="acquireOrderId", required=false) String acquireOrderId, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="locatedAtLocationSeqId", required=false) String locatedAtLocationSeqId, @RequestParam(value="actualEndOfLife", required=false) Timestamp actualEndOfLife, @RequestParam(value="dateLastServiced", required=false) Timestamp dateLastServiced, @RequestParam(value="acquireOrderItemSeqId", required=false) String acquireOrderItemSeqId, @RequestParam(value="calendarId", required=false) String calendarId, @RequestParam(value="salvageValue", required=false) BigDecimal salvageValue, @RequestParam(value="parentFixedAssetId", required=false) String parentFixedAssetId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="expectedEndOfLife", required=false) Timestamp expectedEndOfLife, @RequestParam(value="locatedAtFacilityId", required=false) String locatedAtFacilityId, @RequestParam(value="instanceOfProductId", required=false) String instanceOfProductId, @RequestParam(value="depreciation", required=false) BigDecimal depreciation) {
+	public ResponseEntity<Map<String, Object>> updateFixedAsset(HttpSession session, @RequestParam(value="fixedAssetTypeId") String fixedAssetTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="dateNextService", required=false) Timestamp dateNextService, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="dateAcquired", required=false) Timestamp dateAcquired, @RequestParam(value="purchaseCost", required=false) BigDecimal purchaseCost, @RequestParam(value="purchaseCostUomId", required=false) String purchaseCostUomId, @RequestParam(value="productionCapacity", required=false) BigDecimal productionCapacity, @RequestParam(value="serialNumber", required=false) String serialNumber, @RequestParam(value="classEnumId", required=false) String classEnumId, @RequestParam(value="fixedAssetName", required=false) String fixedAssetName, @RequestParam(value="acquireOrderId", required=false) String acquireOrderId, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="locatedAtLocationSeqId", required=false) String locatedAtLocationSeqId, @RequestParam(value="actualEndOfLife", required=false) Timestamp actualEndOfLife, @RequestParam(value="dateLastServiced", required=false) Timestamp dateLastServiced, @RequestParam(value="acquireOrderItemSeqId", required=false) String acquireOrderItemSeqId, @RequestParam(value="calendarId", required=false) String calendarId, @RequestParam(value="salvageValue", required=false) BigDecimal salvageValue, @RequestParam(value="parentFixedAssetId", required=false) String parentFixedAssetId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="expectedEndOfLife", required=false) Timestamp expectedEndOfLife, @RequestParam(value="locatedAtFacilityId", required=false) String locatedAtFacilityId, @RequestParam(value="instanceOfProductId", required=false) String instanceOfProductId, @RequestParam(value="depreciation", required=false) BigDecimal depreciation) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetTypeId",fixedAssetTypeId);
@@ -726,23 +728,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFixedAssetType")
-	public ResponseEntity<Object> createFixedAssetType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="fixedAssetTypeId", required=false) String fixedAssetTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createFixedAssetType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="fixedAssetTypeId", required=false) String fixedAssetTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("parentTypeId",parentTypeId);
@@ -758,23 +760,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteFixedAssetRegistration")
-	public ResponseEntity<Object> deleteFixedAssetRegistration(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="fixedAssetId") String fixedAssetId) {
+	public ResponseEntity<Map<String, Object>> deleteFixedAssetRegistration(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="fixedAssetId") String fixedAssetId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -788,23 +790,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteFixedAssetMaint")
-	public ResponseEntity<Object> deleteFixedAssetMaint(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="maintHistSeqId") String maintHistSeqId) {
+	public ResponseEntity<Map<String, Object>> deleteFixedAssetMaint(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="maintHistSeqId") String maintHistSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetId",fixedAssetId);
@@ -818,23 +820,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/checkUpdateFixedAssetDepreciation")
-	public ResponseEntity<Object> checkUpdateFixedAssetDepreciation(HttpSession session, @RequestParam(value="acctgTransId") String acctgTransId) {
+	public ResponseEntity<Map<String, Object>> checkUpdateFixedAssetDepreciation(HttpSession session, @RequestParam(value="acctgTransId") String acctgTransId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("acctgTransId",acctgTransId);
@@ -847,23 +849,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateFixedAssetStdCost")
-	public ResponseEntity<Object> updateFixedAssetStdCost(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="fixedAssetStdCostTypeId") String fixedAssetStdCostTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="amountUomId", required=false) String amountUomId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateFixedAssetStdCost(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="fixedAssetStdCostTypeId") String fixedAssetStdCostTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="amountUomId", required=false) String amountUomId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -881,23 +883,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deletePartyFixedAssetAssignment")
-	public ResponseEntity<Object> deletePartyFixedAssetAssignment(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="partyId") String partyId) {
+	public ResponseEntity<Map<String, Object>> deletePartyFixedAssetAssignment(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="partyId") String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -913,23 +915,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteFixedAssetDepMethod")
-	public ResponseEntity<Object> deleteFixedAssetDepMethod(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="depreciationCustomMethodId") String depreciationCustomMethodId) {
+	public ResponseEntity<Map<String, Object>> deleteFixedAssetDepMethod(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="depreciationCustomMethodId") String depreciationCustomMethodId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetId",fixedAssetId);
@@ -943,23 +945,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFixedAssetIdentType")
-	public ResponseEntity<Object> createFixedAssetIdentType(HttpSession session, @RequestParam(value="description", required=false) String description, @RequestParam(value="fixedAssetIdentTypeId", required=false) String fixedAssetIdentTypeId) {
+	public ResponseEntity<Map<String, Object>> createFixedAssetIdentType(HttpSession session, @RequestParam(value="description", required=false) String description, @RequestParam(value="fixedAssetIdentTypeId", required=false) String fixedAssetIdentTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("description",description);
@@ -973,23 +975,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateFixedAssetType")
-	public ResponseEntity<Object> updateFixedAssetType(HttpSession session, @RequestParam(value="fixedAssetTypeId") String fixedAssetTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateFixedAssetType(HttpSession session, @RequestParam(value="fixedAssetTypeId") String fixedAssetTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetTypeId",fixedAssetTypeId);
@@ -1005,23 +1007,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFixedAssetMeter")
-	public ResponseEntity<Object> createFixedAssetMeter(HttpSession session, @RequestParam(value="productMeterTypeId") String productMeterTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="readingDate") Timestamp readingDate, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="readingReasonEnumId", required=false) String readingReasonEnumId, @RequestParam(value="maintHistSeqId", required=false) String maintHistSeqId, @RequestParam(value="meterValue", required=false) BigDecimal meterValue) {
+	public ResponseEntity<Map<String, Object>> createFixedAssetMeter(HttpSession session, @RequestParam(value="productMeterTypeId") String productMeterTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="readingDate") Timestamp readingDate, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="readingReasonEnumId", required=false) String readingReasonEnumId, @RequestParam(value="maintHistSeqId", required=false) String maintHistSeqId, @RequestParam(value="meterValue", required=false) BigDecimal meterValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productMeterTypeId",productMeterTypeId);
@@ -1040,23 +1042,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteFixedAssetTypeAttr")
-	public ResponseEntity<Object> deleteFixedAssetTypeAttr(HttpSession session, @RequestParam(value="fixedAssetTypeId") String fixedAssetTypeId, @RequestParam(value="attrName") String attrName) {
+	public ResponseEntity<Map<String, Object>> deleteFixedAssetTypeAttr(HttpSession session, @RequestParam(value="fixedAssetTypeId") String fixedAssetTypeId, @RequestParam(value="attrName") String attrName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetTypeId",fixedAssetTypeId);
@@ -1070,23 +1072,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateAccommodationMapType")
-	public ResponseEntity<Object> updateAccommodationMapType(HttpSession session, @RequestParam(value="accommodationMapTypeId") String accommodationMapTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateAccommodationMapType(HttpSession session, @RequestParam(value="accommodationMapTypeId") String accommodationMapTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("accommodationMapTypeId",accommodationMapTypeId);
@@ -1100,23 +1102,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateFixedAssetProductType")
-	public ResponseEntity<Object> updateFixedAssetProductType(HttpSession session, @RequestParam(value="fixedAssetProductTypeId") String fixedAssetProductTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateFixedAssetProductType(HttpSession session, @RequestParam(value="fixedAssetProductTypeId") String fixedAssetProductTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetProductTypeId",fixedAssetProductTypeId);
@@ -1130,23 +1132,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteFixedAssetStdCostType")
-	public ResponseEntity<Object> deleteFixedAssetStdCostType(HttpSession session, @RequestParam(value="fixedAssetStdCostTypeId") String fixedAssetStdCostTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteFixedAssetStdCostType(HttpSession session, @RequestParam(value="fixedAssetStdCostTypeId") String fixedAssetStdCostTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetStdCostTypeId",fixedAssetStdCostTypeId);
@@ -1159,23 +1161,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFixedAssetDepMethod")
-	public ResponseEntity<Object> createFixedAssetDepMethod(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="depreciationCustomMethodId") String depreciationCustomMethodId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createFixedAssetDepMethod(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="depreciationCustomMethodId") String depreciationCustomMethodId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetId",fixedAssetId);
@@ -1191,23 +1193,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFixedAssetIdent")
-	public ResponseEntity<Object> createFixedAssetIdent(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="fixedAssetIdentTypeId") String fixedAssetIdentTypeId, @RequestParam(value="idValue", required=false) String idValue) {
+	public ResponseEntity<Map<String, Object>> createFixedAssetIdent(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="fixedAssetIdentTypeId") String fixedAssetIdentTypeId, @RequestParam(value="idValue", required=false) String idValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetId",fixedAssetId);
@@ -1222,23 +1224,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateFixedAssetStdCostType")
-	public ResponseEntity<Object> updateFixedAssetStdCostType(HttpSession session, @RequestParam(value="fixedAssetStdCostTypeId") String fixedAssetStdCostTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateFixedAssetStdCostType(HttpSession session, @RequestParam(value="fixedAssetStdCostTypeId") String fixedAssetStdCostTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetStdCostTypeId",fixedAssetStdCostTypeId);
@@ -1254,23 +1256,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createAccommodationMapType")
-	public ResponseEntity<Object> createAccommodationMapType(HttpSession session, @RequestParam(value="description", required=false) String description, @RequestParam(value="accommodationMapTypeId", required=false) String accommodationMapTypeId) {
+	public ResponseEntity<Map<String, Object>> createAccommodationMapType(HttpSession session, @RequestParam(value="description", required=false) String description, @RequestParam(value="accommodationMapTypeId", required=false) String accommodationMapTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("description",description);
@@ -1284,23 +1286,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createAccommodationMap")
-	public ResponseEntity<Object> createAccommodationMap(HttpSession session, @RequestParam(value="accommodationMapId", required=false) String accommodationMapId, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="numberOfSpaces", required=false) Long numberOfSpaces, @RequestParam(value="accommodationClassId", required=false) String accommodationClassId, @RequestParam(value="accommodationMapTypeId", required=false) String accommodationMapTypeId) {
+	public ResponseEntity<Map<String, Object>> createAccommodationMap(HttpSession session, @RequestParam(value="accommodationMapId", required=false) String accommodationMapId, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="numberOfSpaces", required=false) Long numberOfSpaces, @RequestParam(value="accommodationClassId", required=false) String accommodationClassId, @RequestParam(value="accommodationMapTypeId", required=false) String accommodationMapTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("accommodationMapId",accommodationMapId);
@@ -1317,23 +1319,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateFixedAssetMaint")
-	public ResponseEntity<Object> updateFixedAssetMaint(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="maintHistSeqId") String maintHistSeqId, @RequestParam(value="intervalUomId", required=false) String intervalUomId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="purchaseOrderId", required=false) String purchaseOrderId, @RequestParam(value="scheduleWorkEffortId", required=false) String scheduleWorkEffortId, @RequestParam(value="intervalQuantity", required=false) BigDecimal intervalQuantity, @RequestParam(value="productMaintTypeId", required=false) String productMaintTypeId, @RequestParam(value="intervalMeterTypeId", required=false) String intervalMeterTypeId, @RequestParam(value="productMaintSeqId", required=false) String productMaintSeqId) {
+	public ResponseEntity<Map<String, Object>> updateFixedAssetMaint(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="maintHistSeqId") String maintHistSeqId, @RequestParam(value="intervalUomId", required=false) String intervalUomId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="purchaseOrderId", required=false) String purchaseOrderId, @RequestParam(value="scheduleWorkEffortId", required=false) String scheduleWorkEffortId, @RequestParam(value="intervalQuantity", required=false) BigDecimal intervalQuantity, @RequestParam(value="productMaintTypeId", required=false) String productMaintTypeId, @RequestParam(value="intervalMeterTypeId", required=false) String intervalMeterTypeId, @RequestParam(value="productMaintSeqId", required=false) String productMaintSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetId",fixedAssetId);
@@ -1355,23 +1357,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/doubleDecliningBalanceDepreciation")
-	public ResponseEntity<Object> doubleDecliningBalanceDepreciation(HttpSession session, @RequestParam(value="purchaseCost") BigDecimal purchaseCost, @RequestParam(value="assetAcquiredYear") Integer assetAcquiredYear, @RequestParam(value="usageYears") Integer usageYears, @RequestParam(value="salvageValue") BigDecimal salvageValue, @RequestParam(value="expEndOfLifeYear") Integer expEndOfLifeYear, @RequestParam(value="fixedAssetId") String fixedAssetId) {
+	public ResponseEntity<Map<String, Object>> doubleDecliningBalanceDepreciation(HttpSession session, @RequestParam(value="purchaseCost") BigDecimal purchaseCost, @RequestParam(value="assetAcquiredYear") Integer assetAcquiredYear, @RequestParam(value="usageYears") Integer usageYears, @RequestParam(value="salvageValue") BigDecimal salvageValue, @RequestParam(value="expEndOfLifeYear") Integer expEndOfLifeYear, @RequestParam(value="fixedAssetId") String fixedAssetId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("purchaseCost",purchaseCost);
@@ -1389,23 +1391,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFixedAssetAttribute")
-	public ResponseEntity<Object> createFixedAssetAttribute(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
+	public ResponseEntity<Map<String, Object>> createFixedAssetAttribute(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetId",fixedAssetId);
@@ -1421,23 +1423,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateAccommodationClass")
-	public ResponseEntity<Object> updateAccommodationClass(HttpSession session, @RequestParam(value="accommodationClassId") String accommodationClassId, @RequestParam(value="parentClassId", required=false) String parentClassId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateAccommodationClass(HttpSession session, @RequestParam(value="accommodationClassId") String accommodationClassId, @RequestParam(value="parentClassId", required=false) String parentClassId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("accommodationClassId",accommodationClassId);
@@ -1452,23 +1454,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFixedAssetStdCostType")
-	public ResponseEntity<Object> createFixedAssetStdCostType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="fixedAssetStdCostTypeId", required=false) String fixedAssetStdCostTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createFixedAssetStdCostType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="fixedAssetStdCostTypeId", required=false) String fixedAssetStdCostTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("parentTypeId",parentTypeId);
@@ -1484,23 +1486,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteFixedAssetTypeGlAccount")
-	public ResponseEntity<Object> deleteFixedAssetTypeGlAccount(HttpSession session, @RequestParam(value="fixedAssetTypeId") String fixedAssetTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="organizationPartyId") String organizationPartyId) {
+	public ResponseEntity<Map<String, Object>> deleteFixedAssetTypeGlAccount(HttpSession session, @RequestParam(value="fixedAssetTypeId") String fixedAssetTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="organizationPartyId") String organizationPartyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetTypeId",fixedAssetTypeId);
@@ -1515,23 +1517,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteFixedAssetType")
-	public ResponseEntity<Object> deleteFixedAssetType(HttpSession session, @RequestParam(value="fixedAssetTypeId") String fixedAssetTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteFixedAssetType(HttpSession session, @RequestParam(value="fixedAssetTypeId") String fixedAssetTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetTypeId",fixedAssetTypeId);
@@ -1544,23 +1546,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFixedAssetRegistration")
-	public ResponseEntity<Object> createFixedAssetRegistration(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="registrationNumber", required=false) String registrationNumber, @RequestParam(value="registrationDate", required=false) Timestamp registrationDate, @RequestParam(value="licenseNumber", required=false) String licenseNumber, @RequestParam(value="govAgencyPartyId", required=false) String govAgencyPartyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createFixedAssetRegistration(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="registrationNumber", required=false) String registrationNumber, @RequestParam(value="registrationDate", required=false) Timestamp registrationDate, @RequestParam(value="licenseNumber", required=false) String licenseNumber, @RequestParam(value="govAgencyPartyId", required=false) String govAgencyPartyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetId",fixedAssetId);
@@ -1579,23 +1581,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/fixedAssetDepCalcInterface")
-	public ResponseEntity<Object> fixedAssetDepCalcInterface(HttpSession session, @RequestParam(value="purchaseCost") BigDecimal purchaseCost, @RequestParam(value="assetAcquiredYear") Integer assetAcquiredYear, @RequestParam(value="usageYears") Integer usageYears, @RequestParam(value="salvageValue") BigDecimal salvageValue, @RequestParam(value="expEndOfLifeYear") Integer expEndOfLifeYear) {
+	public ResponseEntity<Map<String, Object>> fixedAssetDepCalcInterface(HttpSession session, @RequestParam(value="purchaseCost") BigDecimal purchaseCost, @RequestParam(value="assetAcquiredYear") Integer assetAcquiredYear, @RequestParam(value="usageYears") Integer usageYears, @RequestParam(value="salvageValue") BigDecimal salvageValue, @RequestParam(value="expEndOfLifeYear") Integer expEndOfLifeYear) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("purchaseCost",purchaseCost);
@@ -1612,23 +1614,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFixedAssetProductType")
-	public ResponseEntity<Object> createFixedAssetProductType(HttpSession session, @RequestParam(value="description", required=false) String description, @RequestParam(value="fixedAssetProductTypeId", required=false) String fixedAssetProductTypeId) {
+	public ResponseEntity<Map<String, Object>> createFixedAssetProductType(HttpSession session, @RequestParam(value="description", required=false) String description, @RequestParam(value="fixedAssetProductTypeId", required=false) String fixedAssetProductTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("description",description);
@@ -1642,23 +1644,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateFixedAssetProduct")
-	public ResponseEntity<Object> updateFixedAssetProduct(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="fixedAssetProductTypeId") String fixedAssetProductTypeId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="quantityUomId", required=false) String quantityUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateFixedAssetProduct(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="fixedAssetProductTypeId") String fixedAssetProductTypeId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="quantityUomId", required=false) String quantityUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -1679,23 +1681,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeFixedAssetProduct")
-	public ResponseEntity<Object> removeFixedAssetProduct(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="fixedAssetProductTypeId") String fixedAssetProductTypeId) {
+	public ResponseEntity<Map<String, Object>> removeFixedAssetProduct(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="fixedAssetProductTypeId") String fixedAssetProductTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -1711,23 +1713,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateFixedAssetRegistration")
-	public ResponseEntity<Object> updateFixedAssetRegistration(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="registrationNumber", required=false) String registrationNumber, @RequestParam(value="registrationDate", required=false) Timestamp registrationDate, @RequestParam(value="licenseNumber", required=false) String licenseNumber, @RequestParam(value="govAgencyPartyId", required=false) String govAgencyPartyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateFixedAssetRegistration(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="registrationNumber", required=false) String registrationNumber, @RequestParam(value="registrationDate", required=false) Timestamp registrationDate, @RequestParam(value="licenseNumber", required=false) String licenseNumber, @RequestParam(value="govAgencyPartyId", required=false) String govAgencyPartyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -1746,23 +1748,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updatePartyFixedAssetAssignment")
-	public ResponseEntity<Object> updatePartyFixedAssetAssignment(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="partyId") String partyId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="allocatedDate", required=false) Timestamp allocatedDate, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updatePartyFixedAssetAssignment(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="partyId") String partyId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="allocatedDate", required=false) Timestamp allocatedDate, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -1782,23 +1784,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateFixedAssetDepMethod")
-	public ResponseEntity<Object> updateFixedAssetDepMethod(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="depreciationCustomMethodId") String depreciationCustomMethodId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateFixedAssetDepMethod(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="depreciationCustomMethodId") String depreciationCustomMethodId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetId",fixedAssetId);
@@ -1814,23 +1816,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFixedAssetGeoPoint")
-	public ResponseEntity<Object> createFixedAssetGeoPoint(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="geoPointId") String geoPointId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createFixedAssetGeoPoint(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="geoPointId") String geoPointId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetId",fixedAssetId);
@@ -1846,23 +1848,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/cancelFixedAssetStdCost")
-	public ResponseEntity<Object> cancelFixedAssetStdCost(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="fixedAssetStdCostTypeId") String fixedAssetStdCostTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="amountUomId", required=false) String amountUomId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> cancelFixedAssetStdCost(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="fixedAssetStdCostTypeId") String fixedAssetStdCostTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="amountUomId", required=false) String amountUomId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -1880,23 +1882,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteFixedAssetProductType")
-	public ResponseEntity<Object> deleteFixedAssetProductType(HttpSession session, @RequestParam(value="fixedAssetProductTypeId") String fixedAssetProductTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteFixedAssetProductType(HttpSession session, @RequestParam(value="fixedAssetProductTypeId") String fixedAssetProductTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetProductTypeId",fixedAssetProductTypeId);
@@ -1909,23 +1911,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateFixedAssetTypeAttr")
-	public ResponseEntity<Object> updateFixedAssetTypeAttr(HttpSession session, @RequestParam(value="fixedAssetTypeId") String fixedAssetTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateFixedAssetTypeAttr(HttpSession session, @RequestParam(value="fixedAssetTypeId") String fixedAssetTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetTypeId",fixedAssetTypeId);
@@ -1940,23 +1942,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/calculateFixedAssetDepreciation")
-	public ResponseEntity<Object> calculateFixedAssetDepreciation(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId) {
+	public ResponseEntity<Map<String, Object>> calculateFixedAssetDepreciation(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetId",fixedAssetId);
@@ -1969,23 +1971,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteAccommodationMapType")
-	public ResponseEntity<Object> deleteAccommodationMapType(HttpSession session, @RequestParam(value="accommodationMapTypeId") String accommodationMapTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteAccommodationMapType(HttpSession session, @RequestParam(value="accommodationMapTypeId") String accommodationMapTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("accommodationMapTypeId",accommodationMapTypeId);
@@ -1998,23 +2000,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateFixedAssetAttribute")
-	public ResponseEntity<Object> updateFixedAssetAttribute(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
+	public ResponseEntity<Map<String, Object>> updateFixedAssetAttribute(HttpSession session, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fixedAssetId",fixedAssetId);
@@ -2030,23 +2032,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFixedAssetMaintOrder")
-	public ResponseEntity<Object> createFixedAssetMaintOrder(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="maintHistSeqId") String maintHistSeqId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId) {
+	public ResponseEntity<Map<String, Object>> createFixedAssetMaintOrder(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="maintHistSeqId") String maintHistSeqId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderId",orderId);
@@ -2062,23 +2064,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFixedAssetStdCost")
-	public ResponseEntity<Object> createFixedAssetStdCost(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="fixedAssetStdCostTypeId") String fixedAssetStdCostTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="amountUomId", required=false) String amountUomId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createFixedAssetStdCost(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="fixedAssetStdCostTypeId") String fixedAssetStdCostTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="amountUomId", required=false) String amountUomId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -2096,23 +2098,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteFixedAssetMeter")
-	public ResponseEntity<Object> deleteFixedAssetMeter(HttpSession session, @RequestParam(value="productMeterTypeId") String productMeterTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="readingDate") Timestamp readingDate) {
+	public ResponseEntity<Map<String, Object>> deleteFixedAssetMeter(HttpSession session, @RequestParam(value="productMeterTypeId") String productMeterTypeId, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="readingDate") Timestamp readingDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productMeterTypeId",productMeterTypeId);
@@ -2127,23 +2129,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/straightLineDepreciation")
-	public ResponseEntity<Object> straightLineDepreciation(HttpSession session, @RequestParam(value="purchaseCost") BigDecimal purchaseCost, @RequestParam(value="assetAcquiredYear") Integer assetAcquiredYear, @RequestParam(value="usageYears") Integer usageYears, @RequestParam(value="salvageValue") BigDecimal salvageValue, @RequestParam(value="expEndOfLifeYear") Integer expEndOfLifeYear, @RequestParam(value="fixedAssetId") String fixedAssetId) {
+	public ResponseEntity<Map<String, Object>> straightLineDepreciation(HttpSession session, @RequestParam(value="purchaseCost") BigDecimal purchaseCost, @RequestParam(value="assetAcquiredYear") Integer assetAcquiredYear, @RequestParam(value="usageYears") Integer usageYears, @RequestParam(value="salvageValue") BigDecimal salvageValue, @RequestParam(value="expEndOfLifeYear") Integer expEndOfLifeYear, @RequestParam(value="fixedAssetId") String fixedAssetId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("purchaseCost",purchaseCost);
@@ -2161,23 +2163,23 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteFixedAssetGeoPoint")
-	public ResponseEntity<Object> deleteFixedAssetGeoPoint(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="geoPointId") String geoPointId) {
+	public ResponseEntity<Map<String, Object>> deleteFixedAssetGeoPoint(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="geoPointId") String geoPointId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -2192,19 +2194,19 @@ public class AccountingFixedassetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

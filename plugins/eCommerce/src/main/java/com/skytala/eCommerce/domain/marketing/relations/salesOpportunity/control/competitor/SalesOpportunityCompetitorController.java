@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.marketing.relations.salesOpportunity.query.c
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/marketing/salesOpportunity/salesOpportunityCompetitors")
 public class SalesOpportunityCompetitorController {
@@ -52,7 +54,7 @@ public class SalesOpportunityCompetitorController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findSalesOpportunityCompetitorsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<SalesOpportunityCompetitor>> findSalesOpportunityCompetitorsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSalesOpportunityCompetitorsBy query = new FindSalesOpportunityCompetitorsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class SalesOpportunityCompetitorController {
 		}
 
 		List<SalesOpportunityCompetitor> salesOpportunityCompetitors =((SalesOpportunityCompetitorFound) Scheduler.execute(query).data()).getSalesOpportunityCompetitors();
-
-		if (salesOpportunityCompetitors.size() == 1) {
-			return ResponseEntity.ok().body(salesOpportunityCompetitors.get(0));
-		}
 
 		return ResponseEntity.ok().body(salesOpportunityCompetitors);
 
@@ -78,7 +76,7 @@ public class SalesOpportunityCompetitorController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createSalesOpportunityCompetitor(HttpServletRequest request) throws Exception {
+	public ResponseEntity<SalesOpportunityCompetitor> createSalesOpportunityCompetitor(HttpServletRequest request) throws Exception {
 
 		SalesOpportunityCompetitor salesOpportunityCompetitorToBeAdded = new SalesOpportunityCompetitor();
 		try {
@@ -86,7 +84,7 @@ public class SalesOpportunityCompetitorController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createSalesOpportunityCompetitor(salesOpportunityCompetitorToBeAdded);
@@ -101,63 +99,15 @@ public class SalesOpportunityCompetitorController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createSalesOpportunityCompetitor(@RequestBody SalesOpportunityCompetitor salesOpportunityCompetitorToBeAdded) throws Exception {
+	public ResponseEntity<SalesOpportunityCompetitor> createSalesOpportunityCompetitor(@RequestBody SalesOpportunityCompetitor salesOpportunityCompetitorToBeAdded) throws Exception {
 
 		AddSalesOpportunityCompetitor command = new AddSalesOpportunityCompetitor(salesOpportunityCompetitorToBeAdded);
 		SalesOpportunityCompetitor salesOpportunityCompetitor = ((SalesOpportunityCompetitorAdded) Scheduler.execute(command).data()).getAddedSalesOpportunityCompetitor();
 		
 		if (salesOpportunityCompetitor != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(salesOpportunityCompetitor);
+			return successful(salesOpportunityCompetitor);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("SalesOpportunityCompetitor could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateSalesOpportunityCompetitor(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		SalesOpportunityCompetitor salesOpportunityCompetitorToBeUpdated = new SalesOpportunityCompetitor();
-
-		try {
-			salesOpportunityCompetitorToBeUpdated = SalesOpportunityCompetitorMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateSalesOpportunityCompetitor(salesOpportunityCompetitorToBeUpdated, salesOpportunityCompetitorToBeUpdated.getCompetitorPartyId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class SalesOpportunityCompetitorController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{competitorPartyId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateSalesOpportunityCompetitor(@RequestBody SalesOpportunityCompetitor salesOpportunityCompetitorToBeUpdated,
+	public ResponseEntity<String> updateSalesOpportunityCompetitor(@RequestBody SalesOpportunityCompetitor salesOpportunityCompetitorToBeUpdated,
 			@PathVariable String competitorPartyId) throws Exception {
 
 		salesOpportunityCompetitorToBeUpdated.setCompetitorPartyId(competitorPartyId);
@@ -178,41 +128,44 @@ public class SalesOpportunityCompetitorController {
 
 		try {
 			if(((SalesOpportunityCompetitorUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{salesOpportunityCompetitorId}")
-	public ResponseEntity<Object> findById(@PathVariable String salesOpportunityCompetitorId) throws Exception {
+	public ResponseEntity<SalesOpportunityCompetitor> findById(@PathVariable String salesOpportunityCompetitorId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("salesOpportunityCompetitorId", salesOpportunityCompetitorId);
 		try {
 
-			Object foundSalesOpportunityCompetitor = findSalesOpportunityCompetitorsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundSalesOpportunityCompetitor);
+			List<SalesOpportunityCompetitor> foundSalesOpportunityCompetitor = findSalesOpportunityCompetitorsBy(requestParams).getBody();
+			if(foundSalesOpportunityCompetitor.size()==1){				return successful(foundSalesOpportunityCompetitor.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{salesOpportunityCompetitorId}")
-	public ResponseEntity<Object> deleteSalesOpportunityCompetitorByIdUpdated(@PathVariable String salesOpportunityCompetitorId) throws Exception {
+	public ResponseEntity<String> deleteSalesOpportunityCompetitorByIdUpdated(@PathVariable String salesOpportunityCompetitorId) throws Exception {
 		DeleteSalesOpportunityCompetitor command = new DeleteSalesOpportunityCompetitor(salesOpportunityCompetitorId);
 
 		try {
 			if (((SalesOpportunityCompetitorDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("SalesOpportunityCompetitor could not be deleted");
+		return conflict();
 
 	}
 

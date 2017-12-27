@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/testtoolss")
 public class TesttoolssServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testServiceInterface")
-	public ResponseEntity<Object> testServiceInterface(HttpSession session, @RequestParam(value="test") junit.framework.Test test, @RequestParam(value="testResult") junit.framework.TestResult testResult) {
+	public ResponseEntity<Map<String, Object>> testServiceInterface(HttpSession session, @RequestParam(value="test") junit.framework.Test test, @RequestParam(value="testResult") junit.framework.TestResult testResult) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("test",test);
@@ -40,19 +42,19 @@ public class TesttoolssServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

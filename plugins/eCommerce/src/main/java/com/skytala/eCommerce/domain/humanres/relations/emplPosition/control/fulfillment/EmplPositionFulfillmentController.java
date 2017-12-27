@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.humanres.relations.emplPosition.query.fulfil
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/humanres/emplPosition/emplPositionFulfillments")
 public class EmplPositionFulfillmentController {
@@ -52,7 +54,7 @@ public class EmplPositionFulfillmentController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findEmplPositionFulfillmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<EmplPositionFulfillment>> findEmplPositionFulfillmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindEmplPositionFulfillmentsBy query = new FindEmplPositionFulfillmentsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class EmplPositionFulfillmentController {
 		}
 
 		List<EmplPositionFulfillment> emplPositionFulfillments =((EmplPositionFulfillmentFound) Scheduler.execute(query).data()).getEmplPositionFulfillments();
-
-		if (emplPositionFulfillments.size() == 1) {
-			return ResponseEntity.ok().body(emplPositionFulfillments.get(0));
-		}
 
 		return ResponseEntity.ok().body(emplPositionFulfillments);
 
@@ -78,7 +76,7 @@ public class EmplPositionFulfillmentController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createEmplPositionFulfillment(HttpServletRequest request) throws Exception {
+	public ResponseEntity<EmplPositionFulfillment> createEmplPositionFulfillment(HttpServletRequest request) throws Exception {
 
 		EmplPositionFulfillment emplPositionFulfillmentToBeAdded = new EmplPositionFulfillment();
 		try {
@@ -86,7 +84,7 @@ public class EmplPositionFulfillmentController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createEmplPositionFulfillment(emplPositionFulfillmentToBeAdded);
@@ -101,63 +99,15 @@ public class EmplPositionFulfillmentController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createEmplPositionFulfillment(@RequestBody EmplPositionFulfillment emplPositionFulfillmentToBeAdded) throws Exception {
+	public ResponseEntity<EmplPositionFulfillment> createEmplPositionFulfillment(@RequestBody EmplPositionFulfillment emplPositionFulfillmentToBeAdded) throws Exception {
 
 		AddEmplPositionFulfillment command = new AddEmplPositionFulfillment(emplPositionFulfillmentToBeAdded);
 		EmplPositionFulfillment emplPositionFulfillment = ((EmplPositionFulfillmentAdded) Scheduler.execute(command).data()).getAddedEmplPositionFulfillment();
 		
 		if (emplPositionFulfillment != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(emplPositionFulfillment);
+			return successful(emplPositionFulfillment);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("EmplPositionFulfillment could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateEmplPositionFulfillment(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		EmplPositionFulfillment emplPositionFulfillmentToBeUpdated = new EmplPositionFulfillment();
-
-		try {
-			emplPositionFulfillmentToBeUpdated = EmplPositionFulfillmentMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateEmplPositionFulfillment(emplPositionFulfillmentToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class EmplPositionFulfillmentController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateEmplPositionFulfillment(@RequestBody EmplPositionFulfillment emplPositionFulfillmentToBeUpdated,
+	public ResponseEntity<String> updateEmplPositionFulfillment(@RequestBody EmplPositionFulfillment emplPositionFulfillmentToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		emplPositionFulfillmentToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class EmplPositionFulfillmentController {
 
 		try {
 			if(((EmplPositionFulfillmentUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{emplPositionFulfillmentId}")
-	public ResponseEntity<Object> findById(@PathVariable String emplPositionFulfillmentId) throws Exception {
+	public ResponseEntity<EmplPositionFulfillment> findById(@PathVariable String emplPositionFulfillmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("emplPositionFulfillmentId", emplPositionFulfillmentId);
 		try {
 
-			Object foundEmplPositionFulfillment = findEmplPositionFulfillmentsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundEmplPositionFulfillment);
+			List<EmplPositionFulfillment> foundEmplPositionFulfillment = findEmplPositionFulfillmentsBy(requestParams).getBody();
+			if(foundEmplPositionFulfillment.size()==1){				return successful(foundEmplPositionFulfillment.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{emplPositionFulfillmentId}")
-	public ResponseEntity<Object> deleteEmplPositionFulfillmentByIdUpdated(@PathVariable String emplPositionFulfillmentId) throws Exception {
+	public ResponseEntity<String> deleteEmplPositionFulfillmentByIdUpdated(@PathVariable String emplPositionFulfillmentId) throws Exception {
 		DeleteEmplPositionFulfillment command = new DeleteEmplPositionFulfillment(emplPositionFulfillmentId);
 
 		try {
 			if (((EmplPositionFulfillmentDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("EmplPositionFulfillment could not be deleted");
+		return conflict();
 
 	}
 

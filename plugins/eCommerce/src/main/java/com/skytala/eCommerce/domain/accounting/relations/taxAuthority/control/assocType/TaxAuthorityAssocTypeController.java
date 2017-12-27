@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.taxAuthority.query.asso
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/taxAuthority/taxAuthorityAssocTypes")
 public class TaxAuthorityAssocTypeController {
@@ -52,7 +54,7 @@ public class TaxAuthorityAssocTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findTaxAuthorityAssocTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<TaxAuthorityAssocType>> findTaxAuthorityAssocTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTaxAuthorityAssocTypesBy query = new FindTaxAuthorityAssocTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class TaxAuthorityAssocTypeController {
 		}
 
 		List<TaxAuthorityAssocType> taxAuthorityAssocTypes =((TaxAuthorityAssocTypeFound) Scheduler.execute(query).data()).getTaxAuthorityAssocTypes();
-
-		if (taxAuthorityAssocTypes.size() == 1) {
-			return ResponseEntity.ok().body(taxAuthorityAssocTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(taxAuthorityAssocTypes);
 
@@ -78,7 +76,7 @@ public class TaxAuthorityAssocTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createTaxAuthorityAssocType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<TaxAuthorityAssocType> createTaxAuthorityAssocType(HttpServletRequest request) throws Exception {
 
 		TaxAuthorityAssocType taxAuthorityAssocTypeToBeAdded = new TaxAuthorityAssocType();
 		try {
@@ -86,7 +84,7 @@ public class TaxAuthorityAssocTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createTaxAuthorityAssocType(taxAuthorityAssocTypeToBeAdded);
@@ -101,63 +99,15 @@ public class TaxAuthorityAssocTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createTaxAuthorityAssocType(@RequestBody TaxAuthorityAssocType taxAuthorityAssocTypeToBeAdded) throws Exception {
+	public ResponseEntity<TaxAuthorityAssocType> createTaxAuthorityAssocType(@RequestBody TaxAuthorityAssocType taxAuthorityAssocTypeToBeAdded) throws Exception {
 
 		AddTaxAuthorityAssocType command = new AddTaxAuthorityAssocType(taxAuthorityAssocTypeToBeAdded);
 		TaxAuthorityAssocType taxAuthorityAssocType = ((TaxAuthorityAssocTypeAdded) Scheduler.execute(command).data()).getAddedTaxAuthorityAssocType();
 		
 		if (taxAuthorityAssocType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(taxAuthorityAssocType);
+			return successful(taxAuthorityAssocType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("TaxAuthorityAssocType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateTaxAuthorityAssocType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		TaxAuthorityAssocType taxAuthorityAssocTypeToBeUpdated = new TaxAuthorityAssocType();
-
-		try {
-			taxAuthorityAssocTypeToBeUpdated = TaxAuthorityAssocTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateTaxAuthorityAssocType(taxAuthorityAssocTypeToBeUpdated, taxAuthorityAssocTypeToBeUpdated.getTaxAuthorityAssocTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class TaxAuthorityAssocTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{taxAuthorityAssocTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateTaxAuthorityAssocType(@RequestBody TaxAuthorityAssocType taxAuthorityAssocTypeToBeUpdated,
+	public ResponseEntity<String> updateTaxAuthorityAssocType(@RequestBody TaxAuthorityAssocType taxAuthorityAssocTypeToBeUpdated,
 			@PathVariable String taxAuthorityAssocTypeId) throws Exception {
 
 		taxAuthorityAssocTypeToBeUpdated.setTaxAuthorityAssocTypeId(taxAuthorityAssocTypeId);
@@ -178,41 +128,44 @@ public class TaxAuthorityAssocTypeController {
 
 		try {
 			if(((TaxAuthorityAssocTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{taxAuthorityAssocTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String taxAuthorityAssocTypeId) throws Exception {
+	public ResponseEntity<TaxAuthorityAssocType> findById(@PathVariable String taxAuthorityAssocTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("taxAuthorityAssocTypeId", taxAuthorityAssocTypeId);
 		try {
 
-			Object foundTaxAuthorityAssocType = findTaxAuthorityAssocTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundTaxAuthorityAssocType);
+			List<TaxAuthorityAssocType> foundTaxAuthorityAssocType = findTaxAuthorityAssocTypesBy(requestParams).getBody();
+			if(foundTaxAuthorityAssocType.size()==1){				return successful(foundTaxAuthorityAssocType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{taxAuthorityAssocTypeId}")
-	public ResponseEntity<Object> deleteTaxAuthorityAssocTypeByIdUpdated(@PathVariable String taxAuthorityAssocTypeId) throws Exception {
+	public ResponseEntity<String> deleteTaxAuthorityAssocTypeByIdUpdated(@PathVariable String taxAuthorityAssocTypeId) throws Exception {
 		DeleteTaxAuthorityAssocType command = new DeleteTaxAuthorityAssocType(taxAuthorityAssocTypeId);
 
 		try {
 			if (((TaxAuthorityAssocTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("TaxAuthorityAssocType could not be deleted");
+		return conflict();
 
 	}
 

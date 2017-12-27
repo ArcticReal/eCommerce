@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.shipment.relations.shippingDocument.query.Fi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/shipment/shippingDocuments")
 public class ShippingDocumentController {
@@ -52,7 +54,7 @@ public class ShippingDocumentController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findShippingDocumentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ShippingDocument>> findShippingDocumentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShippingDocumentsBy query = new FindShippingDocumentsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ShippingDocumentController {
 		}
 
 		List<ShippingDocument> shippingDocuments =((ShippingDocumentFound) Scheduler.execute(query).data()).getShippingDocuments();
-
-		if (shippingDocuments.size() == 1) {
-			return ResponseEntity.ok().body(shippingDocuments.get(0));
-		}
 
 		return ResponseEntity.ok().body(shippingDocuments);
 
@@ -78,7 +76,7 @@ public class ShippingDocumentController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createShippingDocument(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ShippingDocument> createShippingDocument(HttpServletRequest request) throws Exception {
 
 		ShippingDocument shippingDocumentToBeAdded = new ShippingDocument();
 		try {
@@ -86,7 +84,7 @@ public class ShippingDocumentController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createShippingDocument(shippingDocumentToBeAdded);
@@ -101,63 +99,15 @@ public class ShippingDocumentController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createShippingDocument(@RequestBody ShippingDocument shippingDocumentToBeAdded) throws Exception {
+	public ResponseEntity<ShippingDocument> createShippingDocument(@RequestBody ShippingDocument shippingDocumentToBeAdded) throws Exception {
 
 		AddShippingDocument command = new AddShippingDocument(shippingDocumentToBeAdded);
 		ShippingDocument shippingDocument = ((ShippingDocumentAdded) Scheduler.execute(command).data()).getAddedShippingDocument();
 		
 		if (shippingDocument != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(shippingDocument);
+			return successful(shippingDocument);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ShippingDocument could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateShippingDocument(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ShippingDocument shippingDocumentToBeUpdated = new ShippingDocument();
-
-		try {
-			shippingDocumentToBeUpdated = ShippingDocumentMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateShippingDocument(shippingDocumentToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ShippingDocumentController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateShippingDocument(@RequestBody ShippingDocument shippingDocumentToBeUpdated,
+	public ResponseEntity<String> updateShippingDocument(@RequestBody ShippingDocument shippingDocumentToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		shippingDocumentToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ShippingDocumentController {
 
 		try {
 			if(((ShippingDocumentUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{shippingDocumentId}")
-	public ResponseEntity<Object> findById(@PathVariable String shippingDocumentId) throws Exception {
+	public ResponseEntity<ShippingDocument> findById(@PathVariable String shippingDocumentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shippingDocumentId", shippingDocumentId);
 		try {
 
-			Object foundShippingDocument = findShippingDocumentsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundShippingDocument);
+			List<ShippingDocument> foundShippingDocument = findShippingDocumentsBy(requestParams).getBody();
+			if(foundShippingDocument.size()==1){				return successful(foundShippingDocument.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{shippingDocumentId}")
-	public ResponseEntity<Object> deleteShippingDocumentByIdUpdated(@PathVariable String shippingDocumentId) throws Exception {
+	public ResponseEntity<String> deleteShippingDocumentByIdUpdated(@PathVariable String shippingDocumentId) throws Exception {
 		DeleteShippingDocument command = new DeleteShippingDocument(shippingDocumentId);
 
 		try {
 			if (((ShippingDocumentDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ShippingDocument could not be deleted");
+		return conflict();
 
 	}
 

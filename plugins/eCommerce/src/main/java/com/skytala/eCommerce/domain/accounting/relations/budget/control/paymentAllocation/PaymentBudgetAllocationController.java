@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.budget.query.paymentAll
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/budget/paymentBudgetAllocations")
 public class PaymentBudgetAllocationController {
@@ -52,7 +54,7 @@ public class PaymentBudgetAllocationController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPaymentBudgetAllocationsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PaymentBudgetAllocation>> findPaymentBudgetAllocationsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentBudgetAllocationsBy query = new FindPaymentBudgetAllocationsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PaymentBudgetAllocationController {
 		}
 
 		List<PaymentBudgetAllocation> paymentBudgetAllocations =((PaymentBudgetAllocationFound) Scheduler.execute(query).data()).getPaymentBudgetAllocations();
-
-		if (paymentBudgetAllocations.size() == 1) {
-			return ResponseEntity.ok().body(paymentBudgetAllocations.get(0));
-		}
 
 		return ResponseEntity.ok().body(paymentBudgetAllocations);
 
@@ -78,7 +76,7 @@ public class PaymentBudgetAllocationController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPaymentBudgetAllocation(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PaymentBudgetAllocation> createPaymentBudgetAllocation(HttpServletRequest request) throws Exception {
 
 		PaymentBudgetAllocation paymentBudgetAllocationToBeAdded = new PaymentBudgetAllocation();
 		try {
@@ -86,7 +84,7 @@ public class PaymentBudgetAllocationController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPaymentBudgetAllocation(paymentBudgetAllocationToBeAdded);
@@ -101,63 +99,15 @@ public class PaymentBudgetAllocationController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPaymentBudgetAllocation(@RequestBody PaymentBudgetAllocation paymentBudgetAllocationToBeAdded) throws Exception {
+	public ResponseEntity<PaymentBudgetAllocation> createPaymentBudgetAllocation(@RequestBody PaymentBudgetAllocation paymentBudgetAllocationToBeAdded) throws Exception {
 
 		AddPaymentBudgetAllocation command = new AddPaymentBudgetAllocation(paymentBudgetAllocationToBeAdded);
 		PaymentBudgetAllocation paymentBudgetAllocation = ((PaymentBudgetAllocationAdded) Scheduler.execute(command).data()).getAddedPaymentBudgetAllocation();
 		
 		if (paymentBudgetAllocation != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(paymentBudgetAllocation);
+			return successful(paymentBudgetAllocation);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PaymentBudgetAllocation could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePaymentBudgetAllocation(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PaymentBudgetAllocation paymentBudgetAllocationToBeUpdated = new PaymentBudgetAllocation();
-
-		try {
-			paymentBudgetAllocationToBeUpdated = PaymentBudgetAllocationMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePaymentBudgetAllocation(paymentBudgetAllocationToBeUpdated, paymentBudgetAllocationToBeUpdated.getBudgetItemSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PaymentBudgetAllocationController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{budgetItemSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePaymentBudgetAllocation(@RequestBody PaymentBudgetAllocation paymentBudgetAllocationToBeUpdated,
+	public ResponseEntity<String> updatePaymentBudgetAllocation(@RequestBody PaymentBudgetAllocation paymentBudgetAllocationToBeUpdated,
 			@PathVariable String budgetItemSeqId) throws Exception {
 
 		paymentBudgetAllocationToBeUpdated.setBudgetItemSeqId(budgetItemSeqId);
@@ -178,41 +128,44 @@ public class PaymentBudgetAllocationController {
 
 		try {
 			if(((PaymentBudgetAllocationUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{paymentBudgetAllocationId}")
-	public ResponseEntity<Object> findById(@PathVariable String paymentBudgetAllocationId) throws Exception {
+	public ResponseEntity<PaymentBudgetAllocation> findById(@PathVariable String paymentBudgetAllocationId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentBudgetAllocationId", paymentBudgetAllocationId);
 		try {
 
-			Object foundPaymentBudgetAllocation = findPaymentBudgetAllocationsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPaymentBudgetAllocation);
+			List<PaymentBudgetAllocation> foundPaymentBudgetAllocation = findPaymentBudgetAllocationsBy(requestParams).getBody();
+			if(foundPaymentBudgetAllocation.size()==1){				return successful(foundPaymentBudgetAllocation.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{paymentBudgetAllocationId}")
-	public ResponseEntity<Object> deletePaymentBudgetAllocationByIdUpdated(@PathVariable String paymentBudgetAllocationId) throws Exception {
+	public ResponseEntity<String> deletePaymentBudgetAllocationByIdUpdated(@PathVariable String paymentBudgetAllocationId) throws Exception {
 		DeletePaymentBudgetAllocation command = new DeletePaymentBudgetAllocation(paymentBudgetAllocationId);
 
 		try {
 			if (((PaymentBudgetAllocationDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PaymentBudgetAllocation could not be deleted");
+		return conflict();
 
 	}
 

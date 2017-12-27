@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.party.query.contentType.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/party/partyContentTypes")
 public class PartyContentTypeController {
@@ -52,7 +54,7 @@ public class PartyContentTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPartyContentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PartyContentType>> findPartyContentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyContentTypesBy query = new FindPartyContentTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PartyContentTypeController {
 		}
 
 		List<PartyContentType> partyContentTypes =((PartyContentTypeFound) Scheduler.execute(query).data()).getPartyContentTypes();
-
-		if (partyContentTypes.size() == 1) {
-			return ResponseEntity.ok().body(partyContentTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(partyContentTypes);
 
@@ -78,7 +76,7 @@ public class PartyContentTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPartyContentType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PartyContentType> createPartyContentType(HttpServletRequest request) throws Exception {
 
 		PartyContentType partyContentTypeToBeAdded = new PartyContentType();
 		try {
@@ -86,7 +84,7 @@ public class PartyContentTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPartyContentType(partyContentTypeToBeAdded);
@@ -101,63 +99,15 @@ public class PartyContentTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPartyContentType(@RequestBody PartyContentType partyContentTypeToBeAdded) throws Exception {
+	public ResponseEntity<PartyContentType> createPartyContentType(@RequestBody PartyContentType partyContentTypeToBeAdded) throws Exception {
 
 		AddPartyContentType command = new AddPartyContentType(partyContentTypeToBeAdded);
 		PartyContentType partyContentType = ((PartyContentTypeAdded) Scheduler.execute(command).data()).getAddedPartyContentType();
 		
 		if (partyContentType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(partyContentType);
+			return successful(partyContentType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PartyContentType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePartyContentType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PartyContentType partyContentTypeToBeUpdated = new PartyContentType();
-
-		try {
-			partyContentTypeToBeUpdated = PartyContentTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePartyContentType(partyContentTypeToBeUpdated, partyContentTypeToBeUpdated.getPartyContentTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PartyContentTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{partyContentTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePartyContentType(@RequestBody PartyContentType partyContentTypeToBeUpdated,
+	public ResponseEntity<String> updatePartyContentType(@RequestBody PartyContentType partyContentTypeToBeUpdated,
 			@PathVariable String partyContentTypeId) throws Exception {
 
 		partyContentTypeToBeUpdated.setPartyContentTypeId(partyContentTypeId);
@@ -178,41 +128,44 @@ public class PartyContentTypeController {
 
 		try {
 			if(((PartyContentTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{partyContentTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String partyContentTypeId) throws Exception {
+	public ResponseEntity<PartyContentType> findById(@PathVariable String partyContentTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyContentTypeId", partyContentTypeId);
 		try {
 
-			Object foundPartyContentType = findPartyContentTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPartyContentType);
+			List<PartyContentType> foundPartyContentType = findPartyContentTypesBy(requestParams).getBody();
+			if(foundPartyContentType.size()==1){				return successful(foundPartyContentType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{partyContentTypeId}")
-	public ResponseEntity<Object> deletePartyContentTypeByIdUpdated(@PathVariable String partyContentTypeId) throws Exception {
+	public ResponseEntity<String> deletePartyContentTypeByIdUpdated(@PathVariable String partyContentTypeId) throws Exception {
 		DeletePartyContentType command = new DeletePartyContentType(partyContentTypeId);
 
 		try {
 			if (((PartyContentTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PartyContentType could not be deleted");
+		return conflict();
 
 	}
 

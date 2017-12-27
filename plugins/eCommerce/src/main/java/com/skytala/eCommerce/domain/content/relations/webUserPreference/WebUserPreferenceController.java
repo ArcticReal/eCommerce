@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.webUserPreference.query.Fi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/webUserPreferences")
 public class WebUserPreferenceController {
@@ -52,7 +54,7 @@ public class WebUserPreferenceController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWebUserPreferencesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WebUserPreference>> findWebUserPreferencesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWebUserPreferencesBy query = new FindWebUserPreferencesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WebUserPreferenceController {
 		}
 
 		List<WebUserPreference> webUserPreferences =((WebUserPreferenceFound) Scheduler.execute(query).data()).getWebUserPreferences();
-
-		if (webUserPreferences.size() == 1) {
-			return ResponseEntity.ok().body(webUserPreferences.get(0));
-		}
 
 		return ResponseEntity.ok().body(webUserPreferences);
 
@@ -78,7 +76,7 @@ public class WebUserPreferenceController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWebUserPreference(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WebUserPreference> createWebUserPreference(HttpServletRequest request) throws Exception {
 
 		WebUserPreference webUserPreferenceToBeAdded = new WebUserPreference();
 		try {
@@ -86,7 +84,7 @@ public class WebUserPreferenceController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWebUserPreference(webUserPreferenceToBeAdded);
@@ -101,63 +99,15 @@ public class WebUserPreferenceController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWebUserPreference(@RequestBody WebUserPreference webUserPreferenceToBeAdded) throws Exception {
+	public ResponseEntity<WebUserPreference> createWebUserPreference(@RequestBody WebUserPreference webUserPreferenceToBeAdded) throws Exception {
 
 		AddWebUserPreference command = new AddWebUserPreference(webUserPreferenceToBeAdded);
 		WebUserPreference webUserPreference = ((WebUserPreferenceAdded) Scheduler.execute(command).data()).getAddedWebUserPreference();
 		
 		if (webUserPreference != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(webUserPreference);
+			return successful(webUserPreference);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WebUserPreference could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWebUserPreference(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WebUserPreference webUserPreferenceToBeUpdated = new WebUserPreference();
-
-		try {
-			webUserPreferenceToBeUpdated = WebUserPreferenceMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWebUserPreference(webUserPreferenceToBeUpdated, webUserPreferenceToBeUpdated.getVisitId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WebUserPreferenceController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{visitId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWebUserPreference(@RequestBody WebUserPreference webUserPreferenceToBeUpdated,
+	public ResponseEntity<String> updateWebUserPreference(@RequestBody WebUserPreference webUserPreferenceToBeUpdated,
 			@PathVariable String visitId) throws Exception {
 
 		webUserPreferenceToBeUpdated.setVisitId(visitId);
@@ -178,41 +128,44 @@ public class WebUserPreferenceController {
 
 		try {
 			if(((WebUserPreferenceUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{webUserPreferenceId}")
-	public ResponseEntity<Object> findById(@PathVariable String webUserPreferenceId) throws Exception {
+	public ResponseEntity<WebUserPreference> findById(@PathVariable String webUserPreferenceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("webUserPreferenceId", webUserPreferenceId);
 		try {
 
-			Object foundWebUserPreference = findWebUserPreferencesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWebUserPreference);
+			List<WebUserPreference> foundWebUserPreference = findWebUserPreferencesBy(requestParams).getBody();
+			if(foundWebUserPreference.size()==1){				return successful(foundWebUserPreference.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{webUserPreferenceId}")
-	public ResponseEntity<Object> deleteWebUserPreferenceByIdUpdated(@PathVariable String webUserPreferenceId) throws Exception {
+	public ResponseEntity<String> deleteWebUserPreferenceByIdUpdated(@PathVariable String webUserPreferenceId) throws Exception {
 		DeleteWebUserPreference command = new DeleteWebUserPreference(webUserPreferenceId);
 
 		try {
 			if (((WebUserPreferenceDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WebUserPreference could not be deleted");
+		return conflict();
 
 	}
 

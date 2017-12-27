@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/contentOutput")
 public class ContentOutputServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/sendPrintFromScreen")
-	public ResponseEntity<Object> sendPrintFromScreen(HttpSession session, @RequestParam(value="screenLocation") String screenLocation, @RequestParam(value="screenContext", required=false) Map screenContext, @RequestParam(value="printRequestAttributes", required=false) List printRequestAttributes, @RequestParam(value="printerName", required=false) String printerName, @RequestParam(value="docAttributes", required=false) List docAttributes, @RequestParam(value="contentType", required=false) String contentType, @RequestParam(value="printerContentType", required=false) String printerContentType) {
+	public ResponseEntity<Map<String, Object>> sendPrintFromScreen(HttpSession session, @RequestParam(value="screenLocation") String screenLocation, @RequestParam(value="screenContext", required=false) Map screenContext, @RequestParam(value="printRequestAttributes", required=false) List printRequestAttributes, @RequestParam(value="printerName", required=false) String printerName, @RequestParam(value="docAttributes", required=false) List docAttributes, @RequestParam(value="contentType", required=false) String contentType, @RequestParam(value="printerContentType", required=false) String printerContentType) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("screenLocation",screenLocation);
@@ -45,23 +47,23 @@ public class ContentOutputServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFileFromScreen")
-	public ResponseEntity<Object> createFileFromScreen(HttpSession session, @RequestParam(value="fileName") String fileName, @RequestParam(value="screenLocation") String screenLocation, @RequestParam(value="screenContext", required=false) Map screenContext, @RequestParam(value="filePath", required=false) String filePath, @RequestParam(value="contentType", required=false) String contentType) {
+	public ResponseEntity<Map<String, Object>> createFileFromScreen(HttpSession session, @RequestParam(value="fileName") String fileName, @RequestParam(value="screenLocation") String screenLocation, @RequestParam(value="screenContext", required=false) Map screenContext, @RequestParam(value="filePath", required=false) String filePath, @RequestParam(value="contentType", required=false) String contentType) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fileName",fileName);
@@ -78,19 +80,19 @@ public class ContentOutputServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

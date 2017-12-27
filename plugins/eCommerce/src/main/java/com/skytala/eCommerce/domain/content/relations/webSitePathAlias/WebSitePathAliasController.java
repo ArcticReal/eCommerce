@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.webSitePathAlias.query.Fin
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/webSitePathAliass")
 public class WebSitePathAliasController {
@@ -52,7 +54,7 @@ public class WebSitePathAliasController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWebSitePathAliassBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WebSitePathAlias>> findWebSitePathAliassBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWebSitePathAliassBy query = new FindWebSitePathAliassBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WebSitePathAliasController {
 		}
 
 		List<WebSitePathAlias> webSitePathAliass =((WebSitePathAliasFound) Scheduler.execute(query).data()).getWebSitePathAliass();
-
-		if (webSitePathAliass.size() == 1) {
-			return ResponseEntity.ok().body(webSitePathAliass.get(0));
-		}
 
 		return ResponseEntity.ok().body(webSitePathAliass);
 
@@ -78,7 +76,7 @@ public class WebSitePathAliasController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWebSitePathAlias(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WebSitePathAlias> createWebSitePathAlias(HttpServletRequest request) throws Exception {
 
 		WebSitePathAlias webSitePathAliasToBeAdded = new WebSitePathAlias();
 		try {
@@ -86,7 +84,7 @@ public class WebSitePathAliasController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWebSitePathAlias(webSitePathAliasToBeAdded);
@@ -101,63 +99,15 @@ public class WebSitePathAliasController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWebSitePathAlias(@RequestBody WebSitePathAlias webSitePathAliasToBeAdded) throws Exception {
+	public ResponseEntity<WebSitePathAlias> createWebSitePathAlias(@RequestBody WebSitePathAlias webSitePathAliasToBeAdded) throws Exception {
 
 		AddWebSitePathAlias command = new AddWebSitePathAlias(webSitePathAliasToBeAdded);
 		WebSitePathAlias webSitePathAlias = ((WebSitePathAliasAdded) Scheduler.execute(command).data()).getAddedWebSitePathAlias();
 		
 		if (webSitePathAlias != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(webSitePathAlias);
+			return successful(webSitePathAlias);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WebSitePathAlias could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWebSitePathAlias(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WebSitePathAlias webSitePathAliasToBeUpdated = new WebSitePathAlias();
-
-		try {
-			webSitePathAliasToBeUpdated = WebSitePathAliasMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWebSitePathAlias(webSitePathAliasToBeUpdated, webSitePathAliasToBeUpdated.getPathAlias()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WebSitePathAliasController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{pathAlias}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWebSitePathAlias(@RequestBody WebSitePathAlias webSitePathAliasToBeUpdated,
+	public ResponseEntity<String> updateWebSitePathAlias(@RequestBody WebSitePathAlias webSitePathAliasToBeUpdated,
 			@PathVariable String pathAlias) throws Exception {
 
 		webSitePathAliasToBeUpdated.setPathAlias(pathAlias);
@@ -178,41 +128,44 @@ public class WebSitePathAliasController {
 
 		try {
 			if(((WebSitePathAliasUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{webSitePathAliasId}")
-	public ResponseEntity<Object> findById(@PathVariable String webSitePathAliasId) throws Exception {
+	public ResponseEntity<WebSitePathAlias> findById(@PathVariable String webSitePathAliasId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("webSitePathAliasId", webSitePathAliasId);
 		try {
 
-			Object foundWebSitePathAlias = findWebSitePathAliassBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWebSitePathAlias);
+			List<WebSitePathAlias> foundWebSitePathAlias = findWebSitePathAliassBy(requestParams).getBody();
+			if(foundWebSitePathAlias.size()==1){				return successful(foundWebSitePathAlias.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{webSitePathAliasId}")
-	public ResponseEntity<Object> deleteWebSitePathAliasByIdUpdated(@PathVariable String webSitePathAliasId) throws Exception {
+	public ResponseEntity<String> deleteWebSitePathAliasByIdUpdated(@PathVariable String webSitePathAliasId) throws Exception {
 		DeleteWebSitePathAlias command = new DeleteWebSitePathAlias(webSitePathAliasId);
 
 		try {
 			if (((WebSitePathAliasDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WebSitePathAlias could not be deleted");
+		return conflict();
 
 	}
 

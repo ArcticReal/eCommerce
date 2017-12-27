@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.costComponent.query.type.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/costComponent/costComponentTypes")
 public class CostComponentTypeController {
@@ -52,7 +54,7 @@ public class CostComponentTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findCostComponentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<CostComponentType>> findCostComponentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCostComponentTypesBy query = new FindCostComponentTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class CostComponentTypeController {
 		}
 
 		List<CostComponentType> costComponentTypes =((CostComponentTypeFound) Scheduler.execute(query).data()).getCostComponentTypes();
-
-		if (costComponentTypes.size() == 1) {
-			return ResponseEntity.ok().body(costComponentTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(costComponentTypes);
 
@@ -78,7 +76,7 @@ public class CostComponentTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createCostComponentType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<CostComponentType> createCostComponentType(HttpServletRequest request) throws Exception {
 
 		CostComponentType costComponentTypeToBeAdded = new CostComponentType();
 		try {
@@ -86,7 +84,7 @@ public class CostComponentTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createCostComponentType(costComponentTypeToBeAdded);
@@ -101,63 +99,15 @@ public class CostComponentTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createCostComponentType(@RequestBody CostComponentType costComponentTypeToBeAdded) throws Exception {
+	public ResponseEntity<CostComponentType> createCostComponentType(@RequestBody CostComponentType costComponentTypeToBeAdded) throws Exception {
 
 		AddCostComponentType command = new AddCostComponentType(costComponentTypeToBeAdded);
 		CostComponentType costComponentType = ((CostComponentTypeAdded) Scheduler.execute(command).data()).getAddedCostComponentType();
 		
 		if (costComponentType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(costComponentType);
+			return successful(costComponentType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("CostComponentType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateCostComponentType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		CostComponentType costComponentTypeToBeUpdated = new CostComponentType();
-
-		try {
-			costComponentTypeToBeUpdated = CostComponentTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateCostComponentType(costComponentTypeToBeUpdated, costComponentTypeToBeUpdated.getCostComponentTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class CostComponentTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{costComponentTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateCostComponentType(@RequestBody CostComponentType costComponentTypeToBeUpdated,
+	public ResponseEntity<String> updateCostComponentType(@RequestBody CostComponentType costComponentTypeToBeUpdated,
 			@PathVariable String costComponentTypeId) throws Exception {
 
 		costComponentTypeToBeUpdated.setCostComponentTypeId(costComponentTypeId);
@@ -178,41 +128,44 @@ public class CostComponentTypeController {
 
 		try {
 			if(((CostComponentTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{costComponentTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String costComponentTypeId) throws Exception {
+	public ResponseEntity<CostComponentType> findById(@PathVariable String costComponentTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("costComponentTypeId", costComponentTypeId);
 		try {
 
-			Object foundCostComponentType = findCostComponentTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundCostComponentType);
+			List<CostComponentType> foundCostComponentType = findCostComponentTypesBy(requestParams).getBody();
+			if(foundCostComponentType.size()==1){				return successful(foundCostComponentType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{costComponentTypeId}")
-	public ResponseEntity<Object> deleteCostComponentTypeByIdUpdated(@PathVariable String costComponentTypeId) throws Exception {
+	public ResponseEntity<String> deleteCostComponentTypeByIdUpdated(@PathVariable String costComponentTypeId) throws Exception {
 		DeleteCostComponentType command = new DeleteCostComponentType(costComponentTypeId);
 
 		try {
 			if (((CostComponentTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("CostComponentType could not be deleted");
+		return conflict();
 
 	}
 

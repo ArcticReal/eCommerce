@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.humanres.relations.validResponsibility.query
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/humanres/validResponsibilitys")
 public class ValidResponsibilityController {
@@ -52,7 +54,7 @@ public class ValidResponsibilityController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findValidResponsibilitysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ValidResponsibility>> findValidResponsibilitysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindValidResponsibilitysBy query = new FindValidResponsibilitysBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ValidResponsibilityController {
 		}
 
 		List<ValidResponsibility> validResponsibilitys =((ValidResponsibilityFound) Scheduler.execute(query).data()).getValidResponsibilitys();
-
-		if (validResponsibilitys.size() == 1) {
-			return ResponseEntity.ok().body(validResponsibilitys.get(0));
-		}
 
 		return ResponseEntity.ok().body(validResponsibilitys);
 
@@ -78,7 +76,7 @@ public class ValidResponsibilityController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createValidResponsibility(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ValidResponsibility> createValidResponsibility(HttpServletRequest request) throws Exception {
 
 		ValidResponsibility validResponsibilityToBeAdded = new ValidResponsibility();
 		try {
@@ -86,7 +84,7 @@ public class ValidResponsibilityController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createValidResponsibility(validResponsibilityToBeAdded);
@@ -101,63 +99,15 @@ public class ValidResponsibilityController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createValidResponsibility(@RequestBody ValidResponsibility validResponsibilityToBeAdded) throws Exception {
+	public ResponseEntity<ValidResponsibility> createValidResponsibility(@RequestBody ValidResponsibility validResponsibilityToBeAdded) throws Exception {
 
 		AddValidResponsibility command = new AddValidResponsibility(validResponsibilityToBeAdded);
 		ValidResponsibility validResponsibility = ((ValidResponsibilityAdded) Scheduler.execute(command).data()).getAddedValidResponsibility();
 		
 		if (validResponsibility != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(validResponsibility);
+			return successful(validResponsibility);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ValidResponsibility could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateValidResponsibility(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ValidResponsibility validResponsibilityToBeUpdated = new ValidResponsibility();
-
-		try {
-			validResponsibilityToBeUpdated = ValidResponsibilityMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateValidResponsibility(validResponsibilityToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ValidResponsibilityController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateValidResponsibility(@RequestBody ValidResponsibility validResponsibilityToBeUpdated,
+	public ResponseEntity<String> updateValidResponsibility(@RequestBody ValidResponsibility validResponsibilityToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		validResponsibilityToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ValidResponsibilityController {
 
 		try {
 			if(((ValidResponsibilityUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{validResponsibilityId}")
-	public ResponseEntity<Object> findById(@PathVariable String validResponsibilityId) throws Exception {
+	public ResponseEntity<ValidResponsibility> findById(@PathVariable String validResponsibilityId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("validResponsibilityId", validResponsibilityId);
 		try {
 
-			Object foundValidResponsibility = findValidResponsibilitysBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundValidResponsibility);
+			List<ValidResponsibility> foundValidResponsibility = findValidResponsibilitysBy(requestParams).getBody();
+			if(foundValidResponsibility.size()==1){				return successful(foundValidResponsibility.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{validResponsibilityId}")
-	public ResponseEntity<Object> deleteValidResponsibilityByIdUpdated(@PathVariable String validResponsibilityId) throws Exception {
+	public ResponseEntity<String> deleteValidResponsibilityByIdUpdated(@PathVariable String validResponsibilityId) throws Exception {
 		DeleteValidResponsibility command = new DeleteValidResponsibility(validResponsibilityId);
 
 		try {
 			if (((ValidResponsibilityDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ValidResponsibility could not be deleted");
+		return conflict();
 
 	}
 

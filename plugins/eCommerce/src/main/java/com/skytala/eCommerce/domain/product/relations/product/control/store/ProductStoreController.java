@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.store.FindPr
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productStores")
 public class ProductStoreController {
@@ -52,7 +54,7 @@ public class ProductStoreController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductStoresBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductStore>> findProductStoresBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductStoresBy query = new FindProductStoresBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductStoreController {
 		}
 
 		List<ProductStore> productStores =((ProductStoreFound) Scheduler.execute(query).data()).getProductStores();
-
-		if (productStores.size() == 1) {
-			return ResponseEntity.ok().body(productStores.get(0));
-		}
 
 		return ResponseEntity.ok().body(productStores);
 
@@ -78,7 +76,7 @@ public class ProductStoreController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductStore(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductStore> createProductStore(HttpServletRequest request) throws Exception {
 
 		ProductStore productStoreToBeAdded = new ProductStore();
 		try {
@@ -86,7 +84,7 @@ public class ProductStoreController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductStore(productStoreToBeAdded);
@@ -101,63 +99,15 @@ public class ProductStoreController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductStore(@RequestBody ProductStore productStoreToBeAdded) throws Exception {
+	public ResponseEntity<ProductStore> createProductStore(@RequestBody ProductStore productStoreToBeAdded) throws Exception {
 
 		AddProductStore command = new AddProductStore(productStoreToBeAdded);
 		ProductStore productStore = ((ProductStoreAdded) Scheduler.execute(command).data()).getAddedProductStore();
 		
 		if (productStore != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productStore);
+			return successful(productStore);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductStore could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductStore(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductStore productStoreToBeUpdated = new ProductStore();
-
-		try {
-			productStoreToBeUpdated = ProductStoreMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductStore(productStoreToBeUpdated, productStoreToBeUpdated.getProductStoreId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductStoreController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{productStoreId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductStore(@RequestBody ProductStore productStoreToBeUpdated,
+	public ResponseEntity<String> updateProductStore(@RequestBody ProductStore productStoreToBeUpdated,
 			@PathVariable String productStoreId) throws Exception {
 
 		productStoreToBeUpdated.setProductStoreId(productStoreId);
@@ -178,41 +128,44 @@ public class ProductStoreController {
 
 		try {
 			if(((ProductStoreUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productStoreId}")
-	public ResponseEntity<Object> findById(@PathVariable String productStoreId) throws Exception {
+	public ResponseEntity<ProductStore> findById(@PathVariable String productStoreId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productStoreId", productStoreId);
 		try {
 
-			Object foundProductStore = findProductStoresBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductStore);
+			List<ProductStore> foundProductStore = findProductStoresBy(requestParams).getBody();
+			if(foundProductStore.size()==1){				return successful(foundProductStore.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productStoreId}")
-	public ResponseEntity<Object> deleteProductStoreByIdUpdated(@PathVariable String productStoreId) throws Exception {
+	public ResponseEntity<String> deleteProductStoreByIdUpdated(@PathVariable String productStoreId) throws Exception {
 		DeleteProductStore command = new DeleteProductStore(productStoreId);
 
 		try {
 			if (((ProductStoreDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductStore could not be deleted");
+		return conflict();
 
 	}
 

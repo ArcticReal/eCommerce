@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.humanres.relations.emplLeave.query.reasonTyp
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/humanres/emplLeave/emplLeaveReasonTypes")
 public class EmplLeaveReasonTypeController {
@@ -52,7 +54,7 @@ public class EmplLeaveReasonTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findEmplLeaveReasonTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<EmplLeaveReasonType>> findEmplLeaveReasonTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindEmplLeaveReasonTypesBy query = new FindEmplLeaveReasonTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class EmplLeaveReasonTypeController {
 		}
 
 		List<EmplLeaveReasonType> emplLeaveReasonTypes =((EmplLeaveReasonTypeFound) Scheduler.execute(query).data()).getEmplLeaveReasonTypes();
-
-		if (emplLeaveReasonTypes.size() == 1) {
-			return ResponseEntity.ok().body(emplLeaveReasonTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(emplLeaveReasonTypes);
 
@@ -78,7 +76,7 @@ public class EmplLeaveReasonTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createEmplLeaveReasonType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<EmplLeaveReasonType> createEmplLeaveReasonType(HttpServletRequest request) throws Exception {
 
 		EmplLeaveReasonType emplLeaveReasonTypeToBeAdded = new EmplLeaveReasonType();
 		try {
@@ -86,7 +84,7 @@ public class EmplLeaveReasonTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createEmplLeaveReasonType(emplLeaveReasonTypeToBeAdded);
@@ -101,63 +99,15 @@ public class EmplLeaveReasonTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createEmplLeaveReasonType(@RequestBody EmplLeaveReasonType emplLeaveReasonTypeToBeAdded) throws Exception {
+	public ResponseEntity<EmplLeaveReasonType> createEmplLeaveReasonType(@RequestBody EmplLeaveReasonType emplLeaveReasonTypeToBeAdded) throws Exception {
 
 		AddEmplLeaveReasonType command = new AddEmplLeaveReasonType(emplLeaveReasonTypeToBeAdded);
 		EmplLeaveReasonType emplLeaveReasonType = ((EmplLeaveReasonTypeAdded) Scheduler.execute(command).data()).getAddedEmplLeaveReasonType();
 		
 		if (emplLeaveReasonType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(emplLeaveReasonType);
+			return successful(emplLeaveReasonType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("EmplLeaveReasonType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateEmplLeaveReasonType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		EmplLeaveReasonType emplLeaveReasonTypeToBeUpdated = new EmplLeaveReasonType();
-
-		try {
-			emplLeaveReasonTypeToBeUpdated = EmplLeaveReasonTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateEmplLeaveReasonType(emplLeaveReasonTypeToBeUpdated, emplLeaveReasonTypeToBeUpdated.getEmplLeaveReasonTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class EmplLeaveReasonTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{emplLeaveReasonTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateEmplLeaveReasonType(@RequestBody EmplLeaveReasonType emplLeaveReasonTypeToBeUpdated,
+	public ResponseEntity<String> updateEmplLeaveReasonType(@RequestBody EmplLeaveReasonType emplLeaveReasonTypeToBeUpdated,
 			@PathVariable String emplLeaveReasonTypeId) throws Exception {
 
 		emplLeaveReasonTypeToBeUpdated.setEmplLeaveReasonTypeId(emplLeaveReasonTypeId);
@@ -178,41 +128,44 @@ public class EmplLeaveReasonTypeController {
 
 		try {
 			if(((EmplLeaveReasonTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{emplLeaveReasonTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String emplLeaveReasonTypeId) throws Exception {
+	public ResponseEntity<EmplLeaveReasonType> findById(@PathVariable String emplLeaveReasonTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("emplLeaveReasonTypeId", emplLeaveReasonTypeId);
 		try {
 
-			Object foundEmplLeaveReasonType = findEmplLeaveReasonTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundEmplLeaveReasonType);
+			List<EmplLeaveReasonType> foundEmplLeaveReasonType = findEmplLeaveReasonTypesBy(requestParams).getBody();
+			if(foundEmplLeaveReasonType.size()==1){				return successful(foundEmplLeaveReasonType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{emplLeaveReasonTypeId}")
-	public ResponseEntity<Object> deleteEmplLeaveReasonTypeByIdUpdated(@PathVariable String emplLeaveReasonTypeId) throws Exception {
+	public ResponseEntity<String> deleteEmplLeaveReasonTypeByIdUpdated(@PathVariable String emplLeaveReasonTypeId) throws Exception {
 		DeleteEmplLeaveReasonType command = new DeleteEmplLeaveReasonType(emplLeaveReasonTypeId);
 
 		try {
 			if (((EmplLeaveReasonTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("EmplLeaveReasonType could not be deleted");
+		return conflict();
 
 	}
 

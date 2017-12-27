@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.login.relations.securityGroup.query.FindSecu
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/login/securityGroups")
 public class SecurityGroupController {
@@ -52,7 +54,7 @@ public class SecurityGroupController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findSecurityGroupsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<SecurityGroup>> findSecurityGroupsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSecurityGroupsBy query = new FindSecurityGroupsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class SecurityGroupController {
 		}
 
 		List<SecurityGroup> securityGroups =((SecurityGroupFound) Scheduler.execute(query).data()).getSecurityGroups();
-
-		if (securityGroups.size() == 1) {
-			return ResponseEntity.ok().body(securityGroups.get(0));
-		}
 
 		return ResponseEntity.ok().body(securityGroups);
 
@@ -78,7 +76,7 @@ public class SecurityGroupController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createSecurityGroup(HttpServletRequest request) throws Exception {
+	public ResponseEntity<SecurityGroup> createSecurityGroup(HttpServletRequest request) throws Exception {
 
 		SecurityGroup securityGroupToBeAdded = new SecurityGroup();
 		try {
@@ -86,7 +84,7 @@ public class SecurityGroupController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createSecurityGroup(securityGroupToBeAdded);
@@ -101,63 +99,15 @@ public class SecurityGroupController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createSecurityGroup(@RequestBody SecurityGroup securityGroupToBeAdded) throws Exception {
+	public ResponseEntity<SecurityGroup> createSecurityGroup(@RequestBody SecurityGroup securityGroupToBeAdded) throws Exception {
 
 		AddSecurityGroup command = new AddSecurityGroup(securityGroupToBeAdded);
 		SecurityGroup securityGroup = ((SecurityGroupAdded) Scheduler.execute(command).data()).getAddedSecurityGroup();
 		
 		if (securityGroup != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(securityGroup);
+			return successful(securityGroup);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("SecurityGroup could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateSecurityGroup(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		SecurityGroup securityGroupToBeUpdated = new SecurityGroup();
-
-		try {
-			securityGroupToBeUpdated = SecurityGroupMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateSecurityGroup(securityGroupToBeUpdated, securityGroupToBeUpdated.getGroupId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class SecurityGroupController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{groupId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateSecurityGroup(@RequestBody SecurityGroup securityGroupToBeUpdated,
+	public ResponseEntity<String> updateSecurityGroup(@RequestBody SecurityGroup securityGroupToBeUpdated,
 			@PathVariable String groupId) throws Exception {
 
 		securityGroupToBeUpdated.setGroupId(groupId);
@@ -178,41 +128,44 @@ public class SecurityGroupController {
 
 		try {
 			if(((SecurityGroupUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{securityGroupId}")
-	public ResponseEntity<Object> findById(@PathVariable String securityGroupId) throws Exception {
+	public ResponseEntity<SecurityGroup> findById(@PathVariable String securityGroupId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("securityGroupId", securityGroupId);
 		try {
 
-			Object foundSecurityGroup = findSecurityGroupsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundSecurityGroup);
+			List<SecurityGroup> foundSecurityGroup = findSecurityGroupsBy(requestParams).getBody();
+			if(foundSecurityGroup.size()==1){				return successful(foundSecurityGroup.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{securityGroupId}")
-	public ResponseEntity<Object> deleteSecurityGroupByIdUpdated(@PathVariable String securityGroupId) throws Exception {
+	public ResponseEntity<String> deleteSecurityGroupByIdUpdated(@PathVariable String securityGroupId) throws Exception {
 		DeleteSecurityGroup command = new DeleteSecurityGroup(securityGroupId);
 
 		try {
 			if (((SecurityGroupDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("SecurityGroup could not be deleted");
+		return conflict();
 
 	}
 

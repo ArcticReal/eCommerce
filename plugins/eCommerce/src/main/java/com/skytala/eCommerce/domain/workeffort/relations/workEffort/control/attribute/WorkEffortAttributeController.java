@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.workeffort.relations.workEffort.query.attrib
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/workeffort/workEffort/workEffortAttributes")
 public class WorkEffortAttributeController {
@@ -52,7 +54,7 @@ public class WorkEffortAttributeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWorkEffortAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WorkEffortAttribute>> findWorkEffortAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortAttributesBy query = new FindWorkEffortAttributesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WorkEffortAttributeController {
 		}
 
 		List<WorkEffortAttribute> workEffortAttributes =((WorkEffortAttributeFound) Scheduler.execute(query).data()).getWorkEffortAttributes();
-
-		if (workEffortAttributes.size() == 1) {
-			return ResponseEntity.ok().body(workEffortAttributes.get(0));
-		}
 
 		return ResponseEntity.ok().body(workEffortAttributes);
 
@@ -78,7 +76,7 @@ public class WorkEffortAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWorkEffortAttribute(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WorkEffortAttribute> createWorkEffortAttribute(HttpServletRequest request) throws Exception {
 
 		WorkEffortAttribute workEffortAttributeToBeAdded = new WorkEffortAttribute();
 		try {
@@ -86,7 +84,7 @@ public class WorkEffortAttributeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWorkEffortAttribute(workEffortAttributeToBeAdded);
@@ -101,63 +99,15 @@ public class WorkEffortAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWorkEffortAttribute(@RequestBody WorkEffortAttribute workEffortAttributeToBeAdded) throws Exception {
+	public ResponseEntity<WorkEffortAttribute> createWorkEffortAttribute(@RequestBody WorkEffortAttribute workEffortAttributeToBeAdded) throws Exception {
 
 		AddWorkEffortAttribute command = new AddWorkEffortAttribute(workEffortAttributeToBeAdded);
 		WorkEffortAttribute workEffortAttribute = ((WorkEffortAttributeAdded) Scheduler.execute(command).data()).getAddedWorkEffortAttribute();
 		
 		if (workEffortAttribute != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(workEffortAttribute);
+			return successful(workEffortAttribute);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WorkEffortAttribute could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWorkEffortAttribute(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WorkEffortAttribute workEffortAttributeToBeUpdated = new WorkEffortAttribute();
-
-		try {
-			workEffortAttributeToBeUpdated = WorkEffortAttributeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWorkEffortAttribute(workEffortAttributeToBeUpdated, workEffortAttributeToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WorkEffortAttributeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWorkEffortAttribute(@RequestBody WorkEffortAttribute workEffortAttributeToBeUpdated,
+	public ResponseEntity<String> updateWorkEffortAttribute(@RequestBody WorkEffortAttribute workEffortAttributeToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		workEffortAttributeToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class WorkEffortAttributeController {
 
 		try {
 			if(((WorkEffortAttributeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{workEffortAttributeId}")
-	public ResponseEntity<Object> findById(@PathVariable String workEffortAttributeId) throws Exception {
+	public ResponseEntity<WorkEffortAttribute> findById(@PathVariable String workEffortAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortAttributeId", workEffortAttributeId);
 		try {
 
-			Object foundWorkEffortAttribute = findWorkEffortAttributesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWorkEffortAttribute);
+			List<WorkEffortAttribute> foundWorkEffortAttribute = findWorkEffortAttributesBy(requestParams).getBody();
+			if(foundWorkEffortAttribute.size()==1){				return successful(foundWorkEffortAttribute.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{workEffortAttributeId}")
-	public ResponseEntity<Object> deleteWorkEffortAttributeByIdUpdated(@PathVariable String workEffortAttributeId) throws Exception {
+	public ResponseEntity<String> deleteWorkEffortAttributeByIdUpdated(@PathVariable String workEffortAttributeId) throws Exception {
 		DeleteWorkEffortAttribute command = new DeleteWorkEffortAttribute(workEffortAttributeId);
 
 		try {
 			if (((WorkEffortAttributeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WorkEffortAttribute could not be deleted");
+		return conflict();
 
 	}
 

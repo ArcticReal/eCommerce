@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.fixedAsset.query.meter.
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/fixedAsset/fixedAssetMeters")
 public class FixedAssetMeterController {
@@ -52,7 +54,7 @@ public class FixedAssetMeterController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findFixedAssetMetersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<FixedAssetMeter>> findFixedAssetMetersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFixedAssetMetersBy query = new FindFixedAssetMetersBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class FixedAssetMeterController {
 		}
 
 		List<FixedAssetMeter> fixedAssetMeters =((FixedAssetMeterFound) Scheduler.execute(query).data()).getFixedAssetMeters();
-
-		if (fixedAssetMeters.size() == 1) {
-			return ResponseEntity.ok().body(fixedAssetMeters.get(0));
-		}
 
 		return ResponseEntity.ok().body(fixedAssetMeters);
 
@@ -78,7 +76,7 @@ public class FixedAssetMeterController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createFixedAssetMeter(HttpServletRequest request) throws Exception {
+	public ResponseEntity<FixedAssetMeter> createFixedAssetMeter(HttpServletRequest request) throws Exception {
 
 		FixedAssetMeter fixedAssetMeterToBeAdded = new FixedAssetMeter();
 		try {
@@ -86,7 +84,7 @@ public class FixedAssetMeterController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createFixedAssetMeter(fixedAssetMeterToBeAdded);
@@ -101,63 +99,15 @@ public class FixedAssetMeterController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createFixedAssetMeter(@RequestBody FixedAssetMeter fixedAssetMeterToBeAdded) throws Exception {
+	public ResponseEntity<FixedAssetMeter> createFixedAssetMeter(@RequestBody FixedAssetMeter fixedAssetMeterToBeAdded) throws Exception {
 
 		AddFixedAssetMeter command = new AddFixedAssetMeter(fixedAssetMeterToBeAdded);
 		FixedAssetMeter fixedAssetMeter = ((FixedAssetMeterAdded) Scheduler.execute(command).data()).getAddedFixedAssetMeter();
 		
 		if (fixedAssetMeter != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(fixedAssetMeter);
+			return successful(fixedAssetMeter);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("FixedAssetMeter could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateFixedAssetMeter(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		FixedAssetMeter fixedAssetMeterToBeUpdated = new FixedAssetMeter();
-
-		try {
-			fixedAssetMeterToBeUpdated = FixedAssetMeterMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateFixedAssetMeter(fixedAssetMeterToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class FixedAssetMeterController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateFixedAssetMeter(@RequestBody FixedAssetMeter fixedAssetMeterToBeUpdated,
+	public ResponseEntity<String> updateFixedAssetMeter(@RequestBody FixedAssetMeter fixedAssetMeterToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		fixedAssetMeterToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class FixedAssetMeterController {
 
 		try {
 			if(((FixedAssetMeterUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{fixedAssetMeterId}")
-	public ResponseEntity<Object> findById(@PathVariable String fixedAssetMeterId) throws Exception {
+	public ResponseEntity<FixedAssetMeter> findById(@PathVariable String fixedAssetMeterId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("fixedAssetMeterId", fixedAssetMeterId);
 		try {
 
-			Object foundFixedAssetMeter = findFixedAssetMetersBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundFixedAssetMeter);
+			List<FixedAssetMeter> foundFixedAssetMeter = findFixedAssetMetersBy(requestParams).getBody();
+			if(foundFixedAssetMeter.size()==1){				return successful(foundFixedAssetMeter.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{fixedAssetMeterId}")
-	public ResponseEntity<Object> deleteFixedAssetMeterByIdUpdated(@PathVariable String fixedAssetMeterId) throws Exception {
+	public ResponseEntity<String> deleteFixedAssetMeterByIdUpdated(@PathVariable String fixedAssetMeterId) throws Exception {
 		DeleteFixedAssetMeter command = new DeleteFixedAssetMeter(fixedAssetMeterId);
 
 		try {
 			if (((FixedAssetMeterDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("FixedAssetMeter could not be deleted");
+		return conflict();
 
 	}
 

@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/entityextGroup")
 public class EntityextGroupServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createEntityGroup")
-	public ResponseEntity<Object> createEntityGroup(HttpSession session, @RequestParam(value="entityGroupId", required=false) String entityGroupId, @RequestParam(value="entityGroupName", required=false) String entityGroupName) {
+	public ResponseEntity<Map<String, Object>> createEntityGroup(HttpSession session, @RequestParam(value="entityGroupId", required=false) String entityGroupId, @RequestParam(value="entityGroupName", required=false) String entityGroupName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("entityGroupId",entityGroupId);
@@ -40,23 +42,23 @@ public class EntityextGroupServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateEntityGroup")
-	public ResponseEntity<Object> updateEntityGroup(HttpSession session, @RequestParam(value="entityGroupId") String entityGroupId, @RequestParam(value="entityGroupName", required=false) String entityGroupName) {
+	public ResponseEntity<Map<String, Object>> updateEntityGroup(HttpSession session, @RequestParam(value="entityGroupId") String entityGroupId, @RequestParam(value="entityGroupName", required=false) String entityGroupName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("entityGroupId",entityGroupId);
@@ -70,23 +72,23 @@ public class EntityextGroupServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateEntityGroupEntry")
-	public ResponseEntity<Object> updateEntityGroupEntry(HttpSession session, @RequestParam(value="entityOrPackage") String entityOrPackage, @RequestParam(value="entityGroupId") String entityGroupId, @RequestParam(value="applEnumId", required=false) String applEnumId) {
+	public ResponseEntity<Map<String, Object>> updateEntityGroupEntry(HttpSession session, @RequestParam(value="entityOrPackage") String entityOrPackage, @RequestParam(value="entityGroupId") String entityGroupId, @RequestParam(value="applEnumId", required=false) String applEnumId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("entityOrPackage",entityOrPackage);
@@ -101,23 +103,23 @@ public class EntityextGroupServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteEntityGroupEntry")
-	public ResponseEntity<Object> deleteEntityGroupEntry(HttpSession session, @RequestParam(value="entityOrPackage") String entityOrPackage, @RequestParam(value="entityGroupId") String entityGroupId) {
+	public ResponseEntity<Map<String, Object>> deleteEntityGroupEntry(HttpSession session, @RequestParam(value="entityOrPackage") String entityOrPackage, @RequestParam(value="entityGroupId") String entityGroupId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("entityOrPackage",entityOrPackage);
@@ -131,23 +133,23 @@ public class EntityextGroupServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteEntityGroup")
-	public ResponseEntity<Object> deleteEntityGroup(HttpSession session, @RequestParam(value="entityGroupId") String entityGroupId) {
+	public ResponseEntity<Map<String, Object>> deleteEntityGroup(HttpSession session, @RequestParam(value="entityGroupId") String entityGroupId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("entityGroupId",entityGroupId);
@@ -160,23 +162,23 @@ public class EntityextGroupServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createEntityGroupEntry")
-	public ResponseEntity<Object> createEntityGroupEntry(HttpSession session, @RequestParam(value="entityOrPackage") String entityOrPackage, @RequestParam(value="entityGroupId") String entityGroupId, @RequestParam(value="applEnumId", required=false) String applEnumId) {
+	public ResponseEntity<Map<String, Object>> createEntityGroupEntry(HttpSession session, @RequestParam(value="entityOrPackage") String entityOrPackage, @RequestParam(value="entityGroupId") String entityGroupId, @RequestParam(value="applEnumId", required=false) String applEnumId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("entityOrPackage",entityOrPackage);
@@ -191,19 +193,19 @@ public class EntityextGroupServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

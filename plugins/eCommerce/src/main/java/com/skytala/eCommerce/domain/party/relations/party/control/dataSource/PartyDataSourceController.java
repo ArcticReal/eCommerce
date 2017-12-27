@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.party.query.dataSource.FindP
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/party/partyDataSources")
 public class PartyDataSourceController {
@@ -52,7 +54,7 @@ public class PartyDataSourceController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPartyDataSourcesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PartyDataSource>> findPartyDataSourcesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyDataSourcesBy query = new FindPartyDataSourcesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PartyDataSourceController {
 		}
 
 		List<PartyDataSource> partyDataSources =((PartyDataSourceFound) Scheduler.execute(query).data()).getPartyDataSources();
-
-		if (partyDataSources.size() == 1) {
-			return ResponseEntity.ok().body(partyDataSources.get(0));
-		}
 
 		return ResponseEntity.ok().body(partyDataSources);
 
@@ -78,7 +76,7 @@ public class PartyDataSourceController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPartyDataSource(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PartyDataSource> createPartyDataSource(HttpServletRequest request) throws Exception {
 
 		PartyDataSource partyDataSourceToBeAdded = new PartyDataSource();
 		try {
@@ -86,7 +84,7 @@ public class PartyDataSourceController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPartyDataSource(partyDataSourceToBeAdded);
@@ -101,63 +99,15 @@ public class PartyDataSourceController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPartyDataSource(@RequestBody PartyDataSource partyDataSourceToBeAdded) throws Exception {
+	public ResponseEntity<PartyDataSource> createPartyDataSource(@RequestBody PartyDataSource partyDataSourceToBeAdded) throws Exception {
 
 		AddPartyDataSource command = new AddPartyDataSource(partyDataSourceToBeAdded);
 		PartyDataSource partyDataSource = ((PartyDataSourceAdded) Scheduler.execute(command).data()).getAddedPartyDataSource();
 		
 		if (partyDataSource != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(partyDataSource);
+			return successful(partyDataSource);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PartyDataSource could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePartyDataSource(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PartyDataSource partyDataSourceToBeUpdated = new PartyDataSource();
-
-		try {
-			partyDataSourceToBeUpdated = PartyDataSourceMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePartyDataSource(partyDataSourceToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PartyDataSourceController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePartyDataSource(@RequestBody PartyDataSource partyDataSourceToBeUpdated,
+	public ResponseEntity<String> updatePartyDataSource(@RequestBody PartyDataSource partyDataSourceToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		partyDataSourceToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class PartyDataSourceController {
 
 		try {
 			if(((PartyDataSourceUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{partyDataSourceId}")
-	public ResponseEntity<Object> findById(@PathVariable String partyDataSourceId) throws Exception {
+	public ResponseEntity<PartyDataSource> findById(@PathVariable String partyDataSourceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyDataSourceId", partyDataSourceId);
 		try {
 
-			Object foundPartyDataSource = findPartyDataSourcesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPartyDataSource);
+			List<PartyDataSource> foundPartyDataSource = findPartyDataSourcesBy(requestParams).getBody();
+			if(foundPartyDataSource.size()==1){				return successful(foundPartyDataSource.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{partyDataSourceId}")
-	public ResponseEntity<Object> deletePartyDataSourceByIdUpdated(@PathVariable String partyDataSourceId) throws Exception {
+	public ResponseEntity<String> deletePartyDataSourceByIdUpdated(@PathVariable String partyDataSourceId) throws Exception {
 		DeletePartyDataSource command = new DeletePartyDataSource(partyDataSourceId);
 
 		try {
 			if (((PartyDataSourceDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PartyDataSource could not be deleted");
+		return conflict();
 
 	}
 

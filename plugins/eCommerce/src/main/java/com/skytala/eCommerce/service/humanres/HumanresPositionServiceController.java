@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/humanresPosition")
 public class HumanresPositionServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createEmplPositionClassType")
-	public ResponseEntity<Object> createEmplPositionClassType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description, @RequestParam(value="emplPositionClassTypeId", required=false) String emplPositionClassTypeId) {
+	public ResponseEntity<Map<String, Object>> createEmplPositionClassType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description, @RequestParam(value="emplPositionClassTypeId", required=false) String emplPositionClassTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("parentTypeId",parentTypeId);
@@ -42,23 +44,23 @@ public class HumanresPositionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteEmplPositionClassType")
-	public ResponseEntity<Object> deleteEmplPositionClassType(HttpSession session, @RequestParam(value="emplPositionClassTypeId") String emplPositionClassTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteEmplPositionClassType(HttpSession session, @RequestParam(value="emplPositionClassTypeId") String emplPositionClassTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("emplPositionClassTypeId",emplPositionClassTypeId);
@@ -71,23 +73,23 @@ public class HumanresPositionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createEmplPositionTypeClass")
-	public ResponseEntity<Object> createEmplPositionTypeClass(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="emplPositionTypeId") String emplPositionTypeId, @RequestParam(value="emplPositionClassTypeId") String emplPositionClassTypeId, @RequestParam(value="standardHoursPerWeek", required=false) BigDecimal standardHoursPerWeek, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createEmplPositionTypeClass(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="emplPositionTypeId") String emplPositionTypeId, @RequestParam(value="emplPositionClassTypeId") String emplPositionClassTypeId, @RequestParam(value="standardHoursPerWeek", required=false) BigDecimal standardHoursPerWeek, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -104,23 +106,23 @@ public class HumanresPositionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateEmplPositionClassType")
-	public ResponseEntity<Object> updateEmplPositionClassType(HttpSession session, @RequestParam(value="emplPositionClassTypeId") String emplPositionClassTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateEmplPositionClassType(HttpSession session, @RequestParam(value="emplPositionClassTypeId") String emplPositionClassTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("emplPositionClassTypeId",emplPositionClassTypeId);
@@ -136,23 +138,23 @@ public class HumanresPositionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/expireEmplPositionTypeClass")
-	public ResponseEntity<Object> expireEmplPositionTypeClass(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="emplPositionTypeId") String emplPositionTypeId, @RequestParam(value="emplPositionClassTypeId") String emplPositionClassTypeId) {
+	public ResponseEntity<Map<String, Object>> expireEmplPositionTypeClass(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="emplPositionTypeId") String emplPositionTypeId, @RequestParam(value="emplPositionClassTypeId") String emplPositionClassTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -167,23 +169,23 @@ public class HumanresPositionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateEmplPositionTypeClass")
-	public ResponseEntity<Object> updateEmplPositionTypeClass(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="emplPositionTypeId") String emplPositionTypeId, @RequestParam(value="emplPositionClassTypeId") String emplPositionClassTypeId, @RequestParam(value="standardHoursPerWeek", required=false) BigDecimal standardHoursPerWeek, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateEmplPositionTypeClass(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="emplPositionTypeId") String emplPositionTypeId, @RequestParam(value="emplPositionClassTypeId") String emplPositionClassTypeId, @RequestParam(value="standardHoursPerWeek", required=false) BigDecimal standardHoursPerWeek, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -200,19 +202,19 @@ public class HumanresPositionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

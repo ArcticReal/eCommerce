@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.glReconciliation.query.
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/glReconciliations")
 public class GlReconciliationController {
@@ -52,7 +54,7 @@ public class GlReconciliationController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findGlReconciliationsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<GlReconciliation>> findGlReconciliationsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGlReconciliationsBy query = new FindGlReconciliationsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class GlReconciliationController {
 		}
 
 		List<GlReconciliation> glReconciliations =((GlReconciliationFound) Scheduler.execute(query).data()).getGlReconciliations();
-
-		if (glReconciliations.size() == 1) {
-			return ResponseEntity.ok().body(glReconciliations.get(0));
-		}
 
 		return ResponseEntity.ok().body(glReconciliations);
 
@@ -78,7 +76,7 @@ public class GlReconciliationController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createGlReconciliation(HttpServletRequest request) throws Exception {
+	public ResponseEntity<GlReconciliation> createGlReconciliation(HttpServletRequest request) throws Exception {
 
 		GlReconciliation glReconciliationToBeAdded = new GlReconciliation();
 		try {
@@ -86,7 +84,7 @@ public class GlReconciliationController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createGlReconciliation(glReconciliationToBeAdded);
@@ -101,63 +99,15 @@ public class GlReconciliationController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createGlReconciliation(@RequestBody GlReconciliation glReconciliationToBeAdded) throws Exception {
+	public ResponseEntity<GlReconciliation> createGlReconciliation(@RequestBody GlReconciliation glReconciliationToBeAdded) throws Exception {
 
 		AddGlReconciliation command = new AddGlReconciliation(glReconciliationToBeAdded);
 		GlReconciliation glReconciliation = ((GlReconciliationAdded) Scheduler.execute(command).data()).getAddedGlReconciliation();
 		
 		if (glReconciliation != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(glReconciliation);
+			return successful(glReconciliation);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("GlReconciliation could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateGlReconciliation(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		GlReconciliation glReconciliationToBeUpdated = new GlReconciliation();
-
-		try {
-			glReconciliationToBeUpdated = GlReconciliationMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateGlReconciliation(glReconciliationToBeUpdated, glReconciliationToBeUpdated.getGlReconciliationId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class GlReconciliationController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{glReconciliationId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateGlReconciliation(@RequestBody GlReconciliation glReconciliationToBeUpdated,
+	public ResponseEntity<String> updateGlReconciliation(@RequestBody GlReconciliation glReconciliationToBeUpdated,
 			@PathVariable String glReconciliationId) throws Exception {
 
 		glReconciliationToBeUpdated.setGlReconciliationId(glReconciliationId);
@@ -178,41 +128,44 @@ public class GlReconciliationController {
 
 		try {
 			if(((GlReconciliationUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{glReconciliationId}")
-	public ResponseEntity<Object> findById(@PathVariable String glReconciliationId) throws Exception {
+	public ResponseEntity<GlReconciliation> findById(@PathVariable String glReconciliationId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("glReconciliationId", glReconciliationId);
 		try {
 
-			Object foundGlReconciliation = findGlReconciliationsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundGlReconciliation);
+			List<GlReconciliation> foundGlReconciliation = findGlReconciliationsBy(requestParams).getBody();
+			if(foundGlReconciliation.size()==1){				return successful(foundGlReconciliation.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{glReconciliationId}")
-	public ResponseEntity<Object> deleteGlReconciliationByIdUpdated(@PathVariable String glReconciliationId) throws Exception {
+	public ResponseEntity<String> deleteGlReconciliationByIdUpdated(@PathVariable String glReconciliationId) throws Exception {
 		DeleteGlReconciliation command = new DeleteGlReconciliation(glReconciliationId);
 
 		try {
 			if (((GlReconciliationDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("GlReconciliation could not be deleted");
+		return conflict();
 
 	}
 

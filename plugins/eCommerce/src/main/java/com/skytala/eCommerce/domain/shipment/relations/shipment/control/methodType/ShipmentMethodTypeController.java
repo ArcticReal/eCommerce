@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.shipment.relations.shipment.query.methodType
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/shipment/shipment/shipmentMethodTypes")
 public class ShipmentMethodTypeController {
@@ -52,7 +54,7 @@ public class ShipmentMethodTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findShipmentMethodTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ShipmentMethodType>> findShipmentMethodTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentMethodTypesBy query = new FindShipmentMethodTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ShipmentMethodTypeController {
 		}
 
 		List<ShipmentMethodType> shipmentMethodTypes =((ShipmentMethodTypeFound) Scheduler.execute(query).data()).getShipmentMethodTypes();
-
-		if (shipmentMethodTypes.size() == 1) {
-			return ResponseEntity.ok().body(shipmentMethodTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(shipmentMethodTypes);
 
@@ -78,7 +76,7 @@ public class ShipmentMethodTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createShipmentMethodType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ShipmentMethodType> createShipmentMethodType(HttpServletRequest request) throws Exception {
 
 		ShipmentMethodType shipmentMethodTypeToBeAdded = new ShipmentMethodType();
 		try {
@@ -86,7 +84,7 @@ public class ShipmentMethodTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createShipmentMethodType(shipmentMethodTypeToBeAdded);
@@ -101,63 +99,15 @@ public class ShipmentMethodTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createShipmentMethodType(@RequestBody ShipmentMethodType shipmentMethodTypeToBeAdded) throws Exception {
+	public ResponseEntity<ShipmentMethodType> createShipmentMethodType(@RequestBody ShipmentMethodType shipmentMethodTypeToBeAdded) throws Exception {
 
 		AddShipmentMethodType command = new AddShipmentMethodType(shipmentMethodTypeToBeAdded);
 		ShipmentMethodType shipmentMethodType = ((ShipmentMethodTypeAdded) Scheduler.execute(command).data()).getAddedShipmentMethodType();
 		
 		if (shipmentMethodType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(shipmentMethodType);
+			return successful(shipmentMethodType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ShipmentMethodType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateShipmentMethodType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ShipmentMethodType shipmentMethodTypeToBeUpdated = new ShipmentMethodType();
-
-		try {
-			shipmentMethodTypeToBeUpdated = ShipmentMethodTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateShipmentMethodType(shipmentMethodTypeToBeUpdated, shipmentMethodTypeToBeUpdated.getShipmentMethodTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ShipmentMethodTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{shipmentMethodTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateShipmentMethodType(@RequestBody ShipmentMethodType shipmentMethodTypeToBeUpdated,
+	public ResponseEntity<String> updateShipmentMethodType(@RequestBody ShipmentMethodType shipmentMethodTypeToBeUpdated,
 			@PathVariable String shipmentMethodTypeId) throws Exception {
 
 		shipmentMethodTypeToBeUpdated.setShipmentMethodTypeId(shipmentMethodTypeId);
@@ -178,41 +128,44 @@ public class ShipmentMethodTypeController {
 
 		try {
 			if(((ShipmentMethodTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{shipmentMethodTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String shipmentMethodTypeId) throws Exception {
+	public ResponseEntity<ShipmentMethodType> findById(@PathVariable String shipmentMethodTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentMethodTypeId", shipmentMethodTypeId);
 		try {
 
-			Object foundShipmentMethodType = findShipmentMethodTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundShipmentMethodType);
+			List<ShipmentMethodType> foundShipmentMethodType = findShipmentMethodTypesBy(requestParams).getBody();
+			if(foundShipmentMethodType.size()==1){				return successful(foundShipmentMethodType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{shipmentMethodTypeId}")
-	public ResponseEntity<Object> deleteShipmentMethodTypeByIdUpdated(@PathVariable String shipmentMethodTypeId) throws Exception {
+	public ResponseEntity<String> deleteShipmentMethodTypeByIdUpdated(@PathVariable String shipmentMethodTypeId) throws Exception {
 		DeleteShipmentMethodType command = new DeleteShipmentMethodType(shipmentMethodTypeId);
 
 		try {
 			if (((ShipmentMethodTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ShipmentMethodType could not be deleted");
+		return conflict();
 
 	}
 

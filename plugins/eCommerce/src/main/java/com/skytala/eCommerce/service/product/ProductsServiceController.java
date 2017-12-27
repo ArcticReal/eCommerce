@@ -84,7 +84,7 @@ public class ProductsServiceController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addProductCatalogToParty")
 	// @Role(Role.ADMINSTRATOR, Role.BOOKKEEPING)
-	public ResponseEntity addProductCatalogToParty(HttpSession session, ProdCatalogRole role) throws Exception {
+	public ResponseEntity<String> addProductCatalogToParty(HttpSession session, ProdCatalogRole role) throws Exception {
 
 		Party party = new Party(role.getPartyId(), getFindPartiesQuery(role.getPartyId()));
 
@@ -101,7 +101,7 @@ public class ProductsServiceController {
 
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addProdCatalogToParty")
-	public ResponseEntity addProdCatalogToParty(HttpSession session,
+	public ResponseEntity<Map<String, Object>> addProdCatalogToParty(HttpSession session,
 												@RequestParam(value="roleTypeId") String roleTypeId,
 												@RequestParam(value="partyId") String partyId,
 												@RequestParam(value="prodCatalogId") String prodCatalogId,
@@ -125,19 +125,19 @@ public class ProductsServiceController {
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductMaintType")
@@ -5252,7 +5252,7 @@ public class ProductsServiceController {
 
 	@PostMapping("/removeProductFromCategories")
 	@PreAuthorize(HAS_ADMIN_AUTHORITY)
-	public ResponseEntity removeProductFromCategories(HttpSession session,
+	public ResponseEntity<String> removeProductFromCategories(HttpSession session,
 													  @RequestParam("productId") String productId,
 													  @RequestBody List<String> productCategoryIds) throws Exception {
 		try{
@@ -9072,9 +9072,5 @@ public class ProductsServiceController {
 		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
 	}
 
-	@RequestMapping(value = (" * "))
-	public ResponseEntity<Object> returnErrorPage(HttpSession session) {
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Requested service does not exist. JSESSIONID=" + session.getId());
-	}
 
 }

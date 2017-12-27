@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.workeffort.relations.workEffort.query.purpos
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/workeffort/workEffort/workEffortPurposeTypes")
 public class WorkEffortPurposeTypeController {
@@ -52,7 +54,7 @@ public class WorkEffortPurposeTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWorkEffortPurposeTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WorkEffortPurposeType>> findWorkEffortPurposeTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortPurposeTypesBy query = new FindWorkEffortPurposeTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WorkEffortPurposeTypeController {
 		}
 
 		List<WorkEffortPurposeType> workEffortPurposeTypes =((WorkEffortPurposeTypeFound) Scheduler.execute(query).data()).getWorkEffortPurposeTypes();
-
-		if (workEffortPurposeTypes.size() == 1) {
-			return ResponseEntity.ok().body(workEffortPurposeTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(workEffortPurposeTypes);
 
@@ -78,7 +76,7 @@ public class WorkEffortPurposeTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWorkEffortPurposeType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WorkEffortPurposeType> createWorkEffortPurposeType(HttpServletRequest request) throws Exception {
 
 		WorkEffortPurposeType workEffortPurposeTypeToBeAdded = new WorkEffortPurposeType();
 		try {
@@ -86,7 +84,7 @@ public class WorkEffortPurposeTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWorkEffortPurposeType(workEffortPurposeTypeToBeAdded);
@@ -101,63 +99,15 @@ public class WorkEffortPurposeTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWorkEffortPurposeType(@RequestBody WorkEffortPurposeType workEffortPurposeTypeToBeAdded) throws Exception {
+	public ResponseEntity<WorkEffortPurposeType> createWorkEffortPurposeType(@RequestBody WorkEffortPurposeType workEffortPurposeTypeToBeAdded) throws Exception {
 
 		AddWorkEffortPurposeType command = new AddWorkEffortPurposeType(workEffortPurposeTypeToBeAdded);
 		WorkEffortPurposeType workEffortPurposeType = ((WorkEffortPurposeTypeAdded) Scheduler.execute(command).data()).getAddedWorkEffortPurposeType();
 		
 		if (workEffortPurposeType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(workEffortPurposeType);
+			return successful(workEffortPurposeType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WorkEffortPurposeType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWorkEffortPurposeType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WorkEffortPurposeType workEffortPurposeTypeToBeUpdated = new WorkEffortPurposeType();
-
-		try {
-			workEffortPurposeTypeToBeUpdated = WorkEffortPurposeTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWorkEffortPurposeType(workEffortPurposeTypeToBeUpdated, workEffortPurposeTypeToBeUpdated.getWorkEffortPurposeTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WorkEffortPurposeTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{workEffortPurposeTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWorkEffortPurposeType(@RequestBody WorkEffortPurposeType workEffortPurposeTypeToBeUpdated,
+	public ResponseEntity<String> updateWorkEffortPurposeType(@RequestBody WorkEffortPurposeType workEffortPurposeTypeToBeUpdated,
 			@PathVariable String workEffortPurposeTypeId) throws Exception {
 
 		workEffortPurposeTypeToBeUpdated.setWorkEffortPurposeTypeId(workEffortPurposeTypeId);
@@ -178,41 +128,44 @@ public class WorkEffortPurposeTypeController {
 
 		try {
 			if(((WorkEffortPurposeTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{workEffortPurposeTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String workEffortPurposeTypeId) throws Exception {
+	public ResponseEntity<WorkEffortPurposeType> findById(@PathVariable String workEffortPurposeTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortPurposeTypeId", workEffortPurposeTypeId);
 		try {
 
-			Object foundWorkEffortPurposeType = findWorkEffortPurposeTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWorkEffortPurposeType);
+			List<WorkEffortPurposeType> foundWorkEffortPurposeType = findWorkEffortPurposeTypesBy(requestParams).getBody();
+			if(foundWorkEffortPurposeType.size()==1){				return successful(foundWorkEffortPurposeType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{workEffortPurposeTypeId}")
-	public ResponseEntity<Object> deleteWorkEffortPurposeTypeByIdUpdated(@PathVariable String workEffortPurposeTypeId) throws Exception {
+	public ResponseEntity<String> deleteWorkEffortPurposeTypeByIdUpdated(@PathVariable String workEffortPurposeTypeId) throws Exception {
 		DeleteWorkEffortPurposeType command = new DeleteWorkEffortPurposeType(workEffortPurposeTypeId);
 
 		try {
 			if (((WorkEffortPurposeTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WorkEffortPurposeType could not be deleted");
+		return conflict();
 
 	}
 

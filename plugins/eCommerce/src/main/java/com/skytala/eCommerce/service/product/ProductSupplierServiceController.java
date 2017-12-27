@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/productSupplier")
 public class ProductSupplierServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteSupplierRatingType")
-	public ResponseEntity<Object> deleteSupplierRatingType(HttpSession session, @RequestParam(value="supplierRatingTypeId") String supplierRatingTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteSupplierRatingType(HttpSession session, @RequestParam(value="supplierRatingTypeId") String supplierRatingTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("supplierRatingTypeId",supplierRatingTypeId);
@@ -39,23 +41,23 @@ public class ProductSupplierServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createReorderGuideline")
-	public ResponseEntity<Object> createReorderGuideline(HttpSession session, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="reorderLevel", required=false) BigDecimal reorderLevel, @RequestParam(value="reorderGuidelineId", required=false) String reorderGuidelineId, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="geoId", required=false) String geoId, @RequestParam(value="reorderQuantity", required=false) BigDecimal reorderQuantity, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createReorderGuideline(HttpSession session, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="reorderLevel", required=false) BigDecimal reorderLevel, @RequestParam(value="reorderGuidelineId", required=false) String reorderGuidelineId, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="geoId", required=false) String geoId, @RequestParam(value="reorderQuantity", required=false) BigDecimal reorderQuantity, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -77,23 +79,23 @@ public class ProductSupplierServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateReorderGuideline")
-	public ResponseEntity<Object> updateReorderGuideline(HttpSession session, @RequestParam(value="reorderGuidelineId") String reorderGuidelineId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="reorderLevel", required=false) BigDecimal reorderLevel, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="geoId", required=false) String geoId, @RequestParam(value="reorderQuantity", required=false) BigDecimal reorderQuantity, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateReorderGuideline(HttpSession session, @RequestParam(value="reorderGuidelineId") String reorderGuidelineId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="reorderLevel", required=false) BigDecimal reorderLevel, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="geoId", required=false) String geoId, @RequestParam(value="reorderQuantity", required=false) BigDecimal reorderQuantity, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("reorderGuidelineId",reorderGuidelineId);
@@ -115,23 +117,23 @@ public class ProductSupplierServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createSupplierRatingType")
-	public ResponseEntity<Object> createSupplierRatingType(HttpSession session, @RequestParam(value="supplierRatingTypeId", required=false) String supplierRatingTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createSupplierRatingType(HttpSession session, @RequestParam(value="supplierRatingTypeId", required=false) String supplierRatingTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("supplierRatingTypeId",supplierRatingTypeId);
@@ -145,23 +147,23 @@ public class ProductSupplierServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateSupplierRatingType")
-	public ResponseEntity<Object> updateSupplierRatingType(HttpSession session, @RequestParam(value="supplierRatingTypeId") String supplierRatingTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateSupplierRatingType(HttpSession session, @RequestParam(value="supplierRatingTypeId") String supplierRatingTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("supplierRatingTypeId",supplierRatingTypeId);
@@ -175,23 +177,23 @@ public class ProductSupplierServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteReorderGuideline")
-	public ResponseEntity<Object> deleteReorderGuideline(HttpSession session, @RequestParam(value="reorderGuidelineId") String reorderGuidelineId) {
+	public ResponseEntity<Map<String, Object>> deleteReorderGuideline(HttpSession session, @RequestParam(value="reorderGuidelineId") String reorderGuidelineId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("reorderGuidelineId",reorderGuidelineId);
@@ -204,19 +206,19 @@ public class ProductSupplierServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

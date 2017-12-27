@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.budget.query.scenarioAp
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/budget/budgetScenarioApplications")
 public class BudgetScenarioApplicationController {
@@ -52,7 +54,7 @@ public class BudgetScenarioApplicationController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findBudgetScenarioApplicationsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<BudgetScenarioApplication>> findBudgetScenarioApplicationsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindBudgetScenarioApplicationsBy query = new FindBudgetScenarioApplicationsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class BudgetScenarioApplicationController {
 		}
 
 		List<BudgetScenarioApplication> budgetScenarioApplications =((BudgetScenarioApplicationFound) Scheduler.execute(query).data()).getBudgetScenarioApplications();
-
-		if (budgetScenarioApplications.size() == 1) {
-			return ResponseEntity.ok().body(budgetScenarioApplications.get(0));
-		}
 
 		return ResponseEntity.ok().body(budgetScenarioApplications);
 
@@ -78,7 +76,7 @@ public class BudgetScenarioApplicationController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createBudgetScenarioApplication(HttpServletRequest request) throws Exception {
+	public ResponseEntity<BudgetScenarioApplication> createBudgetScenarioApplication(HttpServletRequest request) throws Exception {
 
 		BudgetScenarioApplication budgetScenarioApplicationToBeAdded = new BudgetScenarioApplication();
 		try {
@@ -86,7 +84,7 @@ public class BudgetScenarioApplicationController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createBudgetScenarioApplication(budgetScenarioApplicationToBeAdded);
@@ -101,63 +99,15 @@ public class BudgetScenarioApplicationController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createBudgetScenarioApplication(@RequestBody BudgetScenarioApplication budgetScenarioApplicationToBeAdded) throws Exception {
+	public ResponseEntity<BudgetScenarioApplication> createBudgetScenarioApplication(@RequestBody BudgetScenarioApplication budgetScenarioApplicationToBeAdded) throws Exception {
 
 		AddBudgetScenarioApplication command = new AddBudgetScenarioApplication(budgetScenarioApplicationToBeAdded);
 		BudgetScenarioApplication budgetScenarioApplication = ((BudgetScenarioApplicationAdded) Scheduler.execute(command).data()).getAddedBudgetScenarioApplication();
 		
 		if (budgetScenarioApplication != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(budgetScenarioApplication);
+			return successful(budgetScenarioApplication);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("BudgetScenarioApplication could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateBudgetScenarioApplication(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		BudgetScenarioApplication budgetScenarioApplicationToBeUpdated = new BudgetScenarioApplication();
-
-		try {
-			budgetScenarioApplicationToBeUpdated = BudgetScenarioApplicationMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateBudgetScenarioApplication(budgetScenarioApplicationToBeUpdated, budgetScenarioApplicationToBeUpdated.getBudgetScenarioApplicId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class BudgetScenarioApplicationController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{budgetScenarioApplicId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateBudgetScenarioApplication(@RequestBody BudgetScenarioApplication budgetScenarioApplicationToBeUpdated,
+	public ResponseEntity<String> updateBudgetScenarioApplication(@RequestBody BudgetScenarioApplication budgetScenarioApplicationToBeUpdated,
 			@PathVariable String budgetScenarioApplicId) throws Exception {
 
 		budgetScenarioApplicationToBeUpdated.setBudgetScenarioApplicId(budgetScenarioApplicId);
@@ -178,41 +128,44 @@ public class BudgetScenarioApplicationController {
 
 		try {
 			if(((BudgetScenarioApplicationUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{budgetScenarioApplicationId}")
-	public ResponseEntity<Object> findById(@PathVariable String budgetScenarioApplicationId) throws Exception {
+	public ResponseEntity<BudgetScenarioApplication> findById(@PathVariable String budgetScenarioApplicationId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("budgetScenarioApplicationId", budgetScenarioApplicationId);
 		try {
 
-			Object foundBudgetScenarioApplication = findBudgetScenarioApplicationsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundBudgetScenarioApplication);
+			List<BudgetScenarioApplication> foundBudgetScenarioApplication = findBudgetScenarioApplicationsBy(requestParams).getBody();
+			if(foundBudgetScenarioApplication.size()==1){				return successful(foundBudgetScenarioApplication.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{budgetScenarioApplicationId}")
-	public ResponseEntity<Object> deleteBudgetScenarioApplicationByIdUpdated(@PathVariable String budgetScenarioApplicationId) throws Exception {
+	public ResponseEntity<String> deleteBudgetScenarioApplicationByIdUpdated(@PathVariable String budgetScenarioApplicationId) throws Exception {
 		DeleteBudgetScenarioApplication command = new DeleteBudgetScenarioApplication(budgetScenarioApplicationId);
 
 		try {
 			if (((BudgetScenarioApplicationDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("BudgetScenarioApplication could not be deleted");
+		return conflict();
 
 	}
 

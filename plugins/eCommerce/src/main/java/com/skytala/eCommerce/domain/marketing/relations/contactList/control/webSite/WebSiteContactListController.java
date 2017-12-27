@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.marketing.relations.contactList.query.webSit
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/marketing/contactList/webSiteContactLists")
 public class WebSiteContactListController {
@@ -52,7 +54,7 @@ public class WebSiteContactListController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWebSiteContactListsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WebSiteContactList>> findWebSiteContactListsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWebSiteContactListsBy query = new FindWebSiteContactListsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WebSiteContactListController {
 		}
 
 		List<WebSiteContactList> webSiteContactLists =((WebSiteContactListFound) Scheduler.execute(query).data()).getWebSiteContactLists();
-
-		if (webSiteContactLists.size() == 1) {
-			return ResponseEntity.ok().body(webSiteContactLists.get(0));
-		}
 
 		return ResponseEntity.ok().body(webSiteContactLists);
 
@@ -78,7 +76,7 @@ public class WebSiteContactListController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWebSiteContactList(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WebSiteContactList> createWebSiteContactList(HttpServletRequest request) throws Exception {
 
 		WebSiteContactList webSiteContactListToBeAdded = new WebSiteContactList();
 		try {
@@ -86,7 +84,7 @@ public class WebSiteContactListController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWebSiteContactList(webSiteContactListToBeAdded);
@@ -101,63 +99,15 @@ public class WebSiteContactListController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWebSiteContactList(@RequestBody WebSiteContactList webSiteContactListToBeAdded) throws Exception {
+	public ResponseEntity<WebSiteContactList> createWebSiteContactList(@RequestBody WebSiteContactList webSiteContactListToBeAdded) throws Exception {
 
 		AddWebSiteContactList command = new AddWebSiteContactList(webSiteContactListToBeAdded);
 		WebSiteContactList webSiteContactList = ((WebSiteContactListAdded) Scheduler.execute(command).data()).getAddedWebSiteContactList();
 		
 		if (webSiteContactList != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(webSiteContactList);
+			return successful(webSiteContactList);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WebSiteContactList could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWebSiteContactList(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WebSiteContactList webSiteContactListToBeUpdated = new WebSiteContactList();
-
-		try {
-			webSiteContactListToBeUpdated = WebSiteContactListMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWebSiteContactList(webSiteContactListToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WebSiteContactListController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWebSiteContactList(@RequestBody WebSiteContactList webSiteContactListToBeUpdated,
+	public ResponseEntity<String> updateWebSiteContactList(@RequestBody WebSiteContactList webSiteContactListToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		webSiteContactListToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class WebSiteContactListController {
 
 		try {
 			if(((WebSiteContactListUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{webSiteContactListId}")
-	public ResponseEntity<Object> findById(@PathVariable String webSiteContactListId) throws Exception {
+	public ResponseEntity<WebSiteContactList> findById(@PathVariable String webSiteContactListId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("webSiteContactListId", webSiteContactListId);
 		try {
 
-			Object foundWebSiteContactList = findWebSiteContactListsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWebSiteContactList);
+			List<WebSiteContactList> foundWebSiteContactList = findWebSiteContactListsBy(requestParams).getBody();
+			if(foundWebSiteContactList.size()==1){				return successful(foundWebSiteContactList.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{webSiteContactListId}")
-	public ResponseEntity<Object> deleteWebSiteContactListByIdUpdated(@PathVariable String webSiteContactListId) throws Exception {
+	public ResponseEntity<String> deleteWebSiteContactListByIdUpdated(@PathVariable String webSiteContactListId) throws Exception {
 		DeleteWebSiteContactList command = new DeleteWebSiteContactList(webSiteContactListId);
 
 		try {
 			if (((WebSiteContactListDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WebSiteContactList could not be deleted");
+		return conflict();
 
 	}
 

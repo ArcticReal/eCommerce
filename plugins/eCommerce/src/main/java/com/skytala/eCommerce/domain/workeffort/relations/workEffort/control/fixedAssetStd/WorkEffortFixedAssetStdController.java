@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.workeffort.relations.workEffort.query.fixedA
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/workeffort/workEffort/workEffortFixedAssetStds")
 public class WorkEffortFixedAssetStdController {
@@ -52,7 +54,7 @@ public class WorkEffortFixedAssetStdController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWorkEffortFixedAssetStdsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WorkEffortFixedAssetStd>> findWorkEffortFixedAssetStdsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortFixedAssetStdsBy query = new FindWorkEffortFixedAssetStdsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WorkEffortFixedAssetStdController {
 		}
 
 		List<WorkEffortFixedAssetStd> workEffortFixedAssetStds =((WorkEffortFixedAssetStdFound) Scheduler.execute(query).data()).getWorkEffortFixedAssetStds();
-
-		if (workEffortFixedAssetStds.size() == 1) {
-			return ResponseEntity.ok().body(workEffortFixedAssetStds.get(0));
-		}
 
 		return ResponseEntity.ok().body(workEffortFixedAssetStds);
 
@@ -78,7 +76,7 @@ public class WorkEffortFixedAssetStdController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWorkEffortFixedAssetStd(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WorkEffortFixedAssetStd> createWorkEffortFixedAssetStd(HttpServletRequest request) throws Exception {
 
 		WorkEffortFixedAssetStd workEffortFixedAssetStdToBeAdded = new WorkEffortFixedAssetStd();
 		try {
@@ -86,7 +84,7 @@ public class WorkEffortFixedAssetStdController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWorkEffortFixedAssetStd(workEffortFixedAssetStdToBeAdded);
@@ -101,63 +99,15 @@ public class WorkEffortFixedAssetStdController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWorkEffortFixedAssetStd(@RequestBody WorkEffortFixedAssetStd workEffortFixedAssetStdToBeAdded) throws Exception {
+	public ResponseEntity<WorkEffortFixedAssetStd> createWorkEffortFixedAssetStd(@RequestBody WorkEffortFixedAssetStd workEffortFixedAssetStdToBeAdded) throws Exception {
 
 		AddWorkEffortFixedAssetStd command = new AddWorkEffortFixedAssetStd(workEffortFixedAssetStdToBeAdded);
 		WorkEffortFixedAssetStd workEffortFixedAssetStd = ((WorkEffortFixedAssetStdAdded) Scheduler.execute(command).data()).getAddedWorkEffortFixedAssetStd();
 		
 		if (workEffortFixedAssetStd != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(workEffortFixedAssetStd);
+			return successful(workEffortFixedAssetStd);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WorkEffortFixedAssetStd could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWorkEffortFixedAssetStd(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WorkEffortFixedAssetStd workEffortFixedAssetStdToBeUpdated = new WorkEffortFixedAssetStd();
-
-		try {
-			workEffortFixedAssetStdToBeUpdated = WorkEffortFixedAssetStdMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWorkEffortFixedAssetStd(workEffortFixedAssetStdToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WorkEffortFixedAssetStdController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWorkEffortFixedAssetStd(@RequestBody WorkEffortFixedAssetStd workEffortFixedAssetStdToBeUpdated,
+	public ResponseEntity<String> updateWorkEffortFixedAssetStd(@RequestBody WorkEffortFixedAssetStd workEffortFixedAssetStdToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		workEffortFixedAssetStdToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class WorkEffortFixedAssetStdController {
 
 		try {
 			if(((WorkEffortFixedAssetStdUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{workEffortFixedAssetStdId}")
-	public ResponseEntity<Object> findById(@PathVariable String workEffortFixedAssetStdId) throws Exception {
+	public ResponseEntity<WorkEffortFixedAssetStd> findById(@PathVariable String workEffortFixedAssetStdId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortFixedAssetStdId", workEffortFixedAssetStdId);
 		try {
 
-			Object foundWorkEffortFixedAssetStd = findWorkEffortFixedAssetStdsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWorkEffortFixedAssetStd);
+			List<WorkEffortFixedAssetStd> foundWorkEffortFixedAssetStd = findWorkEffortFixedAssetStdsBy(requestParams).getBody();
+			if(foundWorkEffortFixedAssetStd.size()==1){				return successful(foundWorkEffortFixedAssetStd.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{workEffortFixedAssetStdId}")
-	public ResponseEntity<Object> deleteWorkEffortFixedAssetStdByIdUpdated(@PathVariable String workEffortFixedAssetStdId) throws Exception {
+	public ResponseEntity<String> deleteWorkEffortFixedAssetStdByIdUpdated(@PathVariable String workEffortFixedAssetStdId) throws Exception {
 		DeleteWorkEffortFixedAssetStd command = new DeleteWorkEffortFixedAssetStd(workEffortFixedAssetStdId);
 
 		try {
 			if (((WorkEffortFixedAssetStdDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WorkEffortFixedAssetStd could not be deleted");
+		return conflict();
 
 	}
 

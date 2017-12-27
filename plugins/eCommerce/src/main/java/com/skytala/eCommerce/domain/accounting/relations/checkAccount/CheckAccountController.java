@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.checkAccount.query.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/checkAccounts")
 public class CheckAccountController {
@@ -52,7 +54,7 @@ public class CheckAccountController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findCheckAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<CheckAccount>> findCheckAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCheckAccountsBy query = new FindCheckAccountsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class CheckAccountController {
 		}
 
 		List<CheckAccount> checkAccounts =((CheckAccountFound) Scheduler.execute(query).data()).getCheckAccounts();
-
-		if (checkAccounts.size() == 1) {
-			return ResponseEntity.ok().body(checkAccounts.get(0));
-		}
 
 		return ResponseEntity.ok().body(checkAccounts);
 
@@ -78,7 +76,7 @@ public class CheckAccountController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createCheckAccount(HttpServletRequest request) throws Exception {
+	public ResponseEntity<CheckAccount> createCheckAccount(HttpServletRequest request) throws Exception {
 
 		CheckAccount checkAccountToBeAdded = new CheckAccount();
 		try {
@@ -86,7 +84,7 @@ public class CheckAccountController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createCheckAccount(checkAccountToBeAdded);
@@ -101,63 +99,15 @@ public class CheckAccountController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createCheckAccount(@RequestBody CheckAccount checkAccountToBeAdded) throws Exception {
+	public ResponseEntity<CheckAccount> createCheckAccount(@RequestBody CheckAccount checkAccountToBeAdded) throws Exception {
 
 		AddCheckAccount command = new AddCheckAccount(checkAccountToBeAdded);
 		CheckAccount checkAccount = ((CheckAccountAdded) Scheduler.execute(command).data()).getAddedCheckAccount();
 		
 		if (checkAccount != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(checkAccount);
+			return successful(checkAccount);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("CheckAccount could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateCheckAccount(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		CheckAccount checkAccountToBeUpdated = new CheckAccount();
-
-		try {
-			checkAccountToBeUpdated = CheckAccountMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateCheckAccount(checkAccountToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class CheckAccountController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateCheckAccount(@RequestBody CheckAccount checkAccountToBeUpdated,
+	public ResponseEntity<String> updateCheckAccount(@RequestBody CheckAccount checkAccountToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		checkAccountToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class CheckAccountController {
 
 		try {
 			if(((CheckAccountUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{checkAccountId}")
-	public ResponseEntity<Object> findById(@PathVariable String checkAccountId) throws Exception {
+	public ResponseEntity<CheckAccount> findById(@PathVariable String checkAccountId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("checkAccountId", checkAccountId);
 		try {
 
-			Object foundCheckAccount = findCheckAccountsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundCheckAccount);
+			List<CheckAccount> foundCheckAccount = findCheckAccountsBy(requestParams).getBody();
+			if(foundCheckAccount.size()==1){				return successful(foundCheckAccount.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{checkAccountId}")
-	public ResponseEntity<Object> deleteCheckAccountByIdUpdated(@PathVariable String checkAccountId) throws Exception {
+	public ResponseEntity<String> deleteCheckAccountByIdUpdated(@PathVariable String checkAccountId) throws Exception {
 		DeleteCheckAccount command = new DeleteCheckAccount(checkAccountId);
 
 		try {
 			if (((CheckAccountDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("CheckAccount could not be deleted");
+		return conflict();
 
 	}
 

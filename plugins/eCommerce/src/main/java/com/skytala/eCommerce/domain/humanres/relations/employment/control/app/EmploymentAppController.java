@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.humanres.relations.employment.query.app.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/humanres/employment/employmentApps")
 public class EmploymentAppController {
@@ -52,7 +54,7 @@ public class EmploymentAppController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findEmploymentAppsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<EmploymentApp>> findEmploymentAppsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindEmploymentAppsBy query = new FindEmploymentAppsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class EmploymentAppController {
 		}
 
 		List<EmploymentApp> employmentApps =((EmploymentAppFound) Scheduler.execute(query).data()).getEmploymentApps();
-
-		if (employmentApps.size() == 1) {
-			return ResponseEntity.ok().body(employmentApps.get(0));
-		}
 
 		return ResponseEntity.ok().body(employmentApps);
 
@@ -78,7 +76,7 @@ public class EmploymentAppController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createEmploymentApp(HttpServletRequest request) throws Exception {
+	public ResponseEntity<EmploymentApp> createEmploymentApp(HttpServletRequest request) throws Exception {
 
 		EmploymentApp employmentAppToBeAdded = new EmploymentApp();
 		try {
@@ -86,7 +84,7 @@ public class EmploymentAppController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createEmploymentApp(employmentAppToBeAdded);
@@ -101,63 +99,15 @@ public class EmploymentAppController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createEmploymentApp(@RequestBody EmploymentApp employmentAppToBeAdded) throws Exception {
+	public ResponseEntity<EmploymentApp> createEmploymentApp(@RequestBody EmploymentApp employmentAppToBeAdded) throws Exception {
 
 		AddEmploymentApp command = new AddEmploymentApp(employmentAppToBeAdded);
 		EmploymentApp employmentApp = ((EmploymentAppAdded) Scheduler.execute(command).data()).getAddedEmploymentApp();
 		
 		if (employmentApp != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(employmentApp);
+			return successful(employmentApp);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("EmploymentApp could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateEmploymentApp(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		EmploymentApp employmentAppToBeUpdated = new EmploymentApp();
-
-		try {
-			employmentAppToBeUpdated = EmploymentAppMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateEmploymentApp(employmentAppToBeUpdated, employmentAppToBeUpdated.getApplicationId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class EmploymentAppController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{applicationId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateEmploymentApp(@RequestBody EmploymentApp employmentAppToBeUpdated,
+	public ResponseEntity<String> updateEmploymentApp(@RequestBody EmploymentApp employmentAppToBeUpdated,
 			@PathVariable String applicationId) throws Exception {
 
 		employmentAppToBeUpdated.setApplicationId(applicationId);
@@ -178,41 +128,44 @@ public class EmploymentAppController {
 
 		try {
 			if(((EmploymentAppUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{employmentAppId}")
-	public ResponseEntity<Object> findById(@PathVariable String employmentAppId) throws Exception {
+	public ResponseEntity<EmploymentApp> findById(@PathVariable String employmentAppId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("employmentAppId", employmentAppId);
 		try {
 
-			Object foundEmploymentApp = findEmploymentAppsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundEmploymentApp);
+			List<EmploymentApp> foundEmploymentApp = findEmploymentAppsBy(requestParams).getBody();
+			if(foundEmploymentApp.size()==1){				return successful(foundEmploymentApp.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{employmentAppId}")
-	public ResponseEntity<Object> deleteEmploymentAppByIdUpdated(@PathVariable String employmentAppId) throws Exception {
+	public ResponseEntity<String> deleteEmploymentAppByIdUpdated(@PathVariable String employmentAppId) throws Exception {
 		DeleteEmploymentApp command = new DeleteEmploymentApp(employmentAppId);
 
 		try {
 			if (((EmploymentAppDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("EmploymentApp could not be deleted");
+		return conflict();
 
 	}
 

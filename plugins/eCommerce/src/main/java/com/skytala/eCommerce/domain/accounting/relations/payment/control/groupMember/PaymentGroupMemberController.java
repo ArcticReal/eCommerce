@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.payment.query.groupMemb
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/payment/paymentGroupMembers")
 public class PaymentGroupMemberController {
@@ -52,7 +54,7 @@ public class PaymentGroupMemberController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPaymentGroupMembersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PaymentGroupMember>> findPaymentGroupMembersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentGroupMembersBy query = new FindPaymentGroupMembersBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PaymentGroupMemberController {
 		}
 
 		List<PaymentGroupMember> paymentGroupMembers =((PaymentGroupMemberFound) Scheduler.execute(query).data()).getPaymentGroupMembers();
-
-		if (paymentGroupMembers.size() == 1) {
-			return ResponseEntity.ok().body(paymentGroupMembers.get(0));
-		}
 
 		return ResponseEntity.ok().body(paymentGroupMembers);
 
@@ -78,7 +76,7 @@ public class PaymentGroupMemberController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPaymentGroupMember(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PaymentGroupMember> createPaymentGroupMember(HttpServletRequest request) throws Exception {
 
 		PaymentGroupMember paymentGroupMemberToBeAdded = new PaymentGroupMember();
 		try {
@@ -86,7 +84,7 @@ public class PaymentGroupMemberController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPaymentGroupMember(paymentGroupMemberToBeAdded);
@@ -101,63 +99,15 @@ public class PaymentGroupMemberController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPaymentGroupMember(@RequestBody PaymentGroupMember paymentGroupMemberToBeAdded) throws Exception {
+	public ResponseEntity<PaymentGroupMember> createPaymentGroupMember(@RequestBody PaymentGroupMember paymentGroupMemberToBeAdded) throws Exception {
 
 		AddPaymentGroupMember command = new AddPaymentGroupMember(paymentGroupMemberToBeAdded);
 		PaymentGroupMember paymentGroupMember = ((PaymentGroupMemberAdded) Scheduler.execute(command).data()).getAddedPaymentGroupMember();
 		
 		if (paymentGroupMember != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(paymentGroupMember);
+			return successful(paymentGroupMember);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PaymentGroupMember could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePaymentGroupMember(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PaymentGroupMember paymentGroupMemberToBeUpdated = new PaymentGroupMember();
-
-		try {
-			paymentGroupMemberToBeUpdated = PaymentGroupMemberMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePaymentGroupMember(paymentGroupMemberToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PaymentGroupMemberController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePaymentGroupMember(@RequestBody PaymentGroupMember paymentGroupMemberToBeUpdated,
+	public ResponseEntity<String> updatePaymentGroupMember(@RequestBody PaymentGroupMember paymentGroupMemberToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		paymentGroupMemberToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class PaymentGroupMemberController {
 
 		try {
 			if(((PaymentGroupMemberUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{paymentGroupMemberId}")
-	public ResponseEntity<Object> findById(@PathVariable String paymentGroupMemberId) throws Exception {
+	public ResponseEntity<PaymentGroupMember> findById(@PathVariable String paymentGroupMemberId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentGroupMemberId", paymentGroupMemberId);
 		try {
 
-			Object foundPaymentGroupMember = findPaymentGroupMembersBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPaymentGroupMember);
+			List<PaymentGroupMember> foundPaymentGroupMember = findPaymentGroupMembersBy(requestParams).getBody();
+			if(foundPaymentGroupMember.size()==1){				return successful(foundPaymentGroupMember.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{paymentGroupMemberId}")
-	public ResponseEntity<Object> deletePaymentGroupMemberByIdUpdated(@PathVariable String paymentGroupMemberId) throws Exception {
+	public ResponseEntity<String> deletePaymentGroupMemberByIdUpdated(@PathVariable String paymentGroupMemberId) throws Exception {
 		DeletePaymentGroupMember command = new DeletePaymentGroupMember(paymentGroupMemberId);
 
 		try {
 			if (((PaymentGroupMemberDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PaymentGroupMember could not be deleted");
+		return conflict();
 
 	}
 

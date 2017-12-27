@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.workeffort.relations.workEffort.query.partyA
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/workeffort/workEffort/workEffortPartyAssignments")
 public class WorkEffortPartyAssignmentController {
@@ -52,7 +54,7 @@ public class WorkEffortPartyAssignmentController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWorkEffortPartyAssignmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WorkEffortPartyAssignment>> findWorkEffortPartyAssignmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortPartyAssignmentsBy query = new FindWorkEffortPartyAssignmentsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WorkEffortPartyAssignmentController {
 		}
 
 		List<WorkEffortPartyAssignment> workEffortPartyAssignments =((WorkEffortPartyAssignmentFound) Scheduler.execute(query).data()).getWorkEffortPartyAssignments();
-
-		if (workEffortPartyAssignments.size() == 1) {
-			return ResponseEntity.ok().body(workEffortPartyAssignments.get(0));
-		}
 
 		return ResponseEntity.ok().body(workEffortPartyAssignments);
 
@@ -78,7 +76,7 @@ public class WorkEffortPartyAssignmentController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWorkEffortPartyAssignment(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WorkEffortPartyAssignment> createWorkEffortPartyAssignment(HttpServletRequest request) throws Exception {
 
 		WorkEffortPartyAssignment workEffortPartyAssignmentToBeAdded = new WorkEffortPartyAssignment();
 		try {
@@ -86,7 +84,7 @@ public class WorkEffortPartyAssignmentController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWorkEffortPartyAssignment(workEffortPartyAssignmentToBeAdded);
@@ -101,63 +99,15 @@ public class WorkEffortPartyAssignmentController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWorkEffortPartyAssignment(@RequestBody WorkEffortPartyAssignment workEffortPartyAssignmentToBeAdded) throws Exception {
+	public ResponseEntity<WorkEffortPartyAssignment> createWorkEffortPartyAssignment(@RequestBody WorkEffortPartyAssignment workEffortPartyAssignmentToBeAdded) throws Exception {
 
 		AddWorkEffortPartyAssignment command = new AddWorkEffortPartyAssignment(workEffortPartyAssignmentToBeAdded);
 		WorkEffortPartyAssignment workEffortPartyAssignment = ((WorkEffortPartyAssignmentAdded) Scheduler.execute(command).data()).getAddedWorkEffortPartyAssignment();
 		
 		if (workEffortPartyAssignment != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(workEffortPartyAssignment);
+			return successful(workEffortPartyAssignment);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WorkEffortPartyAssignment could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWorkEffortPartyAssignment(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WorkEffortPartyAssignment workEffortPartyAssignmentToBeUpdated = new WorkEffortPartyAssignment();
-
-		try {
-			workEffortPartyAssignmentToBeUpdated = WorkEffortPartyAssignmentMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWorkEffortPartyAssignment(workEffortPartyAssignmentToBeUpdated, workEffortPartyAssignmentToBeUpdated.getRoleTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WorkEffortPartyAssignmentController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{roleTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWorkEffortPartyAssignment(@RequestBody WorkEffortPartyAssignment workEffortPartyAssignmentToBeUpdated,
+	public ResponseEntity<String> updateWorkEffortPartyAssignment(@RequestBody WorkEffortPartyAssignment workEffortPartyAssignmentToBeUpdated,
 			@PathVariable String roleTypeId) throws Exception {
 
 		workEffortPartyAssignmentToBeUpdated.setRoleTypeId(roleTypeId);
@@ -178,41 +128,44 @@ public class WorkEffortPartyAssignmentController {
 
 		try {
 			if(((WorkEffortPartyAssignmentUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{workEffortPartyAssignmentId}")
-	public ResponseEntity<Object> findById(@PathVariable String workEffortPartyAssignmentId) throws Exception {
+	public ResponseEntity<WorkEffortPartyAssignment> findById(@PathVariable String workEffortPartyAssignmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortPartyAssignmentId", workEffortPartyAssignmentId);
 		try {
 
-			Object foundWorkEffortPartyAssignment = findWorkEffortPartyAssignmentsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWorkEffortPartyAssignment);
+			List<WorkEffortPartyAssignment> foundWorkEffortPartyAssignment = findWorkEffortPartyAssignmentsBy(requestParams).getBody();
+			if(foundWorkEffortPartyAssignment.size()==1){				return successful(foundWorkEffortPartyAssignment.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{workEffortPartyAssignmentId}")
-	public ResponseEntity<Object> deleteWorkEffortPartyAssignmentByIdUpdated(@PathVariable String workEffortPartyAssignmentId) throws Exception {
+	public ResponseEntity<String> deleteWorkEffortPartyAssignmentByIdUpdated(@PathVariable String workEffortPartyAssignmentId) throws Exception {
 		DeleteWorkEffortPartyAssignment command = new DeleteWorkEffortPartyAssignment(workEffortPartyAssignmentId);
 
 		try {
 			if (((WorkEffortPartyAssignmentDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WorkEffortPartyAssignment could not be deleted");
+		return conflict();
 
 	}
 

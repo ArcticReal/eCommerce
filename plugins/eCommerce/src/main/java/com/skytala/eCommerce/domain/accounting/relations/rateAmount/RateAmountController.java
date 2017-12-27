@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.rateAmount.query.FindRa
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/rateAmounts")
 public class RateAmountController {
@@ -52,7 +54,7 @@ public class RateAmountController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findRateAmountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<RateAmount>> findRateAmountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindRateAmountsBy query = new FindRateAmountsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class RateAmountController {
 		}
 
 		List<RateAmount> rateAmounts =((RateAmountFound) Scheduler.execute(query).data()).getRateAmounts();
-
-		if (rateAmounts.size() == 1) {
-			return ResponseEntity.ok().body(rateAmounts.get(0));
-		}
 
 		return ResponseEntity.ok().body(rateAmounts);
 
@@ -78,7 +76,7 @@ public class RateAmountController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createRateAmount(HttpServletRequest request) throws Exception {
+	public ResponseEntity<RateAmount> createRateAmount(HttpServletRequest request) throws Exception {
 
 		RateAmount rateAmountToBeAdded = new RateAmount();
 		try {
@@ -86,7 +84,7 @@ public class RateAmountController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createRateAmount(rateAmountToBeAdded);
@@ -101,63 +99,15 @@ public class RateAmountController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createRateAmount(@RequestBody RateAmount rateAmountToBeAdded) throws Exception {
+	public ResponseEntity<RateAmount> createRateAmount(@RequestBody RateAmount rateAmountToBeAdded) throws Exception {
 
 		AddRateAmount command = new AddRateAmount(rateAmountToBeAdded);
 		RateAmount rateAmount = ((RateAmountAdded) Scheduler.execute(command).data()).getAddedRateAmount();
 		
 		if (rateAmount != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(rateAmount);
+			return successful(rateAmount);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("RateAmount could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateRateAmount(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		RateAmount rateAmountToBeUpdated = new RateAmount();
-
-		try {
-			rateAmountToBeUpdated = RateAmountMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateRateAmount(rateAmountToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class RateAmountController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateRateAmount(@RequestBody RateAmount rateAmountToBeUpdated,
+	public ResponseEntity<String> updateRateAmount(@RequestBody RateAmount rateAmountToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		rateAmountToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class RateAmountController {
 
 		try {
 			if(((RateAmountUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{rateAmountId}")
-	public ResponseEntity<Object> findById(@PathVariable String rateAmountId) throws Exception {
+	public ResponseEntity<RateAmount> findById(@PathVariable String rateAmountId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("rateAmountId", rateAmountId);
 		try {
 
-			Object foundRateAmount = findRateAmountsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundRateAmount);
+			List<RateAmount> foundRateAmount = findRateAmountsBy(requestParams).getBody();
+			if(foundRateAmount.size()==1){				return successful(foundRateAmount.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{rateAmountId}")
-	public ResponseEntity<Object> deleteRateAmountByIdUpdated(@PathVariable String rateAmountId) throws Exception {
+	public ResponseEntity<String> deleteRateAmountByIdUpdated(@PathVariable String rateAmountId) throws Exception {
 		DeleteRateAmount command = new DeleteRateAmount(rateAmountId);
 
 		try {
 			if (((RateAmountDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("RateAmount could not be deleted");
+		return conflict();
 
 	}
 

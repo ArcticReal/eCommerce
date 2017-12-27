@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.quote.query.attribute.FindQu
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/quote/quoteAttributes")
 public class QuoteAttributeController {
@@ -52,7 +54,7 @@ public class QuoteAttributeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findQuoteAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<QuoteAttribute>> findQuoteAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindQuoteAttributesBy query = new FindQuoteAttributesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class QuoteAttributeController {
 		}
 
 		List<QuoteAttribute> quoteAttributes =((QuoteAttributeFound) Scheduler.execute(query).data()).getQuoteAttributes();
-
-		if (quoteAttributes.size() == 1) {
-			return ResponseEntity.ok().body(quoteAttributes.get(0));
-		}
 
 		return ResponseEntity.ok().body(quoteAttributes);
 
@@ -78,7 +76,7 @@ public class QuoteAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createQuoteAttribute(HttpServletRequest request) throws Exception {
+	public ResponseEntity<QuoteAttribute> createQuoteAttribute(HttpServletRequest request) throws Exception {
 
 		QuoteAttribute quoteAttributeToBeAdded = new QuoteAttribute();
 		try {
@@ -86,7 +84,7 @@ public class QuoteAttributeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createQuoteAttribute(quoteAttributeToBeAdded);
@@ -101,63 +99,15 @@ public class QuoteAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createQuoteAttribute(@RequestBody QuoteAttribute quoteAttributeToBeAdded) throws Exception {
+	public ResponseEntity<QuoteAttribute> createQuoteAttribute(@RequestBody QuoteAttribute quoteAttributeToBeAdded) throws Exception {
 
 		AddQuoteAttribute command = new AddQuoteAttribute(quoteAttributeToBeAdded);
 		QuoteAttribute quoteAttribute = ((QuoteAttributeAdded) Scheduler.execute(command).data()).getAddedQuoteAttribute();
 		
 		if (quoteAttribute != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(quoteAttribute);
+			return successful(quoteAttribute);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("QuoteAttribute could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateQuoteAttribute(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		QuoteAttribute quoteAttributeToBeUpdated = new QuoteAttribute();
-
-		try {
-			quoteAttributeToBeUpdated = QuoteAttributeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateQuoteAttribute(quoteAttributeToBeUpdated, quoteAttributeToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class QuoteAttributeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateQuoteAttribute(@RequestBody QuoteAttribute quoteAttributeToBeUpdated,
+	public ResponseEntity<String> updateQuoteAttribute(@RequestBody QuoteAttribute quoteAttributeToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		quoteAttributeToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class QuoteAttributeController {
 
 		try {
 			if(((QuoteAttributeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{quoteAttributeId}")
-	public ResponseEntity<Object> findById(@PathVariable String quoteAttributeId) throws Exception {
+	public ResponseEntity<QuoteAttribute> findById(@PathVariable String quoteAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("quoteAttributeId", quoteAttributeId);
 		try {
 
-			Object foundQuoteAttribute = findQuoteAttributesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundQuoteAttribute);
+			List<QuoteAttribute> foundQuoteAttribute = findQuoteAttributesBy(requestParams).getBody();
+			if(foundQuoteAttribute.size()==1){				return successful(foundQuoteAttribute.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{quoteAttributeId}")
-	public ResponseEntity<Object> deleteQuoteAttributeByIdUpdated(@PathVariable String quoteAttributeId) throws Exception {
+	public ResponseEntity<String> deleteQuoteAttributeByIdUpdated(@PathVariable String quoteAttributeId) throws Exception {
 		DeleteQuoteAttribute command = new DeleteQuoteAttribute(quoteAttributeId);
 
 		try {
 			if (((QuoteAttributeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("QuoteAttribute could not be deleted");
+		return conflict();
 
 	}
 

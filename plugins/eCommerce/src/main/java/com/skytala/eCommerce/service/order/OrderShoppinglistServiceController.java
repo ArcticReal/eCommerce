@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/orderShoppinglist")
 public class OrderShoppinglistServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateShoppingListItem")
-	public ResponseEntity<Object> updateShoppingListItem(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId, @RequestParam(value="shoppingListItemSeqId") String shoppingListItemSeqId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="reservLength", required=false) BigDecimal reservLength, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="reservPersons", required=false) BigDecimal reservPersons, @RequestParam(value="reservStart", required=false) Timestamp reservStart, @RequestParam(value="configId", required=false) String configId, @RequestParam(value="quantityPurchased", required=false) BigDecimal quantityPurchased, @RequestParam(value="modifiedPrice", required=false) BigDecimal modifiedPrice) {
+	public ResponseEntity<Map<String, Object>> updateShoppingListItem(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId, @RequestParam(value="shoppingListItemSeqId") String shoppingListItemSeqId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="reservLength", required=false) BigDecimal reservLength, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="reservPersons", required=false) BigDecimal reservPersons, @RequestParam(value="reservStart", required=false) Timestamp reservStart, @RequestParam(value="configId", required=false) String configId, @RequestParam(value="quantityPurchased", required=false) BigDecimal quantityPurchased, @RequestParam(value="modifiedPrice", required=false) BigDecimal modifiedPrice) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shoppingListId",shoppingListId);
@@ -48,23 +50,23 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteShoppingListType")
-	public ResponseEntity<Object> deleteShoppingListType(HttpSession session, @RequestParam(value="shoppingListTypeId") String shoppingListTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteShoppingListType(HttpSession session, @RequestParam(value="shoppingListTypeId") String shoppingListTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shoppingListTypeId",shoppingListTypeId);
@@ -77,23 +79,23 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/shoppingListItemInterface")
-	public ResponseEntity<Object> shoppingListItemInterface(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="reservLength", required=false) BigDecimal reservLength, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="reservPersons", required=false) BigDecimal reservPersons, @RequestParam(value="reservStart", required=false) Timestamp reservStart, @RequestParam(value="configId", required=false) String configId, @RequestParam(value="quantityPurchased", required=false) BigDecimal quantityPurchased, @RequestParam(value="modifiedPrice", required=false) BigDecimal modifiedPrice) {
+	public ResponseEntity<Map<String, Object>> shoppingListItemInterface(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="reservLength", required=false) BigDecimal reservLength, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="reservPersons", required=false) BigDecimal reservPersons, @RequestParam(value="reservStart", required=false) Timestamp reservStart, @RequestParam(value="configId", required=false) String configId, @RequestParam(value="quantityPurchased", required=false) BigDecimal quantityPurchased, @RequestParam(value="modifiedPrice", required=false) BigDecimal modifiedPrice) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shoppingListId",shoppingListId);
@@ -114,23 +116,23 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateShoppingList")
-	public ResponseEntity<Object> updateShoppingList(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId, @RequestParam(value="intervalNumber", required=false) Integer intervalNumber, @RequestParam(value="recurrenceInfoId", required=false) String recurrenceInfoId, @RequestParam(value="parentShoppingListId", required=false) String parentShoppingListId, @RequestParam(value="productPromoCodeId", required=false) String productPromoCodeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="endDateTime", required=false) Timestamp endDateTime, @RequestParam(value="isActive", required=false) String isActive, @RequestParam(value="shoppingListTypeId", required=false) String shoppingListTypeId, @RequestParam(value="contactMechId", required=false) String contactMechId, @RequestParam(value="frequency", required=false) Integer frequency, @RequestParam(value="shippingMethodString", required=false) String shippingMethodString, @RequestParam(value="carrierPartyId", required=false) String carrierPartyId, @RequestParam(value="startDateTime", required=false) Timestamp startDateTime, @RequestParam(value="currencyUom", required=false) String currencyUom, @RequestParam(value="lastOrderedDate", required=false) Timestamp lastOrderedDate, @RequestParam(value="carrierRoleTypeId", required=false) String carrierRoleTypeId, @RequestParam(value="paymentMethodId", required=false) String paymentMethodId, @RequestParam(value="isPublic", required=false) String isPublic, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="listName", required=false) String listName, @RequestParam(value="lastAdminModified", required=false) Timestamp lastAdminModified, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId, @RequestParam(value="visitorId", required=false) String visitorId) {
+	public ResponseEntity<Map<String, Object>> updateShoppingList(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId, @RequestParam(value="intervalNumber", required=false) Integer intervalNumber, @RequestParam(value="recurrenceInfoId", required=false) String recurrenceInfoId, @RequestParam(value="parentShoppingListId", required=false) String parentShoppingListId, @RequestParam(value="productPromoCodeId", required=false) String productPromoCodeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="endDateTime", required=false) Timestamp endDateTime, @RequestParam(value="isActive", required=false) String isActive, @RequestParam(value="shoppingListTypeId", required=false) String shoppingListTypeId, @RequestParam(value="contactMechId", required=false) String contactMechId, @RequestParam(value="frequency", required=false) Integer frequency, @RequestParam(value="shippingMethodString", required=false) String shippingMethodString, @RequestParam(value="carrierPartyId", required=false) String carrierPartyId, @RequestParam(value="startDateTime", required=false) Timestamp startDateTime, @RequestParam(value="currencyUom", required=false) String currencyUom, @RequestParam(value="lastOrderedDate", required=false) Timestamp lastOrderedDate, @RequestParam(value="carrierRoleTypeId", required=false) String carrierRoleTypeId, @RequestParam(value="paymentMethodId", required=false) String paymentMethodId, @RequestParam(value="isPublic", required=false) String isPublic, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="listName", required=false) String listName, @RequestParam(value="lastAdminModified", required=false) Timestamp lastAdminModified, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId, @RequestParam(value="visitorId", required=false) String visitorId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shoppingListId",shoppingListId);
@@ -167,23 +169,23 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShoppingListItemSurvey")
-	public ResponseEntity<Object> createShoppingListItemSurvey(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId, @RequestParam(value="shoppingListItemSeqId") String shoppingListItemSeqId, @RequestParam(value="surveyResponseId") String surveyResponseId) {
+	public ResponseEntity<Map<String, Object>> createShoppingListItemSurvey(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId, @RequestParam(value="shoppingListItemSeqId") String shoppingListItemSeqId, @RequestParam(value="surveyResponseId") String surveyResponseId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shoppingListId",shoppingListId);
@@ -198,23 +200,23 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShoppingListType")
-	public ResponseEntity<Object> createShoppingListType(HttpSession session, @RequestParam(value="shoppingListTypeId") String shoppingListTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createShoppingListType(HttpSession session, @RequestParam(value="shoppingListTypeId") String shoppingListTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shoppingListTypeId",shoppingListTypeId);
@@ -228,23 +230,23 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/splitShipmentMethodString")
-	public ResponseEntity<Object> splitShipmentMethodString(HttpSession session, @RequestParam(value="shippingMethodString", required=false) String shippingMethodString) {
+	public ResponseEntity<Map<String, Object>> splitShipmentMethodString(HttpSession session, @RequestParam(value="shippingMethodString", required=false) String shippingMethodString) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shippingMethodString",shippingMethodString);
@@ -257,23 +259,23 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/shoppingListInterface")
-	public ResponseEntity<Object> shoppingListInterface(HttpSession session, @RequestParam(value="recurrenceInfoId", required=false) String recurrenceInfoId, @RequestParam(value="parentShoppingListId", required=false) String parentShoppingListId, @RequestParam(value="productPromoCodeId", required=false) String productPromoCodeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="isActive", required=false) String isActive, @RequestParam(value="shoppingListTypeId", required=false) String shoppingListTypeId, @RequestParam(value="contactMechId", required=false) String contactMechId, @RequestParam(value="shippingMethodString", required=false) String shippingMethodString, @RequestParam(value="carrierPartyId", required=false) String carrierPartyId, @RequestParam(value="currencyUom", required=false) String currencyUom, @RequestParam(value="lastOrderedDate", required=false) Timestamp lastOrderedDate, @RequestParam(value="carrierRoleTypeId", required=false) String carrierRoleTypeId, @RequestParam(value="paymentMethodId", required=false) String paymentMethodId, @RequestParam(value="isPublic", required=false) String isPublic, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="listName", required=false) String listName, @RequestParam(value="lastAdminModified", required=false) Timestamp lastAdminModified, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId, @RequestParam(value="visitorId", required=false) String visitorId) {
+	public ResponseEntity<Map<String, Object>> shoppingListInterface(HttpSession session, @RequestParam(value="recurrenceInfoId", required=false) String recurrenceInfoId, @RequestParam(value="parentShoppingListId", required=false) String parentShoppingListId, @RequestParam(value="productPromoCodeId", required=false) String productPromoCodeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="isActive", required=false) String isActive, @RequestParam(value="shoppingListTypeId", required=false) String shoppingListTypeId, @RequestParam(value="contactMechId", required=false) String contactMechId, @RequestParam(value="shippingMethodString", required=false) String shippingMethodString, @RequestParam(value="carrierPartyId", required=false) String carrierPartyId, @RequestParam(value="currencyUom", required=false) String currencyUom, @RequestParam(value="lastOrderedDate", required=false) Timestamp lastOrderedDate, @RequestParam(value="carrierRoleTypeId", required=false) String carrierRoleTypeId, @RequestParam(value="paymentMethodId", required=false) String paymentMethodId, @RequestParam(value="isPublic", required=false) String isPublic, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="listName", required=false) String listName, @RequestParam(value="lastAdminModified", required=false) Timestamp lastAdminModified, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId, @RequestParam(value="visitorId", required=false) String visitorId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("recurrenceInfoId",recurrenceInfoId);
@@ -305,23 +307,23 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeShoppingList")
-	public ResponseEntity<Object> removeShoppingList(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId) {
+	public ResponseEntity<Map<String, Object>> removeShoppingList(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shoppingListId",shoppingListId);
@@ -334,23 +336,23 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/makeShoppingListFromOrder")
-	public ResponseEntity<Object> makeShoppingListFromOrder(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="intervalNumber", required=false) Integer intervalNumber, @RequestParam(value="startDateTime", required=false) Timestamp startDateTime, @RequestParam(value="shoppingListId", required=false) String shoppingListId, @RequestParam(value="endDateTime", required=false) Timestamp endDateTime, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="shoppingListTypeId", required=false) String shoppingListTypeId, @RequestParam(value="frequency", required=false) Integer frequency) {
+	public ResponseEntity<Map<String, Object>> makeShoppingListFromOrder(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="intervalNumber", required=false) Integer intervalNumber, @RequestParam(value="startDateTime", required=false) Timestamp startDateTime, @RequestParam(value="shoppingListId", required=false) String shoppingListId, @RequestParam(value="endDateTime", required=false) Timestamp endDateTime, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="shoppingListTypeId", required=false) String shoppingListTypeId, @RequestParam(value="frequency", required=false) Integer frequency) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderId",orderId);
@@ -370,23 +372,23 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateShoppingListType")
-	public ResponseEntity<Object> updateShoppingListType(HttpSession session, @RequestParam(value="shoppingListTypeId") String shoppingListTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateShoppingListType(HttpSession session, @RequestParam(value="shoppingListTypeId") String shoppingListTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shoppingListTypeId",shoppingListTypeId);
@@ -400,23 +402,23 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteShoppingListItemSurvey")
-	public ResponseEntity<Object> deleteShoppingListItemSurvey(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId, @RequestParam(value="shoppingListItemSeqId") String shoppingListItemSeqId, @RequestParam(value="surveyResponseId") String surveyResponseId) {
+	public ResponseEntity<Map<String, Object>> deleteShoppingListItemSurvey(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId, @RequestParam(value="shoppingListItemSeqId") String shoppingListItemSeqId, @RequestParam(value="surveyResponseId") String surveyResponseId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shoppingListId",shoppingListId);
@@ -431,23 +433,23 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShoppingList")
-	public ResponseEntity<Object> createShoppingList(HttpSession session, @RequestParam(value="intervalNumber", required=false) Integer intervalNumber, @RequestParam(value="recurrenceInfoId", required=false) String recurrenceInfoId, @RequestParam(value="parentShoppingListId", required=false) String parentShoppingListId, @RequestParam(value="productPromoCodeId", required=false) String productPromoCodeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="endDateTime", required=false) Timestamp endDateTime, @RequestParam(value="isActive", required=false) String isActive, @RequestParam(value="shoppingListTypeId", required=false) String shoppingListTypeId, @RequestParam(value="contactMechId", required=false) String contactMechId, @RequestParam(value="frequency", required=false) Integer frequency, @RequestParam(value="shippingMethodString", required=false) String shippingMethodString, @RequestParam(value="carrierPartyId", required=false) String carrierPartyId, @RequestParam(value="startDateTime", required=false) Timestamp startDateTime, @RequestParam(value="currencyUom", required=false) String currencyUom, @RequestParam(value="lastOrderedDate", required=false) Timestamp lastOrderedDate, @RequestParam(value="carrierRoleTypeId", required=false) String carrierRoleTypeId, @RequestParam(value="paymentMethodId", required=false) String paymentMethodId, @RequestParam(value="isPublic", required=false) String isPublic, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="listName", required=false) String listName, @RequestParam(value="lastAdminModified", required=false) Timestamp lastAdminModified, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId, @RequestParam(value="visitorId", required=false) String visitorId) {
+	public ResponseEntity<Map<String, Object>> createShoppingList(HttpSession session, @RequestParam(value="intervalNumber", required=false) Integer intervalNumber, @RequestParam(value="recurrenceInfoId", required=false) String recurrenceInfoId, @RequestParam(value="parentShoppingListId", required=false) String parentShoppingListId, @RequestParam(value="productPromoCodeId", required=false) String productPromoCodeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="endDateTime", required=false) Timestamp endDateTime, @RequestParam(value="isActive", required=false) String isActive, @RequestParam(value="shoppingListTypeId", required=false) String shoppingListTypeId, @RequestParam(value="contactMechId", required=false) String contactMechId, @RequestParam(value="frequency", required=false) Integer frequency, @RequestParam(value="shippingMethodString", required=false) String shippingMethodString, @RequestParam(value="carrierPartyId", required=false) String carrierPartyId, @RequestParam(value="startDateTime", required=false) Timestamp startDateTime, @RequestParam(value="currencyUom", required=false) String currencyUom, @RequestParam(value="lastOrderedDate", required=false) Timestamp lastOrderedDate, @RequestParam(value="carrierRoleTypeId", required=false) String carrierRoleTypeId, @RequestParam(value="paymentMethodId", required=false) String paymentMethodId, @RequestParam(value="isPublic", required=false) String isPublic, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="listName", required=false) String listName, @RequestParam(value="lastAdminModified", required=false) Timestamp lastAdminModified, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId, @RequestParam(value="visitorId", required=false) String visitorId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("intervalNumber",intervalNumber);
@@ -483,23 +485,23 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShoppingListRecurrence")
-	public ResponseEntity<Object> createShoppingListRecurrence(HttpSession session, @RequestParam(value="intervalNumber", required=false) Integer intervalNumber, @RequestParam(value="startDateTime", required=false) Timestamp startDateTime, @RequestParam(value="endDateTime", required=false) Timestamp endDateTime, @RequestParam(value="frequency", required=false) Integer frequency) {
+	public ResponseEntity<Map<String, Object>> createShoppingListRecurrence(HttpSession session, @RequestParam(value="intervalNumber", required=false) Integer intervalNumber, @RequestParam(value="startDateTime", required=false) Timestamp startDateTime, @RequestParam(value="endDateTime", required=false) Timestamp endDateTime, @RequestParam(value="frequency", required=false) Integer frequency) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("intervalNumber",intervalNumber);
@@ -515,23 +517,23 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/runShoppingListAutoReorder")
-	public ResponseEntity<Object> runShoppingListAutoReorder(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> runShoppingListAutoReorder(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -543,23 +545,23 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/autoDeleteAutoSaveShoppingList")
-	public ResponseEntity<Object> autoDeleteAutoSaveShoppingList(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> autoDeleteAutoSaveShoppingList(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -571,23 +573,23 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeShoppingListItem")
-	public ResponseEntity<Object> removeShoppingListItem(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId, @RequestParam(value="shoppingListItemSeqId") String shoppingListItemSeqId) {
+	public ResponseEntity<Map<String, Object>> removeShoppingListItem(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId, @RequestParam(value="shoppingListItemSeqId") String shoppingListItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shoppingListId",shoppingListId);
@@ -601,23 +603,23 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addSuggestionsToShoppingList")
-	public ResponseEntity<Object> addSuggestionsToShoppingList(HttpSession session, @RequestParam(value="orderId") String orderId) {
+	public ResponseEntity<Map<String, Object>> addSuggestionsToShoppingList(HttpSession session, @RequestParam(value="orderId") String orderId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderId",orderId);
@@ -630,23 +632,23 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/calculateShoppingListDeepTotalPrice")
-	public ResponseEntity<Object> calculateShoppingListDeepTotalPrice(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId, @RequestParam(value="prodCatalogId") String prodCatalogId, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="autoUserLogin", required=false) org.apache.ofbiz.entity.GenericValue autoUserLogin, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="productStoreGroupId", required=false) String productStoreGroupId) {
+	public ResponseEntity<Map<String, Object>> calculateShoppingListDeepTotalPrice(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId, @RequestParam(value="prodCatalogId") String prodCatalogId, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="autoUserLogin", required=false) org.apache.ofbiz.entity.GenericValue autoUserLogin, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="productStoreGroupId", required=false) String productStoreGroupId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shoppingListId",shoppingListId);
@@ -667,23 +669,23 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShoppingListItem")
-	public ResponseEntity<Object> createShoppingListItem(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="reservLength", required=false) BigDecimal reservLength, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="reservPersons", required=false) BigDecimal reservPersons, @RequestParam(value="reservStart", required=false) Timestamp reservStart, @RequestParam(value="configId", required=false) String configId, @RequestParam(value="quantityPurchased", required=false) BigDecimal quantityPurchased, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="modifiedPrice", required=false) BigDecimal modifiedPrice) {
+	public ResponseEntity<Map<String, Object>> createShoppingListItem(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="reservLength", required=false) BigDecimal reservLength, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="reservPersons", required=false) BigDecimal reservPersons, @RequestParam(value="reservStart", required=false) Timestamp reservStart, @RequestParam(value="configId", required=false) String configId, @RequestParam(value="quantityPurchased", required=false) BigDecimal quantityPurchased, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="modifiedPrice", required=false) BigDecimal modifiedPrice) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shoppingListId",shoppingListId);
@@ -705,23 +707,23 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addDistinctShoppingListItem")
-	public ResponseEntity<Object> addDistinctShoppingListItem(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="reservLength", required=false) BigDecimal reservLength, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="reservPersons", required=false) BigDecimal reservPersons, @RequestParam(value="reservStart", required=false) Timestamp reservStart, @RequestParam(value="configId", required=false) String configId, @RequestParam(value="quantityPurchased", required=false) BigDecimal quantityPurchased, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="modifiedPrice", required=false) BigDecimal modifiedPrice) {
+	public ResponseEntity<Map<String, Object>> addDistinctShoppingListItem(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="reservLength", required=false) BigDecimal reservLength, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="reservPersons", required=false) BigDecimal reservPersons, @RequestParam(value="reservStart", required=false) Timestamp reservStart, @RequestParam(value="configId", required=false) String configId, @RequestParam(value="quantityPurchased", required=false) BigDecimal quantityPurchased, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="modifiedPrice", required=false) BigDecimal modifiedPrice) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shoppingListId",shoppingListId);
@@ -743,19 +745,19 @@ public class OrderShoppinglistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

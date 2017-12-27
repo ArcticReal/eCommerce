@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.inventoryItem.query.status
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/inventoryItem/inventoryItemStatuss")
 public class InventoryItemStatusController {
@@ -52,7 +54,7 @@ public class InventoryItemStatusController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findInventoryItemStatussBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<InventoryItemStatus>> findInventoryItemStatussBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInventoryItemStatussBy query = new FindInventoryItemStatussBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class InventoryItemStatusController {
 		}
 
 		List<InventoryItemStatus> inventoryItemStatuss =((InventoryItemStatusFound) Scheduler.execute(query).data()).getInventoryItemStatuss();
-
-		if (inventoryItemStatuss.size() == 1) {
-			return ResponseEntity.ok().body(inventoryItemStatuss.get(0));
-		}
 
 		return ResponseEntity.ok().body(inventoryItemStatuss);
 
@@ -78,7 +76,7 @@ public class InventoryItemStatusController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createInventoryItemStatus(HttpServletRequest request) throws Exception {
+	public ResponseEntity<InventoryItemStatus> createInventoryItemStatus(HttpServletRequest request) throws Exception {
 
 		InventoryItemStatus inventoryItemStatusToBeAdded = new InventoryItemStatus();
 		try {
@@ -86,7 +84,7 @@ public class InventoryItemStatusController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createInventoryItemStatus(inventoryItemStatusToBeAdded);
@@ -101,63 +99,15 @@ public class InventoryItemStatusController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createInventoryItemStatus(@RequestBody InventoryItemStatus inventoryItemStatusToBeAdded) throws Exception {
+	public ResponseEntity<InventoryItemStatus> createInventoryItemStatus(@RequestBody InventoryItemStatus inventoryItemStatusToBeAdded) throws Exception {
 
 		AddInventoryItemStatus command = new AddInventoryItemStatus(inventoryItemStatusToBeAdded);
 		InventoryItemStatus inventoryItemStatus = ((InventoryItemStatusAdded) Scheduler.execute(command).data()).getAddedInventoryItemStatus();
 		
 		if (inventoryItemStatus != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(inventoryItemStatus);
+			return successful(inventoryItemStatus);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("InventoryItemStatus could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateInventoryItemStatus(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		InventoryItemStatus inventoryItemStatusToBeUpdated = new InventoryItemStatus();
-
-		try {
-			inventoryItemStatusToBeUpdated = InventoryItemStatusMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateInventoryItemStatus(inventoryItemStatusToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class InventoryItemStatusController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateInventoryItemStatus(@RequestBody InventoryItemStatus inventoryItemStatusToBeUpdated,
+	public ResponseEntity<String> updateInventoryItemStatus(@RequestBody InventoryItemStatus inventoryItemStatusToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		inventoryItemStatusToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class InventoryItemStatusController {
 
 		try {
 			if(((InventoryItemStatusUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{inventoryItemStatusId}")
-	public ResponseEntity<Object> findById(@PathVariable String inventoryItemStatusId) throws Exception {
+	public ResponseEntity<InventoryItemStatus> findById(@PathVariable String inventoryItemStatusId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("inventoryItemStatusId", inventoryItemStatusId);
 		try {
 
-			Object foundInventoryItemStatus = findInventoryItemStatussBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundInventoryItemStatus);
+			List<InventoryItemStatus> foundInventoryItemStatus = findInventoryItemStatussBy(requestParams).getBody();
+			if(foundInventoryItemStatus.size()==1){				return successful(foundInventoryItemStatus.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{inventoryItemStatusId}")
-	public ResponseEntity<Object> deleteInventoryItemStatusByIdUpdated(@PathVariable String inventoryItemStatusId) throws Exception {
+	public ResponseEntity<String> deleteInventoryItemStatusByIdUpdated(@PathVariable String inventoryItemStatusId) throws Exception {
 		DeleteInventoryItemStatus command = new DeleteInventoryItemStatus(inventoryItemStatusId);
 
 		try {
 			if (((InventoryItemStatusDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("InventoryItemStatus could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.glAccount.query.party.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/glAccount/partyGlAccounts")
 public class PartyGlAccountController {
@@ -52,7 +54,7 @@ public class PartyGlAccountController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPartyGlAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PartyGlAccount>> findPartyGlAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyGlAccountsBy query = new FindPartyGlAccountsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PartyGlAccountController {
 		}
 
 		List<PartyGlAccount> partyGlAccounts =((PartyGlAccountFound) Scheduler.execute(query).data()).getPartyGlAccounts();
-
-		if (partyGlAccounts.size() == 1) {
-			return ResponseEntity.ok().body(partyGlAccounts.get(0));
-		}
 
 		return ResponseEntity.ok().body(partyGlAccounts);
 
@@ -78,7 +76,7 @@ public class PartyGlAccountController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPartyGlAccount(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PartyGlAccount> createPartyGlAccount(HttpServletRequest request) throws Exception {
 
 		PartyGlAccount partyGlAccountToBeAdded = new PartyGlAccount();
 		try {
@@ -86,7 +84,7 @@ public class PartyGlAccountController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPartyGlAccount(partyGlAccountToBeAdded);
@@ -101,63 +99,15 @@ public class PartyGlAccountController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPartyGlAccount(@RequestBody PartyGlAccount partyGlAccountToBeAdded) throws Exception {
+	public ResponseEntity<PartyGlAccount> createPartyGlAccount(@RequestBody PartyGlAccount partyGlAccountToBeAdded) throws Exception {
 
 		AddPartyGlAccount command = new AddPartyGlAccount(partyGlAccountToBeAdded);
 		PartyGlAccount partyGlAccount = ((PartyGlAccountAdded) Scheduler.execute(command).data()).getAddedPartyGlAccount();
 		
 		if (partyGlAccount != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(partyGlAccount);
+			return successful(partyGlAccount);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PartyGlAccount could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePartyGlAccount(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PartyGlAccount partyGlAccountToBeUpdated = new PartyGlAccount();
-
-		try {
-			partyGlAccountToBeUpdated = PartyGlAccountMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePartyGlAccount(partyGlAccountToBeUpdated, partyGlAccountToBeUpdated.getRoleTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PartyGlAccountController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{roleTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePartyGlAccount(@RequestBody PartyGlAccount partyGlAccountToBeUpdated,
+	public ResponseEntity<String> updatePartyGlAccount(@RequestBody PartyGlAccount partyGlAccountToBeUpdated,
 			@PathVariable String roleTypeId) throws Exception {
 
 		partyGlAccountToBeUpdated.setRoleTypeId(roleTypeId);
@@ -178,41 +128,44 @@ public class PartyGlAccountController {
 
 		try {
 			if(((PartyGlAccountUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{partyGlAccountId}")
-	public ResponseEntity<Object> findById(@PathVariable String partyGlAccountId) throws Exception {
+	public ResponseEntity<PartyGlAccount> findById(@PathVariable String partyGlAccountId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyGlAccountId", partyGlAccountId);
 		try {
 
-			Object foundPartyGlAccount = findPartyGlAccountsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPartyGlAccount);
+			List<PartyGlAccount> foundPartyGlAccount = findPartyGlAccountsBy(requestParams).getBody();
+			if(foundPartyGlAccount.size()==1){				return successful(foundPartyGlAccount.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{partyGlAccountId}")
-	public ResponseEntity<Object> deletePartyGlAccountByIdUpdated(@PathVariable String partyGlAccountId) throws Exception {
+	public ResponseEntity<String> deletePartyGlAccountByIdUpdated(@PathVariable String partyGlAccountId) throws Exception {
 		DeletePartyGlAccount command = new DeletePartyGlAccount(partyGlAccountId);
 
 		try {
 			if (((PartyGlAccountDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PartyGlAccount could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.content.query.revisionItem
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/content/contentRevisionItems")
 public class ContentRevisionItemController {
@@ -52,7 +54,7 @@ public class ContentRevisionItemController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findContentRevisionItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ContentRevisionItem>> findContentRevisionItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContentRevisionItemsBy query = new FindContentRevisionItemsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ContentRevisionItemController {
 		}
 
 		List<ContentRevisionItem> contentRevisionItems =((ContentRevisionItemFound) Scheduler.execute(query).data()).getContentRevisionItems();
-
-		if (contentRevisionItems.size() == 1) {
-			return ResponseEntity.ok().body(contentRevisionItems.get(0));
-		}
 
 		return ResponseEntity.ok().body(contentRevisionItems);
 
@@ -78,7 +76,7 @@ public class ContentRevisionItemController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createContentRevisionItem(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ContentRevisionItem> createContentRevisionItem(HttpServletRequest request) throws Exception {
 
 		ContentRevisionItem contentRevisionItemToBeAdded = new ContentRevisionItem();
 		try {
@@ -86,7 +84,7 @@ public class ContentRevisionItemController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createContentRevisionItem(contentRevisionItemToBeAdded);
@@ -101,63 +99,15 @@ public class ContentRevisionItemController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createContentRevisionItem(@RequestBody ContentRevisionItem contentRevisionItemToBeAdded) throws Exception {
+	public ResponseEntity<ContentRevisionItem> createContentRevisionItem(@RequestBody ContentRevisionItem contentRevisionItemToBeAdded) throws Exception {
 
 		AddContentRevisionItem command = new AddContentRevisionItem(contentRevisionItemToBeAdded);
 		ContentRevisionItem contentRevisionItem = ((ContentRevisionItemAdded) Scheduler.execute(command).data()).getAddedContentRevisionItem();
 		
 		if (contentRevisionItem != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(contentRevisionItem);
+			return successful(contentRevisionItem);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ContentRevisionItem could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateContentRevisionItem(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ContentRevisionItem contentRevisionItemToBeUpdated = new ContentRevisionItem();
-
-		try {
-			contentRevisionItemToBeUpdated = ContentRevisionItemMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateContentRevisionItem(contentRevisionItemToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ContentRevisionItemController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateContentRevisionItem(@RequestBody ContentRevisionItem contentRevisionItemToBeUpdated,
+	public ResponseEntity<String> updateContentRevisionItem(@RequestBody ContentRevisionItem contentRevisionItemToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		contentRevisionItemToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ContentRevisionItemController {
 
 		try {
 			if(((ContentRevisionItemUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{contentRevisionItemId}")
-	public ResponseEntity<Object> findById(@PathVariable String contentRevisionItemId) throws Exception {
+	public ResponseEntity<ContentRevisionItem> findById(@PathVariable String contentRevisionItemId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contentRevisionItemId", contentRevisionItemId);
 		try {
 
-			Object foundContentRevisionItem = findContentRevisionItemsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundContentRevisionItem);
+			List<ContentRevisionItem> foundContentRevisionItem = findContentRevisionItemsBy(requestParams).getBody();
+			if(foundContentRevisionItem.size()==1){				return successful(foundContentRevisionItem.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{contentRevisionItemId}")
-	public ResponseEntity<Object> deleteContentRevisionItemByIdUpdated(@PathVariable String contentRevisionItemId) throws Exception {
+	public ResponseEntity<String> deleteContentRevisionItemByIdUpdated(@PathVariable String contentRevisionItemId) throws Exception {
 		DeleteContentRevisionItem command = new DeleteContentRevisionItem(contentRevisionItemId);
 
 		try {
 			if (((ContentRevisionItemDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ContentRevisionItem could not be deleted");
+		return conflict();
 
 	}
 

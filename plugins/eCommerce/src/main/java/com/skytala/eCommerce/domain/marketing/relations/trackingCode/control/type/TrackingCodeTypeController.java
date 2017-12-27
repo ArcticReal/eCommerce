@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.marketing.relations.trackingCode.query.type.
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/marketing/trackingCode/trackingCodeTypes")
 public class TrackingCodeTypeController {
@@ -52,7 +54,7 @@ public class TrackingCodeTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findTrackingCodeTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<TrackingCodeType>> findTrackingCodeTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTrackingCodeTypesBy query = new FindTrackingCodeTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class TrackingCodeTypeController {
 		}
 
 		List<TrackingCodeType> trackingCodeTypes =((TrackingCodeTypeFound) Scheduler.execute(query).data()).getTrackingCodeTypes();
-
-		if (trackingCodeTypes.size() == 1) {
-			return ResponseEntity.ok().body(trackingCodeTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(trackingCodeTypes);
 
@@ -78,7 +76,7 @@ public class TrackingCodeTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createTrackingCodeType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<TrackingCodeType> createTrackingCodeType(HttpServletRequest request) throws Exception {
 
 		TrackingCodeType trackingCodeTypeToBeAdded = new TrackingCodeType();
 		try {
@@ -86,7 +84,7 @@ public class TrackingCodeTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createTrackingCodeType(trackingCodeTypeToBeAdded);
@@ -101,63 +99,15 @@ public class TrackingCodeTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createTrackingCodeType(@RequestBody TrackingCodeType trackingCodeTypeToBeAdded) throws Exception {
+	public ResponseEntity<TrackingCodeType> createTrackingCodeType(@RequestBody TrackingCodeType trackingCodeTypeToBeAdded) throws Exception {
 
 		AddTrackingCodeType command = new AddTrackingCodeType(trackingCodeTypeToBeAdded);
 		TrackingCodeType trackingCodeType = ((TrackingCodeTypeAdded) Scheduler.execute(command).data()).getAddedTrackingCodeType();
 		
 		if (trackingCodeType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(trackingCodeType);
+			return successful(trackingCodeType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("TrackingCodeType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateTrackingCodeType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		TrackingCodeType trackingCodeTypeToBeUpdated = new TrackingCodeType();
-
-		try {
-			trackingCodeTypeToBeUpdated = TrackingCodeTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateTrackingCodeType(trackingCodeTypeToBeUpdated, trackingCodeTypeToBeUpdated.getTrackingCodeTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class TrackingCodeTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{trackingCodeTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateTrackingCodeType(@RequestBody TrackingCodeType trackingCodeTypeToBeUpdated,
+	public ResponseEntity<String> updateTrackingCodeType(@RequestBody TrackingCodeType trackingCodeTypeToBeUpdated,
 			@PathVariable String trackingCodeTypeId) throws Exception {
 
 		trackingCodeTypeToBeUpdated.setTrackingCodeTypeId(trackingCodeTypeId);
@@ -178,41 +128,44 @@ public class TrackingCodeTypeController {
 
 		try {
 			if(((TrackingCodeTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{trackingCodeTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String trackingCodeTypeId) throws Exception {
+	public ResponseEntity<TrackingCodeType> findById(@PathVariable String trackingCodeTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("trackingCodeTypeId", trackingCodeTypeId);
 		try {
 
-			Object foundTrackingCodeType = findTrackingCodeTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundTrackingCodeType);
+			List<TrackingCodeType> foundTrackingCodeType = findTrackingCodeTypesBy(requestParams).getBody();
+			if(foundTrackingCodeType.size()==1){				return successful(foundTrackingCodeType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{trackingCodeTypeId}")
-	public ResponseEntity<Object> deleteTrackingCodeTypeByIdUpdated(@PathVariable String trackingCodeTypeId) throws Exception {
+	public ResponseEntity<String> deleteTrackingCodeTypeByIdUpdated(@PathVariable String trackingCodeTypeId) throws Exception {
 		DeleteTrackingCodeType command = new DeleteTrackingCodeType(trackingCodeTypeId);
 
 		try {
 			if (((TrackingCodeTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("TrackingCodeType could not be deleted");
+		return conflict();
 
 	}
 

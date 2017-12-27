@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.workeffort.relations.timesheet.query.role.Fi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/workeffort/timesheet/timesheetRoles")
 public class TimesheetRoleController {
@@ -52,7 +54,7 @@ public class TimesheetRoleController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findTimesheetRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<TimesheetRole>> findTimesheetRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTimesheetRolesBy query = new FindTimesheetRolesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class TimesheetRoleController {
 		}
 
 		List<TimesheetRole> timesheetRoles =((TimesheetRoleFound) Scheduler.execute(query).data()).getTimesheetRoles();
-
-		if (timesheetRoles.size() == 1) {
-			return ResponseEntity.ok().body(timesheetRoles.get(0));
-		}
 
 		return ResponseEntity.ok().body(timesheetRoles);
 
@@ -78,7 +76,7 @@ public class TimesheetRoleController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createTimesheetRole(HttpServletRequest request) throws Exception {
+	public ResponseEntity<TimesheetRole> createTimesheetRole(HttpServletRequest request) throws Exception {
 
 		TimesheetRole timesheetRoleToBeAdded = new TimesheetRole();
 		try {
@@ -86,7 +84,7 @@ public class TimesheetRoleController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createTimesheetRole(timesheetRoleToBeAdded);
@@ -101,63 +99,15 @@ public class TimesheetRoleController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createTimesheetRole(@RequestBody TimesheetRole timesheetRoleToBeAdded) throws Exception {
+	public ResponseEntity<TimesheetRole> createTimesheetRole(@RequestBody TimesheetRole timesheetRoleToBeAdded) throws Exception {
 
 		AddTimesheetRole command = new AddTimesheetRole(timesheetRoleToBeAdded);
 		TimesheetRole timesheetRole = ((TimesheetRoleAdded) Scheduler.execute(command).data()).getAddedTimesheetRole();
 		
 		if (timesheetRole != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(timesheetRole);
+			return successful(timesheetRole);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("TimesheetRole could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateTimesheetRole(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		TimesheetRole timesheetRoleToBeUpdated = new TimesheetRole();
-
-		try {
-			timesheetRoleToBeUpdated = TimesheetRoleMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateTimesheetRole(timesheetRoleToBeUpdated, timesheetRoleToBeUpdated.getRoleTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class TimesheetRoleController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{roleTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateTimesheetRole(@RequestBody TimesheetRole timesheetRoleToBeUpdated,
+	public ResponseEntity<String> updateTimesheetRole(@RequestBody TimesheetRole timesheetRoleToBeUpdated,
 			@PathVariable String roleTypeId) throws Exception {
 
 		timesheetRoleToBeUpdated.setRoleTypeId(roleTypeId);
@@ -178,41 +128,44 @@ public class TimesheetRoleController {
 
 		try {
 			if(((TimesheetRoleUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{timesheetRoleId}")
-	public ResponseEntity<Object> findById(@PathVariable String timesheetRoleId) throws Exception {
+	public ResponseEntity<TimesheetRole> findById(@PathVariable String timesheetRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("timesheetRoleId", timesheetRoleId);
 		try {
 
-			Object foundTimesheetRole = findTimesheetRolesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundTimesheetRole);
+			List<TimesheetRole> foundTimesheetRole = findTimesheetRolesBy(requestParams).getBody();
+			if(foundTimesheetRole.size()==1){				return successful(foundTimesheetRole.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{timesheetRoleId}")
-	public ResponseEntity<Object> deleteTimesheetRoleByIdUpdated(@PathVariable String timesheetRoleId) throws Exception {
+	public ResponseEntity<String> deleteTimesheetRoleByIdUpdated(@PathVariable String timesheetRoleId) throws Exception {
 		DeleteTimesheetRole command = new DeleteTimesheetRole(timesheetRoleId);
 
 		try {
 			if (((TimesheetRoleDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("TimesheetRole could not be deleted");
+		return conflict();
 
 	}
 

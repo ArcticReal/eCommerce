@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.shipment.relations.shipment.query.itemBillin
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/shipment/shipment/shipmentItemBillings")
 public class ShipmentItemBillingController {
@@ -52,7 +54,7 @@ public class ShipmentItemBillingController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findShipmentItemBillingsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ShipmentItemBilling>> findShipmentItemBillingsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentItemBillingsBy query = new FindShipmentItemBillingsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ShipmentItemBillingController {
 		}
 
 		List<ShipmentItemBilling> shipmentItemBillings =((ShipmentItemBillingFound) Scheduler.execute(query).data()).getShipmentItemBillings();
-
-		if (shipmentItemBillings.size() == 1) {
-			return ResponseEntity.ok().body(shipmentItemBillings.get(0));
-		}
 
 		return ResponseEntity.ok().body(shipmentItemBillings);
 
@@ -78,7 +76,7 @@ public class ShipmentItemBillingController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createShipmentItemBilling(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ShipmentItemBilling> createShipmentItemBilling(HttpServletRequest request) throws Exception {
 
 		ShipmentItemBilling shipmentItemBillingToBeAdded = new ShipmentItemBilling();
 		try {
@@ -86,7 +84,7 @@ public class ShipmentItemBillingController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createShipmentItemBilling(shipmentItemBillingToBeAdded);
@@ -101,63 +99,15 @@ public class ShipmentItemBillingController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createShipmentItemBilling(@RequestBody ShipmentItemBilling shipmentItemBillingToBeAdded) throws Exception {
+	public ResponseEntity<ShipmentItemBilling> createShipmentItemBilling(@RequestBody ShipmentItemBilling shipmentItemBillingToBeAdded) throws Exception {
 
 		AddShipmentItemBilling command = new AddShipmentItemBilling(shipmentItemBillingToBeAdded);
 		ShipmentItemBilling shipmentItemBilling = ((ShipmentItemBillingAdded) Scheduler.execute(command).data()).getAddedShipmentItemBilling();
 		
 		if (shipmentItemBilling != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(shipmentItemBilling);
+			return successful(shipmentItemBilling);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ShipmentItemBilling could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateShipmentItemBilling(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ShipmentItemBilling shipmentItemBillingToBeUpdated = new ShipmentItemBilling();
-
-		try {
-			shipmentItemBillingToBeUpdated = ShipmentItemBillingMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateShipmentItemBilling(shipmentItemBillingToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ShipmentItemBillingController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateShipmentItemBilling(@RequestBody ShipmentItemBilling shipmentItemBillingToBeUpdated,
+	public ResponseEntity<String> updateShipmentItemBilling(@RequestBody ShipmentItemBilling shipmentItemBillingToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		shipmentItemBillingToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ShipmentItemBillingController {
 
 		try {
 			if(((ShipmentItemBillingUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{shipmentItemBillingId}")
-	public ResponseEntity<Object> findById(@PathVariable String shipmentItemBillingId) throws Exception {
+	public ResponseEntity<ShipmentItemBilling> findById(@PathVariable String shipmentItemBillingId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentItemBillingId", shipmentItemBillingId);
 		try {
 
-			Object foundShipmentItemBilling = findShipmentItemBillingsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundShipmentItemBilling);
+			List<ShipmentItemBilling> foundShipmentItemBilling = findShipmentItemBillingsBy(requestParams).getBody();
+			if(foundShipmentItemBilling.size()==1){				return successful(foundShipmentItemBilling.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{shipmentItemBillingId}")
-	public ResponseEntity<Object> deleteShipmentItemBillingByIdUpdated(@PathVariable String shipmentItemBillingId) throws Exception {
+	public ResponseEntity<String> deleteShipmentItemBillingByIdUpdated(@PathVariable String shipmentItemBillingId) throws Exception {
 		DeleteShipmentItemBilling command = new DeleteShipmentItemBilling(shipmentItemBillingId);
 
 		try {
 			if (((ShipmentItemBillingDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ShipmentItemBilling could not be deleted");
+		return conflict();
 
 	}
 

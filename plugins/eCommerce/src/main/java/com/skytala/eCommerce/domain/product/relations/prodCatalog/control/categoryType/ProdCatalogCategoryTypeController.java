@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.prodCatalog.query.category
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/prodCatalog/prodCatalogCategoryTypes")
 public class ProdCatalogCategoryTypeController {
@@ -52,7 +54,7 @@ public class ProdCatalogCategoryTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProdCatalogCategoryTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProdCatalogCategoryType>> findProdCatalogCategoryTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProdCatalogCategoryTypesBy query = new FindProdCatalogCategoryTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProdCatalogCategoryTypeController {
 		}
 
 		List<ProdCatalogCategoryType> prodCatalogCategoryTypes =((ProdCatalogCategoryTypeFound) Scheduler.execute(query).data()).getProdCatalogCategoryTypes();
-
-		if (prodCatalogCategoryTypes.size() == 1) {
-			return ResponseEntity.ok().body(prodCatalogCategoryTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(prodCatalogCategoryTypes);
 
@@ -78,7 +76,7 @@ public class ProdCatalogCategoryTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProdCatalogCategoryType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProdCatalogCategoryType> createProdCatalogCategoryType(HttpServletRequest request) throws Exception {
 
 		ProdCatalogCategoryType prodCatalogCategoryTypeToBeAdded = new ProdCatalogCategoryType();
 		try {
@@ -86,7 +84,7 @@ public class ProdCatalogCategoryTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProdCatalogCategoryType(prodCatalogCategoryTypeToBeAdded);
@@ -101,63 +99,15 @@ public class ProdCatalogCategoryTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProdCatalogCategoryType(@RequestBody ProdCatalogCategoryType prodCatalogCategoryTypeToBeAdded) throws Exception {
+	public ResponseEntity<ProdCatalogCategoryType> createProdCatalogCategoryType(@RequestBody ProdCatalogCategoryType prodCatalogCategoryTypeToBeAdded) throws Exception {
 
 		AddProdCatalogCategoryType command = new AddProdCatalogCategoryType(prodCatalogCategoryTypeToBeAdded);
 		ProdCatalogCategoryType prodCatalogCategoryType = ((ProdCatalogCategoryTypeAdded) Scheduler.execute(command).data()).getAddedProdCatalogCategoryType();
 		
 		if (prodCatalogCategoryType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(prodCatalogCategoryType);
+			return successful(prodCatalogCategoryType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProdCatalogCategoryType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProdCatalogCategoryType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProdCatalogCategoryType prodCatalogCategoryTypeToBeUpdated = new ProdCatalogCategoryType();
-
-		try {
-			prodCatalogCategoryTypeToBeUpdated = ProdCatalogCategoryTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProdCatalogCategoryType(prodCatalogCategoryTypeToBeUpdated, prodCatalogCategoryTypeToBeUpdated.getProdCatalogCategoryTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProdCatalogCategoryTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{prodCatalogCategoryTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProdCatalogCategoryType(@RequestBody ProdCatalogCategoryType prodCatalogCategoryTypeToBeUpdated,
+	public ResponseEntity<String> updateProdCatalogCategoryType(@RequestBody ProdCatalogCategoryType prodCatalogCategoryTypeToBeUpdated,
 			@PathVariable String prodCatalogCategoryTypeId) throws Exception {
 
 		prodCatalogCategoryTypeToBeUpdated.setProdCatalogCategoryTypeId(prodCatalogCategoryTypeId);
@@ -178,41 +128,44 @@ public class ProdCatalogCategoryTypeController {
 
 		try {
 			if(((ProdCatalogCategoryTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{prodCatalogCategoryTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String prodCatalogCategoryTypeId) throws Exception {
+	public ResponseEntity<ProdCatalogCategoryType> findById(@PathVariable String prodCatalogCategoryTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("prodCatalogCategoryTypeId", prodCatalogCategoryTypeId);
 		try {
 
-			Object foundProdCatalogCategoryType = findProdCatalogCategoryTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProdCatalogCategoryType);
+			List<ProdCatalogCategoryType> foundProdCatalogCategoryType = findProdCatalogCategoryTypesBy(requestParams).getBody();
+			if(foundProdCatalogCategoryType.size()==1){				return successful(foundProdCatalogCategoryType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{prodCatalogCategoryTypeId}")
-	public ResponseEntity<Object> deleteProdCatalogCategoryTypeByIdUpdated(@PathVariable String prodCatalogCategoryTypeId) throws Exception {
+	public ResponseEntity<String> deleteProdCatalogCategoryTypeByIdUpdated(@PathVariable String prodCatalogCategoryTypeId) throws Exception {
 		DeleteProdCatalogCategoryType command = new DeleteProdCatalogCategoryType(prodCatalogCategoryTypeId);
 
 		try {
 			if (((ProdCatalogCategoryTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProdCatalogCategoryType could not be deleted");
+		return conflict();
 
 	}
 

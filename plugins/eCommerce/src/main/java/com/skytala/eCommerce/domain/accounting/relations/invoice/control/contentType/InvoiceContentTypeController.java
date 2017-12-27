@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.invoice.query.contentTy
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/invoice/invoiceContentTypes")
 public class InvoiceContentTypeController {
@@ -52,7 +54,7 @@ public class InvoiceContentTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findInvoiceContentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<InvoiceContentType>> findInvoiceContentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInvoiceContentTypesBy query = new FindInvoiceContentTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class InvoiceContentTypeController {
 		}
 
 		List<InvoiceContentType> invoiceContentTypes =((InvoiceContentTypeFound) Scheduler.execute(query).data()).getInvoiceContentTypes();
-
-		if (invoiceContentTypes.size() == 1) {
-			return ResponseEntity.ok().body(invoiceContentTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(invoiceContentTypes);
 
@@ -78,7 +76,7 @@ public class InvoiceContentTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createInvoiceContentType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<InvoiceContentType> createInvoiceContentType(HttpServletRequest request) throws Exception {
 
 		InvoiceContentType invoiceContentTypeToBeAdded = new InvoiceContentType();
 		try {
@@ -86,7 +84,7 @@ public class InvoiceContentTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createInvoiceContentType(invoiceContentTypeToBeAdded);
@@ -101,63 +99,15 @@ public class InvoiceContentTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createInvoiceContentType(@RequestBody InvoiceContentType invoiceContentTypeToBeAdded) throws Exception {
+	public ResponseEntity<InvoiceContentType> createInvoiceContentType(@RequestBody InvoiceContentType invoiceContentTypeToBeAdded) throws Exception {
 
 		AddInvoiceContentType command = new AddInvoiceContentType(invoiceContentTypeToBeAdded);
 		InvoiceContentType invoiceContentType = ((InvoiceContentTypeAdded) Scheduler.execute(command).data()).getAddedInvoiceContentType();
 		
 		if (invoiceContentType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(invoiceContentType);
+			return successful(invoiceContentType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("InvoiceContentType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateInvoiceContentType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		InvoiceContentType invoiceContentTypeToBeUpdated = new InvoiceContentType();
-
-		try {
-			invoiceContentTypeToBeUpdated = InvoiceContentTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateInvoiceContentType(invoiceContentTypeToBeUpdated, invoiceContentTypeToBeUpdated.getInvoiceContentTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class InvoiceContentTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{invoiceContentTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateInvoiceContentType(@RequestBody InvoiceContentType invoiceContentTypeToBeUpdated,
+	public ResponseEntity<String> updateInvoiceContentType(@RequestBody InvoiceContentType invoiceContentTypeToBeUpdated,
 			@PathVariable String invoiceContentTypeId) throws Exception {
 
 		invoiceContentTypeToBeUpdated.setInvoiceContentTypeId(invoiceContentTypeId);
@@ -178,41 +128,44 @@ public class InvoiceContentTypeController {
 
 		try {
 			if(((InvoiceContentTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{invoiceContentTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String invoiceContentTypeId) throws Exception {
+	public ResponseEntity<InvoiceContentType> findById(@PathVariable String invoiceContentTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("invoiceContentTypeId", invoiceContentTypeId);
 		try {
 
-			Object foundInvoiceContentType = findInvoiceContentTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundInvoiceContentType);
+			List<InvoiceContentType> foundInvoiceContentType = findInvoiceContentTypesBy(requestParams).getBody();
+			if(foundInvoiceContentType.size()==1){				return successful(foundInvoiceContentType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{invoiceContentTypeId}")
-	public ResponseEntity<Object> deleteInvoiceContentTypeByIdUpdated(@PathVariable String invoiceContentTypeId) throws Exception {
+	public ResponseEntity<String> deleteInvoiceContentTypeByIdUpdated(@PathVariable String invoiceContentTypeId) throws Exception {
 		DeleteInvoiceContentType command = new DeleteInvoiceContentType(invoiceContentTypeId);
 
 		try {
 			if (((InvoiceContentTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("InvoiceContentType could not be deleted");
+		return conflict();
 
 	}
 

@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/accountingValuelink")
 public class AccountingValuelinkServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/disableGiftCardPin")
-	public ResponseEntity<Object> disableGiftCardPin(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="pin") String pin, @RequestParam(value="cardNumber") String cardNumber, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Map<String, Object>> disableGiftCardPin(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="pin") String pin, @RequestParam(value="cardNumber") String cardNumber, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("paymentConfig",paymentConfig);
@@ -43,23 +45,23 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/linkPhysicalGiftCard")
-	public ResponseEntity<Object> linkPhysicalGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="physicalPin") String physicalPin, @RequestParam(value="physicalCard") String physicalCard, @RequestParam(value="virtualCard") String virtualCard, @RequestParam(value="virtualPin") String virtualPin, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Map<String, Object>> linkPhysicalGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="physicalPin") String physicalPin, @RequestParam(value="physicalCard") String physicalCard, @RequestParam(value="virtualCard") String virtualCard, @RequestParam(value="virtualPin") String virtualPin, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("paymentConfig",paymentConfig);
@@ -77,23 +79,23 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/valueLinkRefund")
-	public ResponseEntity<Object> valueLinkRefund(HttpSession session, @RequestParam(value="orderPaymentPreference") org.apache.ofbiz.entity.GenericValue orderPaymentPreference, @RequestParam(value="refundAmount") BigDecimal refundAmount, @RequestParam(value="paymentConfig", required=false) String paymentConfig, @RequestParam(value="paymentGatewayConfigId", required=false) String paymentGatewayConfigId, @RequestParam(value="currency", required=false) String currency) {
+	public ResponseEntity<Map<String, Object>> valueLinkRefund(HttpSession session, @RequestParam(value="orderPaymentPreference") org.apache.ofbiz.entity.GenericValue orderPaymentPreference, @RequestParam(value="refundAmount") BigDecimal refundAmount, @RequestParam(value="paymentConfig", required=false) String paymentConfig, @RequestParam(value="paymentGatewayConfigId", required=false) String paymentGatewayConfigId, @RequestParam(value="currency", required=false) String currency) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderPaymentPreference",orderPaymentPreference);
@@ -110,23 +112,23 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createVLKeys")
-	public ResponseEntity<Object> createVLKeys(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="kekOnly", required=false) Boolean kekOnly, @RequestParam(value="kekTest", required=false) String kekTest) {
+	public ResponseEntity<Map<String, Object>> createVLKeys(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="kekOnly", required=false) Boolean kekOnly, @RequestParam(value="kekTest", required=false) String kekTest) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("paymentConfig",paymentConfig);
@@ -141,23 +143,23 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/voidReloadGiftCard")
-	public ResponseEntity<Object> voidReloadGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="amount") BigDecimal amount, @RequestParam(value="pin") String pin, @RequestParam(value="currency") String currency, @RequestParam(value="cardNumber") String cardNumber, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Map<String, Object>> voidReloadGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="amount") BigDecimal amount, @RequestParam(value="pin") String pin, @RequestParam(value="currency") String currency, @RequestParam(value="cardNumber") String cardNumber, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("paymentConfig",paymentConfig);
@@ -176,23 +178,23 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/valueLinkGcPurchase")
-	public ResponseEntity<Object> valueLinkGcPurchase(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="orderItem") org.apache.ofbiz.entity.GenericValue orderItem, @RequestParam(value="contentId") String contentId, @RequestParam(value="productContentTypeId") String productContentTypeId) {
+	public ResponseEntity<Map<String, Object>> valueLinkGcPurchase(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="orderItem") org.apache.ofbiz.entity.GenericValue orderItem, @RequestParam(value="contentId") String contentId, @RequestParam(value="productContentTypeId") String productContentTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -209,23 +211,23 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/transactionHistoryGiftCard")
-	public ResponseEntity<Object> transactionHistoryGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="pin") String pin, @RequestParam(value="cardNumber") String cardNumber, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Map<String, Object>> transactionHistoryGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="pin") String pin, @RequestParam(value="cardNumber") String cardNumber, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("paymentConfig",paymentConfig);
@@ -242,23 +244,23 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/refundGiftCard")
-	public ResponseEntity<Object> refundGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="amount") BigDecimal amount, @RequestParam(value="pin") String pin, @RequestParam(value="currency") String currency, @RequestParam(value="cardNumber") String cardNumber, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Map<String, Object>> refundGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="amount") BigDecimal amount, @RequestParam(value="pin") String pin, @RequestParam(value="currency") String currency, @RequestParam(value="cardNumber") String cardNumber, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("paymentConfig",paymentConfig);
@@ -277,23 +279,23 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/voidRedeemGiftCard")
-	public ResponseEntity<Object> voidRedeemGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="amount") BigDecimal amount, @RequestParam(value="pin") String pin, @RequestParam(value="currency") String currency, @RequestParam(value="cardNumber") String cardNumber, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Map<String, Object>> voidRedeemGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="amount") BigDecimal amount, @RequestParam(value="pin") String pin, @RequestParam(value="currency") String currency, @RequestParam(value="cardNumber") String cardNumber, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("paymentConfig",paymentConfig);
@@ -312,23 +314,23 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/voidActivateGiftCard")
-	public ResponseEntity<Object> voidActivateGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="amount") BigDecimal amount, @RequestParam(value="currency") String currency, @RequestParam(value="pin", required=false) String pin, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="cardNumber", required=false) String cardNumber) {
+	public ResponseEntity<Map<String, Object>> voidActivateGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="amount") BigDecimal amount, @RequestParam(value="currency") String currency, @RequestParam(value="pin", required=false) String pin, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="cardNumber", required=false) String cardNumber) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("paymentConfig",paymentConfig);
@@ -347,23 +349,23 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/reloadGiftCard")
-	public ResponseEntity<Object> reloadGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="amount") BigDecimal amount, @RequestParam(value="pin") String pin, @RequestParam(value="currency") String currency, @RequestParam(value="cardNumber") String cardNumber, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Map<String, Object>> reloadGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="amount") BigDecimal amount, @RequestParam(value="pin") String pin, @RequestParam(value="currency") String currency, @RequestParam(value="cardNumber") String cardNumber, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("paymentConfig",paymentConfig);
@@ -382,23 +384,23 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testKekEncryption")
-	public ResponseEntity<Object> testKekEncryption(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="mode") Integer mode, @RequestParam(value="kekTest") String kekTest) {
+	public ResponseEntity<Map<String, Object>> testKekEncryption(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="mode") Integer mode, @RequestParam(value="kekTest") String kekTest) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("paymentConfig",paymentConfig);
@@ -413,23 +415,23 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/activateGiftCard")
-	public ResponseEntity<Object> activateGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="amount") BigDecimal amount, @RequestParam(value="vlPromoCode") String vlPromoCode, @RequestParam(value="currency") String currency, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Map<String, Object>> activateGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="amount") BigDecimal amount, @RequestParam(value="vlPromoCode") String vlPromoCode, @RequestParam(value="currency") String currency, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("paymentConfig",paymentConfig);
@@ -447,23 +449,23 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/valueLinkRelease")
-	public ResponseEntity<Object> valueLinkRelease(HttpSession session, @RequestParam(value="releaseAmount") BigDecimal releaseAmount, @RequestParam(value="orderPaymentPreference") org.apache.ofbiz.entity.GenericValue orderPaymentPreference, @RequestParam(value="paymentConfig", required=false) String paymentConfig, @RequestParam(value="paymentGatewayConfigId", required=false) String paymentGatewayConfigId, @RequestParam(value="authTrans", required=false) org.apache.ofbiz.entity.GenericValue authTrans, @RequestParam(value="currency", required=false) String currency) {
+	public ResponseEntity<Map<String, Object>> valueLinkRelease(HttpSession session, @RequestParam(value="releaseAmount") BigDecimal releaseAmount, @RequestParam(value="orderPaymentPreference") org.apache.ofbiz.entity.GenericValue orderPaymentPreference, @RequestParam(value="paymentConfig", required=false) String paymentConfig, @RequestParam(value="paymentGatewayConfigId", required=false) String paymentGatewayConfigId, @RequestParam(value="authTrans", required=false) org.apache.ofbiz.entity.GenericValue authTrans, @RequestParam(value="currency", required=false) String currency) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("releaseAmount",releaseAmount);
@@ -481,23 +483,23 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/valueLinkGcReload")
-	public ResponseEntity<Object> valueLinkGcReload(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="orderItem") org.apache.ofbiz.entity.GenericValue orderItem, @RequestParam(value="contentId") String contentId, @RequestParam(value="productContentTypeId") String productContentTypeId) {
+	public ResponseEntity<Map<String, Object>> valueLinkGcReload(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="orderItem") org.apache.ofbiz.entity.GenericValue orderItem, @RequestParam(value="contentId") String contentId, @RequestParam(value="productContentTypeId") String productContentTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -514,23 +516,23 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/vlTimeOutReversal")
-	public ResponseEntity<Object> vlTimeOutReversal(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> vlTimeOutReversal(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -542,23 +544,23 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/balanceInquireGiftCard")
-	public ResponseEntity<Object> balanceInquireGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="pin") String pin, @RequestParam(value="currency") String currency, @RequestParam(value="cardNumber") String cardNumber, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Map<String, Object>> balanceInquireGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="pin") String pin, @RequestParam(value="currency") String currency, @RequestParam(value="cardNumber") String cardNumber, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("paymentConfig",paymentConfig);
@@ -576,23 +578,23 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/redeemGiftCard")
-	public ResponseEntity<Object> redeemGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="amount") BigDecimal amount, @RequestParam(value="pin") String pin, @RequestParam(value="currency") String currency, @RequestParam(value="cardNumber") String cardNumber, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Map<String, Object>> redeemGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="amount") BigDecimal amount, @RequestParam(value="pin") String pin, @RequestParam(value="currency") String currency, @RequestParam(value="cardNumber") String cardNumber, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("paymentConfig",paymentConfig);
@@ -611,23 +613,23 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/voidRefundGiftCard")
-	public ResponseEntity<Object> voidRefundGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="amount") BigDecimal amount, @RequestParam(value="pin") String pin, @RequestParam(value="currency") String currency, @RequestParam(value="cardNumber") String cardNumber, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Map<String, Object>> voidRefundGiftCard(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="amount") BigDecimal amount, @RequestParam(value="pin") String pin, @RequestParam(value="currency") String currency, @RequestParam(value="cardNumber") String cardNumber, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("paymentConfig",paymentConfig);
@@ -646,23 +648,23 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/assignWorkingKey")
-	public ResponseEntity<Object> assignWorkingKey(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="desHexString", required=false) String desHexString) {
+	public ResponseEntity<Map<String, Object>> assignWorkingKey(HttpSession session, @RequestParam(value="paymentConfig") String paymentConfig, @RequestParam(value="desHexString", required=false) String desHexString) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("paymentConfig",paymentConfig);
@@ -676,23 +678,23 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/valueLinkProcessor")
-	public ResponseEntity<Object> valueLinkProcessor(HttpSession session, @RequestParam(value="billToParty") org.apache.ofbiz.entity.GenericValue billToParty, @RequestParam(value="orderId") String orderId, @RequestParam(value="processAmount") BigDecimal processAmount, @RequestParam(value="orderPaymentPreference") org.apache.ofbiz.entity.GenericValue orderPaymentPreference, @RequestParam(value="giftCard") org.apache.ofbiz.entity.GenericValue giftCard, @RequestParam(value="orderItems") List orderItems, @RequestParam(value="paymentConfig", required=false) String paymentConfig, @RequestParam(value="billToEmail", required=false) org.apache.ofbiz.entity.GenericValue billToEmail, @RequestParam(value="paymentGatewayConfigId", required=false) String paymentGatewayConfigId, @RequestParam(value="shippingAddress", required=false) org.apache.ofbiz.entity.GenericValue shippingAddress, @RequestParam(value="currency", required=false) String currency, @RequestParam(value="billingAddress", required=false) org.apache.ofbiz.entity.GenericValue billingAddress, @RequestParam(value="customerIpAddress", required=false) String customerIpAddress) {
+	public ResponseEntity<Map<String, Object>> valueLinkProcessor(HttpSession session, @RequestParam(value="billToParty") org.apache.ofbiz.entity.GenericValue billToParty, @RequestParam(value="orderId") String orderId, @RequestParam(value="processAmount") BigDecimal processAmount, @RequestParam(value="orderPaymentPreference") org.apache.ofbiz.entity.GenericValue orderPaymentPreference, @RequestParam(value="giftCard") org.apache.ofbiz.entity.GenericValue giftCard, @RequestParam(value="orderItems") List orderItems, @RequestParam(value="paymentConfig", required=false) String paymentConfig, @RequestParam(value="billToEmail", required=false) org.apache.ofbiz.entity.GenericValue billToEmail, @RequestParam(value="paymentGatewayConfigId", required=false) String paymentGatewayConfigId, @RequestParam(value="shippingAddress", required=false) org.apache.ofbiz.entity.GenericValue shippingAddress, @RequestParam(value="currency", required=false) String currency, @RequestParam(value="billingAddress", required=false) org.apache.ofbiz.entity.GenericValue billingAddress, @RequestParam(value="customerIpAddress", required=false) String customerIpAddress) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("billToParty",billToParty);
@@ -717,19 +719,19 @@ public class AccountingValuelinkServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

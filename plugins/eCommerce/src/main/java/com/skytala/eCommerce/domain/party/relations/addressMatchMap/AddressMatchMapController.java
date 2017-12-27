@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.addressMatchMap.query.FindAd
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/addressMatchMaps")
 public class AddressMatchMapController {
@@ -52,7 +54,7 @@ public class AddressMatchMapController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findAddressMatchMapsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<AddressMatchMap>> findAddressMatchMapsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAddressMatchMapsBy query = new FindAddressMatchMapsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class AddressMatchMapController {
 		}
 
 		List<AddressMatchMap> addressMatchMaps =((AddressMatchMapFound) Scheduler.execute(query).data()).getAddressMatchMaps();
-
-		if (addressMatchMaps.size() == 1) {
-			return ResponseEntity.ok().body(addressMatchMaps.get(0));
-		}
 
 		return ResponseEntity.ok().body(addressMatchMaps);
 
@@ -78,7 +76,7 @@ public class AddressMatchMapController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createAddressMatchMap(HttpServletRequest request) throws Exception {
+	public ResponseEntity<AddressMatchMap> createAddressMatchMap(HttpServletRequest request) throws Exception {
 
 		AddressMatchMap addressMatchMapToBeAdded = new AddressMatchMap();
 		try {
@@ -86,7 +84,7 @@ public class AddressMatchMapController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createAddressMatchMap(addressMatchMapToBeAdded);
@@ -101,63 +99,15 @@ public class AddressMatchMapController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createAddressMatchMap(@RequestBody AddressMatchMap addressMatchMapToBeAdded) throws Exception {
+	public ResponseEntity<AddressMatchMap> createAddressMatchMap(@RequestBody AddressMatchMap addressMatchMapToBeAdded) throws Exception {
 
 		AddAddressMatchMap command = new AddAddressMatchMap(addressMatchMapToBeAdded);
 		AddressMatchMap addressMatchMap = ((AddressMatchMapAdded) Scheduler.execute(command).data()).getAddedAddressMatchMap();
 		
 		if (addressMatchMap != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(addressMatchMap);
+			return successful(addressMatchMap);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("AddressMatchMap could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateAddressMatchMap(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		AddressMatchMap addressMatchMapToBeUpdated = new AddressMatchMap();
-
-		try {
-			addressMatchMapToBeUpdated = AddressMatchMapMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateAddressMatchMap(addressMatchMapToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class AddressMatchMapController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateAddressMatchMap(@RequestBody AddressMatchMap addressMatchMapToBeUpdated,
+	public ResponseEntity<String> updateAddressMatchMap(@RequestBody AddressMatchMap addressMatchMapToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		addressMatchMapToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class AddressMatchMapController {
 
 		try {
 			if(((AddressMatchMapUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{addressMatchMapId}")
-	public ResponseEntity<Object> findById(@PathVariable String addressMatchMapId) throws Exception {
+	public ResponseEntity<AddressMatchMap> findById(@PathVariable String addressMatchMapId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("addressMatchMapId", addressMatchMapId);
 		try {
 
-			Object foundAddressMatchMap = findAddressMatchMapsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundAddressMatchMap);
+			List<AddressMatchMap> foundAddressMatchMap = findAddressMatchMapsBy(requestParams).getBody();
+			if(foundAddressMatchMap.size()==1){				return successful(foundAddressMatchMap.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{addressMatchMapId}")
-	public ResponseEntity<Object> deleteAddressMatchMapByIdUpdated(@PathVariable String addressMatchMapId) throws Exception {
+	public ResponseEntity<String> deleteAddressMatchMapByIdUpdated(@PathVariable String addressMatchMapId) throws Exception {
 		DeleteAddressMatchMap command = new DeleteAddressMatchMap(addressMatchMapId);
 
 		try {
 			if (((AddressMatchMapDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("AddressMatchMap could not be deleted");
+		return conflict();
 
 	}
 

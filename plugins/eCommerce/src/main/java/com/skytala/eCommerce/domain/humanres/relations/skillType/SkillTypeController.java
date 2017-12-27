@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.humanres.relations.skillType.query.FindSkill
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/humanres/skillTypes")
 public class SkillTypeController {
@@ -52,7 +54,7 @@ public class SkillTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findSkillTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<SkillType>> findSkillTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSkillTypesBy query = new FindSkillTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class SkillTypeController {
 		}
 
 		List<SkillType> skillTypes =((SkillTypeFound) Scheduler.execute(query).data()).getSkillTypes();
-
-		if (skillTypes.size() == 1) {
-			return ResponseEntity.ok().body(skillTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(skillTypes);
 
@@ -78,7 +76,7 @@ public class SkillTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createSkillType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<SkillType> createSkillType(HttpServletRequest request) throws Exception {
 
 		SkillType skillTypeToBeAdded = new SkillType();
 		try {
@@ -86,7 +84,7 @@ public class SkillTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createSkillType(skillTypeToBeAdded);
@@ -101,63 +99,15 @@ public class SkillTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createSkillType(@RequestBody SkillType skillTypeToBeAdded) throws Exception {
+	public ResponseEntity<SkillType> createSkillType(@RequestBody SkillType skillTypeToBeAdded) throws Exception {
 
 		AddSkillType command = new AddSkillType(skillTypeToBeAdded);
 		SkillType skillType = ((SkillTypeAdded) Scheduler.execute(command).data()).getAddedSkillType();
 		
 		if (skillType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(skillType);
+			return successful(skillType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("SkillType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateSkillType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		SkillType skillTypeToBeUpdated = new SkillType();
-
-		try {
-			skillTypeToBeUpdated = SkillTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateSkillType(skillTypeToBeUpdated, skillTypeToBeUpdated.getSkillTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class SkillTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{skillTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateSkillType(@RequestBody SkillType skillTypeToBeUpdated,
+	public ResponseEntity<String> updateSkillType(@RequestBody SkillType skillTypeToBeUpdated,
 			@PathVariable String skillTypeId) throws Exception {
 
 		skillTypeToBeUpdated.setSkillTypeId(skillTypeId);
@@ -178,41 +128,44 @@ public class SkillTypeController {
 
 		try {
 			if(((SkillTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{skillTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String skillTypeId) throws Exception {
+	public ResponseEntity<SkillType> findById(@PathVariable String skillTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("skillTypeId", skillTypeId);
 		try {
 
-			Object foundSkillType = findSkillTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundSkillType);
+			List<SkillType> foundSkillType = findSkillTypesBy(requestParams).getBody();
+			if(foundSkillType.size()==1){				return successful(foundSkillType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{skillTypeId}")
-	public ResponseEntity<Object> deleteSkillTypeByIdUpdated(@PathVariable String skillTypeId) throws Exception {
+	public ResponseEntity<String> deleteSkillTypeByIdUpdated(@PathVariable String skillTypeId) throws Exception {
 		DeleteSkillType command = new DeleteSkillType(skillTypeId);
 
 		try {
 			if (((SkillTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("SkillType could not be deleted");
+		return conflict();
 
 	}
 

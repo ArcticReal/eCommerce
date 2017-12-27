@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.humanres.relations.trainingRequest.query.Fin
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/humanres/trainingRequests")
 public class TrainingRequestController {
@@ -52,7 +54,7 @@ public class TrainingRequestController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findTrainingRequestsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<TrainingRequest>> findTrainingRequestsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTrainingRequestsBy query = new FindTrainingRequestsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class TrainingRequestController {
 		}
 
 		List<TrainingRequest> trainingRequests =((TrainingRequestFound) Scheduler.execute(query).data()).getTrainingRequests();
-
-		if (trainingRequests.size() == 1) {
-			return ResponseEntity.ok().body(trainingRequests.get(0));
-		}
 
 		return ResponseEntity.ok().body(trainingRequests);
 
@@ -78,7 +76,7 @@ public class TrainingRequestController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createTrainingRequest(HttpServletRequest request) throws Exception {
+	public ResponseEntity<TrainingRequest> createTrainingRequest(HttpServletRequest request) throws Exception {
 
 		TrainingRequest trainingRequestToBeAdded = new TrainingRequest();
 		try {
@@ -86,7 +84,7 @@ public class TrainingRequestController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createTrainingRequest(trainingRequestToBeAdded);
@@ -101,63 +99,15 @@ public class TrainingRequestController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createTrainingRequest(@RequestBody TrainingRequest trainingRequestToBeAdded) throws Exception {
+	public ResponseEntity<TrainingRequest> createTrainingRequest(@RequestBody TrainingRequest trainingRequestToBeAdded) throws Exception {
 
 		AddTrainingRequest command = new AddTrainingRequest(trainingRequestToBeAdded);
 		TrainingRequest trainingRequest = ((TrainingRequestAdded) Scheduler.execute(command).data()).getAddedTrainingRequest();
 		
 		if (trainingRequest != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(trainingRequest);
+			return successful(trainingRequest);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("TrainingRequest could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateTrainingRequest(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		TrainingRequest trainingRequestToBeUpdated = new TrainingRequest();
-
-		try {
-			trainingRequestToBeUpdated = TrainingRequestMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateTrainingRequest(trainingRequestToBeUpdated, trainingRequestToBeUpdated.getTrainingRequestId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class TrainingRequestController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{trainingRequestId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateTrainingRequest(@RequestBody TrainingRequest trainingRequestToBeUpdated,
+	public ResponseEntity<String> updateTrainingRequest(@RequestBody TrainingRequest trainingRequestToBeUpdated,
 			@PathVariable String trainingRequestId) throws Exception {
 
 		trainingRequestToBeUpdated.setTrainingRequestId(trainingRequestId);
@@ -178,41 +128,44 @@ public class TrainingRequestController {
 
 		try {
 			if(((TrainingRequestUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{trainingRequestId}")
-	public ResponseEntity<Object> findById(@PathVariable String trainingRequestId) throws Exception {
+	public ResponseEntity<TrainingRequest> findById(@PathVariable String trainingRequestId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("trainingRequestId", trainingRequestId);
 		try {
 
-			Object foundTrainingRequest = findTrainingRequestsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundTrainingRequest);
+			List<TrainingRequest> foundTrainingRequest = findTrainingRequestsBy(requestParams).getBody();
+			if(foundTrainingRequest.size()==1){				return successful(foundTrainingRequest.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{trainingRequestId}")
-	public ResponseEntity<Object> deleteTrainingRequestByIdUpdated(@PathVariable String trainingRequestId) throws Exception {
+	public ResponseEntity<String> deleteTrainingRequestByIdUpdated(@PathVariable String trainingRequestId) throws Exception {
 		DeleteTrainingRequest command = new DeleteTrainingRequest(trainingRequestId);
 
 		try {
 			if (((TrainingRequestDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("TrainingRequest could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.content.query.attribute.Fi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/content/contentAttributes")
 public class ContentAttributeController {
@@ -52,7 +54,7 @@ public class ContentAttributeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findContentAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ContentAttribute>> findContentAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContentAttributesBy query = new FindContentAttributesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ContentAttributeController {
 		}
 
 		List<ContentAttribute> contentAttributes =((ContentAttributeFound) Scheduler.execute(query).data()).getContentAttributes();
-
-		if (contentAttributes.size() == 1) {
-			return ResponseEntity.ok().body(contentAttributes.get(0));
-		}
 
 		return ResponseEntity.ok().body(contentAttributes);
 
@@ -78,7 +76,7 @@ public class ContentAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createContentAttribute(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ContentAttribute> createContentAttribute(HttpServletRequest request) throws Exception {
 
 		ContentAttribute contentAttributeToBeAdded = new ContentAttribute();
 		try {
@@ -86,7 +84,7 @@ public class ContentAttributeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createContentAttribute(contentAttributeToBeAdded);
@@ -101,63 +99,15 @@ public class ContentAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createContentAttribute(@RequestBody ContentAttribute contentAttributeToBeAdded) throws Exception {
+	public ResponseEntity<ContentAttribute> createContentAttribute(@RequestBody ContentAttribute contentAttributeToBeAdded) throws Exception {
 
 		AddContentAttribute command = new AddContentAttribute(contentAttributeToBeAdded);
 		ContentAttribute contentAttribute = ((ContentAttributeAdded) Scheduler.execute(command).data()).getAddedContentAttribute();
 		
 		if (contentAttribute != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(contentAttribute);
+			return successful(contentAttribute);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ContentAttribute could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateContentAttribute(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ContentAttribute contentAttributeToBeUpdated = new ContentAttribute();
-
-		try {
-			contentAttributeToBeUpdated = ContentAttributeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateContentAttribute(contentAttributeToBeUpdated, contentAttributeToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ContentAttributeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateContentAttribute(@RequestBody ContentAttribute contentAttributeToBeUpdated,
+	public ResponseEntity<String> updateContentAttribute(@RequestBody ContentAttribute contentAttributeToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		contentAttributeToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class ContentAttributeController {
 
 		try {
 			if(((ContentAttributeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{contentAttributeId}")
-	public ResponseEntity<Object> findById(@PathVariable String contentAttributeId) throws Exception {
+	public ResponseEntity<ContentAttribute> findById(@PathVariable String contentAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contentAttributeId", contentAttributeId);
 		try {
 
-			Object foundContentAttribute = findContentAttributesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundContentAttribute);
+			List<ContentAttribute> foundContentAttribute = findContentAttributesBy(requestParams).getBody();
+			if(foundContentAttribute.size()==1){				return successful(foundContentAttribute.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{contentAttributeId}")
-	public ResponseEntity<Object> deleteContentAttributeByIdUpdated(@PathVariable String contentAttributeId) throws Exception {
+	public ResponseEntity<String> deleteContentAttributeByIdUpdated(@PathVariable String contentAttributeId) throws Exception {
 		DeleteContentAttribute command = new DeleteContentAttribute(contentAttributeId);
 
 		try {
 			if (((ContentAttributeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ContentAttribute could not be deleted");
+		return conflict();
 
 	}
 

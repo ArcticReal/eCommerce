@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.creditCard.query.FindCr
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/creditCards")
 public class CreditCardController {
@@ -52,7 +54,7 @@ public class CreditCardController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findCreditCardsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<CreditCard>> findCreditCardsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCreditCardsBy query = new FindCreditCardsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class CreditCardController {
 		}
 
 		List<CreditCard> creditCards =((CreditCardFound) Scheduler.execute(query).data()).getCreditCards();
-
-		if (creditCards.size() == 1) {
-			return ResponseEntity.ok().body(creditCards.get(0));
-		}
 
 		return ResponseEntity.ok().body(creditCards);
 
@@ -78,7 +76,7 @@ public class CreditCardController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createCreditCard(HttpServletRequest request) throws Exception {
+	public ResponseEntity<CreditCard> createCreditCard(HttpServletRequest request) throws Exception {
 
 		CreditCard creditCardToBeAdded = new CreditCard();
 		try {
@@ -86,7 +84,7 @@ public class CreditCardController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createCreditCard(creditCardToBeAdded);
@@ -101,63 +99,15 @@ public class CreditCardController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createCreditCard(@RequestBody CreditCard creditCardToBeAdded) throws Exception {
+	public ResponseEntity<CreditCard> createCreditCard(@RequestBody CreditCard creditCardToBeAdded) throws Exception {
 
 		AddCreditCard command = new AddCreditCard(creditCardToBeAdded);
 		CreditCard creditCard = ((CreditCardAdded) Scheduler.execute(command).data()).getAddedCreditCard();
 		
 		if (creditCard != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(creditCard);
+			return successful(creditCard);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("CreditCard could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateCreditCard(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		CreditCard creditCardToBeUpdated = new CreditCard();
-
-		try {
-			creditCardToBeUpdated = CreditCardMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateCreditCard(creditCardToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class CreditCardController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateCreditCard(@RequestBody CreditCard creditCardToBeUpdated,
+	public ResponseEntity<String> updateCreditCard(@RequestBody CreditCard creditCardToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		creditCardToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class CreditCardController {
 
 		try {
 			if(((CreditCardUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{creditCardId}")
-	public ResponseEntity<Object> findById(@PathVariable String creditCardId) throws Exception {
+	public ResponseEntity<CreditCard> findById(@PathVariable String creditCardId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("creditCardId", creditCardId);
 		try {
 
-			Object foundCreditCard = findCreditCardsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundCreditCard);
+			List<CreditCard> foundCreditCard = findCreditCardsBy(requestParams).getBody();
+			if(foundCreditCard.size()==1){				return successful(foundCreditCard.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{creditCardId}")
-	public ResponseEntity<Object> deleteCreditCardByIdUpdated(@PathVariable String creditCardId) throws Exception {
+	public ResponseEntity<String> deleteCreditCardByIdUpdated(@PathVariable String creditCardId) throws Exception {
 		DeleteCreditCard command = new DeleteCreditCard(creditCardId);
 
 		try {
 			if (((CreditCardDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("CreditCard could not be deleted");
+		return conflict();
 
 	}
 

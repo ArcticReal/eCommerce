@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.marketInterest.query.FindM
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/marketInterests")
 public class MarketInterestController {
@@ -52,7 +54,7 @@ public class MarketInterestController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findMarketInterestsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<MarketInterest>> findMarketInterestsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindMarketInterestsBy query = new FindMarketInterestsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class MarketInterestController {
 		}
 
 		List<MarketInterest> marketInterests =((MarketInterestFound) Scheduler.execute(query).data()).getMarketInterests();
-
-		if (marketInterests.size() == 1) {
-			return ResponseEntity.ok().body(marketInterests.get(0));
-		}
 
 		return ResponseEntity.ok().body(marketInterests);
 
@@ -78,7 +76,7 @@ public class MarketInterestController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createMarketInterest(HttpServletRequest request) throws Exception {
+	public ResponseEntity<MarketInterest> createMarketInterest(HttpServletRequest request) throws Exception {
 
 		MarketInterest marketInterestToBeAdded = new MarketInterest();
 		try {
@@ -86,7 +84,7 @@ public class MarketInterestController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createMarketInterest(marketInterestToBeAdded);
@@ -101,63 +99,15 @@ public class MarketInterestController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createMarketInterest(@RequestBody MarketInterest marketInterestToBeAdded) throws Exception {
+	public ResponseEntity<MarketInterest> createMarketInterest(@RequestBody MarketInterest marketInterestToBeAdded) throws Exception {
 
 		AddMarketInterest command = new AddMarketInterest(marketInterestToBeAdded);
 		MarketInterest marketInterest = ((MarketInterestAdded) Scheduler.execute(command).data()).getAddedMarketInterest();
 		
 		if (marketInterest != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(marketInterest);
+			return successful(marketInterest);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("MarketInterest could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateMarketInterest(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		MarketInterest marketInterestToBeUpdated = new MarketInterest();
-
-		try {
-			marketInterestToBeUpdated = MarketInterestMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateMarketInterest(marketInterestToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class MarketInterestController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateMarketInterest(@RequestBody MarketInterest marketInterestToBeUpdated,
+	public ResponseEntity<String> updateMarketInterest(@RequestBody MarketInterest marketInterestToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		marketInterestToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class MarketInterestController {
 
 		try {
 			if(((MarketInterestUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{marketInterestId}")
-	public ResponseEntity<Object> findById(@PathVariable String marketInterestId) throws Exception {
+	public ResponseEntity<MarketInterest> findById(@PathVariable String marketInterestId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("marketInterestId", marketInterestId);
 		try {
 
-			Object foundMarketInterest = findMarketInterestsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundMarketInterest);
+			List<MarketInterest> foundMarketInterest = findMarketInterestsBy(requestParams).getBody();
+			if(foundMarketInterest.size()==1){				return successful(foundMarketInterest.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{marketInterestId}")
-	public ResponseEntity<Object> deleteMarketInterestByIdUpdated(@PathVariable String marketInterestId) throws Exception {
+	public ResponseEntity<String> deleteMarketInterestByIdUpdated(@PathVariable String marketInterestId) throws Exception {
 		DeleteMarketInterest command = new DeleteMarketInterest(marketInterestId);
 
 		try {
 			if (((MarketInterestDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("MarketInterest could not be deleted");
+		return conflict();
 
 	}
 

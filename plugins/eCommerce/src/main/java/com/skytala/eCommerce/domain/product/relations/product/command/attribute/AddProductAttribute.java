@@ -13,31 +13,33 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class AddProductAttribute extends Command {
 
-private ProductAttribute elementToBeAdded;
-public AddProductAttribute(ProductAttribute elementToBeAdded){
-this.elementToBeAdded = elementToBeAdded;
-}
+    private ProductAttribute elementToBeAdded;
+    public AddProductAttribute(ProductAttribute elementToBeAdded){
+        this.elementToBeAdded = elementToBeAdded;
+    }
 
-@Override
-public Event execute(){
+    @Override
+    public Event execute(){
 
 
-Delegator delegator = DelegatorFactory.getDelegator("default");
+        Delegator delegator = DelegatorFactory.getDelegator("default");
 
-ProductAttribute addedElement = null;
-boolean success = false;
-try {
-elementToBeAdded.setAttrName(delegator.getNextSeqId("ProductAttribute"));
-GenericValue newValue = delegator.makeValue("ProductAttribute", elementToBeAdded.mapAttributeField());
-addedElement = ProductAttributeMapper.map(delegator.create(newValue));
-success = true;
-} catch(GenericEntityException e) {
- e.printStackTrace(); 
-addedElement = null;
-}
+        ProductAttribute addedElement = null;
+        boolean success = false;
+        try {
 
-Event resultingEvent = new ProductAttributeAdded(addedElement, success);
-Broker.instance().publish(resultingEvent);
-return resultingEvent;
-}
+            GenericValue newValue = delegator.makeValue("ProductAttribute", elementToBeAdded.mapAttributeField());
+            addedElement = ProductAttributeMapper.map(delegator.create(newValue));
+            success = true;
+        } catch(GenericEntityException e) {
+
+
+            e.printStackTrace();
+            addedElement = null;
+        }
+
+        Event resultingEvent = new ProductAttributeAdded(addedElement, success);
+        Broker.instance().publish(resultingEvent);
+        return resultingEvent;
+    }
 }

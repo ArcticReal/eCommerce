@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.humanres.relations.perfReview.query.itemType
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/humanres/perfReview/perfReviewItemTypes")
 public class PerfReviewItemTypeController {
@@ -52,7 +54,7 @@ public class PerfReviewItemTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPerfReviewItemTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PerfReviewItemType>> findPerfReviewItemTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPerfReviewItemTypesBy query = new FindPerfReviewItemTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PerfReviewItemTypeController {
 		}
 
 		List<PerfReviewItemType> perfReviewItemTypes =((PerfReviewItemTypeFound) Scheduler.execute(query).data()).getPerfReviewItemTypes();
-
-		if (perfReviewItemTypes.size() == 1) {
-			return ResponseEntity.ok().body(perfReviewItemTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(perfReviewItemTypes);
 
@@ -78,7 +76,7 @@ public class PerfReviewItemTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPerfReviewItemType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PerfReviewItemType> createPerfReviewItemType(HttpServletRequest request) throws Exception {
 
 		PerfReviewItemType perfReviewItemTypeToBeAdded = new PerfReviewItemType();
 		try {
@@ -86,7 +84,7 @@ public class PerfReviewItemTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPerfReviewItemType(perfReviewItemTypeToBeAdded);
@@ -101,63 +99,15 @@ public class PerfReviewItemTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPerfReviewItemType(@RequestBody PerfReviewItemType perfReviewItemTypeToBeAdded) throws Exception {
+	public ResponseEntity<PerfReviewItemType> createPerfReviewItemType(@RequestBody PerfReviewItemType perfReviewItemTypeToBeAdded) throws Exception {
 
 		AddPerfReviewItemType command = new AddPerfReviewItemType(perfReviewItemTypeToBeAdded);
 		PerfReviewItemType perfReviewItemType = ((PerfReviewItemTypeAdded) Scheduler.execute(command).data()).getAddedPerfReviewItemType();
 		
 		if (perfReviewItemType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(perfReviewItemType);
+			return successful(perfReviewItemType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PerfReviewItemType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePerfReviewItemType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PerfReviewItemType perfReviewItemTypeToBeUpdated = new PerfReviewItemType();
-
-		try {
-			perfReviewItemTypeToBeUpdated = PerfReviewItemTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePerfReviewItemType(perfReviewItemTypeToBeUpdated, perfReviewItemTypeToBeUpdated.getPerfReviewItemTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PerfReviewItemTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{perfReviewItemTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePerfReviewItemType(@RequestBody PerfReviewItemType perfReviewItemTypeToBeUpdated,
+	public ResponseEntity<String> updatePerfReviewItemType(@RequestBody PerfReviewItemType perfReviewItemTypeToBeUpdated,
 			@PathVariable String perfReviewItemTypeId) throws Exception {
 
 		perfReviewItemTypeToBeUpdated.setPerfReviewItemTypeId(perfReviewItemTypeId);
@@ -178,41 +128,44 @@ public class PerfReviewItemTypeController {
 
 		try {
 			if(((PerfReviewItemTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{perfReviewItemTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String perfReviewItemTypeId) throws Exception {
+	public ResponseEntity<PerfReviewItemType> findById(@PathVariable String perfReviewItemTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("perfReviewItemTypeId", perfReviewItemTypeId);
 		try {
 
-			Object foundPerfReviewItemType = findPerfReviewItemTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPerfReviewItemType);
+			List<PerfReviewItemType> foundPerfReviewItemType = findPerfReviewItemTypesBy(requestParams).getBody();
+			if(foundPerfReviewItemType.size()==1){				return successful(foundPerfReviewItemType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{perfReviewItemTypeId}")
-	public ResponseEntity<Object> deletePerfReviewItemTypeByIdUpdated(@PathVariable String perfReviewItemTypeId) throws Exception {
+	public ResponseEntity<String> deletePerfReviewItemTypeByIdUpdated(@PathVariable String perfReviewItemTypeId) throws Exception {
 		DeletePerfReviewItemType command = new DeletePerfReviewItemType(perfReviewItemTypeId);
 
 		try {
 			if (((PerfReviewItemTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PerfReviewItemType could not be deleted");
+		return conflict();
 
 	}
 

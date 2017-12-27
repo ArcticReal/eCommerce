@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.finAccount.query.status
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/finAccount/finAccountStatuss")
 public class FinAccountStatusController {
@@ -52,7 +54,7 @@ public class FinAccountStatusController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findFinAccountStatussBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<FinAccountStatus>> findFinAccountStatussBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFinAccountStatussBy query = new FindFinAccountStatussBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class FinAccountStatusController {
 		}
 
 		List<FinAccountStatus> finAccountStatuss =((FinAccountStatusFound) Scheduler.execute(query).data()).getFinAccountStatuss();
-
-		if (finAccountStatuss.size() == 1) {
-			return ResponseEntity.ok().body(finAccountStatuss.get(0));
-		}
 
 		return ResponseEntity.ok().body(finAccountStatuss);
 
@@ -78,7 +76,7 @@ public class FinAccountStatusController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createFinAccountStatus(HttpServletRequest request) throws Exception {
+	public ResponseEntity<FinAccountStatus> createFinAccountStatus(HttpServletRequest request) throws Exception {
 
 		FinAccountStatus finAccountStatusToBeAdded = new FinAccountStatus();
 		try {
@@ -86,7 +84,7 @@ public class FinAccountStatusController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createFinAccountStatus(finAccountStatusToBeAdded);
@@ -101,63 +99,15 @@ public class FinAccountStatusController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createFinAccountStatus(@RequestBody FinAccountStatus finAccountStatusToBeAdded) throws Exception {
+	public ResponseEntity<FinAccountStatus> createFinAccountStatus(@RequestBody FinAccountStatus finAccountStatusToBeAdded) throws Exception {
 
 		AddFinAccountStatus command = new AddFinAccountStatus(finAccountStatusToBeAdded);
 		FinAccountStatus finAccountStatus = ((FinAccountStatusAdded) Scheduler.execute(command).data()).getAddedFinAccountStatus();
 		
 		if (finAccountStatus != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(finAccountStatus);
+			return successful(finAccountStatus);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("FinAccountStatus could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateFinAccountStatus(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		FinAccountStatus finAccountStatusToBeUpdated = new FinAccountStatus();
-
-		try {
-			finAccountStatusToBeUpdated = FinAccountStatusMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateFinAccountStatus(finAccountStatusToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class FinAccountStatusController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateFinAccountStatus(@RequestBody FinAccountStatus finAccountStatusToBeUpdated,
+	public ResponseEntity<String> updateFinAccountStatus(@RequestBody FinAccountStatus finAccountStatusToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		finAccountStatusToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class FinAccountStatusController {
 
 		try {
 			if(((FinAccountStatusUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{finAccountStatusId}")
-	public ResponseEntity<Object> findById(@PathVariable String finAccountStatusId) throws Exception {
+	public ResponseEntity<FinAccountStatus> findById(@PathVariable String finAccountStatusId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("finAccountStatusId", finAccountStatusId);
 		try {
 
-			Object foundFinAccountStatus = findFinAccountStatussBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundFinAccountStatus);
+			List<FinAccountStatus> foundFinAccountStatus = findFinAccountStatussBy(requestParams).getBody();
+			if(foundFinAccountStatus.size()==1){				return successful(foundFinAccountStatus.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{finAccountStatusId}")
-	public ResponseEntity<Object> deleteFinAccountStatusByIdUpdated(@PathVariable String finAccountStatusId) throws Exception {
+	public ResponseEntity<String> deleteFinAccountStatusByIdUpdated(@PathVariable String finAccountStatusId) throws Exception {
 		DeleteFinAccountStatus command = new DeleteFinAccountStatus(finAccountStatusId);
 
 		try {
 			if (((FinAccountStatusDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("FinAccountStatus could not be deleted");
+		return conflict();
 
 	}
 

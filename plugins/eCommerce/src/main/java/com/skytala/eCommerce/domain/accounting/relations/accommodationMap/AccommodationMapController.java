@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.accommodationMap.query.
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/accommodationMaps")
 public class AccommodationMapController {
@@ -52,7 +54,7 @@ public class AccommodationMapController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findAccommodationMapsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<AccommodationMap>> findAccommodationMapsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAccommodationMapsBy query = new FindAccommodationMapsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class AccommodationMapController {
 		}
 
 		List<AccommodationMap> accommodationMaps =((AccommodationMapFound) Scheduler.execute(query).data()).getAccommodationMaps();
-
-		if (accommodationMaps.size() == 1) {
-			return ResponseEntity.ok().body(accommodationMaps.get(0));
-		}
 
 		return ResponseEntity.ok().body(accommodationMaps);
 
@@ -78,7 +76,7 @@ public class AccommodationMapController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createAccommodationMap(HttpServletRequest request) throws Exception {
+	public ResponseEntity<AccommodationMap> createAccommodationMap(HttpServletRequest request) throws Exception {
 
 		AccommodationMap accommodationMapToBeAdded = new AccommodationMap();
 		try {
@@ -86,7 +84,7 @@ public class AccommodationMapController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createAccommodationMap(accommodationMapToBeAdded);
@@ -101,63 +99,15 @@ public class AccommodationMapController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createAccommodationMap(@RequestBody AccommodationMap accommodationMapToBeAdded) throws Exception {
+	public ResponseEntity<AccommodationMap> createAccommodationMap(@RequestBody AccommodationMap accommodationMapToBeAdded) throws Exception {
 
 		AddAccommodationMap command = new AddAccommodationMap(accommodationMapToBeAdded);
 		AccommodationMap accommodationMap = ((AccommodationMapAdded) Scheduler.execute(command).data()).getAddedAccommodationMap();
 		
 		if (accommodationMap != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(accommodationMap);
+			return successful(accommodationMap);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("AccommodationMap could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateAccommodationMap(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		AccommodationMap accommodationMapToBeUpdated = new AccommodationMap();
-
-		try {
-			accommodationMapToBeUpdated = AccommodationMapMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateAccommodationMap(accommodationMapToBeUpdated, accommodationMapToBeUpdated.getAccommodationMapId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class AccommodationMapController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{accommodationMapId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateAccommodationMap(@RequestBody AccommodationMap accommodationMapToBeUpdated,
+	public ResponseEntity<String> updateAccommodationMap(@RequestBody AccommodationMap accommodationMapToBeUpdated,
 			@PathVariable String accommodationMapId) throws Exception {
 
 		accommodationMapToBeUpdated.setAccommodationMapId(accommodationMapId);
@@ -178,41 +128,44 @@ public class AccommodationMapController {
 
 		try {
 			if(((AccommodationMapUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{accommodationMapId}")
-	public ResponseEntity<Object> findById(@PathVariable String accommodationMapId) throws Exception {
+	public ResponseEntity<AccommodationMap> findById(@PathVariable String accommodationMapId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("accommodationMapId", accommodationMapId);
 		try {
 
-			Object foundAccommodationMap = findAccommodationMapsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundAccommodationMap);
+			List<AccommodationMap> foundAccommodationMap = findAccommodationMapsBy(requestParams).getBody();
+			if(foundAccommodationMap.size()==1){				return successful(foundAccommodationMap.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{accommodationMapId}")
-	public ResponseEntity<Object> deleteAccommodationMapByIdUpdated(@PathVariable String accommodationMapId) throws Exception {
+	public ResponseEntity<String> deleteAccommodationMapByIdUpdated(@PathVariable String accommodationMapId) throws Exception {
 		DeleteAccommodationMap command = new DeleteAccommodationMap(accommodationMapId);
 
 		try {
 			if (((AccommodationMapDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("AccommodationMap could not be deleted");
+		return conflict();
 
 	}
 

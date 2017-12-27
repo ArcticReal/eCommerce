@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.custRequest.query.resolution
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/custRequest/custRequestResolutions")
 public class CustRequestResolutionController {
@@ -52,7 +54,7 @@ public class CustRequestResolutionController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findCustRequestResolutionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<CustRequestResolution>> findCustRequestResolutionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCustRequestResolutionsBy query = new FindCustRequestResolutionsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class CustRequestResolutionController {
 		}
 
 		List<CustRequestResolution> custRequestResolutions =((CustRequestResolutionFound) Scheduler.execute(query).data()).getCustRequestResolutions();
-
-		if (custRequestResolutions.size() == 1) {
-			return ResponseEntity.ok().body(custRequestResolutions.get(0));
-		}
 
 		return ResponseEntity.ok().body(custRequestResolutions);
 
@@ -78,7 +76,7 @@ public class CustRequestResolutionController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createCustRequestResolution(HttpServletRequest request) throws Exception {
+	public ResponseEntity<CustRequestResolution> createCustRequestResolution(HttpServletRequest request) throws Exception {
 
 		CustRequestResolution custRequestResolutionToBeAdded = new CustRequestResolution();
 		try {
@@ -86,7 +84,7 @@ public class CustRequestResolutionController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createCustRequestResolution(custRequestResolutionToBeAdded);
@@ -101,63 +99,15 @@ public class CustRequestResolutionController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createCustRequestResolution(@RequestBody CustRequestResolution custRequestResolutionToBeAdded) throws Exception {
+	public ResponseEntity<CustRequestResolution> createCustRequestResolution(@RequestBody CustRequestResolution custRequestResolutionToBeAdded) throws Exception {
 
 		AddCustRequestResolution command = new AddCustRequestResolution(custRequestResolutionToBeAdded);
 		CustRequestResolution custRequestResolution = ((CustRequestResolutionAdded) Scheduler.execute(command).data()).getAddedCustRequestResolution();
 		
 		if (custRequestResolution != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(custRequestResolution);
+			return successful(custRequestResolution);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("CustRequestResolution could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateCustRequestResolution(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		CustRequestResolution custRequestResolutionToBeUpdated = new CustRequestResolution();
-
-		try {
-			custRequestResolutionToBeUpdated = CustRequestResolutionMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateCustRequestResolution(custRequestResolutionToBeUpdated, custRequestResolutionToBeUpdated.getCustRequestResolutionId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class CustRequestResolutionController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{custRequestResolutionId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateCustRequestResolution(@RequestBody CustRequestResolution custRequestResolutionToBeUpdated,
+	public ResponseEntity<String> updateCustRequestResolution(@RequestBody CustRequestResolution custRequestResolutionToBeUpdated,
 			@PathVariable String custRequestResolutionId) throws Exception {
 
 		custRequestResolutionToBeUpdated.setCustRequestResolutionId(custRequestResolutionId);
@@ -178,41 +128,44 @@ public class CustRequestResolutionController {
 
 		try {
 			if(((CustRequestResolutionUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{custRequestResolutionId}")
-	public ResponseEntity<Object> findById(@PathVariable String custRequestResolutionId) throws Exception {
+	public ResponseEntity<CustRequestResolution> findById(@PathVariable String custRequestResolutionId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("custRequestResolutionId", custRequestResolutionId);
 		try {
 
-			Object foundCustRequestResolution = findCustRequestResolutionsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundCustRequestResolution);
+			List<CustRequestResolution> foundCustRequestResolution = findCustRequestResolutionsBy(requestParams).getBody();
+			if(foundCustRequestResolution.size()==1){				return successful(foundCustRequestResolution.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{custRequestResolutionId}")
-	public ResponseEntity<Object> deleteCustRequestResolutionByIdUpdated(@PathVariable String custRequestResolutionId) throws Exception {
+	public ResponseEntity<String> deleteCustRequestResolutionByIdUpdated(@PathVariable String custRequestResolutionId) throws Exception {
 		DeleteCustRequestResolution command = new DeleteCustRequestResolution(custRequestResolutionId);
 
 		try {
 			if (((CustRequestResolutionDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("CustRequestResolution could not be deleted");
+		return conflict();
 
 	}
 

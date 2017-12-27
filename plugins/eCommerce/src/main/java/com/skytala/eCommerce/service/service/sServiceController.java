@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/s")
 public class sServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCatalinaSession")
-	public ResponseEntity<Object> createCatalinaSession(HttpSession session, @RequestParam(value="sessionInfo", required=false) java.nio.ByteBuffer sessionInfo, @RequestParam(value="maxIdle", required=false) Long maxIdle, @RequestParam(value="isValid", required=false) String isValid, @RequestParam(value="lastAccessed", required=false) Long lastAccessed, @RequestParam(value="sessionId", required=false) String sessionId, @RequestParam(value="sessionSize", required=false) Long sessionSize) {
+	public ResponseEntity<Map<String, Object>> createCatalinaSession(HttpSession session, @RequestParam(value="sessionInfo", required=false) java.nio.ByteBuffer sessionInfo, @RequestParam(value="maxIdle", required=false) Long maxIdle, @RequestParam(value="isValid", required=false) String isValid, @RequestParam(value="lastAccessed", required=false) Long lastAccessed, @RequestParam(value="sessionId", required=false) String sessionId, @RequestParam(value="sessionSize", required=false) Long sessionSize) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("sessionInfo",sessionInfo);
@@ -44,23 +46,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCatalinaSession")
-	public ResponseEntity<Object> updateCatalinaSession(HttpSession session, @RequestParam(value="sessionId") String sessionId, @RequestParam(value="sessionInfo", required=false) java.nio.ByteBuffer sessionInfo, @RequestParam(value="maxIdle", required=false) Long maxIdle, @RequestParam(value="isValid", required=false) String isValid, @RequestParam(value="lastAccessed", required=false) Long lastAccessed, @RequestParam(value="sessionSize", required=false) Long sessionSize) {
+	public ResponseEntity<Map<String, Object>> updateCatalinaSession(HttpSession session, @RequestParam(value="sessionId") String sessionId, @RequestParam(value="sessionInfo", required=false) java.nio.ByteBuffer sessionInfo, @RequestParam(value="maxIdle", required=false) Long maxIdle, @RequestParam(value="isValid", required=false) String isValid, @RequestParam(value="lastAccessed", required=false) Long lastAccessed, @RequestParam(value="sessionSize", required=false) Long sessionSize) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("sessionId",sessionId);
@@ -78,23 +80,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/cancelJobRetries")
-	public ResponseEntity<Object> cancelJobRetries(HttpSession session, @RequestParam(value="jobId") String jobId) {
+	public ResponseEntity<Map<String, Object>> cancelJobRetries(HttpSession session, @RequestParam(value="jobId") String jobId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("jobId",jobId);
@@ -107,23 +109,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createStandardLanguage")
-	public ResponseEntity<Object> createStandardLanguage(HttpSession session, @RequestParam(value="langCode3t", required=false) String langCode3t, @RequestParam(value="langCode2", required=false) String langCode2, @RequestParam(value="standardLanguageId", required=false) String standardLanguageId, @RequestParam(value="langCode3b", required=false) String langCode3b, @RequestParam(value="langFamily", required=false) String langFamily, @RequestParam(value="langName", required=false) String langName, @RequestParam(value="langCharset", required=false) String langCharset) {
+	public ResponseEntity<Map<String, Object>> createStandardLanguage(HttpSession session, @RequestParam(value="langCode3t", required=false) String langCode3t, @RequestParam(value="langCode2", required=false) String langCode2, @RequestParam(value="standardLanguageId", required=false) String standardLanguageId, @RequestParam(value="langCode3b", required=false) String langCode3b, @RequestParam(value="langFamily", required=false) String langFamily, @RequestParam(value="langName", required=false) String langName, @RequestParam(value="langCharset", required=false) String langCharset) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("langCode3t",langCode3t);
@@ -142,23 +144,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/effectiveDateEcaCondition")
-	public ResponseEntity<Object> effectiveDateEcaCondition(HttpSession session, @RequestParam(value="serviceContext") Map serviceContext, @RequestParam(value="serviceName") String serviceName, @RequestParam(value="fromDate", required=false) java.sql.Timestamp fromDate, @RequestParam(value="thruDate", required=false) java.sql.Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> effectiveDateEcaCondition(HttpSession session, @RequestParam(value="serviceContext") Map serviceContext, @RequestParam(value="serviceName") String serviceName, @RequestParam(value="fromDate", required=false) java.sql.Timestamp fromDate, @RequestParam(value="thruDate", required=false) java.sql.Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("serviceContext",serviceContext);
@@ -174,23 +176,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/cancelScheduledJob")
-	public ResponseEntity<Object> cancelScheduledJob(HttpSession session, @RequestParam(value="jobId") String jobId) {
+	public ResponseEntity<Map<String, Object>> cancelScheduledJob(HttpSession session, @RequestParam(value="jobId") String jobId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("jobId",jobId);
@@ -203,23 +205,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/resetScheduledJob")
-	public ResponseEntity<Object> resetScheduledJob(HttpSession session, @RequestParam(value="jobId") String jobId) {
+	public ResponseEntity<Map<String, Object>> resetScheduledJob(HttpSession session, @RequestParam(value="jobId") String jobId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("jobId",jobId);
@@ -232,23 +234,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateSequenceValueItem")
-	public ResponseEntity<Object> updateSequenceValueItem(HttpSession session, @RequestParam(value="seqName") String seqName, @RequestParam(value="seqId", required=false) Long seqId) {
+	public ResponseEntity<Map<String, Object>> updateSequenceValueItem(HttpSession session, @RequestParam(value="seqName") String seqName, @RequestParam(value="seqId", required=false) Long seqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("seqName",seqName);
@@ -262,23 +264,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/authenticationInterface")
-	public ResponseEntity<Object> authenticationInterface(HttpSession session, @RequestParam(value="login.username") String loginusername, @RequestParam(value="login.password") String loginpassword, @RequestParam(value="visitId", required=false) String visitId, @RequestParam(value="isServiceAuth", required=false) Boolean isServiceAuth) {
+	public ResponseEntity<Map<String, Object>> authenticationInterface(HttpSession session, @RequestParam(value="login.username") String loginusername, @RequestParam(value="login.password") String loginpassword, @RequestParam(value="visitId", required=false) String visitId, @RequestParam(value="isServiceAuth", required=false) Boolean isServiceAuth) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("login.username",loginusername);
@@ -294,23 +296,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateJobManagerLock")
-	public ResponseEntity<Object> updateJobManagerLock(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="instanceId") String instanceId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="reasonEnumId", required=false) String reasonEnumId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateJobManagerLock(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="instanceId") String instanceId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="reasonEnumId", required=false) String reasonEnumId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -331,23 +333,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createStatusItem")
-	public ResponseEntity<Object> createStatusItem(HttpSession session, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="statusTypeId", required=false) String statusTypeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="sequenceId", required=false) String sequenceId, @RequestParam(value="statusCode", required=false) String statusCode) {
+	public ResponseEntity<Map<String, Object>> createStatusItem(HttpSession session, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="statusTypeId", required=false) String statusTypeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="sequenceId", required=false) String sequenceId, @RequestParam(value="statusCode", required=false) String statusCode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("statusId",statusId);
@@ -364,23 +366,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createRuntimeData")
-	public ResponseEntity<Object> createRuntimeData(HttpSession session, @RequestParam(value="runtimeDataId", required=false) String runtimeDataId, @RequestParam(value="runtimeInfo", required=false) String runtimeInfo) {
+	public ResponseEntity<Map<String, Object>> createRuntimeData(HttpSession session, @RequestParam(value="runtimeDataId", required=false) String runtimeDataId, @RequestParam(value="runtimeInfo", required=false) String runtimeInfo) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("runtimeDataId",runtimeDataId);
@@ -394,23 +396,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createJobSandbox")
-	public ResponseEntity<Object> createJobSandbox(HttpSession session, @RequestParam(value="jobName", required=false) String jobName, @RequestParam(value="recurrenceInfoId", required=false) String recurrenceInfoId, @RequestParam(value="runByInstanceId", required=false) String runByInstanceId, @RequestParam(value="maxRecurrenceCount", required=false) Long maxRecurrenceCount, @RequestParam(value="currentRecurrenceCount", required=false) Long currentRecurrenceCount, @RequestParam(value="tempExprId", required=false) String tempExprId, @RequestParam(value="cancelDateTime", required=false) Timestamp cancelDateTime, @RequestParam(value="serviceName", required=false) String serviceName, @RequestParam(value="authUserLoginId", required=false) String authUserLoginId, @RequestParam(value="runtimeDataId", required=false) String runtimeDataId, @RequestParam(value="currentRetryCount", required=false) Long currentRetryCount, @RequestParam(value="runAsUser", required=false) String runAsUser, @RequestParam(value="finishDateTime", required=false) Timestamp finishDateTime, @RequestParam(value="jobId", required=false) String jobId, @RequestParam(value="maxRetry", required=false) Long maxRetry, @RequestParam(value="loaderName", required=false) String loaderName, @RequestParam(value="startDateTime", required=false) Timestamp startDateTime, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="previousJobId", required=false) String previousJobId, @RequestParam(value="parentJobId", required=false) String parentJobId, @RequestParam(value="jobResult", required=false) Long jobResult, @RequestParam(value="poolId", required=false) String poolId, @RequestParam(value="runTime", required=false) Timestamp runTime) {
+	public ResponseEntity<Map<String, Object>> createJobSandbox(HttpSession session, @RequestParam(value="jobName", required=false) String jobName, @RequestParam(value="recurrenceInfoId", required=false) String recurrenceInfoId, @RequestParam(value="runByInstanceId", required=false) String runByInstanceId, @RequestParam(value="maxRecurrenceCount", required=false) Long maxRecurrenceCount, @RequestParam(value="currentRecurrenceCount", required=false) Long currentRecurrenceCount, @RequestParam(value="tempExprId", required=false) String tempExprId, @RequestParam(value="cancelDateTime", required=false) Timestamp cancelDateTime, @RequestParam(value="serviceName", required=false) String serviceName, @RequestParam(value="authUserLoginId", required=false) String authUserLoginId, @RequestParam(value="runtimeDataId", required=false) String runtimeDataId, @RequestParam(value="currentRetryCount", required=false) Long currentRetryCount, @RequestParam(value="runAsUser", required=false) String runAsUser, @RequestParam(value="finishDateTime", required=false) Timestamp finishDateTime, @RequestParam(value="jobId", required=false) String jobId, @RequestParam(value="maxRetry", required=false) Long maxRetry, @RequestParam(value="loaderName", required=false) String loaderName, @RequestParam(value="startDateTime", required=false) Timestamp startDateTime, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="previousJobId", required=false) String previousJobId, @RequestParam(value="parentJobId", required=false) String parentJobId, @RequestParam(value="jobResult", required=false) Long jobResult, @RequestParam(value="poolId", required=false) String poolId, @RequestParam(value="runTime", required=false) Timestamp runTime) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("jobName",jobName);
@@ -445,23 +447,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/serviceStreamInterface")
-	public ResponseEntity<Object> serviceStreamInterface(HttpSession session, @RequestParam(value="inputStream") java.io.InputStream inputStream, @RequestParam(value="outputStream") java.io.OutputStream outputStream) {
+	public ResponseEntity<Map<String, Object>> serviceStreamInterface(HttpSession session, @RequestParam(value="inputStream") java.io.InputStream inputStream, @RequestParam(value="outputStream") java.io.OutputStream outputStream) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("inputStream",inputStream);
@@ -475,23 +477,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateRuntimeData")
-	public ResponseEntity<Object> updateRuntimeData(HttpSession session, @RequestParam(value="runtimeDataId") String runtimeDataId, @RequestParam(value="runtimeInfo", required=false) String runtimeInfo) {
+	public ResponseEntity<Map<String, Object>> updateRuntimeData(HttpSession session, @RequestParam(value="runtimeDataId") String runtimeDataId, @RequestParam(value="runtimeInfo", required=false) String runtimeInfo) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("runtimeDataId",runtimeDataId);
@@ -505,23 +507,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateJobSandbox")
-	public ResponseEntity<Object> updateJobSandbox(HttpSession session, @RequestParam(value="jobId") String jobId, @RequestParam(value="jobName", required=false) String jobName, @RequestParam(value="recurrenceInfoId", required=false) String recurrenceInfoId, @RequestParam(value="runByInstanceId", required=false) String runByInstanceId, @RequestParam(value="maxRecurrenceCount", required=false) Long maxRecurrenceCount, @RequestParam(value="currentRecurrenceCount", required=false) Long currentRecurrenceCount, @RequestParam(value="tempExprId", required=false) String tempExprId, @RequestParam(value="cancelDateTime", required=false) Timestamp cancelDateTime, @RequestParam(value="serviceName", required=false) String serviceName, @RequestParam(value="authUserLoginId", required=false) String authUserLoginId, @RequestParam(value="runtimeDataId", required=false) String runtimeDataId, @RequestParam(value="currentRetryCount", required=false) Long currentRetryCount, @RequestParam(value="runAsUser", required=false) String runAsUser, @RequestParam(value="finishDateTime", required=false) Timestamp finishDateTime, @RequestParam(value="maxRetry", required=false) Long maxRetry, @RequestParam(value="loaderName", required=false) String loaderName, @RequestParam(value="startDateTime", required=false) Timestamp startDateTime, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="previousJobId", required=false) String previousJobId, @RequestParam(value="parentJobId", required=false) String parentJobId, @RequestParam(value="jobResult", required=false) Long jobResult, @RequestParam(value="poolId", required=false) String poolId, @RequestParam(value="runTime", required=false) Timestamp runTime) {
+	public ResponseEntity<Map<String, Object>> updateJobSandbox(HttpSession session, @RequestParam(value="jobId") String jobId, @RequestParam(value="jobName", required=false) String jobName, @RequestParam(value="recurrenceInfoId", required=false) String recurrenceInfoId, @RequestParam(value="runByInstanceId", required=false) String runByInstanceId, @RequestParam(value="maxRecurrenceCount", required=false) Long maxRecurrenceCount, @RequestParam(value="currentRecurrenceCount", required=false) Long currentRecurrenceCount, @RequestParam(value="tempExprId", required=false) String tempExprId, @RequestParam(value="cancelDateTime", required=false) Timestamp cancelDateTime, @RequestParam(value="serviceName", required=false) String serviceName, @RequestParam(value="authUserLoginId", required=false) String authUserLoginId, @RequestParam(value="runtimeDataId", required=false) String runtimeDataId, @RequestParam(value="currentRetryCount", required=false) Long currentRetryCount, @RequestParam(value="runAsUser", required=false) String runAsUser, @RequestParam(value="finishDateTime", required=false) Timestamp finishDateTime, @RequestParam(value="maxRetry", required=false) Long maxRetry, @RequestParam(value="loaderName", required=false) String loaderName, @RequestParam(value="startDateTime", required=false) Timestamp startDateTime, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="previousJobId", required=false) String previousJobId, @RequestParam(value="parentJobId", required=false) String parentJobId, @RequestParam(value="jobResult", required=false) Long jobResult, @RequestParam(value="poolId", required=false) String poolId, @RequestParam(value="runTime", required=false) Timestamp runTime) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("jobId",jobId);
@@ -556,23 +558,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteJobSandbox")
-	public ResponseEntity<Object> deleteJobSandbox(HttpSession session, @RequestParam(value="jobId") String jobId) {
+	public ResponseEntity<Map<String, Object>> deleteJobSandbox(HttpSession session, @RequestParam(value="jobId") String jobId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("jobId",jobId);
@@ -585,23 +587,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteCatalinaSession")
-	public ResponseEntity<Object> deleteCatalinaSession(HttpSession session, @RequestParam(value="sessionId") String sessionId, @RequestParam(value="sessionInfo", required=false) java.nio.ByteBuffer sessionInfo, @RequestParam(value="maxIdle", required=false) Long maxIdle, @RequestParam(value="isValid", required=false) String isValid, @RequestParam(value="lastAccessed", required=false) Long lastAccessed, @RequestParam(value="sessionSize", required=false) Long sessionSize) {
+	public ResponseEntity<Map<String, Object>> deleteCatalinaSession(HttpSession session, @RequestParam(value="sessionId") String sessionId, @RequestParam(value="sessionInfo", required=false) java.nio.ByteBuffer sessionInfo, @RequestParam(value="maxIdle", required=false) Long maxIdle, @RequestParam(value="isValid", required=false) String isValid, @RequestParam(value="lastAccessed", required=false) Long lastAccessed, @RequestParam(value="sessionSize", required=false) Long sessionSize) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("sessionId",sessionId);
@@ -619,23 +621,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createJobManagerLock")
-	public ResponseEntity<Object> createJobManagerLock(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="instanceId") String instanceId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="reasonEnumId", required=false) String reasonEnumId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createJobManagerLock(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="instanceId") String instanceId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="reasonEnumId", required=false) String reasonEnumId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -656,23 +658,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/serviceEcaConditionInterface")
-	public ResponseEntity<Object> serviceEcaConditionInterface(HttpSession session, @RequestParam(value="serviceContext") Map serviceContext, @RequestParam(value="serviceName") String serviceName) {
+	public ResponseEntity<Map<String, Object>> serviceEcaConditionInterface(HttpSession session, @RequestParam(value="serviceContext") Map serviceContext, @RequestParam(value="serviceName") String serviceName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("serviceContext",serviceContext);
@@ -686,23 +688,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/serviceMcaConditionInterface")
-	public ResponseEntity<Object> serviceMcaConditionInterface(HttpSession session, @RequestParam(value="messageWrapper") org.apache.ofbiz.service.mail.MimeMessageWrapper messageWrapper) {
+	public ResponseEntity<Map<String, Object>> serviceMcaConditionInterface(HttpSession session, @RequestParam(value="messageWrapper") org.apache.ofbiz.service.mail.MimeMessageWrapper messageWrapper) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("messageWrapper",messageWrapper);
@@ -715,23 +717,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteStandardLanguage")
-	public ResponseEntity<Object> deleteStandardLanguage(HttpSession session, @RequestParam(value="standardLanguageId") String standardLanguageId) {
+	public ResponseEntity<Map<String, Object>> deleteStandardLanguage(HttpSession session, @RequestParam(value="standardLanguageId") String standardLanguageId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("standardLanguageId",standardLanguageId);
@@ -744,23 +746,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteStatusItem")
-	public ResponseEntity<Object> deleteStatusItem(HttpSession session, @RequestParam(value="statusId") String statusId) {
+	public ResponseEntity<Map<String, Object>> deleteStatusItem(HttpSession session, @RequestParam(value="statusId") String statusId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("statusId",statusId);
@@ -773,23 +775,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/mailProcessInterface")
-	public ResponseEntity<Object> mailProcessInterface(HttpSession session, @RequestParam(value="messageWrapper") org.apache.ofbiz.service.mail.MimeMessageWrapper messageWrapper) {
+	public ResponseEntity<Map<String, Object>> mailProcessInterface(HttpSession session, @RequestParam(value="messageWrapper") org.apache.ofbiz.service.mail.MimeMessageWrapper messageWrapper) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("messageWrapper",messageWrapper);
@@ -802,23 +804,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteSequenceValueItem")
-	public ResponseEntity<Object> deleteSequenceValueItem(HttpSession session, @RequestParam(value="seqName") String seqName) {
+	public ResponseEntity<Map<String, Object>> deleteSequenceValueItem(HttpSession session, @RequestParam(value="seqName") String seqName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("seqName",seqName);
@@ -831,23 +833,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateStatusItem")
-	public ResponseEntity<Object> updateStatusItem(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="statusTypeId", required=false) String statusTypeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="sequenceId", required=false) String sequenceId, @RequestParam(value="statusCode", required=false) String statusCode) {
+	public ResponseEntity<Map<String, Object>> updateStatusItem(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="statusTypeId", required=false) String statusTypeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="sequenceId", required=false) String sequenceId, @RequestParam(value="statusCode", required=false) String statusCode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("statusId",statusId);
@@ -864,23 +866,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateStatusType")
-	public ResponseEntity<Object> updateStatusType(HttpSession session, @RequestParam(value="statusTypeId") String statusTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateStatusType(HttpSession session, @RequestParam(value="statusTypeId") String statusTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("statusTypeId",statusTypeId);
@@ -896,23 +898,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteStatusType")
-	public ResponseEntity<Object> deleteStatusType(HttpSession session, @RequestParam(value="statusTypeId") String statusTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteStatusType(HttpSession session, @RequestParam(value="statusTypeId") String statusTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("statusTypeId",statusTypeId);
@@ -925,23 +927,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteRuntimeData")
-	public ResponseEntity<Object> deleteRuntimeData(HttpSession session, @RequestParam(value="runtimeDataId") String runtimeDataId) {
+	public ResponseEntity<Map<String, Object>> deleteRuntimeData(HttpSession session, @RequestParam(value="runtimeDataId") String runtimeDataId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("runtimeDataId",runtimeDataId);
@@ -954,23 +956,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/permissionInterface")
-	public ResponseEntity<Object> permissionInterface(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="mainAction", required=false) String mainAction) {
+	public ResponseEntity<Map<String, Object>> permissionInterface(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="mainAction", required=false) String mainAction) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("primaryPermission",primaryPermission);
@@ -986,23 +988,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateStandardLanguage")
-	public ResponseEntity<Object> updateStandardLanguage(HttpSession session, @RequestParam(value="standardLanguageId") String standardLanguageId, @RequestParam(value="langCode3t", required=false) String langCode3t, @RequestParam(value="langCode2", required=false) String langCode2, @RequestParam(value="langCode3b", required=false) String langCode3b, @RequestParam(value="langFamily", required=false) String langFamily, @RequestParam(value="langName", required=false) String langName, @RequestParam(value="langCharset", required=false) String langCharset) {
+	public ResponseEntity<Map<String, Object>> updateStandardLanguage(HttpSession session, @RequestParam(value="standardLanguageId") String standardLanguageId, @RequestParam(value="langCode3t", required=false) String langCode3t, @RequestParam(value="langCode2", required=false) String langCode2, @RequestParam(value="langCode3b", required=false) String langCode3b, @RequestParam(value="langFamily", required=false) String langFamily, @RequestParam(value="langName", required=false) String langName, @RequestParam(value="langCharset", required=false) String langCharset) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("standardLanguageId",standardLanguageId);
@@ -1021,23 +1023,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createSequenceValueItem")
-	public ResponseEntity<Object> createSequenceValueItem(HttpSession session, @RequestParam(value="seqName", required=false) String seqName, @RequestParam(value="seqId", required=false) Long seqId) {
+	public ResponseEntity<Map<String, Object>> createSequenceValueItem(HttpSession session, @RequestParam(value="seqName", required=false) String seqName, @RequestParam(value="seqId", required=false) Long seqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("seqName",seqName);
@@ -1051,23 +1053,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/purgeOldJobs")
-	public ResponseEntity<Object> purgeOldJobs(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> purgeOldJobs(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -1079,23 +1081,23 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createStatusType")
-	public ResponseEntity<Object> createStatusType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="statusTypeId", required=false) String statusTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createStatusType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="statusTypeId", required=false) String statusTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("parentTypeId",parentTypeId);
@@ -1111,19 +1113,19 @@ public class sServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

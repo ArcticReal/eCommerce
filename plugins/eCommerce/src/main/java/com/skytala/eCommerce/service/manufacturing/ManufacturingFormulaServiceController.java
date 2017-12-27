@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/manufacturingFormula")
 public class ManufacturingFormulaServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/exampleTaskFormula")
-	public ResponseEntity<Object> exampleTaskFormula(HttpSession session, @RequestParam(value="arguments") java.util.Map arguments) {
+	public ResponseEntity<Map<String, Object>> exampleTaskFormula(HttpSession session, @RequestParam(value="arguments") java.util.Map arguments) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("arguments",arguments);
@@ -39,23 +41,23 @@ public class ManufacturingFormulaServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/exampleComponentFormula")
-	public ResponseEntity<Object> exampleComponentFormula(HttpSession session, @RequestParam(value="arguments") java.util.Map arguments) {
+	public ResponseEntity<Map<String, Object>> exampleComponentFormula(HttpSession session, @RequestParam(value="arguments") java.util.Map arguments) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("arguments",arguments);
@@ -68,23 +70,23 @@ public class ManufacturingFormulaServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/linearComponentFormula")
-	public ResponseEntity<Object> linearComponentFormula(HttpSession session, @RequestParam(value="arguments") java.util.Map arguments) {
+	public ResponseEntity<Map<String, Object>> linearComponentFormula(HttpSession session, @RequestParam(value="arguments") java.util.Map arguments) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("arguments",arguments);
@@ -97,23 +99,23 @@ public class ManufacturingFormulaServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/interfaceTaskFormula")
-	public ResponseEntity<Object> interfaceTaskFormula(HttpSession session, @RequestParam(value="arguments") java.util.Map arguments) {
+	public ResponseEntity<Map<String, Object>> interfaceTaskFormula(HttpSession session, @RequestParam(value="arguments") java.util.Map arguments) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("arguments",arguments);
@@ -126,23 +128,23 @@ public class ManufacturingFormulaServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/interfaceBomFormula")
-	public ResponseEntity<Object> interfaceBomFormula(HttpSession session, @RequestParam(value="arguments") java.util.Map arguments) {
+	public ResponseEntity<Map<String, Object>> interfaceBomFormula(HttpSession session, @RequestParam(value="arguments") java.util.Map arguments) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("arguments",arguments);
@@ -155,19 +157,19 @@ public class ManufacturingFormulaServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

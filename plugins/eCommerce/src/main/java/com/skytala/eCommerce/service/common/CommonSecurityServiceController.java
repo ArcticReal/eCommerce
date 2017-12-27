@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/commonSecurity")
 public class CommonSecurityServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeUserLoginToSecurityGroup")
-	public ResponseEntity<Object> removeUserLoginToSecurityGroup(HttpSession session, @RequestParam(value="userLoginId") String userLoginId, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="groupId") String groupId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> removeUserLoginToSecurityGroup(HttpSession session, @RequestParam(value="userLoginId") String userLoginId, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="groupId") String groupId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLoginId",userLoginId);
@@ -42,23 +44,23 @@ public class CommonSecurityServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateSecurityPermission")
-	public ResponseEntity<Object> updateSecurityPermission(HttpSession session, @RequestParam(value="permissionId") String permissionId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateSecurityPermission(HttpSession session, @RequestParam(value="permissionId") String permissionId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("permissionId",permissionId);
@@ -72,23 +74,23 @@ public class CommonSecurityServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeUserLoginSecurityQuestion")
-	public ResponseEntity<Object> removeUserLoginSecurityQuestion(HttpSession session, @RequestParam(value="userLoginId") String userLoginId, @RequestParam(value="questionEnumId") String questionEnumId, @RequestParam(value="securityAnswer", required=false) String securityAnswer) {
+	public ResponseEntity<Map<String, Object>> removeUserLoginSecurityQuestion(HttpSession session, @RequestParam(value="userLoginId") String userLoginId, @RequestParam(value="questionEnumId") String questionEnumId, @RequestParam(value="securityAnswer", required=false) String securityAnswer) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLoginId",userLoginId);
@@ -103,23 +105,23 @@ public class CommonSecurityServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteSecurityGroup")
-	public ResponseEntity<Object> deleteSecurityGroup(HttpSession session, @RequestParam(value="groupId") String groupId) {
+	public ResponseEntity<Map<String, Object>> deleteSecurityGroup(HttpSession session, @RequestParam(value="groupId") String groupId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("groupId",groupId);
@@ -132,23 +134,23 @@ public class CommonSecurityServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createSecurityGroup")
-	public ResponseEntity<Object> createSecurityGroup(HttpSession session, @RequestParam(value="groupId") String groupId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createSecurityGroup(HttpSession session, @RequestParam(value="groupId") String groupId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("groupId",groupId);
@@ -162,23 +164,23 @@ public class CommonSecurityServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateSecurityGroup")
-	public ResponseEntity<Object> updateSecurityGroup(HttpSession session, @RequestParam(value="groupId") String groupId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateSecurityGroup(HttpSession session, @RequestParam(value="groupId") String groupId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("groupId",groupId);
@@ -192,23 +194,23 @@ public class CommonSecurityServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addSecurityPermissionToSecurityGroup")
-	public ResponseEntity<Object> addSecurityPermissionToSecurityGroup(HttpSession session, @RequestParam(value="permissionId") String permissionId, @RequestParam(value="groupId") String groupId) {
+	public ResponseEntity<Map<String, Object>> addSecurityPermissionToSecurityGroup(HttpSession session, @RequestParam(value="permissionId") String permissionId, @RequestParam(value="groupId") String groupId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("permissionId",permissionId);
@@ -222,23 +224,23 @@ public class CommonSecurityServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateUserLoginToSecurityGroup")
-	public ResponseEntity<Object> updateUserLoginToSecurityGroup(HttpSession session, @RequestParam(value="userLoginId") String userLoginId, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="groupId") String groupId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateUserLoginToSecurityGroup(HttpSession session, @RequestParam(value="userLoginId") String userLoginId, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="groupId") String groupId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLoginId",userLoginId);
@@ -254,23 +256,23 @@ public class CommonSecurityServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createSecurityPermission")
-	public ResponseEntity<Object> createSecurityPermission(HttpSession session, @RequestParam(value="permissionId") String permissionId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createSecurityPermission(HttpSession session, @RequestParam(value="permissionId") String permissionId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("permissionId",permissionId);
@@ -284,23 +286,23 @@ public class CommonSecurityServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProtectedViewToSecurityGroup")
-	public ResponseEntity<Object> updateProtectedViewToSecurityGroup(HttpSession session, @RequestParam(value="viewNameId") String viewNameId, @RequestParam(value="maxHitsDuration") Long maxHitsDuration, @RequestParam(value="tarpitDuration") Long tarpitDuration, @RequestParam(value="groupId") String groupId, @RequestParam(value="maxHits") Long maxHits) {
+	public ResponseEntity<Map<String, Object>> updateProtectedViewToSecurityGroup(HttpSession session, @RequestParam(value="viewNameId") String viewNameId, @RequestParam(value="maxHitsDuration") Long maxHitsDuration, @RequestParam(value="tarpitDuration") Long tarpitDuration, @RequestParam(value="groupId") String groupId, @RequestParam(value="maxHits") Long maxHits) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("viewNameId",viewNameId);
@@ -317,23 +319,23 @@ public class CommonSecurityServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addProtectedViewToSecurityGroup")
-	public ResponseEntity<Object> addProtectedViewToSecurityGroup(HttpSession session, @RequestParam(value="viewNameId") String viewNameId, @RequestParam(value="maxHitsDuration") Long maxHitsDuration, @RequestParam(value="tarpitDuration") Long tarpitDuration, @RequestParam(value="groupId") String groupId, @RequestParam(value="maxHits") Long maxHits) {
+	public ResponseEntity<Map<String, Object>> addProtectedViewToSecurityGroup(HttpSession session, @RequestParam(value="viewNameId") String viewNameId, @RequestParam(value="maxHitsDuration") Long maxHitsDuration, @RequestParam(value="tarpitDuration") Long tarpitDuration, @RequestParam(value="groupId") String groupId, @RequestParam(value="maxHits") Long maxHits) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("viewNameId",viewNameId);
@@ -350,23 +352,23 @@ public class CommonSecurityServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeSecurityPermissionFromSecurityGroup")
-	public ResponseEntity<Object> removeSecurityPermissionFromSecurityGroup(HttpSession session, @RequestParam(value="permissionId") String permissionId, @RequestParam(value="groupId") String groupId) {
+	public ResponseEntity<Map<String, Object>> removeSecurityPermissionFromSecurityGroup(HttpSession session, @RequestParam(value="permissionId") String permissionId, @RequestParam(value="groupId") String groupId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("permissionId",permissionId);
@@ -380,23 +382,23 @@ public class CommonSecurityServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateUserLoginSecurityQuestion")
-	public ResponseEntity<Object> updateUserLoginSecurityQuestion(HttpSession session, @RequestParam(value="userLoginId") String userLoginId, @RequestParam(value="questionEnumId") String questionEnumId, @RequestParam(value="securityAnswer", required=false) String securityAnswer) {
+	public ResponseEntity<Map<String, Object>> updateUserLoginSecurityQuestion(HttpSession session, @RequestParam(value="userLoginId") String userLoginId, @RequestParam(value="questionEnumId") String questionEnumId, @RequestParam(value="securityAnswer", required=false) String securityAnswer) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLoginId",userLoginId);
@@ -411,23 +413,23 @@ public class CommonSecurityServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeProtectedViewFromSecurityGroup")
-	public ResponseEntity<Object> removeProtectedViewFromSecurityGroup(HttpSession session, @RequestParam(value="viewNameId") String viewNameId, @RequestParam(value="groupId") String groupId) {
+	public ResponseEntity<Map<String, Object>> removeProtectedViewFromSecurityGroup(HttpSession session, @RequestParam(value="viewNameId") String viewNameId, @RequestParam(value="groupId") String groupId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("viewNameId",viewNameId);
@@ -441,23 +443,23 @@ public class CommonSecurityServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createUserLoginSecurityQuestion")
-	public ResponseEntity<Object> createUserLoginSecurityQuestion(HttpSession session, @RequestParam(value="userLoginId") String userLoginId, @RequestParam(value="questionEnumId") String questionEnumId, @RequestParam(value="securityAnswer", required=false) String securityAnswer) {
+	public ResponseEntity<Map<String, Object>> createUserLoginSecurityQuestion(HttpSession session, @RequestParam(value="userLoginId") String userLoginId, @RequestParam(value="questionEnumId") String questionEnumId, @RequestParam(value="securityAnswer", required=false) String securityAnswer) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLoginId",userLoginId);
@@ -472,23 +474,23 @@ public class CommonSecurityServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addUserLoginToSecurityGroup")
-	public ResponseEntity<Object> addUserLoginToSecurityGroup(HttpSession session, @RequestParam(value="userLoginId") String userLoginId, @RequestParam(value="groupId") String groupId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> addUserLoginToSecurityGroup(HttpSession session, @RequestParam(value="userLoginId") String userLoginId, @RequestParam(value="groupId") String groupId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLoginId",userLoginId);
@@ -504,23 +506,23 @@ public class CommonSecurityServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/securityPermissionCheck")
-	public ResponseEntity<Object> securityPermissionCheck(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="mainAction", required=false) String mainAction) {
+	public ResponseEntity<Map<String, Object>> securityPermissionCheck(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="mainAction", required=false) String mainAction) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("primaryPermission",primaryPermission);
@@ -536,19 +538,19 @@ public class CommonSecurityServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

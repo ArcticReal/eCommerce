@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.inventoryItem.query.varian
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/inventoryItem/inventoryItemVariances")
 public class InventoryItemVarianceController {
@@ -52,7 +54,7 @@ public class InventoryItemVarianceController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findInventoryItemVariancesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<InventoryItemVariance>> findInventoryItemVariancesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInventoryItemVariancesBy query = new FindInventoryItemVariancesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class InventoryItemVarianceController {
 		}
 
 		List<InventoryItemVariance> inventoryItemVariances =((InventoryItemVarianceFound) Scheduler.execute(query).data()).getInventoryItemVariances();
-
-		if (inventoryItemVariances.size() == 1) {
-			return ResponseEntity.ok().body(inventoryItemVariances.get(0));
-		}
 
 		return ResponseEntity.ok().body(inventoryItemVariances);
 
@@ -78,7 +76,7 @@ public class InventoryItemVarianceController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createInventoryItemVariance(HttpServletRequest request) throws Exception {
+	public ResponseEntity<InventoryItemVariance> createInventoryItemVariance(HttpServletRequest request) throws Exception {
 
 		InventoryItemVariance inventoryItemVarianceToBeAdded = new InventoryItemVariance();
 		try {
@@ -86,7 +84,7 @@ public class InventoryItemVarianceController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createInventoryItemVariance(inventoryItemVarianceToBeAdded);
@@ -101,63 +99,15 @@ public class InventoryItemVarianceController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createInventoryItemVariance(@RequestBody InventoryItemVariance inventoryItemVarianceToBeAdded) throws Exception {
+	public ResponseEntity<InventoryItemVariance> createInventoryItemVariance(@RequestBody InventoryItemVariance inventoryItemVarianceToBeAdded) throws Exception {
 
 		AddInventoryItemVariance command = new AddInventoryItemVariance(inventoryItemVarianceToBeAdded);
 		InventoryItemVariance inventoryItemVariance = ((InventoryItemVarianceAdded) Scheduler.execute(command).data()).getAddedInventoryItemVariance();
 		
 		if (inventoryItemVariance != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(inventoryItemVariance);
+			return successful(inventoryItemVariance);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("InventoryItemVariance could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateInventoryItemVariance(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		InventoryItemVariance inventoryItemVarianceToBeUpdated = new InventoryItemVariance();
-
-		try {
-			inventoryItemVarianceToBeUpdated = InventoryItemVarianceMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateInventoryItemVariance(inventoryItemVarianceToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class InventoryItemVarianceController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateInventoryItemVariance(@RequestBody InventoryItemVariance inventoryItemVarianceToBeUpdated,
+	public ResponseEntity<String> updateInventoryItemVariance(@RequestBody InventoryItemVariance inventoryItemVarianceToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		inventoryItemVarianceToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class InventoryItemVarianceController {
 
 		try {
 			if(((InventoryItemVarianceUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{inventoryItemVarianceId}")
-	public ResponseEntity<Object> findById(@PathVariable String inventoryItemVarianceId) throws Exception {
+	public ResponseEntity<InventoryItemVariance> findById(@PathVariable String inventoryItemVarianceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("inventoryItemVarianceId", inventoryItemVarianceId);
 		try {
 
-			Object foundInventoryItemVariance = findInventoryItemVariancesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundInventoryItemVariance);
+			List<InventoryItemVariance> foundInventoryItemVariance = findInventoryItemVariancesBy(requestParams).getBody();
+			if(foundInventoryItemVariance.size()==1){				return successful(foundInventoryItemVariance.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{inventoryItemVarianceId}")
-	public ResponseEntity<Object> deleteInventoryItemVarianceByIdUpdated(@PathVariable String inventoryItemVarianceId) throws Exception {
+	public ResponseEntity<String> deleteInventoryItemVarianceByIdUpdated(@PathVariable String inventoryItemVarianceId) throws Exception {
 		DeleteInventoryItemVariance command = new DeleteInventoryItemVariance(inventoryItemVarianceId);
 
 		try {
 			if (((InventoryItemVarianceDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("InventoryItemVariance could not be deleted");
+		return conflict();
 
 	}
 

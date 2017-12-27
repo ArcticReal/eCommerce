@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.supplierPrefOrder.query.Fi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/supplierPrefOrders")
 public class SupplierPrefOrderController {
@@ -52,7 +54,7 @@ public class SupplierPrefOrderController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findSupplierPrefOrdersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<SupplierPrefOrder>> findSupplierPrefOrdersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSupplierPrefOrdersBy query = new FindSupplierPrefOrdersBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class SupplierPrefOrderController {
 		}
 
 		List<SupplierPrefOrder> supplierPrefOrders =((SupplierPrefOrderFound) Scheduler.execute(query).data()).getSupplierPrefOrders();
-
-		if (supplierPrefOrders.size() == 1) {
-			return ResponseEntity.ok().body(supplierPrefOrders.get(0));
-		}
 
 		return ResponseEntity.ok().body(supplierPrefOrders);
 
@@ -78,7 +76,7 @@ public class SupplierPrefOrderController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createSupplierPrefOrder(HttpServletRequest request) throws Exception {
+	public ResponseEntity<SupplierPrefOrder> createSupplierPrefOrder(HttpServletRequest request) throws Exception {
 
 		SupplierPrefOrder supplierPrefOrderToBeAdded = new SupplierPrefOrder();
 		try {
@@ -86,7 +84,7 @@ public class SupplierPrefOrderController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createSupplierPrefOrder(supplierPrefOrderToBeAdded);
@@ -101,63 +99,15 @@ public class SupplierPrefOrderController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createSupplierPrefOrder(@RequestBody SupplierPrefOrder supplierPrefOrderToBeAdded) throws Exception {
+	public ResponseEntity<SupplierPrefOrder> createSupplierPrefOrder(@RequestBody SupplierPrefOrder supplierPrefOrderToBeAdded) throws Exception {
 
 		AddSupplierPrefOrder command = new AddSupplierPrefOrder(supplierPrefOrderToBeAdded);
 		SupplierPrefOrder supplierPrefOrder = ((SupplierPrefOrderAdded) Scheduler.execute(command).data()).getAddedSupplierPrefOrder();
 		
 		if (supplierPrefOrder != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(supplierPrefOrder);
+			return successful(supplierPrefOrder);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("SupplierPrefOrder could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateSupplierPrefOrder(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		SupplierPrefOrder supplierPrefOrderToBeUpdated = new SupplierPrefOrder();
-
-		try {
-			supplierPrefOrderToBeUpdated = SupplierPrefOrderMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateSupplierPrefOrder(supplierPrefOrderToBeUpdated, supplierPrefOrderToBeUpdated.getSupplierPrefOrderId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class SupplierPrefOrderController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{supplierPrefOrderId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateSupplierPrefOrder(@RequestBody SupplierPrefOrder supplierPrefOrderToBeUpdated,
+	public ResponseEntity<String> updateSupplierPrefOrder(@RequestBody SupplierPrefOrder supplierPrefOrderToBeUpdated,
 			@PathVariable String supplierPrefOrderId) throws Exception {
 
 		supplierPrefOrderToBeUpdated.setSupplierPrefOrderId(supplierPrefOrderId);
@@ -178,41 +128,44 @@ public class SupplierPrefOrderController {
 
 		try {
 			if(((SupplierPrefOrderUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{supplierPrefOrderId}")
-	public ResponseEntity<Object> findById(@PathVariable String supplierPrefOrderId) throws Exception {
+	public ResponseEntity<SupplierPrefOrder> findById(@PathVariable String supplierPrefOrderId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("supplierPrefOrderId", supplierPrefOrderId);
 		try {
 
-			Object foundSupplierPrefOrder = findSupplierPrefOrdersBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundSupplierPrefOrder);
+			List<SupplierPrefOrder> foundSupplierPrefOrder = findSupplierPrefOrdersBy(requestParams).getBody();
+			if(foundSupplierPrefOrder.size()==1){				return successful(foundSupplierPrefOrder.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{supplierPrefOrderId}")
-	public ResponseEntity<Object> deleteSupplierPrefOrderByIdUpdated(@PathVariable String supplierPrefOrderId) throws Exception {
+	public ResponseEntity<String> deleteSupplierPrefOrderByIdUpdated(@PathVariable String supplierPrefOrderId) throws Exception {
 		DeleteSupplierPrefOrder command = new DeleteSupplierPrefOrder(supplierPrefOrderId);
 
 		try {
 			if (((SupplierPrefOrderDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("SupplierPrefOrder could not be deleted");
+		return conflict();
 
 	}
 

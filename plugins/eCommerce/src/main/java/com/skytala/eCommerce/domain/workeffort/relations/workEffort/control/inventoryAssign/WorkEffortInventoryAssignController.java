@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.workeffort.relations.workEffort.query.invent
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/workeffort/workEffort/workEffortInventoryAssigns")
 public class WorkEffortInventoryAssignController {
@@ -52,7 +54,7 @@ public class WorkEffortInventoryAssignController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWorkEffortInventoryAssignsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WorkEffortInventoryAssign>> findWorkEffortInventoryAssignsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortInventoryAssignsBy query = new FindWorkEffortInventoryAssignsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WorkEffortInventoryAssignController {
 		}
 
 		List<WorkEffortInventoryAssign> workEffortInventoryAssigns =((WorkEffortInventoryAssignFound) Scheduler.execute(query).data()).getWorkEffortInventoryAssigns();
-
-		if (workEffortInventoryAssigns.size() == 1) {
-			return ResponseEntity.ok().body(workEffortInventoryAssigns.get(0));
-		}
 
 		return ResponseEntity.ok().body(workEffortInventoryAssigns);
 
@@ -78,7 +76,7 @@ public class WorkEffortInventoryAssignController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWorkEffortInventoryAssign(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WorkEffortInventoryAssign> createWorkEffortInventoryAssign(HttpServletRequest request) throws Exception {
 
 		WorkEffortInventoryAssign workEffortInventoryAssignToBeAdded = new WorkEffortInventoryAssign();
 		try {
@@ -86,7 +84,7 @@ public class WorkEffortInventoryAssignController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWorkEffortInventoryAssign(workEffortInventoryAssignToBeAdded);
@@ -101,63 +99,15 @@ public class WorkEffortInventoryAssignController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWorkEffortInventoryAssign(@RequestBody WorkEffortInventoryAssign workEffortInventoryAssignToBeAdded) throws Exception {
+	public ResponseEntity<WorkEffortInventoryAssign> createWorkEffortInventoryAssign(@RequestBody WorkEffortInventoryAssign workEffortInventoryAssignToBeAdded) throws Exception {
 
 		AddWorkEffortInventoryAssign command = new AddWorkEffortInventoryAssign(workEffortInventoryAssignToBeAdded);
 		WorkEffortInventoryAssign workEffortInventoryAssign = ((WorkEffortInventoryAssignAdded) Scheduler.execute(command).data()).getAddedWorkEffortInventoryAssign();
 		
 		if (workEffortInventoryAssign != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(workEffortInventoryAssign);
+			return successful(workEffortInventoryAssign);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WorkEffortInventoryAssign could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWorkEffortInventoryAssign(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WorkEffortInventoryAssign workEffortInventoryAssignToBeUpdated = new WorkEffortInventoryAssign();
-
-		try {
-			workEffortInventoryAssignToBeUpdated = WorkEffortInventoryAssignMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWorkEffortInventoryAssign(workEffortInventoryAssignToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WorkEffortInventoryAssignController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWorkEffortInventoryAssign(@RequestBody WorkEffortInventoryAssign workEffortInventoryAssignToBeUpdated,
+	public ResponseEntity<String> updateWorkEffortInventoryAssign(@RequestBody WorkEffortInventoryAssign workEffortInventoryAssignToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		workEffortInventoryAssignToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class WorkEffortInventoryAssignController {
 
 		try {
 			if(((WorkEffortInventoryAssignUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{workEffortInventoryAssignId}")
-	public ResponseEntity<Object> findById(@PathVariable String workEffortInventoryAssignId) throws Exception {
+	public ResponseEntity<WorkEffortInventoryAssign> findById(@PathVariable String workEffortInventoryAssignId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortInventoryAssignId", workEffortInventoryAssignId);
 		try {
 
-			Object foundWorkEffortInventoryAssign = findWorkEffortInventoryAssignsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWorkEffortInventoryAssign);
+			List<WorkEffortInventoryAssign> foundWorkEffortInventoryAssign = findWorkEffortInventoryAssignsBy(requestParams).getBody();
+			if(foundWorkEffortInventoryAssign.size()==1){				return successful(foundWorkEffortInventoryAssign.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{workEffortInventoryAssignId}")
-	public ResponseEntity<Object> deleteWorkEffortInventoryAssignByIdUpdated(@PathVariable String workEffortInventoryAssignId) throws Exception {
+	public ResponseEntity<String> deleteWorkEffortInventoryAssignByIdUpdated(@PathVariable String workEffortInventoryAssignId) throws Exception {
 		DeleteWorkEffortInventoryAssign command = new DeleteWorkEffortInventoryAssign(workEffortInventoryAssignId);
 
 		try {
 			if (((WorkEffortInventoryAssignDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WorkEffortInventoryAssign could not be deleted");
+		return conflict();
 
 	}
 

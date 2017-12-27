@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.facility.query.party.FindF
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/facility/facilityPartys")
 public class FacilityPartyController {
@@ -52,7 +54,7 @@ public class FacilityPartyController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findFacilityPartysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<FacilityParty>> findFacilityPartysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFacilityPartysBy query = new FindFacilityPartysBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class FacilityPartyController {
 		}
 
 		List<FacilityParty> facilityPartys =((FacilityPartyFound) Scheduler.execute(query).data()).getFacilityPartys();
-
-		if (facilityPartys.size() == 1) {
-			return ResponseEntity.ok().body(facilityPartys.get(0));
-		}
 
 		return ResponseEntity.ok().body(facilityPartys);
 
@@ -78,7 +76,7 @@ public class FacilityPartyController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createFacilityParty(HttpServletRequest request) throws Exception {
+	public ResponseEntity<FacilityParty> createFacilityParty(HttpServletRequest request) throws Exception {
 
 		FacilityParty facilityPartyToBeAdded = new FacilityParty();
 		try {
@@ -86,7 +84,7 @@ public class FacilityPartyController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createFacilityParty(facilityPartyToBeAdded);
@@ -101,63 +99,15 @@ public class FacilityPartyController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createFacilityParty(@RequestBody FacilityParty facilityPartyToBeAdded) throws Exception {
+	public ResponseEntity<FacilityParty> createFacilityParty(@RequestBody FacilityParty facilityPartyToBeAdded) throws Exception {
 
 		AddFacilityParty command = new AddFacilityParty(facilityPartyToBeAdded);
 		FacilityParty facilityParty = ((FacilityPartyAdded) Scheduler.execute(command).data()).getAddedFacilityParty();
 		
 		if (facilityParty != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(facilityParty);
+			return successful(facilityParty);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("FacilityParty could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateFacilityParty(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		FacilityParty facilityPartyToBeUpdated = new FacilityParty();
-
-		try {
-			facilityPartyToBeUpdated = FacilityPartyMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateFacilityParty(facilityPartyToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class FacilityPartyController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateFacilityParty(@RequestBody FacilityParty facilityPartyToBeUpdated,
+	public ResponseEntity<String> updateFacilityParty(@RequestBody FacilityParty facilityPartyToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		facilityPartyToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class FacilityPartyController {
 
 		try {
 			if(((FacilityPartyUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{facilityPartyId}")
-	public ResponseEntity<Object> findById(@PathVariable String facilityPartyId) throws Exception {
+	public ResponseEntity<FacilityParty> findById(@PathVariable String facilityPartyId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("facilityPartyId", facilityPartyId);
 		try {
 
-			Object foundFacilityParty = findFacilityPartysBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundFacilityParty);
+			List<FacilityParty> foundFacilityParty = findFacilityPartysBy(requestParams).getBody();
+			if(foundFacilityParty.size()==1){				return successful(foundFacilityParty.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{facilityPartyId}")
-	public ResponseEntity<Object> deleteFacilityPartyByIdUpdated(@PathVariable String facilityPartyId) throws Exception {
+	public ResponseEntity<String> deleteFacilityPartyByIdUpdated(@PathVariable String facilityPartyId) throws Exception {
 		DeleteFacilityParty command = new DeleteFacilityParty(facilityPartyId);
 
 		try {
 			if (((FacilityPartyDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("FacilityParty could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.glAccount.query.varianc
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/glAccount/varianceReasonGlAccounts")
 public class VarianceReasonGlAccountController {
@@ -52,7 +54,7 @@ public class VarianceReasonGlAccountController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findVarianceReasonGlAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<VarianceReasonGlAccount>> findVarianceReasonGlAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindVarianceReasonGlAccountsBy query = new FindVarianceReasonGlAccountsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class VarianceReasonGlAccountController {
 		}
 
 		List<VarianceReasonGlAccount> varianceReasonGlAccounts =((VarianceReasonGlAccountFound) Scheduler.execute(query).data()).getVarianceReasonGlAccounts();
-
-		if (varianceReasonGlAccounts.size() == 1) {
-			return ResponseEntity.ok().body(varianceReasonGlAccounts.get(0));
-		}
 
 		return ResponseEntity.ok().body(varianceReasonGlAccounts);
 
@@ -78,7 +76,7 @@ public class VarianceReasonGlAccountController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createVarianceReasonGlAccount(HttpServletRequest request) throws Exception {
+	public ResponseEntity<VarianceReasonGlAccount> createVarianceReasonGlAccount(HttpServletRequest request) throws Exception {
 
 		VarianceReasonGlAccount varianceReasonGlAccountToBeAdded = new VarianceReasonGlAccount();
 		try {
@@ -86,7 +84,7 @@ public class VarianceReasonGlAccountController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createVarianceReasonGlAccount(varianceReasonGlAccountToBeAdded);
@@ -101,63 +99,15 @@ public class VarianceReasonGlAccountController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createVarianceReasonGlAccount(@RequestBody VarianceReasonGlAccount varianceReasonGlAccountToBeAdded) throws Exception {
+	public ResponseEntity<VarianceReasonGlAccount> createVarianceReasonGlAccount(@RequestBody VarianceReasonGlAccount varianceReasonGlAccountToBeAdded) throws Exception {
 
 		AddVarianceReasonGlAccount command = new AddVarianceReasonGlAccount(varianceReasonGlAccountToBeAdded);
 		VarianceReasonGlAccount varianceReasonGlAccount = ((VarianceReasonGlAccountAdded) Scheduler.execute(command).data()).getAddedVarianceReasonGlAccount();
 		
 		if (varianceReasonGlAccount != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(varianceReasonGlAccount);
+			return successful(varianceReasonGlAccount);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("VarianceReasonGlAccount could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateVarianceReasonGlAccount(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		VarianceReasonGlAccount varianceReasonGlAccountToBeUpdated = new VarianceReasonGlAccount();
-
-		try {
-			varianceReasonGlAccountToBeUpdated = VarianceReasonGlAccountMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateVarianceReasonGlAccount(varianceReasonGlAccountToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class VarianceReasonGlAccountController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateVarianceReasonGlAccount(@RequestBody VarianceReasonGlAccount varianceReasonGlAccountToBeUpdated,
+	public ResponseEntity<String> updateVarianceReasonGlAccount(@RequestBody VarianceReasonGlAccount varianceReasonGlAccountToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		varianceReasonGlAccountToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class VarianceReasonGlAccountController {
 
 		try {
 			if(((VarianceReasonGlAccountUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{varianceReasonGlAccountId}")
-	public ResponseEntity<Object> findById(@PathVariable String varianceReasonGlAccountId) throws Exception {
+	public ResponseEntity<VarianceReasonGlAccount> findById(@PathVariable String varianceReasonGlAccountId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("varianceReasonGlAccountId", varianceReasonGlAccountId);
 		try {
 
-			Object foundVarianceReasonGlAccount = findVarianceReasonGlAccountsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundVarianceReasonGlAccount);
+			List<VarianceReasonGlAccount> foundVarianceReasonGlAccount = findVarianceReasonGlAccountsBy(requestParams).getBody();
+			if(foundVarianceReasonGlAccount.size()==1){				return successful(foundVarianceReasonGlAccount.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{varianceReasonGlAccountId}")
-	public ResponseEntity<Object> deleteVarianceReasonGlAccountByIdUpdated(@PathVariable String varianceReasonGlAccountId) throws Exception {
+	public ResponseEntity<String> deleteVarianceReasonGlAccountByIdUpdated(@PathVariable String varianceReasonGlAccountId) throws Exception {
 		DeleteVarianceReasonGlAccount command = new DeleteVarianceReasonGlAccount(varianceReasonGlAccountId);
 
 		try {
 			if (((VarianceReasonGlAccountDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("VarianceReasonGlAccount could not be deleted");
+		return conflict();
 
 	}
 

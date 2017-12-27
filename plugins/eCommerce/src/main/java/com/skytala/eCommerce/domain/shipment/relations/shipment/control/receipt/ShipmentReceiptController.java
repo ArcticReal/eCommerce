@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.shipment.relations.shipment.query.receipt.Fi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/shipment/shipment/shipmentReceipts")
 public class ShipmentReceiptController {
@@ -52,7 +54,7 @@ public class ShipmentReceiptController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findShipmentReceiptsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ShipmentReceipt>> findShipmentReceiptsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentReceiptsBy query = new FindShipmentReceiptsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ShipmentReceiptController {
 		}
 
 		List<ShipmentReceipt> shipmentReceipts =((ShipmentReceiptFound) Scheduler.execute(query).data()).getShipmentReceipts();
-
-		if (shipmentReceipts.size() == 1) {
-			return ResponseEntity.ok().body(shipmentReceipts.get(0));
-		}
 
 		return ResponseEntity.ok().body(shipmentReceipts);
 
@@ -78,7 +76,7 @@ public class ShipmentReceiptController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createShipmentReceipt(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ShipmentReceipt> createShipmentReceipt(HttpServletRequest request) throws Exception {
 
 		ShipmentReceipt shipmentReceiptToBeAdded = new ShipmentReceipt();
 		try {
@@ -86,7 +84,7 @@ public class ShipmentReceiptController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createShipmentReceipt(shipmentReceiptToBeAdded);
@@ -101,63 +99,15 @@ public class ShipmentReceiptController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createShipmentReceipt(@RequestBody ShipmentReceipt shipmentReceiptToBeAdded) throws Exception {
+	public ResponseEntity<ShipmentReceipt> createShipmentReceipt(@RequestBody ShipmentReceipt shipmentReceiptToBeAdded) throws Exception {
 
 		AddShipmentReceipt command = new AddShipmentReceipt(shipmentReceiptToBeAdded);
 		ShipmentReceipt shipmentReceipt = ((ShipmentReceiptAdded) Scheduler.execute(command).data()).getAddedShipmentReceipt();
 		
 		if (shipmentReceipt != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(shipmentReceipt);
+			return successful(shipmentReceipt);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ShipmentReceipt could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateShipmentReceipt(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ShipmentReceipt shipmentReceiptToBeUpdated = new ShipmentReceipt();
-
-		try {
-			shipmentReceiptToBeUpdated = ShipmentReceiptMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateShipmentReceipt(shipmentReceiptToBeUpdated, shipmentReceiptToBeUpdated.getReceiptId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ShipmentReceiptController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{receiptId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateShipmentReceipt(@RequestBody ShipmentReceipt shipmentReceiptToBeUpdated,
+	public ResponseEntity<String> updateShipmentReceipt(@RequestBody ShipmentReceipt shipmentReceiptToBeUpdated,
 			@PathVariable String receiptId) throws Exception {
 
 		shipmentReceiptToBeUpdated.setReceiptId(receiptId);
@@ -178,41 +128,44 @@ public class ShipmentReceiptController {
 
 		try {
 			if(((ShipmentReceiptUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{shipmentReceiptId}")
-	public ResponseEntity<Object> findById(@PathVariable String shipmentReceiptId) throws Exception {
+	public ResponseEntity<ShipmentReceipt> findById(@PathVariable String shipmentReceiptId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentReceiptId", shipmentReceiptId);
 		try {
 
-			Object foundShipmentReceipt = findShipmentReceiptsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundShipmentReceipt);
+			List<ShipmentReceipt> foundShipmentReceipt = findShipmentReceiptsBy(requestParams).getBody();
+			if(foundShipmentReceipt.size()==1){				return successful(foundShipmentReceipt.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{shipmentReceiptId}")
-	public ResponseEntity<Object> deleteShipmentReceiptByIdUpdated(@PathVariable String shipmentReceiptId) throws Exception {
+	public ResponseEntity<String> deleteShipmentReceiptByIdUpdated(@PathVariable String shipmentReceiptId) throws Exception {
 		DeleteShipmentReceipt command = new DeleteShipmentReceipt(shipmentReceiptId);
 
 		try {
 			if (((ShipmentReceiptDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ShipmentReceipt could not be deleted");
+		return conflict();
 
 	}
 

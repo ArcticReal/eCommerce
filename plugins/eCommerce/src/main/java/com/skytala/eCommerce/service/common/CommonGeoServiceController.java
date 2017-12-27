@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/commonGeo")
 public class CommonGeoServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteCountryCapital")
-	public ResponseEntity<Object> deleteCountryCapital(HttpSession session, @RequestParam(value="countryCode") String countryCode) {
+	public ResponseEntity<Map<String, Object>> deleteCountryCapital(HttpSession session, @RequestParam(value="countryCode") String countryCode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("countryCode",countryCode);
@@ -39,23 +41,23 @@ public class CommonGeoServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteCountryAddressFormat")
-	public ResponseEntity<Object> deleteCountryAddressFormat(HttpSession session, @RequestParam(value="geoId") String geoId) {
+	public ResponseEntity<Map<String, Object>> deleteCountryAddressFormat(HttpSession session, @RequestParam(value="geoId") String geoId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("geoId",geoId);
@@ -68,23 +70,23 @@ public class CommonGeoServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCountryCapital")
-	public ResponseEntity<Object> createCountryCapital(HttpSession session, @RequestParam(value="countryCode") String countryCode, @RequestParam(value="countryCapital", required=false) String countryCapital) {
+	public ResponseEntity<Map<String, Object>> createCountryCapital(HttpSession session, @RequestParam(value="countryCode") String countryCode, @RequestParam(value="countryCapital", required=false) String countryCapital) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("countryCode",countryCode);
@@ -98,23 +100,23 @@ public class CommonGeoServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCountryCode")
-	public ResponseEntity<Object> createCountryCode(HttpSession session, @RequestParam(value="countryCode") String countryCode, @RequestParam(value="countryNumber", required=false) String countryNumber, @RequestParam(value="countryAbbr", required=false) String countryAbbr, @RequestParam(value="countryName", required=false) String countryName) {
+	public ResponseEntity<Map<String, Object>> createCountryCode(HttpSession session, @RequestParam(value="countryCode") String countryCode, @RequestParam(value="countryNumber", required=false) String countryNumber, @RequestParam(value="countryAbbr", required=false) String countryAbbr, @RequestParam(value="countryName", required=false) String countryName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("countryCode",countryCode);
@@ -130,23 +132,23 @@ public class CommonGeoServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteCountryCode")
-	public ResponseEntity<Object> deleteCountryCode(HttpSession session, @RequestParam(value="countryCode") String countryCode) {
+	public ResponseEntity<Map<String, Object>> deleteCountryCode(HttpSession session, @RequestParam(value="countryCode") String countryCode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("countryCode",countryCode);
@@ -159,23 +161,23 @@ public class CommonGeoServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCountryTeleCode")
-	public ResponseEntity<Object> createCountryTeleCode(HttpSession session, @RequestParam(value="countryCode") String countryCode, @RequestParam(value="teleCode", required=false) String teleCode) {
+	public ResponseEntity<Map<String, Object>> createCountryTeleCode(HttpSession session, @RequestParam(value="countryCode") String countryCode, @RequestParam(value="teleCode", required=false) String teleCode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("countryCode",countryCode);
@@ -189,23 +191,23 @@ public class CommonGeoServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCountryTeleCode")
-	public ResponseEntity<Object> updateCountryTeleCode(HttpSession session, @RequestParam(value="countryCode") String countryCode, @RequestParam(value="teleCode", required=false) String teleCode) {
+	public ResponseEntity<Map<String, Object>> updateCountryTeleCode(HttpSession session, @RequestParam(value="countryCode") String countryCode, @RequestParam(value="teleCode", required=false) String teleCode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("countryCode",countryCode);
@@ -219,23 +221,23 @@ public class CommonGeoServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCountryAddressFormat")
-	public ResponseEntity<Object> createCountryAddressFormat(HttpSession session, @RequestParam(value="geoId") String geoId, @RequestParam(value="requirePostalCode", required=false) String requirePostalCode, @RequestParam(value="postalCodeRegex", required=false) String postalCodeRegex, @RequestParam(value="requireStateProvinceId", required=false) String requireStateProvinceId, @RequestParam(value="hasPostalCodeExt", required=false) String hasPostalCodeExt, @RequestParam(value="requirePostalCodeExt", required=false) String requirePostalCodeExt, @RequestParam(value="addressFormat", required=false) String addressFormat, @RequestParam(value="geoAssocTypeId", required=false) String geoAssocTypeId) {
+	public ResponseEntity<Map<String, Object>> createCountryAddressFormat(HttpSession session, @RequestParam(value="geoId") String geoId, @RequestParam(value="requirePostalCode", required=false) String requirePostalCode, @RequestParam(value="postalCodeRegex", required=false) String postalCodeRegex, @RequestParam(value="requireStateProvinceId", required=false) String requireStateProvinceId, @RequestParam(value="hasPostalCodeExt", required=false) String hasPostalCodeExt, @RequestParam(value="requirePostalCodeExt", required=false) String requirePostalCodeExt, @RequestParam(value="addressFormat", required=false) String addressFormat, @RequestParam(value="geoAssocTypeId", required=false) String geoAssocTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("geoId",geoId);
@@ -255,23 +257,23 @@ public class CommonGeoServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCountryCapital")
-	public ResponseEntity<Object> updateCountryCapital(HttpSession session, @RequestParam(value="countryCode") String countryCode, @RequestParam(value="countryCapital", required=false) String countryCapital) {
+	public ResponseEntity<Map<String, Object>> updateCountryCapital(HttpSession session, @RequestParam(value="countryCode") String countryCode, @RequestParam(value="countryCapital", required=false) String countryCapital) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("countryCode",countryCode);
@@ -285,23 +287,23 @@ public class CommonGeoServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCountryCode")
-	public ResponseEntity<Object> updateCountryCode(HttpSession session, @RequestParam(value="countryCode") String countryCode, @RequestParam(value="countryNumber", required=false) String countryNumber, @RequestParam(value="countryAbbr", required=false) String countryAbbr, @RequestParam(value="countryName", required=false) String countryName) {
+	public ResponseEntity<Map<String, Object>> updateCountryCode(HttpSession session, @RequestParam(value="countryCode") String countryCode, @RequestParam(value="countryNumber", required=false) String countryNumber, @RequestParam(value="countryAbbr", required=false) String countryAbbr, @RequestParam(value="countryName", required=false) String countryName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("countryCode",countryCode);
@@ -317,23 +319,23 @@ public class CommonGeoServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCountryAddressFormat")
-	public ResponseEntity<Object> updateCountryAddressFormat(HttpSession session, @RequestParam(value="geoId") String geoId, @RequestParam(value="requirePostalCode", required=false) String requirePostalCode, @RequestParam(value="postalCodeRegex", required=false) String postalCodeRegex, @RequestParam(value="requireStateProvinceId", required=false) String requireStateProvinceId, @RequestParam(value="hasPostalCodeExt", required=false) String hasPostalCodeExt, @RequestParam(value="requirePostalCodeExt", required=false) String requirePostalCodeExt, @RequestParam(value="addressFormat", required=false) String addressFormat, @RequestParam(value="geoAssocTypeId", required=false) String geoAssocTypeId) {
+	public ResponseEntity<Map<String, Object>> updateCountryAddressFormat(HttpSession session, @RequestParam(value="geoId") String geoId, @RequestParam(value="requirePostalCode", required=false) String requirePostalCode, @RequestParam(value="postalCodeRegex", required=false) String postalCodeRegex, @RequestParam(value="requireStateProvinceId", required=false) String requireStateProvinceId, @RequestParam(value="hasPostalCodeExt", required=false) String hasPostalCodeExt, @RequestParam(value="requirePostalCodeExt", required=false) String requirePostalCodeExt, @RequestParam(value="addressFormat", required=false) String addressFormat, @RequestParam(value="geoAssocTypeId", required=false) String geoAssocTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("geoId",geoId);
@@ -353,23 +355,23 @@ public class CommonGeoServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteCountryTeleCode")
-	public ResponseEntity<Object> deleteCountryTeleCode(HttpSession session, @RequestParam(value="countryCode") String countryCode) {
+	public ResponseEntity<Map<String, Object>> deleteCountryTeleCode(HttpSession session, @RequestParam(value="countryCode") String countryCode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("countryCode",countryCode);
@@ -382,19 +384,19 @@ public class CommonGeoServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

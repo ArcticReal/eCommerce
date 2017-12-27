@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.shipment.relations.itemIssuance.query.role.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/shipment/itemIssuance/itemIssuanceRoles")
 public class ItemIssuanceRoleController {
@@ -52,7 +54,7 @@ public class ItemIssuanceRoleController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findItemIssuanceRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ItemIssuanceRole>> findItemIssuanceRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindItemIssuanceRolesBy query = new FindItemIssuanceRolesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ItemIssuanceRoleController {
 		}
 
 		List<ItemIssuanceRole> itemIssuanceRoles =((ItemIssuanceRoleFound) Scheduler.execute(query).data()).getItemIssuanceRoles();
-
-		if (itemIssuanceRoles.size() == 1) {
-			return ResponseEntity.ok().body(itemIssuanceRoles.get(0));
-		}
 
 		return ResponseEntity.ok().body(itemIssuanceRoles);
 
@@ -78,7 +76,7 @@ public class ItemIssuanceRoleController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createItemIssuanceRole(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ItemIssuanceRole> createItemIssuanceRole(HttpServletRequest request) throws Exception {
 
 		ItemIssuanceRole itemIssuanceRoleToBeAdded = new ItemIssuanceRole();
 		try {
@@ -86,7 +84,7 @@ public class ItemIssuanceRoleController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createItemIssuanceRole(itemIssuanceRoleToBeAdded);
@@ -101,63 +99,15 @@ public class ItemIssuanceRoleController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createItemIssuanceRole(@RequestBody ItemIssuanceRole itemIssuanceRoleToBeAdded) throws Exception {
+	public ResponseEntity<ItemIssuanceRole> createItemIssuanceRole(@RequestBody ItemIssuanceRole itemIssuanceRoleToBeAdded) throws Exception {
 
 		AddItemIssuanceRole command = new AddItemIssuanceRole(itemIssuanceRoleToBeAdded);
 		ItemIssuanceRole itemIssuanceRole = ((ItemIssuanceRoleAdded) Scheduler.execute(command).data()).getAddedItemIssuanceRole();
 		
 		if (itemIssuanceRole != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(itemIssuanceRole);
+			return successful(itemIssuanceRole);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ItemIssuanceRole could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateItemIssuanceRole(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ItemIssuanceRole itemIssuanceRoleToBeUpdated = new ItemIssuanceRole();
-
-		try {
-			itemIssuanceRoleToBeUpdated = ItemIssuanceRoleMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateItemIssuanceRole(itemIssuanceRoleToBeUpdated, itemIssuanceRoleToBeUpdated.getRoleTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ItemIssuanceRoleController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{roleTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateItemIssuanceRole(@RequestBody ItemIssuanceRole itemIssuanceRoleToBeUpdated,
+	public ResponseEntity<String> updateItemIssuanceRole(@RequestBody ItemIssuanceRole itemIssuanceRoleToBeUpdated,
 			@PathVariable String roleTypeId) throws Exception {
 
 		itemIssuanceRoleToBeUpdated.setRoleTypeId(roleTypeId);
@@ -178,41 +128,44 @@ public class ItemIssuanceRoleController {
 
 		try {
 			if(((ItemIssuanceRoleUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{itemIssuanceRoleId}")
-	public ResponseEntity<Object> findById(@PathVariable String itemIssuanceRoleId) throws Exception {
+	public ResponseEntity<ItemIssuanceRole> findById(@PathVariable String itemIssuanceRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("itemIssuanceRoleId", itemIssuanceRoleId);
 		try {
 
-			Object foundItemIssuanceRole = findItemIssuanceRolesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundItemIssuanceRole);
+			List<ItemIssuanceRole> foundItemIssuanceRole = findItemIssuanceRolesBy(requestParams).getBody();
+			if(foundItemIssuanceRole.size()==1){				return successful(foundItemIssuanceRole.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{itemIssuanceRoleId}")
-	public ResponseEntity<Object> deleteItemIssuanceRoleByIdUpdated(@PathVariable String itemIssuanceRoleId) throws Exception {
+	public ResponseEntity<String> deleteItemIssuanceRoleByIdUpdated(@PathVariable String itemIssuanceRoleId) throws Exception {
 		DeleteItemIssuanceRole command = new DeleteItemIssuanceRole(itemIssuanceRoleId);
 
 		try {
 			if (((ItemIssuanceRoleDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ItemIssuanceRole could not be deleted");
+		return conflict();
 
 	}
 

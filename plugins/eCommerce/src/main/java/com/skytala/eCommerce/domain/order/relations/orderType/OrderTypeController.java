@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.orderType.query.FindOrderTyp
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/orderTypes")
 public class OrderTypeController {
@@ -52,7 +54,7 @@ public class OrderTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findOrderTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OrderType>> findOrderTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderTypesBy query = new FindOrderTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class OrderTypeController {
 		}
 
 		List<OrderType> orderTypes =((OrderTypeFound) Scheduler.execute(query).data()).getOrderTypes();
-
-		if (orderTypes.size() == 1) {
-			return ResponseEntity.ok().body(orderTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(orderTypes);
 
@@ -78,7 +76,7 @@ public class OrderTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOrderType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OrderType> createOrderType(HttpServletRequest request) throws Exception {
 
 		OrderType orderTypeToBeAdded = new OrderType();
 		try {
@@ -86,7 +84,7 @@ public class OrderTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createOrderType(orderTypeToBeAdded);
@@ -101,63 +99,15 @@ public class OrderTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOrderType(@RequestBody OrderType orderTypeToBeAdded) throws Exception {
+	public ResponseEntity<OrderType> createOrderType(@RequestBody OrderType orderTypeToBeAdded) throws Exception {
 
 		AddOrderType command = new AddOrderType(orderTypeToBeAdded);
 		OrderType orderType = ((OrderTypeAdded) Scheduler.execute(command).data()).getAddedOrderType();
 		
 		if (orderType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(orderType);
+			return successful(orderType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OrderType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateOrderType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OrderType orderTypeToBeUpdated = new OrderType();
-
-		try {
-			orderTypeToBeUpdated = OrderTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOrderType(orderTypeToBeUpdated, orderTypeToBeUpdated.getOrderTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class OrderTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{orderTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOrderType(@RequestBody OrderType orderTypeToBeUpdated,
+	public ResponseEntity<String> updateOrderType(@RequestBody OrderType orderTypeToBeUpdated,
 			@PathVariable String orderTypeId) throws Exception {
 
 		orderTypeToBeUpdated.setOrderTypeId(orderTypeId);
@@ -178,41 +128,44 @@ public class OrderTypeController {
 
 		try {
 			if(((OrderTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{orderTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String orderTypeId) throws Exception {
+	public ResponseEntity<OrderType> findById(@PathVariable String orderTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderTypeId", orderTypeId);
 		try {
 
-			Object foundOrderType = findOrderTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOrderType);
+			List<OrderType> foundOrderType = findOrderTypesBy(requestParams).getBody();
+			if(foundOrderType.size()==1){				return successful(foundOrderType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{orderTypeId}")
-	public ResponseEntity<Object> deleteOrderTypeByIdUpdated(@PathVariable String orderTypeId) throws Exception {
+	public ResponseEntity<String> deleteOrderTypeByIdUpdated(@PathVariable String orderTypeId) throws Exception {
 		DeleteOrderType command = new DeleteOrderType(orderTypeId);
 
 		try {
 			if (((OrderTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("OrderType could not be deleted");
+		return conflict();
 
 	}
 

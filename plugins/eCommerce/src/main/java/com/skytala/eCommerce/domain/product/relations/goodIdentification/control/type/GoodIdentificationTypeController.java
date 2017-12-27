@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.goodIdentification.query.t
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/goodIdentification/goodIdentificationTypes")
 public class GoodIdentificationTypeController {
@@ -52,7 +54,7 @@ public class GoodIdentificationTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findGoodIdentificationTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<GoodIdentificationType>> findGoodIdentificationTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGoodIdentificationTypesBy query = new FindGoodIdentificationTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class GoodIdentificationTypeController {
 		}
 
 		List<GoodIdentificationType> goodIdentificationTypes =((GoodIdentificationTypeFound) Scheduler.execute(query).data()).getGoodIdentificationTypes();
-
-		if (goodIdentificationTypes.size() == 1) {
-			return ResponseEntity.ok().body(goodIdentificationTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(goodIdentificationTypes);
 
@@ -78,7 +76,7 @@ public class GoodIdentificationTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createGoodIdentificationType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<GoodIdentificationType> createGoodIdentificationType(HttpServletRequest request) throws Exception {
 
 		GoodIdentificationType goodIdentificationTypeToBeAdded = new GoodIdentificationType();
 		try {
@@ -86,7 +84,7 @@ public class GoodIdentificationTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createGoodIdentificationType(goodIdentificationTypeToBeAdded);
@@ -101,63 +99,15 @@ public class GoodIdentificationTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createGoodIdentificationType(@RequestBody GoodIdentificationType goodIdentificationTypeToBeAdded) throws Exception {
+	public ResponseEntity<GoodIdentificationType> createGoodIdentificationType(@RequestBody GoodIdentificationType goodIdentificationTypeToBeAdded) throws Exception {
 
 		AddGoodIdentificationType command = new AddGoodIdentificationType(goodIdentificationTypeToBeAdded);
 		GoodIdentificationType goodIdentificationType = ((GoodIdentificationTypeAdded) Scheduler.execute(command).data()).getAddedGoodIdentificationType();
 		
 		if (goodIdentificationType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(goodIdentificationType);
+			return successful(goodIdentificationType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("GoodIdentificationType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateGoodIdentificationType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		GoodIdentificationType goodIdentificationTypeToBeUpdated = new GoodIdentificationType();
-
-		try {
-			goodIdentificationTypeToBeUpdated = GoodIdentificationTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateGoodIdentificationType(goodIdentificationTypeToBeUpdated, goodIdentificationTypeToBeUpdated.getGoodIdentificationTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class GoodIdentificationTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{goodIdentificationTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateGoodIdentificationType(@RequestBody GoodIdentificationType goodIdentificationTypeToBeUpdated,
+	public ResponseEntity<String> updateGoodIdentificationType(@RequestBody GoodIdentificationType goodIdentificationTypeToBeUpdated,
 			@PathVariable String goodIdentificationTypeId) throws Exception {
 
 		goodIdentificationTypeToBeUpdated.setGoodIdentificationTypeId(goodIdentificationTypeId);
@@ -178,41 +128,44 @@ public class GoodIdentificationTypeController {
 
 		try {
 			if(((GoodIdentificationTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{goodIdentificationTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String goodIdentificationTypeId) throws Exception {
+	public ResponseEntity<GoodIdentificationType> findById(@PathVariable String goodIdentificationTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("goodIdentificationTypeId", goodIdentificationTypeId);
 		try {
 
-			Object foundGoodIdentificationType = findGoodIdentificationTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundGoodIdentificationType);
+			List<GoodIdentificationType> foundGoodIdentificationType = findGoodIdentificationTypesBy(requestParams).getBody();
+			if(foundGoodIdentificationType.size()==1){				return successful(foundGoodIdentificationType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{goodIdentificationTypeId}")
-	public ResponseEntity<Object> deleteGoodIdentificationTypeByIdUpdated(@PathVariable String goodIdentificationTypeId) throws Exception {
+	public ResponseEntity<String> deleteGoodIdentificationTypeByIdUpdated(@PathVariable String goodIdentificationTypeId) throws Exception {
 		DeleteGoodIdentificationType command = new DeleteGoodIdentificationType(goodIdentificationTypeId);
 
 		try {
 			if (((GoodIdentificationTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("GoodIdentificationType could not be deleted");
+		return conflict();
 
 	}
 

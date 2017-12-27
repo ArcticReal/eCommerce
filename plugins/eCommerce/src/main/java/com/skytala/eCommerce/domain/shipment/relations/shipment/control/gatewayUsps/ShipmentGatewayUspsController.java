@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.shipment.relations.shipment.query.gatewayUsp
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/shipment/shipment/shipmentGatewayUspss")
 public class ShipmentGatewayUspsController {
@@ -52,7 +54,7 @@ public class ShipmentGatewayUspsController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findShipmentGatewayUspssBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ShipmentGatewayUsps>> findShipmentGatewayUspssBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentGatewayUspssBy query = new FindShipmentGatewayUspssBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ShipmentGatewayUspsController {
 		}
 
 		List<ShipmentGatewayUsps> shipmentGatewayUspss =((ShipmentGatewayUspsFound) Scheduler.execute(query).data()).getShipmentGatewayUspss();
-
-		if (shipmentGatewayUspss.size() == 1) {
-			return ResponseEntity.ok().body(shipmentGatewayUspss.get(0));
-		}
 
 		return ResponseEntity.ok().body(shipmentGatewayUspss);
 
@@ -78,7 +76,7 @@ public class ShipmentGatewayUspsController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createShipmentGatewayUsps(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ShipmentGatewayUsps> createShipmentGatewayUsps(HttpServletRequest request) throws Exception {
 
 		ShipmentGatewayUsps shipmentGatewayUspsToBeAdded = new ShipmentGatewayUsps();
 		try {
@@ -86,7 +84,7 @@ public class ShipmentGatewayUspsController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createShipmentGatewayUsps(shipmentGatewayUspsToBeAdded);
@@ -101,63 +99,15 @@ public class ShipmentGatewayUspsController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createShipmentGatewayUsps(@RequestBody ShipmentGatewayUsps shipmentGatewayUspsToBeAdded) throws Exception {
+	public ResponseEntity<ShipmentGatewayUsps> createShipmentGatewayUsps(@RequestBody ShipmentGatewayUsps shipmentGatewayUspsToBeAdded) throws Exception {
 
 		AddShipmentGatewayUsps command = new AddShipmentGatewayUsps(shipmentGatewayUspsToBeAdded);
 		ShipmentGatewayUsps shipmentGatewayUsps = ((ShipmentGatewayUspsAdded) Scheduler.execute(command).data()).getAddedShipmentGatewayUsps();
 		
 		if (shipmentGatewayUsps != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(shipmentGatewayUsps);
+			return successful(shipmentGatewayUsps);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ShipmentGatewayUsps could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateShipmentGatewayUsps(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ShipmentGatewayUsps shipmentGatewayUspsToBeUpdated = new ShipmentGatewayUsps();
-
-		try {
-			shipmentGatewayUspsToBeUpdated = ShipmentGatewayUspsMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateShipmentGatewayUsps(shipmentGatewayUspsToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ShipmentGatewayUspsController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateShipmentGatewayUsps(@RequestBody ShipmentGatewayUsps shipmentGatewayUspsToBeUpdated,
+	public ResponseEntity<String> updateShipmentGatewayUsps(@RequestBody ShipmentGatewayUsps shipmentGatewayUspsToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		shipmentGatewayUspsToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ShipmentGatewayUspsController {
 
 		try {
 			if(((ShipmentGatewayUspsUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{shipmentGatewayUspsId}")
-	public ResponseEntity<Object> findById(@PathVariable String shipmentGatewayUspsId) throws Exception {
+	public ResponseEntity<ShipmentGatewayUsps> findById(@PathVariable String shipmentGatewayUspsId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentGatewayUspsId", shipmentGatewayUspsId);
 		try {
 
-			Object foundShipmentGatewayUsps = findShipmentGatewayUspssBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundShipmentGatewayUsps);
+			List<ShipmentGatewayUsps> foundShipmentGatewayUsps = findShipmentGatewayUspssBy(requestParams).getBody();
+			if(foundShipmentGatewayUsps.size()==1){				return successful(foundShipmentGatewayUsps.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{shipmentGatewayUspsId}")
-	public ResponseEntity<Object> deleteShipmentGatewayUspsByIdUpdated(@PathVariable String shipmentGatewayUspsId) throws Exception {
+	public ResponseEntity<String> deleteShipmentGatewayUspsByIdUpdated(@PathVariable String shipmentGatewayUspsId) throws Exception {
 		DeleteShipmentGatewayUsps command = new DeleteShipmentGatewayUsps(shipmentGatewayUspsId);
 
 		try {
 			if (((ShipmentGatewayUspsDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ShipmentGatewayUsps could not be deleted");
+		return conflict();
 
 	}
 

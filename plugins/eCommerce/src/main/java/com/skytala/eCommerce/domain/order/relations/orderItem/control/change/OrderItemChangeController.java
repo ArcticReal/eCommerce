@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.orderItem.query.change.FindO
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/orderItem/orderItemChanges")
 public class OrderItemChangeController {
@@ -52,7 +54,7 @@ public class OrderItemChangeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findOrderItemChangesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OrderItemChange>> findOrderItemChangesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderItemChangesBy query = new FindOrderItemChangesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class OrderItemChangeController {
 		}
 
 		List<OrderItemChange> orderItemChanges =((OrderItemChangeFound) Scheduler.execute(query).data()).getOrderItemChanges();
-
-		if (orderItemChanges.size() == 1) {
-			return ResponseEntity.ok().body(orderItemChanges.get(0));
-		}
 
 		return ResponseEntity.ok().body(orderItemChanges);
 
@@ -78,7 +76,7 @@ public class OrderItemChangeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOrderItemChange(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OrderItemChange> createOrderItemChange(HttpServletRequest request) throws Exception {
 
 		OrderItemChange orderItemChangeToBeAdded = new OrderItemChange();
 		try {
@@ -86,7 +84,7 @@ public class OrderItemChangeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createOrderItemChange(orderItemChangeToBeAdded);
@@ -101,63 +99,15 @@ public class OrderItemChangeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOrderItemChange(@RequestBody OrderItemChange orderItemChangeToBeAdded) throws Exception {
+	public ResponseEntity<OrderItemChange> createOrderItemChange(@RequestBody OrderItemChange orderItemChangeToBeAdded) throws Exception {
 
 		AddOrderItemChange command = new AddOrderItemChange(orderItemChangeToBeAdded);
 		OrderItemChange orderItemChange = ((OrderItemChangeAdded) Scheduler.execute(command).data()).getAddedOrderItemChange();
 		
 		if (orderItemChange != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(orderItemChange);
+			return successful(orderItemChange);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OrderItemChange could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateOrderItemChange(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OrderItemChange orderItemChangeToBeUpdated = new OrderItemChange();
-
-		try {
-			orderItemChangeToBeUpdated = OrderItemChangeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOrderItemChange(orderItemChangeToBeUpdated, orderItemChangeToBeUpdated.getOrderItemChangeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class OrderItemChangeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{orderItemChangeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOrderItemChange(@RequestBody OrderItemChange orderItemChangeToBeUpdated,
+	public ResponseEntity<String> updateOrderItemChange(@RequestBody OrderItemChange orderItemChangeToBeUpdated,
 			@PathVariable String orderItemChangeId) throws Exception {
 
 		orderItemChangeToBeUpdated.setOrderItemChangeId(orderItemChangeId);
@@ -178,41 +128,44 @@ public class OrderItemChangeController {
 
 		try {
 			if(((OrderItemChangeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{orderItemChangeId}")
-	public ResponseEntity<Object> findById(@PathVariable String orderItemChangeId) throws Exception {
+	public ResponseEntity<OrderItemChange> findById(@PathVariable String orderItemChangeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderItemChangeId", orderItemChangeId);
 		try {
 
-			Object foundOrderItemChange = findOrderItemChangesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOrderItemChange);
+			List<OrderItemChange> foundOrderItemChange = findOrderItemChangesBy(requestParams).getBody();
+			if(foundOrderItemChange.size()==1){				return successful(foundOrderItemChange.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{orderItemChangeId}")
-	public ResponseEntity<Object> deleteOrderItemChangeByIdUpdated(@PathVariable String orderItemChangeId) throws Exception {
+	public ResponseEntity<String> deleteOrderItemChangeByIdUpdated(@PathVariable String orderItemChangeId) throws Exception {
 		DeleteOrderItemChange command = new DeleteOrderItemChange(orderItemChangeId);
 
 		try {
 			if (((OrderItemChangeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("OrderItemChange could not be deleted");
+		return conflict();
 
 	}
 

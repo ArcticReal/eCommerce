@@ -13,40 +13,42 @@ import com.skytala.eCommerce.framework.pubsub.Event;
 
 public class UpdateProductAttribute extends Command {
 
-private ProductAttribute elementToBeUpdated;
+    private ProductAttribute elementToBeUpdated;
 
-public UpdateProductAttribute(ProductAttribute elementToBeUpdated){
-this.elementToBeUpdated = elementToBeUpdated;
-}
-public ProductAttribute getElementToBeUpdated() {
-return elementToBeUpdated;
-}
-public void setElementToBeUpdated(ProductAttribute elementToBeUpdated){
-this.elementToBeUpdated = elementToBeUpdated;
-}
+    public UpdateProductAttribute(ProductAttribute elementToBeUpdated){
+        this.elementToBeUpdated = elementToBeUpdated;
+    }
+    public ProductAttribute getElementToBeUpdated() {
+        return elementToBeUpdated;
+    }
+    public void setElementToBeUpdated(ProductAttribute elementToBeUpdated){
+        this.elementToBeUpdated = elementToBeUpdated;
+    }
 
-@Override
-public Event execute() throws RecordNotFoundException{
+    @Override
+    public Event execute() throws RecordNotFoundException{
 
 
-Delegator delegator = DelegatorFactory.getDelegator("default");
+        Delegator delegator = DelegatorFactory.getDelegator("default");
 
-boolean success;
-try{
-GenericValue newValue = delegator.makeValue("ProductAttribute", elementToBeUpdated.mapAttributeField());
-if(delegator.store(newValue) == 0) {
-throw new RecordNotFoundException(ProductAttribute.class); 
-}
-success = true;
-} catch (GenericEntityException e) {
-e.printStackTrace();
-if(e.getCause().getClass().equals(GenericEntityNotFoundException.class)) {
-throw new RecordNotFoundException(ProductAttribute.class);
-}
-success = false;
-}
-Event resultingEvent = new ProductAttributeUpdated(success);
-Broker.instance().publish(resultingEvent);
-return resultingEvent;
-}
+
+        boolean success;
+        try{
+            GenericValue newValue = delegator.makeValue("ProductAttribute", elementToBeUpdated.mapAttributeField());
+            if(delegator.createOrStore(newValue) == null) {
+
+                throw new RecordNotFoundException(ProductAttribute.class);
+            }
+            success = true;
+        } catch (GenericEntityException e) {
+            e.printStackTrace();
+            if(e.getCause().getClass().equals(GenericEntityNotFoundException.class)) {
+                throw new RecordNotFoundException(ProductAttribute.class);
+            }
+            success = false;
+        }
+        Event resultingEvent = new ProductAttributeUpdated(success);
+        Broker.instance().publish(resultingEvent);
+        return resultingEvent;
+    }
 }

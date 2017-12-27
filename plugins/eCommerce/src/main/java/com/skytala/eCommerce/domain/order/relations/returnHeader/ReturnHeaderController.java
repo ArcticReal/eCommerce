@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.returnHeader.query.FindRetur
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/returnHeaders")
 public class ReturnHeaderController {
@@ -52,7 +54,7 @@ public class ReturnHeaderController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findReturnHeadersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ReturnHeader>> findReturnHeadersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindReturnHeadersBy query = new FindReturnHeadersBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ReturnHeaderController {
 		}
 
 		List<ReturnHeader> returnHeaders =((ReturnHeaderFound) Scheduler.execute(query).data()).getReturnHeaders();
-
-		if (returnHeaders.size() == 1) {
-			return ResponseEntity.ok().body(returnHeaders.get(0));
-		}
 
 		return ResponseEntity.ok().body(returnHeaders);
 
@@ -78,7 +76,7 @@ public class ReturnHeaderController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createReturnHeader(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ReturnHeader> createReturnHeader(HttpServletRequest request) throws Exception {
 
 		ReturnHeader returnHeaderToBeAdded = new ReturnHeader();
 		try {
@@ -86,7 +84,7 @@ public class ReturnHeaderController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createReturnHeader(returnHeaderToBeAdded);
@@ -101,63 +99,15 @@ public class ReturnHeaderController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createReturnHeader(@RequestBody ReturnHeader returnHeaderToBeAdded) throws Exception {
+	public ResponseEntity<ReturnHeader> createReturnHeader(@RequestBody ReturnHeader returnHeaderToBeAdded) throws Exception {
 
 		AddReturnHeader command = new AddReturnHeader(returnHeaderToBeAdded);
 		ReturnHeader returnHeader = ((ReturnHeaderAdded) Scheduler.execute(command).data()).getAddedReturnHeader();
 		
 		if (returnHeader != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(returnHeader);
+			return successful(returnHeader);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ReturnHeader could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateReturnHeader(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ReturnHeader returnHeaderToBeUpdated = new ReturnHeader();
-
-		try {
-			returnHeaderToBeUpdated = ReturnHeaderMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateReturnHeader(returnHeaderToBeUpdated, returnHeaderToBeUpdated.getReturnId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ReturnHeaderController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{returnId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateReturnHeader(@RequestBody ReturnHeader returnHeaderToBeUpdated,
+	public ResponseEntity<String> updateReturnHeader(@RequestBody ReturnHeader returnHeaderToBeUpdated,
 			@PathVariable String returnId) throws Exception {
 
 		returnHeaderToBeUpdated.setReturnId(returnId);
@@ -178,41 +128,44 @@ public class ReturnHeaderController {
 
 		try {
 			if(((ReturnHeaderUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{returnHeaderId}")
-	public ResponseEntity<Object> findById(@PathVariable String returnHeaderId) throws Exception {
+	public ResponseEntity<ReturnHeader> findById(@PathVariable String returnHeaderId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("returnHeaderId", returnHeaderId);
 		try {
 
-			Object foundReturnHeader = findReturnHeadersBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundReturnHeader);
+			List<ReturnHeader> foundReturnHeader = findReturnHeadersBy(requestParams).getBody();
+			if(foundReturnHeader.size()==1){				return successful(foundReturnHeader.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{returnHeaderId}")
-	public ResponseEntity<Object> deleteReturnHeaderByIdUpdated(@PathVariable String returnHeaderId) throws Exception {
+	public ResponseEntity<String> deleteReturnHeaderByIdUpdated(@PathVariable String returnHeaderId) throws Exception {
 		DeleteReturnHeader command = new DeleteReturnHeader(returnHeaderId);
 
 		try {
 			if (((ReturnHeaderDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ReturnHeader could not be deleted");
+		return conflict();
 
 	}
 

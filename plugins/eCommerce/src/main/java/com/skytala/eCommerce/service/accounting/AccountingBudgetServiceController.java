@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/accountingBudget")
 public class AccountingBudgetServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createBudgetReview")
-	public ResponseEntity<Object> createBudgetReview(HttpSession session, @RequestParam(value="budgetReviewResultTypeId") String budgetReviewResultTypeId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="partyId") String partyId, @RequestParam(value="reviewDate", required=false) Timestamp reviewDate) {
+	public ResponseEntity<Map<String, Object>> createBudgetReview(HttpSession session, @RequestParam(value="budgetReviewResultTypeId") String budgetReviewResultTypeId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="partyId") String partyId, @RequestParam(value="reviewDate", required=false) Timestamp reviewDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetReviewResultTypeId",budgetReviewResultTypeId);
@@ -42,23 +44,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createBudgetItemTypeAttr")
-	public ResponseEntity<Object> createBudgetItemTypeAttr(HttpSession session, @RequestParam(value="budgetItemTypeId") String budgetItemTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createBudgetItemTypeAttr(HttpSession session, @RequestParam(value="budgetItemTypeId") String budgetItemTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetItemTypeId",budgetItemTypeId);
@@ -73,23 +75,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteBudgetItemAttribute")
-	public ResponseEntity<Object> deleteBudgetItemAttribute(HttpSession session, @RequestParam(value="budgetItemSeqId") String budgetItemSeqId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="attrName") String attrName) {
+	public ResponseEntity<Map<String, Object>> deleteBudgetItemAttribute(HttpSession session, @RequestParam(value="budgetItemSeqId") String budgetItemSeqId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="attrName") String attrName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetItemSeqId",budgetItemSeqId);
@@ -104,23 +106,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateBudgetScenario")
-	public ResponseEntity<Object> updateBudgetScenario(HttpSession session, @RequestParam(value="budgetScenarioId") String budgetScenarioId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateBudgetScenario(HttpSession session, @RequestParam(value="budgetScenarioId") String budgetScenarioId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetScenarioId",budgetScenarioId);
@@ -134,23 +136,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateBudgetScenarioRule")
-	public ResponseEntity<Object> updateBudgetScenarioRule(HttpSession session, @RequestParam(value="budgetScenarioId") String budgetScenarioId, @RequestParam(value="budgetItemTypeId") String budgetItemTypeId, @RequestParam(value="amountChange", required=false) BigDecimal amountChange, @RequestParam(value="percentageChange", required=false) BigDecimal percentageChange) {
+	public ResponseEntity<Map<String, Object>> updateBudgetScenarioRule(HttpSession session, @RequestParam(value="budgetScenarioId") String budgetScenarioId, @RequestParam(value="budgetItemTypeId") String budgetItemTypeId, @RequestParam(value="amountChange", required=false) BigDecimal amountChange, @RequestParam(value="percentageChange", required=false) BigDecimal percentageChange) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetScenarioId",budgetScenarioId);
@@ -166,23 +168,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createBudgetScenarioApplication")
-	public ResponseEntity<Object> createBudgetScenarioApplication(HttpSession session, @RequestParam(value="budgetScenarioApplicId") String budgetScenarioApplicId, @RequestParam(value="budgetScenarioId") String budgetScenarioId, @RequestParam(value="amountChange", required=false) BigDecimal amountChange, @RequestParam(value="percentageChange", required=false) BigDecimal percentageChange, @RequestParam(value="budgetItemSeqId", required=false) String budgetItemSeqId, @RequestParam(value="budgetId", required=false) String budgetId) {
+	public ResponseEntity<Map<String, Object>> createBudgetScenarioApplication(HttpSession session, @RequestParam(value="budgetScenarioApplicId") String budgetScenarioApplicId, @RequestParam(value="budgetScenarioId") String budgetScenarioId, @RequestParam(value="amountChange", required=false) BigDecimal amountChange, @RequestParam(value="percentageChange", required=false) BigDecimal percentageChange, @RequestParam(value="budgetItemSeqId", required=false) String budgetItemSeqId, @RequestParam(value="budgetId", required=false) String budgetId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetScenarioApplicId",budgetScenarioApplicId);
@@ -200,23 +202,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateBudgetRevisionImpact")
-	public ResponseEntity<Object> updateBudgetRevisionImpact(HttpSession session, @RequestParam(value="revisionSeqId") String revisionSeqId, @RequestParam(value="budgetItemSeqId") String budgetItemSeqId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="addDeleteFlag", required=false) String addDeleteFlag, @RequestParam(value="revisionReason", required=false) String revisionReason, @RequestParam(value="revisedAmount", required=false) BigDecimal revisedAmount) {
+	public ResponseEntity<Map<String, Object>> updateBudgetRevisionImpact(HttpSession session, @RequestParam(value="revisionSeqId") String revisionSeqId, @RequestParam(value="budgetItemSeqId") String budgetItemSeqId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="addDeleteFlag", required=false) String addDeleteFlag, @RequestParam(value="revisionReason", required=false) String revisionReason, @RequestParam(value="revisedAmount", required=false) BigDecimal revisedAmount) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("revisionSeqId",revisionSeqId);
@@ -234,23 +236,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createBudgetTypeAttr")
-	public ResponseEntity<Object> createBudgetTypeAttr(HttpSession session, @RequestParam(value="budgetTypeId") String budgetTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createBudgetTypeAttr(HttpSession session, @RequestParam(value="budgetTypeId") String budgetTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetTypeId",budgetTypeId);
@@ -265,23 +267,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteBudgetScenarioRule")
-	public ResponseEntity<Object> deleteBudgetScenarioRule(HttpSession session, @RequestParam(value="budgetScenarioId") String budgetScenarioId, @RequestParam(value="budgetItemTypeId") String budgetItemTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteBudgetScenarioRule(HttpSession session, @RequestParam(value="budgetScenarioId") String budgetScenarioId, @RequestParam(value="budgetItemTypeId") String budgetItemTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetScenarioId",budgetScenarioId);
@@ -295,23 +297,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createBudgetScenario")
-	public ResponseEntity<Object> createBudgetScenario(HttpSession session, @RequestParam(value="budgetScenarioId", required=false) String budgetScenarioId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createBudgetScenario(HttpSession session, @RequestParam(value="budgetScenarioId", required=false) String budgetScenarioId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetScenarioId",budgetScenarioId);
@@ -325,23 +327,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeBudgetItem")
-	public ResponseEntity<Object> removeBudgetItem(HttpSession session, @RequestParam(value="budgetItemSeqId") String budgetItemSeqId, @RequestParam(value="budgetId") String budgetId) {
+	public ResponseEntity<Map<String, Object>> removeBudgetItem(HttpSession session, @RequestParam(value="budgetItemSeqId") String budgetItemSeqId, @RequestParam(value="budgetId") String budgetId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetItemSeqId",budgetItemSeqId);
@@ -355,23 +357,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createBudgetRevision")
-	public ResponseEntity<Object> createBudgetRevision(HttpSession session, @RequestParam(value="revisionSeqId") String revisionSeqId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="dateRevised", required=false) Timestamp dateRevised) {
+	public ResponseEntity<Map<String, Object>> createBudgetRevision(HttpSession session, @RequestParam(value="revisionSeqId") String revisionSeqId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="dateRevised", required=false) Timestamp dateRevised) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("revisionSeqId",revisionSeqId);
@@ -386,23 +388,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateBudgetType")
-	public ResponseEntity<Object> updateBudgetType(HttpSession session, @RequestParam(value="budgetTypeId") String budgetTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateBudgetType(HttpSession session, @RequestParam(value="budgetTypeId") String budgetTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetTypeId",budgetTypeId);
@@ -418,23 +420,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteBudgetType")
-	public ResponseEntity<Object> deleteBudgetType(HttpSession session, @RequestParam(value="budgetTypeId") String budgetTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> deleteBudgetType(HttpSession session, @RequestParam(value="budgetTypeId") String budgetTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetTypeId",budgetTypeId);
@@ -450,23 +452,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateBudget")
-	public ResponseEntity<Object> updateBudget(HttpSession session, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="budgetTypeId", required=false) String budgetTypeId, @RequestParam(value="customTimePeriodId", required=false) String customTimePeriodId) {
+	public ResponseEntity<Map<String, Object>> updateBudget(HttpSession session, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="budgetTypeId", required=false) String budgetTypeId, @RequestParam(value="customTimePeriodId", required=false) String customTimePeriodId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetId",budgetId);
@@ -482,23 +484,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createBudgetType")
-	public ResponseEntity<Object> createBudgetType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="budgetTypeId", required=false) String budgetTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createBudgetType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="budgetTypeId", required=false) String budgetTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("parentTypeId",parentTypeId);
@@ -514,23 +516,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createBudgetRole")
-	public ResponseEntity<Object> createBudgetRole(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="partyId") String partyId) {
+	public ResponseEntity<Map<String, Object>> createBudgetRole(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="partyId") String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("roleTypeId",roleTypeId);
@@ -545,23 +547,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteBudgetTypeAttr")
-	public ResponseEntity<Object> deleteBudgetTypeAttr(HttpSession session, @RequestParam(value="budgetTypeId") String budgetTypeId, @RequestParam(value="attrName") String attrName) {
+	public ResponseEntity<Map<String, Object>> deleteBudgetTypeAttr(HttpSession session, @RequestParam(value="budgetTypeId") String budgetTypeId, @RequestParam(value="attrName") String attrName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetTypeId",budgetTypeId);
@@ -575,23 +577,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeBudgetAttribute")
-	public ResponseEntity<Object> removeBudgetAttribute(HttpSession session, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="attrName") String attrName) {
+	public ResponseEntity<Map<String, Object>> removeBudgetAttribute(HttpSession session, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="attrName") String attrName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetId",budgetId);
@@ -605,23 +607,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createBudgetRevisionImpact")
-	public ResponseEntity<Object> createBudgetRevisionImpact(HttpSession session, @RequestParam(value="revisionSeqId") String revisionSeqId, @RequestParam(value="budgetItemSeqId") String budgetItemSeqId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="addDeleteFlag", required=false) String addDeleteFlag, @RequestParam(value="revisionReason", required=false) String revisionReason, @RequestParam(value="revisedAmount", required=false) BigDecimal revisedAmount) {
+	public ResponseEntity<Map<String, Object>> createBudgetRevisionImpact(HttpSession session, @RequestParam(value="revisionSeqId") String revisionSeqId, @RequestParam(value="budgetItemSeqId") String budgetItemSeqId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="addDeleteFlag", required=false) String addDeleteFlag, @RequestParam(value="revisionReason", required=false) String revisionReason, @RequestParam(value="revisedAmount", required=false) BigDecimal revisedAmount) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("revisionSeqId",revisionSeqId);
@@ -639,23 +641,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateBudgetRevision")
-	public ResponseEntity<Object> updateBudgetRevision(HttpSession session, @RequestParam(value="revisionSeqId") String revisionSeqId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="dateRevised", required=false) Timestamp dateRevised) {
+	public ResponseEntity<Map<String, Object>> updateBudgetRevision(HttpSession session, @RequestParam(value="revisionSeqId") String revisionSeqId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="dateRevised", required=false) Timestamp dateRevised) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("revisionSeqId",revisionSeqId);
@@ -670,23 +672,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createBudgetReviewResultType")
-	public ResponseEntity<Object> createBudgetReviewResultType(HttpSession session, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="budgetReviewResultTypeId", required=false) String budgetReviewResultTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createBudgetReviewResultType(HttpSession session, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="budgetReviewResultTypeId", required=false) String budgetReviewResultTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("comments",comments);
@@ -701,23 +703,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateBudgetTypeAttr")
-	public ResponseEntity<Object> updateBudgetTypeAttr(HttpSession session, @RequestParam(value="budgetTypeId") String budgetTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateBudgetTypeAttr(HttpSession session, @RequestParam(value="budgetTypeId") String budgetTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetTypeId",budgetTypeId);
@@ -732,23 +734,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createBudgetStatus")
-	public ResponseEntity<Object> createBudgetStatus(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="statusDate", required=false) Timestamp statusDate, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="changeByUserLoginId", required=false) String changeByUserLoginId) {
+	public ResponseEntity<Map<String, Object>> createBudgetStatus(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="statusDate", required=false) Timestamp statusDate, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="changeByUserLoginId", required=false) String changeByUserLoginId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("statusId",statusId);
@@ -765,23 +767,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createBudgetItemType")
-	public ResponseEntity<Object> createBudgetItemType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description, @RequestParam(value="budgetItemTypeId", required=false) String budgetItemTypeId) {
+	public ResponseEntity<Map<String, Object>> createBudgetItemType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description, @RequestParam(value="budgetItemTypeId", required=false) String budgetItemTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("parentTypeId",parentTypeId);
@@ -797,23 +799,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteBudgetRevision")
-	public ResponseEntity<Object> deleteBudgetRevision(HttpSession session, @RequestParam(value="revisionSeqId") String revisionSeqId, @RequestParam(value="budgetId") String budgetId) {
+	public ResponseEntity<Map<String, Object>> deleteBudgetRevision(HttpSession session, @RequestParam(value="revisionSeqId") String revisionSeqId, @RequestParam(value="budgetId") String budgetId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("revisionSeqId",revisionSeqId);
@@ -827,23 +829,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createBudgetItemAttribute")
-	public ResponseEntity<Object> createBudgetItemAttribute(HttpSession session, @RequestParam(value="budgetItemSeqId") String budgetItemSeqId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
+	public ResponseEntity<Map<String, Object>> createBudgetItemAttribute(HttpSession session, @RequestParam(value="budgetItemSeqId") String budgetItemSeqId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetItemSeqId",budgetItemSeqId);
@@ -860,23 +862,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteBudgetReviewResultType")
-	public ResponseEntity<Object> deleteBudgetReviewResultType(HttpSession session, @RequestParam(value="budgetReviewResultTypeId") String budgetReviewResultTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteBudgetReviewResultType(HttpSession session, @RequestParam(value="budgetReviewResultTypeId") String budgetReviewResultTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetReviewResultTypeId",budgetReviewResultTypeId);
@@ -889,23 +891,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createBudgetScenarioRule")
-	public ResponseEntity<Object> createBudgetScenarioRule(HttpSession session, @RequestParam(value="budgetScenarioId") String budgetScenarioId, @RequestParam(value="budgetItemTypeId") String budgetItemTypeId, @RequestParam(value="amountChange", required=false) BigDecimal amountChange, @RequestParam(value="percentageChange", required=false) BigDecimal percentageChange) {
+	public ResponseEntity<Map<String, Object>> createBudgetScenarioRule(HttpSession session, @RequestParam(value="budgetScenarioId") String budgetScenarioId, @RequestParam(value="budgetItemTypeId") String budgetItemTypeId, @RequestParam(value="amountChange", required=false) BigDecimal amountChange, @RequestParam(value="percentageChange", required=false) BigDecimal percentageChange) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetScenarioId",budgetScenarioId);
@@ -921,23 +923,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteBudgetItemTypeAttr")
-	public ResponseEntity<Object> deleteBudgetItemTypeAttr(HttpSession session, @RequestParam(value="budgetItemTypeId") String budgetItemTypeId, @RequestParam(value="attrName") String attrName) {
+	public ResponseEntity<Map<String, Object>> deleteBudgetItemTypeAttr(HttpSession session, @RequestParam(value="budgetItemTypeId") String budgetItemTypeId, @RequestParam(value="attrName") String attrName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetItemTypeId",budgetItemTypeId);
@@ -951,23 +953,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeBudgetItemType")
-	public ResponseEntity<Object> removeBudgetItemType(HttpSession session, @RequestParam(value="budgetItemTypeId") String budgetItemTypeId) {
+	public ResponseEntity<Map<String, Object>> removeBudgetItemType(HttpSession session, @RequestParam(value="budgetItemTypeId") String budgetItemTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetItemTypeId",budgetItemTypeId);
@@ -980,23 +982,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateBudgetAttribute")
-	public ResponseEntity<Object> updateBudgetAttribute(HttpSession session, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
+	public ResponseEntity<Map<String, Object>> updateBudgetAttribute(HttpSession session, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetId",budgetId);
@@ -1012,23 +1014,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createBudget")
-	public ResponseEntity<Object> createBudget(HttpSession session, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="budgetTypeId", required=false) String budgetTypeId, @RequestParam(value="budgetId", required=false) String budgetId, @RequestParam(value="customTimePeriodId", required=false) String customTimePeriodId) {
+	public ResponseEntity<Map<String, Object>> createBudget(HttpSession session, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="budgetTypeId", required=false) String budgetTypeId, @RequestParam(value="budgetId", required=false) String budgetId, @RequestParam(value="customTimePeriodId", required=false) String customTimePeriodId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("comments",comments);
@@ -1044,23 +1046,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeBudgetRole")
-	public ResponseEntity<Object> removeBudgetRole(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="partyId") String partyId) {
+	public ResponseEntity<Map<String, Object>> removeBudgetRole(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="partyId") String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("roleTypeId",roleTypeId);
@@ -1075,23 +1077,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeBudgetReview")
-	public ResponseEntity<Object> removeBudgetReview(HttpSession session, @RequestParam(value="budgetReviewResultTypeId") String budgetReviewResultTypeId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="partyId") String partyId, @RequestParam(value="budgetReviewId") String budgetReviewId) {
+	public ResponseEntity<Map<String, Object>> removeBudgetReview(HttpSession session, @RequestParam(value="budgetReviewResultTypeId") String budgetReviewResultTypeId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="partyId") String partyId, @RequestParam(value="budgetReviewId") String budgetReviewId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetReviewResultTypeId",budgetReviewResultTypeId);
@@ -1107,23 +1109,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateBudgetStatus")
-	public ResponseEntity<Object> updateBudgetStatus(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="statusDate", required=false) Timestamp statusDate, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="changeByUserLoginId", required=false) String changeByUserLoginId) {
+	public ResponseEntity<Map<String, Object>> updateBudgetStatus(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="statusDate", required=false) Timestamp statusDate, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="changeByUserLoginId", required=false) String changeByUserLoginId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("statusId",statusId);
@@ -1140,23 +1142,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateBudgetReviewResultType")
-	public ResponseEntity<Object> updateBudgetReviewResultType(HttpSession session, @RequestParam(value="budgetReviewResultTypeId") String budgetReviewResultTypeId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateBudgetReviewResultType(HttpSession session, @RequestParam(value="budgetReviewResultTypeId") String budgetReviewResultTypeId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetReviewResultTypeId",budgetReviewResultTypeId);
@@ -1171,23 +1173,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createBudgetAttribute")
-	public ResponseEntity<Object> createBudgetAttribute(HttpSession session, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
+	public ResponseEntity<Map<String, Object>> createBudgetAttribute(HttpSession session, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetId",budgetId);
@@ -1203,23 +1205,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateBudgetItem")
-	public ResponseEntity<Object> updateBudgetItem(HttpSession session, @RequestParam(value="budgetItemSeqId") String budgetItemSeqId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="purpose", required=false) String purpose, @RequestParam(value="budgetItemTypeId", required=false) String budgetItemTypeId, @RequestParam(value="justification", required=false) String justification) {
+	public ResponseEntity<Map<String, Object>> updateBudgetItem(HttpSession session, @RequestParam(value="budgetItemSeqId") String budgetItemSeqId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="purpose", required=false) String purpose, @RequestParam(value="budgetItemTypeId", required=false) String budgetItemTypeId, @RequestParam(value="justification", required=false) String justification) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetItemSeqId",budgetItemSeqId);
@@ -1237,23 +1239,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateBudgetItemType")
-	public ResponseEntity<Object> updateBudgetItemType(HttpSession session, @RequestParam(value="budgetItemTypeId") String budgetItemTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateBudgetItemType(HttpSession session, @RequestParam(value="budgetItemTypeId") String budgetItemTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetItemTypeId",budgetItemTypeId);
@@ -1269,23 +1271,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateBudgetScenarioApplication")
-	public ResponseEntity<Object> updateBudgetScenarioApplication(HttpSession session, @RequestParam(value="budgetScenarioApplicId") String budgetScenarioApplicId, @RequestParam(value="budgetScenarioId") String budgetScenarioId, @RequestParam(value="amountChange", required=false) BigDecimal amountChange, @RequestParam(value="percentageChange", required=false) BigDecimal percentageChange, @RequestParam(value="budgetItemSeqId", required=false) String budgetItemSeqId, @RequestParam(value="budgetId", required=false) String budgetId) {
+	public ResponseEntity<Map<String, Object>> updateBudgetScenarioApplication(HttpSession session, @RequestParam(value="budgetScenarioApplicId") String budgetScenarioApplicId, @RequestParam(value="budgetScenarioId") String budgetScenarioId, @RequestParam(value="amountChange", required=false) BigDecimal amountChange, @RequestParam(value="percentageChange", required=false) BigDecimal percentageChange, @RequestParam(value="budgetItemSeqId", required=false) String budgetItemSeqId, @RequestParam(value="budgetId", required=false) String budgetId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetScenarioApplicId",budgetScenarioApplicId);
@@ -1303,23 +1305,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeBudgetRevisionImpact")
-	public ResponseEntity<Object> removeBudgetRevisionImpact(HttpSession session, @RequestParam(value="revisionSeqId") String revisionSeqId, @RequestParam(value="budgetItemSeqId") String budgetItemSeqId, @RequestParam(value="budgetId") String budgetId) {
+	public ResponseEntity<Map<String, Object>> removeBudgetRevisionImpact(HttpSession session, @RequestParam(value="revisionSeqId") String revisionSeqId, @RequestParam(value="budgetItemSeqId") String budgetItemSeqId, @RequestParam(value="budgetId") String budgetId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("revisionSeqId",revisionSeqId);
@@ -1334,23 +1336,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateBudgetItemAttribute")
-	public ResponseEntity<Object> updateBudgetItemAttribute(HttpSession session, @RequestParam(value="budgetItemSeqId") String budgetItemSeqId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
+	public ResponseEntity<Map<String, Object>> updateBudgetItemAttribute(HttpSession session, @RequestParam(value="budgetItemSeqId") String budgetItemSeqId, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetItemSeqId",budgetItemSeqId);
@@ -1367,23 +1369,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteBudgetScenarioApplication")
-	public ResponseEntity<Object> deleteBudgetScenarioApplication(HttpSession session, @RequestParam(value="budgetScenarioApplicId") String budgetScenarioApplicId, @RequestParam(value="budgetScenarioId") String budgetScenarioId) {
+	public ResponseEntity<Map<String, Object>> deleteBudgetScenarioApplication(HttpSession session, @RequestParam(value="budgetScenarioApplicId") String budgetScenarioApplicId, @RequestParam(value="budgetScenarioId") String budgetScenarioId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetScenarioApplicId",budgetScenarioApplicId);
@@ -1397,23 +1399,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createBudgetItem")
-	public ResponseEntity<Object> createBudgetItem(HttpSession session, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="purpose", required=false) String purpose, @RequestParam(value="budgetItemTypeId", required=false) String budgetItemTypeId, @RequestParam(value="justification", required=false) String justification) {
+	public ResponseEntity<Map<String, Object>> createBudgetItem(HttpSession session, @RequestParam(value="budgetId") String budgetId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="purpose", required=false) String purpose, @RequestParam(value="budgetItemTypeId", required=false) String budgetItemTypeId, @RequestParam(value="justification", required=false) String justification) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetId",budgetId);
@@ -1430,23 +1432,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateBudgetItemTypeAttr")
-	public ResponseEntity<Object> updateBudgetItemTypeAttr(HttpSession session, @RequestParam(value="budgetItemTypeId") String budgetItemTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateBudgetItemTypeAttr(HttpSession session, @RequestParam(value="budgetItemTypeId") String budgetItemTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetItemTypeId",budgetItemTypeId);
@@ -1461,23 +1463,23 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteBudgetScenario")
-	public ResponseEntity<Object> deleteBudgetScenario(HttpSession session, @RequestParam(value="budgetScenarioId") String budgetScenarioId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> deleteBudgetScenario(HttpSession session, @RequestParam(value="budgetScenarioId") String budgetScenarioId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("budgetScenarioId",budgetScenarioId);
@@ -1491,19 +1493,19 @@ public class AccountingBudgetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

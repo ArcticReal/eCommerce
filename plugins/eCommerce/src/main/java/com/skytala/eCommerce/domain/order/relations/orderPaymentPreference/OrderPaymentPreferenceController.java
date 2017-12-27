@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.orderPaymentPreference.query
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/orderPaymentPreferences")
 public class OrderPaymentPreferenceController {
@@ -52,7 +54,7 @@ public class OrderPaymentPreferenceController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findOrderPaymentPreferencesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OrderPaymentPreference>> findOrderPaymentPreferencesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderPaymentPreferencesBy query = new FindOrderPaymentPreferencesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class OrderPaymentPreferenceController {
 		}
 
 		List<OrderPaymentPreference> orderPaymentPreferences =((OrderPaymentPreferenceFound) Scheduler.execute(query).data()).getOrderPaymentPreferences();
-
-		if (orderPaymentPreferences.size() == 1) {
-			return ResponseEntity.ok().body(orderPaymentPreferences.get(0));
-		}
 
 		return ResponseEntity.ok().body(orderPaymentPreferences);
 
@@ -78,7 +76,7 @@ public class OrderPaymentPreferenceController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOrderPaymentPreference(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OrderPaymentPreference> createOrderPaymentPreference(HttpServletRequest request) throws Exception {
 
 		OrderPaymentPreference orderPaymentPreferenceToBeAdded = new OrderPaymentPreference();
 		try {
@@ -86,7 +84,7 @@ public class OrderPaymentPreferenceController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createOrderPaymentPreference(orderPaymentPreferenceToBeAdded);
@@ -101,63 +99,15 @@ public class OrderPaymentPreferenceController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOrderPaymentPreference(@RequestBody OrderPaymentPreference orderPaymentPreferenceToBeAdded) throws Exception {
+	public ResponseEntity<OrderPaymentPreference> createOrderPaymentPreference(@RequestBody OrderPaymentPreference orderPaymentPreferenceToBeAdded) throws Exception {
 
 		AddOrderPaymentPreference command = new AddOrderPaymentPreference(orderPaymentPreferenceToBeAdded);
 		OrderPaymentPreference orderPaymentPreference = ((OrderPaymentPreferenceAdded) Scheduler.execute(command).data()).getAddedOrderPaymentPreference();
 		
 		if (orderPaymentPreference != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(orderPaymentPreference);
+			return successful(orderPaymentPreference);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OrderPaymentPreference could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateOrderPaymentPreference(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OrderPaymentPreference orderPaymentPreferenceToBeUpdated = new OrderPaymentPreference();
-
-		try {
-			orderPaymentPreferenceToBeUpdated = OrderPaymentPreferenceMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOrderPaymentPreference(orderPaymentPreferenceToBeUpdated, orderPaymentPreferenceToBeUpdated.getOrderPaymentPreferenceId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class OrderPaymentPreferenceController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{orderPaymentPreferenceId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOrderPaymentPreference(@RequestBody OrderPaymentPreference orderPaymentPreferenceToBeUpdated,
+	public ResponseEntity<String> updateOrderPaymentPreference(@RequestBody OrderPaymentPreference orderPaymentPreferenceToBeUpdated,
 			@PathVariable String orderPaymentPreferenceId) throws Exception {
 
 		orderPaymentPreferenceToBeUpdated.setOrderPaymentPreferenceId(orderPaymentPreferenceId);
@@ -178,41 +128,44 @@ public class OrderPaymentPreferenceController {
 
 		try {
 			if(((OrderPaymentPreferenceUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{orderPaymentPreferenceId}")
-	public ResponseEntity<Object> findById(@PathVariable String orderPaymentPreferenceId) throws Exception {
+	public ResponseEntity<OrderPaymentPreference> findById(@PathVariable String orderPaymentPreferenceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderPaymentPreferenceId", orderPaymentPreferenceId);
 		try {
 
-			Object foundOrderPaymentPreference = findOrderPaymentPreferencesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOrderPaymentPreference);
+			List<OrderPaymentPreference> foundOrderPaymentPreference = findOrderPaymentPreferencesBy(requestParams).getBody();
+			if(foundOrderPaymentPreference.size()==1){				return successful(foundOrderPaymentPreference.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{orderPaymentPreferenceId}")
-	public ResponseEntity<Object> deleteOrderPaymentPreferenceByIdUpdated(@PathVariable String orderPaymentPreferenceId) throws Exception {
+	public ResponseEntity<String> deleteOrderPaymentPreferenceByIdUpdated(@PathVariable String orderPaymentPreferenceId) throws Exception {
 		DeleteOrderPaymentPreference command = new DeleteOrderPaymentPreference(orderPaymentPreferenceId);
 
 		try {
 			if (((OrderPaymentPreferenceDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("OrderPaymentPreference could not be deleted");
+		return conflict();
 
 	}
 

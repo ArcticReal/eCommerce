@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.storeSurveyA
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productStoreSurveyAppls")
 public class ProductStoreSurveyApplController {
@@ -52,7 +54,7 @@ public class ProductStoreSurveyApplController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductStoreSurveyApplsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductStoreSurveyAppl>> findProductStoreSurveyApplsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductStoreSurveyApplsBy query = new FindProductStoreSurveyApplsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductStoreSurveyApplController {
 		}
 
 		List<ProductStoreSurveyAppl> productStoreSurveyAppls =((ProductStoreSurveyApplFound) Scheduler.execute(query).data()).getProductStoreSurveyAppls();
-
-		if (productStoreSurveyAppls.size() == 1) {
-			return ResponseEntity.ok().body(productStoreSurveyAppls.get(0));
-		}
 
 		return ResponseEntity.ok().body(productStoreSurveyAppls);
 
@@ -78,7 +76,7 @@ public class ProductStoreSurveyApplController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductStoreSurveyAppl(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductStoreSurveyAppl> createProductStoreSurveyAppl(HttpServletRequest request) throws Exception {
 
 		ProductStoreSurveyAppl productStoreSurveyApplToBeAdded = new ProductStoreSurveyAppl();
 		try {
@@ -86,7 +84,7 @@ public class ProductStoreSurveyApplController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductStoreSurveyAppl(productStoreSurveyApplToBeAdded);
@@ -101,63 +99,15 @@ public class ProductStoreSurveyApplController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductStoreSurveyAppl(@RequestBody ProductStoreSurveyAppl productStoreSurveyApplToBeAdded) throws Exception {
+	public ResponseEntity<ProductStoreSurveyAppl> createProductStoreSurveyAppl(@RequestBody ProductStoreSurveyAppl productStoreSurveyApplToBeAdded) throws Exception {
 
 		AddProductStoreSurveyAppl command = new AddProductStoreSurveyAppl(productStoreSurveyApplToBeAdded);
 		ProductStoreSurveyAppl productStoreSurveyAppl = ((ProductStoreSurveyApplAdded) Scheduler.execute(command).data()).getAddedProductStoreSurveyAppl();
 		
 		if (productStoreSurveyAppl != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productStoreSurveyAppl);
+			return successful(productStoreSurveyAppl);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductStoreSurveyAppl could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductStoreSurveyAppl(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductStoreSurveyAppl productStoreSurveyApplToBeUpdated = new ProductStoreSurveyAppl();
-
-		try {
-			productStoreSurveyApplToBeUpdated = ProductStoreSurveyApplMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductStoreSurveyAppl(productStoreSurveyApplToBeUpdated, productStoreSurveyApplToBeUpdated.getProductStoreSurveyId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductStoreSurveyApplController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{productStoreSurveyId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductStoreSurveyAppl(@RequestBody ProductStoreSurveyAppl productStoreSurveyApplToBeUpdated,
+	public ResponseEntity<String> updateProductStoreSurveyAppl(@RequestBody ProductStoreSurveyAppl productStoreSurveyApplToBeUpdated,
 			@PathVariable String productStoreSurveyId) throws Exception {
 
 		productStoreSurveyApplToBeUpdated.setProductStoreSurveyId(productStoreSurveyId);
@@ -178,41 +128,44 @@ public class ProductStoreSurveyApplController {
 
 		try {
 			if(((ProductStoreSurveyApplUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productStoreSurveyApplId}")
-	public ResponseEntity<Object> findById(@PathVariable String productStoreSurveyApplId) throws Exception {
+	public ResponseEntity<ProductStoreSurveyAppl> findById(@PathVariable String productStoreSurveyApplId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productStoreSurveyApplId", productStoreSurveyApplId);
 		try {
 
-			Object foundProductStoreSurveyAppl = findProductStoreSurveyApplsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductStoreSurveyAppl);
+			List<ProductStoreSurveyAppl> foundProductStoreSurveyAppl = findProductStoreSurveyApplsBy(requestParams).getBody();
+			if(foundProductStoreSurveyAppl.size()==1){				return successful(foundProductStoreSurveyAppl.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productStoreSurveyApplId}")
-	public ResponseEntity<Object> deleteProductStoreSurveyApplByIdUpdated(@PathVariable String productStoreSurveyApplId) throws Exception {
+	public ResponseEntity<String> deleteProductStoreSurveyApplByIdUpdated(@PathVariable String productStoreSurveyApplId) throws Exception {
 		DeleteProductStoreSurveyAppl command = new DeleteProductStoreSurveyAppl(productStoreSurveyApplId);
 
 		try {
 			if (((ProductStoreSurveyApplDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductStoreSurveyAppl could not be deleted");
+		return conflict();
 
 	}
 

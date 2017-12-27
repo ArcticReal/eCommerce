@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.manufacturing.relations.mrpEvent.query.FindM
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/manufacturing/mrpEvents")
 public class MrpEventController {
@@ -52,7 +54,7 @@ public class MrpEventController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findMrpEventsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<MrpEvent>> findMrpEventsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindMrpEventsBy query = new FindMrpEventsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class MrpEventController {
 		}
 
 		List<MrpEvent> mrpEvents =((MrpEventFound) Scheduler.execute(query).data()).getMrpEvents();
-
-		if (mrpEvents.size() == 1) {
-			return ResponseEntity.ok().body(mrpEvents.get(0));
-		}
 
 		return ResponseEntity.ok().body(mrpEvents);
 
@@ -78,7 +76,7 @@ public class MrpEventController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createMrpEvent(HttpServletRequest request) throws Exception {
+	public ResponseEntity<MrpEvent> createMrpEvent(HttpServletRequest request) throws Exception {
 
 		MrpEvent mrpEventToBeAdded = new MrpEvent();
 		try {
@@ -86,7 +84,7 @@ public class MrpEventController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createMrpEvent(mrpEventToBeAdded);
@@ -101,63 +99,15 @@ public class MrpEventController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createMrpEvent(@RequestBody MrpEvent mrpEventToBeAdded) throws Exception {
+	public ResponseEntity<MrpEvent> createMrpEvent(@RequestBody MrpEvent mrpEventToBeAdded) throws Exception {
 
 		AddMrpEvent command = new AddMrpEvent(mrpEventToBeAdded);
 		MrpEvent mrpEvent = ((MrpEventAdded) Scheduler.execute(command).data()).getAddedMrpEvent();
 		
 		if (mrpEvent != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(mrpEvent);
+			return successful(mrpEvent);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("MrpEvent could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateMrpEvent(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		MrpEvent mrpEventToBeUpdated = new MrpEvent();
-
-		try {
-			mrpEventToBeUpdated = MrpEventMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateMrpEvent(mrpEventToBeUpdated, mrpEventToBeUpdated.getMrpId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class MrpEventController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{mrpId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateMrpEvent(@RequestBody MrpEvent mrpEventToBeUpdated,
+	public ResponseEntity<String> updateMrpEvent(@RequestBody MrpEvent mrpEventToBeUpdated,
 			@PathVariable String mrpId) throws Exception {
 
 		mrpEventToBeUpdated.setMrpId(mrpId);
@@ -178,41 +128,44 @@ public class MrpEventController {
 
 		try {
 			if(((MrpEventUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{mrpEventId}")
-	public ResponseEntity<Object> findById(@PathVariable String mrpEventId) throws Exception {
+	public ResponseEntity<MrpEvent> findById(@PathVariable String mrpEventId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("mrpEventId", mrpEventId);
 		try {
 
-			Object foundMrpEvent = findMrpEventsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundMrpEvent);
+			List<MrpEvent> foundMrpEvent = findMrpEventsBy(requestParams).getBody();
+			if(foundMrpEvent.size()==1){				return successful(foundMrpEvent.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{mrpEventId}")
-	public ResponseEntity<Object> deleteMrpEventByIdUpdated(@PathVariable String mrpEventId) throws Exception {
+	public ResponseEntity<String> deleteMrpEventByIdUpdated(@PathVariable String mrpEventId) throws Exception {
 		DeleteMrpEvent command = new DeleteMrpEvent(mrpEventId);
 
 		try {
 			if (((MrpEventDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("MrpEvent could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.shipment.relations.shipment.query.typeAttr.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/shipment/shipment/shipmentTypeAttrs")
 public class ShipmentTypeAttrController {
@@ -52,7 +54,7 @@ public class ShipmentTypeAttrController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findShipmentTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ShipmentTypeAttr>> findShipmentTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentTypeAttrsBy query = new FindShipmentTypeAttrsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ShipmentTypeAttrController {
 		}
 
 		List<ShipmentTypeAttr> shipmentTypeAttrs =((ShipmentTypeAttrFound) Scheduler.execute(query).data()).getShipmentTypeAttrs();
-
-		if (shipmentTypeAttrs.size() == 1) {
-			return ResponseEntity.ok().body(shipmentTypeAttrs.get(0));
-		}
 
 		return ResponseEntity.ok().body(shipmentTypeAttrs);
 
@@ -78,7 +76,7 @@ public class ShipmentTypeAttrController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createShipmentTypeAttr(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ShipmentTypeAttr> createShipmentTypeAttr(HttpServletRequest request) throws Exception {
 
 		ShipmentTypeAttr shipmentTypeAttrToBeAdded = new ShipmentTypeAttr();
 		try {
@@ -86,7 +84,7 @@ public class ShipmentTypeAttrController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createShipmentTypeAttr(shipmentTypeAttrToBeAdded);
@@ -101,63 +99,15 @@ public class ShipmentTypeAttrController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createShipmentTypeAttr(@RequestBody ShipmentTypeAttr shipmentTypeAttrToBeAdded) throws Exception {
+	public ResponseEntity<ShipmentTypeAttr> createShipmentTypeAttr(@RequestBody ShipmentTypeAttr shipmentTypeAttrToBeAdded) throws Exception {
 
 		AddShipmentTypeAttr command = new AddShipmentTypeAttr(shipmentTypeAttrToBeAdded);
 		ShipmentTypeAttr shipmentTypeAttr = ((ShipmentTypeAttrAdded) Scheduler.execute(command).data()).getAddedShipmentTypeAttr();
 		
 		if (shipmentTypeAttr != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(shipmentTypeAttr);
+			return successful(shipmentTypeAttr);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ShipmentTypeAttr could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateShipmentTypeAttr(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ShipmentTypeAttr shipmentTypeAttrToBeUpdated = new ShipmentTypeAttr();
-
-		try {
-			shipmentTypeAttrToBeUpdated = ShipmentTypeAttrMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateShipmentTypeAttr(shipmentTypeAttrToBeUpdated, shipmentTypeAttrToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ShipmentTypeAttrController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateShipmentTypeAttr(@RequestBody ShipmentTypeAttr shipmentTypeAttrToBeUpdated,
+	public ResponseEntity<String> updateShipmentTypeAttr(@RequestBody ShipmentTypeAttr shipmentTypeAttrToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		shipmentTypeAttrToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class ShipmentTypeAttrController {
 
 		try {
 			if(((ShipmentTypeAttrUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{shipmentTypeAttrId}")
-	public ResponseEntity<Object> findById(@PathVariable String shipmentTypeAttrId) throws Exception {
+	public ResponseEntity<ShipmentTypeAttr> findById(@PathVariable String shipmentTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentTypeAttrId", shipmentTypeAttrId);
 		try {
 
-			Object foundShipmentTypeAttr = findShipmentTypeAttrsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundShipmentTypeAttr);
+			List<ShipmentTypeAttr> foundShipmentTypeAttr = findShipmentTypeAttrsBy(requestParams).getBody();
+			if(foundShipmentTypeAttr.size()==1){				return successful(foundShipmentTypeAttr.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{shipmentTypeAttrId}")
-	public ResponseEntity<Object> deleteShipmentTypeAttrByIdUpdated(@PathVariable String shipmentTypeAttrId) throws Exception {
+	public ResponseEntity<String> deleteShipmentTypeAttrByIdUpdated(@PathVariable String shipmentTypeAttrId) throws Exception {
 		DeleteShipmentTypeAttr command = new DeleteShipmentTypeAttr(shipmentTypeAttrId);
 
 		try {
 			if (((ShipmentTypeAttrDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ShipmentTypeAttr could not be deleted");
+		return conflict();
 
 	}
 

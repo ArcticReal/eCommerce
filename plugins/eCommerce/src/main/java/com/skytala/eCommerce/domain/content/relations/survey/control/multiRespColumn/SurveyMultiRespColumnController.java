@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.survey.query.multiRespColu
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/survey/surveyMultiRespColumns")
 public class SurveyMultiRespColumnController {
@@ -52,7 +54,7 @@ public class SurveyMultiRespColumnController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findSurveyMultiRespColumnsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<SurveyMultiRespColumn>> findSurveyMultiRespColumnsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSurveyMultiRespColumnsBy query = new FindSurveyMultiRespColumnsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class SurveyMultiRespColumnController {
 		}
 
 		List<SurveyMultiRespColumn> surveyMultiRespColumns =((SurveyMultiRespColumnFound) Scheduler.execute(query).data()).getSurveyMultiRespColumns();
-
-		if (surveyMultiRespColumns.size() == 1) {
-			return ResponseEntity.ok().body(surveyMultiRespColumns.get(0));
-		}
 
 		return ResponseEntity.ok().body(surveyMultiRespColumns);
 
@@ -78,7 +76,7 @@ public class SurveyMultiRespColumnController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createSurveyMultiRespColumn(HttpServletRequest request) throws Exception {
+	public ResponseEntity<SurveyMultiRespColumn> createSurveyMultiRespColumn(HttpServletRequest request) throws Exception {
 
 		SurveyMultiRespColumn surveyMultiRespColumnToBeAdded = new SurveyMultiRespColumn();
 		try {
@@ -86,7 +84,7 @@ public class SurveyMultiRespColumnController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createSurveyMultiRespColumn(surveyMultiRespColumnToBeAdded);
@@ -101,63 +99,15 @@ public class SurveyMultiRespColumnController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createSurveyMultiRespColumn(@RequestBody SurveyMultiRespColumn surveyMultiRespColumnToBeAdded) throws Exception {
+	public ResponseEntity<SurveyMultiRespColumn> createSurveyMultiRespColumn(@RequestBody SurveyMultiRespColumn surveyMultiRespColumnToBeAdded) throws Exception {
 
 		AddSurveyMultiRespColumn command = new AddSurveyMultiRespColumn(surveyMultiRespColumnToBeAdded);
 		SurveyMultiRespColumn surveyMultiRespColumn = ((SurveyMultiRespColumnAdded) Scheduler.execute(command).data()).getAddedSurveyMultiRespColumn();
 		
 		if (surveyMultiRespColumn != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(surveyMultiRespColumn);
+			return successful(surveyMultiRespColumn);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("SurveyMultiRespColumn could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateSurveyMultiRespColumn(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		SurveyMultiRespColumn surveyMultiRespColumnToBeUpdated = new SurveyMultiRespColumn();
-
-		try {
-			surveyMultiRespColumnToBeUpdated = SurveyMultiRespColumnMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateSurveyMultiRespColumn(surveyMultiRespColumnToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class SurveyMultiRespColumnController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateSurveyMultiRespColumn(@RequestBody SurveyMultiRespColumn surveyMultiRespColumnToBeUpdated,
+	public ResponseEntity<String> updateSurveyMultiRespColumn(@RequestBody SurveyMultiRespColumn surveyMultiRespColumnToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		surveyMultiRespColumnToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class SurveyMultiRespColumnController {
 
 		try {
 			if(((SurveyMultiRespColumnUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{surveyMultiRespColumnId}")
-	public ResponseEntity<Object> findById(@PathVariable String surveyMultiRespColumnId) throws Exception {
+	public ResponseEntity<SurveyMultiRespColumn> findById(@PathVariable String surveyMultiRespColumnId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("surveyMultiRespColumnId", surveyMultiRespColumnId);
 		try {
 
-			Object foundSurveyMultiRespColumn = findSurveyMultiRespColumnsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundSurveyMultiRespColumn);
+			List<SurveyMultiRespColumn> foundSurveyMultiRespColumn = findSurveyMultiRespColumnsBy(requestParams).getBody();
+			if(foundSurveyMultiRespColumn.size()==1){				return successful(foundSurveyMultiRespColumn.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{surveyMultiRespColumnId}")
-	public ResponseEntity<Object> deleteSurveyMultiRespColumnByIdUpdated(@PathVariable String surveyMultiRespColumnId) throws Exception {
+	public ResponseEntity<String> deleteSurveyMultiRespColumnByIdUpdated(@PathVariable String surveyMultiRespColumnId) throws Exception {
 		DeleteSurveyMultiRespColumn command = new DeleteSurveyMultiRespColumn(surveyMultiRespColumnId);
 
 		try {
 			if (((SurveyMultiRespColumnDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("SurveyMultiRespColumn could not be deleted");
+		return conflict();
 
 	}
 

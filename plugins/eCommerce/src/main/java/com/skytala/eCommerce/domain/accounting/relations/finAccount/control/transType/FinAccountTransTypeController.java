@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.finAccount.query.transT
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/finAccount/finAccountTransTypes")
 public class FinAccountTransTypeController {
@@ -52,7 +54,7 @@ public class FinAccountTransTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findFinAccountTransTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<FinAccountTransType>> findFinAccountTransTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFinAccountTransTypesBy query = new FindFinAccountTransTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class FinAccountTransTypeController {
 		}
 
 		List<FinAccountTransType> finAccountTransTypes =((FinAccountTransTypeFound) Scheduler.execute(query).data()).getFinAccountTransTypes();
-
-		if (finAccountTransTypes.size() == 1) {
-			return ResponseEntity.ok().body(finAccountTransTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(finAccountTransTypes);
 
@@ -78,7 +76,7 @@ public class FinAccountTransTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createFinAccountTransType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<FinAccountTransType> createFinAccountTransType(HttpServletRequest request) throws Exception {
 
 		FinAccountTransType finAccountTransTypeToBeAdded = new FinAccountTransType();
 		try {
@@ -86,7 +84,7 @@ public class FinAccountTransTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createFinAccountTransType(finAccountTransTypeToBeAdded);
@@ -101,63 +99,15 @@ public class FinAccountTransTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createFinAccountTransType(@RequestBody FinAccountTransType finAccountTransTypeToBeAdded) throws Exception {
+	public ResponseEntity<FinAccountTransType> createFinAccountTransType(@RequestBody FinAccountTransType finAccountTransTypeToBeAdded) throws Exception {
 
 		AddFinAccountTransType command = new AddFinAccountTransType(finAccountTransTypeToBeAdded);
 		FinAccountTransType finAccountTransType = ((FinAccountTransTypeAdded) Scheduler.execute(command).data()).getAddedFinAccountTransType();
 		
 		if (finAccountTransType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(finAccountTransType);
+			return successful(finAccountTransType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("FinAccountTransType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateFinAccountTransType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		FinAccountTransType finAccountTransTypeToBeUpdated = new FinAccountTransType();
-
-		try {
-			finAccountTransTypeToBeUpdated = FinAccountTransTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateFinAccountTransType(finAccountTransTypeToBeUpdated, finAccountTransTypeToBeUpdated.getFinAccountTransTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class FinAccountTransTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{finAccountTransTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateFinAccountTransType(@RequestBody FinAccountTransType finAccountTransTypeToBeUpdated,
+	public ResponseEntity<String> updateFinAccountTransType(@RequestBody FinAccountTransType finAccountTransTypeToBeUpdated,
 			@PathVariable String finAccountTransTypeId) throws Exception {
 
 		finAccountTransTypeToBeUpdated.setFinAccountTransTypeId(finAccountTransTypeId);
@@ -178,41 +128,44 @@ public class FinAccountTransTypeController {
 
 		try {
 			if(((FinAccountTransTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{finAccountTransTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String finAccountTransTypeId) throws Exception {
+	public ResponseEntity<FinAccountTransType> findById(@PathVariable String finAccountTransTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("finAccountTransTypeId", finAccountTransTypeId);
 		try {
 
-			Object foundFinAccountTransType = findFinAccountTransTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundFinAccountTransType);
+			List<FinAccountTransType> foundFinAccountTransType = findFinAccountTransTypesBy(requestParams).getBody();
+			if(foundFinAccountTransType.size()==1){				return successful(foundFinAccountTransType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{finAccountTransTypeId}")
-	public ResponseEntity<Object> deleteFinAccountTransTypeByIdUpdated(@PathVariable String finAccountTransTypeId) throws Exception {
+	public ResponseEntity<String> deleteFinAccountTransTypeByIdUpdated(@PathVariable String finAccountTransTypeId) throws Exception {
 		DeleteFinAccountTransType command = new DeleteFinAccountTransType(finAccountTransTypeId);
 
 		try {
 			if (((FinAccountTransTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("FinAccountTransType could not be deleted");
+		return conflict();
 
 	}
 

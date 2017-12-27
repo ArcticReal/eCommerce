@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.agreement.query.attribute.Fi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/agreement/agreementAttributes")
 public class AgreementAttributeController {
@@ -52,7 +54,7 @@ public class AgreementAttributeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findAgreementAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<AgreementAttribute>> findAgreementAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAgreementAttributesBy query = new FindAgreementAttributesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class AgreementAttributeController {
 		}
 
 		List<AgreementAttribute> agreementAttributes =((AgreementAttributeFound) Scheduler.execute(query).data()).getAgreementAttributes();
-
-		if (agreementAttributes.size() == 1) {
-			return ResponseEntity.ok().body(agreementAttributes.get(0));
-		}
 
 		return ResponseEntity.ok().body(agreementAttributes);
 
@@ -78,7 +76,7 @@ public class AgreementAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createAgreementAttribute(HttpServletRequest request) throws Exception {
+	public ResponseEntity<AgreementAttribute> createAgreementAttribute(HttpServletRequest request) throws Exception {
 
 		AgreementAttribute agreementAttributeToBeAdded = new AgreementAttribute();
 		try {
@@ -86,7 +84,7 @@ public class AgreementAttributeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createAgreementAttribute(agreementAttributeToBeAdded);
@@ -101,63 +99,15 @@ public class AgreementAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createAgreementAttribute(@RequestBody AgreementAttribute agreementAttributeToBeAdded) throws Exception {
+	public ResponseEntity<AgreementAttribute> createAgreementAttribute(@RequestBody AgreementAttribute agreementAttributeToBeAdded) throws Exception {
 
 		AddAgreementAttribute command = new AddAgreementAttribute(agreementAttributeToBeAdded);
 		AgreementAttribute agreementAttribute = ((AgreementAttributeAdded) Scheduler.execute(command).data()).getAddedAgreementAttribute();
 		
 		if (agreementAttribute != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(agreementAttribute);
+			return successful(agreementAttribute);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("AgreementAttribute could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateAgreementAttribute(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		AgreementAttribute agreementAttributeToBeUpdated = new AgreementAttribute();
-
-		try {
-			agreementAttributeToBeUpdated = AgreementAttributeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateAgreementAttribute(agreementAttributeToBeUpdated, agreementAttributeToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class AgreementAttributeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateAgreementAttribute(@RequestBody AgreementAttribute agreementAttributeToBeUpdated,
+	public ResponseEntity<String> updateAgreementAttribute(@RequestBody AgreementAttribute agreementAttributeToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		agreementAttributeToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class AgreementAttributeController {
 
 		try {
 			if(((AgreementAttributeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{agreementAttributeId}")
-	public ResponseEntity<Object> findById(@PathVariable String agreementAttributeId) throws Exception {
+	public ResponseEntity<AgreementAttribute> findById(@PathVariable String agreementAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("agreementAttributeId", agreementAttributeId);
 		try {
 
-			Object foundAgreementAttribute = findAgreementAttributesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundAgreementAttribute);
+			List<AgreementAttribute> foundAgreementAttribute = findAgreementAttributesBy(requestParams).getBody();
+			if(foundAgreementAttribute.size()==1){				return successful(foundAgreementAttribute.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{agreementAttributeId}")
-	public ResponseEntity<Object> deleteAgreementAttributeByIdUpdated(@PathVariable String agreementAttributeId) throws Exception {
+	public ResponseEntity<String> deleteAgreementAttributeByIdUpdated(@PathVariable String agreementAttributeId) throws Exception {
 		DeleteAgreementAttribute command = new DeleteAgreementAttribute(agreementAttributeId);
 
 		try {
 			if (((AgreementAttributeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("AgreementAttribute could not be deleted");
+		return conflict();
 
 	}
 

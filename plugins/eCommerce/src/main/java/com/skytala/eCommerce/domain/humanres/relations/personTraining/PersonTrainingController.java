@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.humanres.relations.personTraining.query.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/humanres/personTrainings")
 public class PersonTrainingController {
@@ -52,7 +54,7 @@ public class PersonTrainingController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPersonTrainingsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PersonTraining>> findPersonTrainingsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPersonTrainingsBy query = new FindPersonTrainingsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PersonTrainingController {
 		}
 
 		List<PersonTraining> personTrainings =((PersonTrainingFound) Scheduler.execute(query).data()).getPersonTrainings();
-
-		if (personTrainings.size() == 1) {
-			return ResponseEntity.ok().body(personTrainings.get(0));
-		}
 
 		return ResponseEntity.ok().body(personTrainings);
 
@@ -78,7 +76,7 @@ public class PersonTrainingController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPersonTraining(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PersonTraining> createPersonTraining(HttpServletRequest request) throws Exception {
 
 		PersonTraining personTrainingToBeAdded = new PersonTraining();
 		try {
@@ -86,7 +84,7 @@ public class PersonTrainingController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPersonTraining(personTrainingToBeAdded);
@@ -101,63 +99,15 @@ public class PersonTrainingController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPersonTraining(@RequestBody PersonTraining personTrainingToBeAdded) throws Exception {
+	public ResponseEntity<PersonTraining> createPersonTraining(@RequestBody PersonTraining personTrainingToBeAdded) throws Exception {
 
 		AddPersonTraining command = new AddPersonTraining(personTrainingToBeAdded);
 		PersonTraining personTraining = ((PersonTrainingAdded) Scheduler.execute(command).data()).getAddedPersonTraining();
 		
 		if (personTraining != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(personTraining);
+			return successful(personTraining);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PersonTraining could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePersonTraining(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PersonTraining personTrainingToBeUpdated = new PersonTraining();
-
-		try {
-			personTrainingToBeUpdated = PersonTrainingMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePersonTraining(personTrainingToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PersonTrainingController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePersonTraining(@RequestBody PersonTraining personTrainingToBeUpdated,
+	public ResponseEntity<String> updatePersonTraining(@RequestBody PersonTraining personTrainingToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		personTrainingToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class PersonTrainingController {
 
 		try {
 			if(((PersonTrainingUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{personTrainingId}")
-	public ResponseEntity<Object> findById(@PathVariable String personTrainingId) throws Exception {
+	public ResponseEntity<PersonTraining> findById(@PathVariable String personTrainingId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("personTrainingId", personTrainingId);
 		try {
 
-			Object foundPersonTraining = findPersonTrainingsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPersonTraining);
+			List<PersonTraining> foundPersonTraining = findPersonTrainingsBy(requestParams).getBody();
+			if(foundPersonTraining.size()==1){				return successful(foundPersonTraining.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{personTrainingId}")
-	public ResponseEntity<Object> deletePersonTrainingByIdUpdated(@PathVariable String personTrainingId) throws Exception {
+	public ResponseEntity<String> deletePersonTrainingByIdUpdated(@PathVariable String personTrainingId) throws Exception {
 		DeletePersonTraining command = new DeletePersonTraining(personTrainingId);
 
 		try {
 			if (((PersonTrainingDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PersonTraining could not be deleted");
+		return conflict();
 
 	}
 

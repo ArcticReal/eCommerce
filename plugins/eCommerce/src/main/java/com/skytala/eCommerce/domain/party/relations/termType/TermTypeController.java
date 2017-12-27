@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.termType.query.FindTermTypes
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/termTypes")
 public class TermTypeController {
@@ -52,7 +54,7 @@ public class TermTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findTermTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<TermType>> findTermTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTermTypesBy query = new FindTermTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class TermTypeController {
 		}
 
 		List<TermType> termTypes =((TermTypeFound) Scheduler.execute(query).data()).getTermTypes();
-
-		if (termTypes.size() == 1) {
-			return ResponseEntity.ok().body(termTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(termTypes);
 
@@ -78,7 +76,7 @@ public class TermTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createTermType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<TermType> createTermType(HttpServletRequest request) throws Exception {
 
 		TermType termTypeToBeAdded = new TermType();
 		try {
@@ -86,7 +84,7 @@ public class TermTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createTermType(termTypeToBeAdded);
@@ -101,63 +99,15 @@ public class TermTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createTermType(@RequestBody TermType termTypeToBeAdded) throws Exception {
+	public ResponseEntity<TermType> createTermType(@RequestBody TermType termTypeToBeAdded) throws Exception {
 
 		AddTermType command = new AddTermType(termTypeToBeAdded);
 		TermType termType = ((TermTypeAdded) Scheduler.execute(command).data()).getAddedTermType();
 		
 		if (termType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(termType);
+			return successful(termType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("TermType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateTermType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		TermType termTypeToBeUpdated = new TermType();
-
-		try {
-			termTypeToBeUpdated = TermTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateTermType(termTypeToBeUpdated, termTypeToBeUpdated.getTermTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class TermTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{termTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateTermType(@RequestBody TermType termTypeToBeUpdated,
+	public ResponseEntity<String> updateTermType(@RequestBody TermType termTypeToBeUpdated,
 			@PathVariable String termTypeId) throws Exception {
 
 		termTypeToBeUpdated.setTermTypeId(termTypeId);
@@ -178,41 +128,44 @@ public class TermTypeController {
 
 		try {
 			if(((TermTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{termTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String termTypeId) throws Exception {
+	public ResponseEntity<TermType> findById(@PathVariable String termTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("termTypeId", termTypeId);
 		try {
 
-			Object foundTermType = findTermTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundTermType);
+			List<TermType> foundTermType = findTermTypesBy(requestParams).getBody();
+			if(foundTermType.size()==1){				return successful(foundTermType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{termTypeId}")
-	public ResponseEntity<Object> deleteTermTypeByIdUpdated(@PathVariable String termTypeId) throws Exception {
+	public ResponseEntity<String> deleteTermTypeByIdUpdated(@PathVariable String termTypeId) throws Exception {
 		DeleteTermType command = new DeleteTermType(termTypeId);
 
 		try {
 			if (((TermTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("TermType could not be deleted");
+		return conflict();
 
 	}
 

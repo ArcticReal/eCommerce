@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.metaDataPredicate.query.Fi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/metaDataPredicates")
 public class MetaDataPredicateController {
@@ -52,7 +54,7 @@ public class MetaDataPredicateController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findMetaDataPredicatesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<MetaDataPredicate>> findMetaDataPredicatesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindMetaDataPredicatesBy query = new FindMetaDataPredicatesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class MetaDataPredicateController {
 		}
 
 		List<MetaDataPredicate> metaDataPredicates =((MetaDataPredicateFound) Scheduler.execute(query).data()).getMetaDataPredicates();
-
-		if (metaDataPredicates.size() == 1) {
-			return ResponseEntity.ok().body(metaDataPredicates.get(0));
-		}
 
 		return ResponseEntity.ok().body(metaDataPredicates);
 
@@ -78,7 +76,7 @@ public class MetaDataPredicateController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createMetaDataPredicate(HttpServletRequest request) throws Exception {
+	public ResponseEntity<MetaDataPredicate> createMetaDataPredicate(HttpServletRequest request) throws Exception {
 
 		MetaDataPredicate metaDataPredicateToBeAdded = new MetaDataPredicate();
 		try {
@@ -86,7 +84,7 @@ public class MetaDataPredicateController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createMetaDataPredicate(metaDataPredicateToBeAdded);
@@ -101,63 +99,15 @@ public class MetaDataPredicateController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createMetaDataPredicate(@RequestBody MetaDataPredicate metaDataPredicateToBeAdded) throws Exception {
+	public ResponseEntity<MetaDataPredicate> createMetaDataPredicate(@RequestBody MetaDataPredicate metaDataPredicateToBeAdded) throws Exception {
 
 		AddMetaDataPredicate command = new AddMetaDataPredicate(metaDataPredicateToBeAdded);
 		MetaDataPredicate metaDataPredicate = ((MetaDataPredicateAdded) Scheduler.execute(command).data()).getAddedMetaDataPredicate();
 		
 		if (metaDataPredicate != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(metaDataPredicate);
+			return successful(metaDataPredicate);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("MetaDataPredicate could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateMetaDataPredicate(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		MetaDataPredicate metaDataPredicateToBeUpdated = new MetaDataPredicate();
-
-		try {
-			metaDataPredicateToBeUpdated = MetaDataPredicateMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateMetaDataPredicate(metaDataPredicateToBeUpdated, metaDataPredicateToBeUpdated.getMetaDataPredicateId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class MetaDataPredicateController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{metaDataPredicateId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateMetaDataPredicate(@RequestBody MetaDataPredicate metaDataPredicateToBeUpdated,
+	public ResponseEntity<String> updateMetaDataPredicate(@RequestBody MetaDataPredicate metaDataPredicateToBeUpdated,
 			@PathVariable String metaDataPredicateId) throws Exception {
 
 		metaDataPredicateToBeUpdated.setMetaDataPredicateId(metaDataPredicateId);
@@ -178,41 +128,44 @@ public class MetaDataPredicateController {
 
 		try {
 			if(((MetaDataPredicateUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{metaDataPredicateId}")
-	public ResponseEntity<Object> findById(@PathVariable String metaDataPredicateId) throws Exception {
+	public ResponseEntity<MetaDataPredicate> findById(@PathVariable String metaDataPredicateId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("metaDataPredicateId", metaDataPredicateId);
 		try {
 
-			Object foundMetaDataPredicate = findMetaDataPredicatesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundMetaDataPredicate);
+			List<MetaDataPredicate> foundMetaDataPredicate = findMetaDataPredicatesBy(requestParams).getBody();
+			if(foundMetaDataPredicate.size()==1){				return successful(foundMetaDataPredicate.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{metaDataPredicateId}")
-	public ResponseEntity<Object> deleteMetaDataPredicateByIdUpdated(@PathVariable String metaDataPredicateId) throws Exception {
+	public ResponseEntity<String> deleteMetaDataPredicateByIdUpdated(@PathVariable String metaDataPredicateId) throws Exception {
 		DeleteMetaDataPredicate command = new DeleteMetaDataPredicate(metaDataPredicateId);
 
 		try {
 			if (((MetaDataPredicateDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("MetaDataPredicate could not be deleted");
+		return conflict();
 
 	}
 

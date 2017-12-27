@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.orderHeader.query.note.FindO
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/orderHeader/orderHeaderNotes")
 public class OrderHeaderNoteController {
@@ -52,7 +54,7 @@ public class OrderHeaderNoteController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findOrderHeaderNotesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OrderHeaderNote>> findOrderHeaderNotesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderHeaderNotesBy query = new FindOrderHeaderNotesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class OrderHeaderNoteController {
 		}
 
 		List<OrderHeaderNote> orderHeaderNotes =((OrderHeaderNoteFound) Scheduler.execute(query).data()).getOrderHeaderNotes();
-
-		if (orderHeaderNotes.size() == 1) {
-			return ResponseEntity.ok().body(orderHeaderNotes.get(0));
-		}
 
 		return ResponseEntity.ok().body(orderHeaderNotes);
 
@@ -78,7 +76,7 @@ public class OrderHeaderNoteController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOrderHeaderNote(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OrderHeaderNote> createOrderHeaderNote(HttpServletRequest request) throws Exception {
 
 		OrderHeaderNote orderHeaderNoteToBeAdded = new OrderHeaderNote();
 		try {
@@ -86,7 +84,7 @@ public class OrderHeaderNoteController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createOrderHeaderNote(orderHeaderNoteToBeAdded);
@@ -101,63 +99,15 @@ public class OrderHeaderNoteController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOrderHeaderNote(@RequestBody OrderHeaderNote orderHeaderNoteToBeAdded) throws Exception {
+	public ResponseEntity<OrderHeaderNote> createOrderHeaderNote(@RequestBody OrderHeaderNote orderHeaderNoteToBeAdded) throws Exception {
 
 		AddOrderHeaderNote command = new AddOrderHeaderNote(orderHeaderNoteToBeAdded);
 		OrderHeaderNote orderHeaderNote = ((OrderHeaderNoteAdded) Scheduler.execute(command).data()).getAddedOrderHeaderNote();
 		
 		if (orderHeaderNote != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(orderHeaderNote);
+			return successful(orderHeaderNote);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OrderHeaderNote could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateOrderHeaderNote(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OrderHeaderNote orderHeaderNoteToBeUpdated = new OrderHeaderNote();
-
-		try {
-			orderHeaderNoteToBeUpdated = OrderHeaderNoteMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOrderHeaderNote(orderHeaderNoteToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class OrderHeaderNoteController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOrderHeaderNote(@RequestBody OrderHeaderNote orderHeaderNoteToBeUpdated,
+	public ResponseEntity<String> updateOrderHeaderNote(@RequestBody OrderHeaderNote orderHeaderNoteToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		orderHeaderNoteToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class OrderHeaderNoteController {
 
 		try {
 			if(((OrderHeaderNoteUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{orderHeaderNoteId}")
-	public ResponseEntity<Object> findById(@PathVariable String orderHeaderNoteId) throws Exception {
+	public ResponseEntity<OrderHeaderNote> findById(@PathVariable String orderHeaderNoteId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderHeaderNoteId", orderHeaderNoteId);
 		try {
 
-			Object foundOrderHeaderNote = findOrderHeaderNotesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOrderHeaderNote);
+			List<OrderHeaderNote> foundOrderHeaderNote = findOrderHeaderNotesBy(requestParams).getBody();
+			if(foundOrderHeaderNote.size()==1){				return successful(foundOrderHeaderNote.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{orderHeaderNoteId}")
-	public ResponseEntity<Object> deleteOrderHeaderNoteByIdUpdated(@PathVariable String orderHeaderNoteId) throws Exception {
+	public ResponseEntity<String> deleteOrderHeaderNoteByIdUpdated(@PathVariable String orderHeaderNoteId) throws Exception {
 		DeleteOrderHeaderNote command = new DeleteOrderHeaderNote(orderHeaderNoteId);
 
 		try {
 			if (((OrderHeaderNoteDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("OrderHeaderNote could not be deleted");
+		return conflict();
 
 	}
 

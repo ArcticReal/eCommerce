@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.orderHeader.query.workEffort
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/orderHeader/orderHeaderWorkEfforts")
 public class OrderHeaderWorkEffortController {
@@ -52,7 +54,7 @@ public class OrderHeaderWorkEffortController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findOrderHeaderWorkEffortsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OrderHeaderWorkEffort>> findOrderHeaderWorkEffortsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderHeaderWorkEffortsBy query = new FindOrderHeaderWorkEffortsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class OrderHeaderWorkEffortController {
 		}
 
 		List<OrderHeaderWorkEffort> orderHeaderWorkEfforts =((OrderHeaderWorkEffortFound) Scheduler.execute(query).data()).getOrderHeaderWorkEfforts();
-
-		if (orderHeaderWorkEfforts.size() == 1) {
-			return ResponseEntity.ok().body(orderHeaderWorkEfforts.get(0));
-		}
 
 		return ResponseEntity.ok().body(orderHeaderWorkEfforts);
 
@@ -78,7 +76,7 @@ public class OrderHeaderWorkEffortController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOrderHeaderWorkEffort(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OrderHeaderWorkEffort> createOrderHeaderWorkEffort(HttpServletRequest request) throws Exception {
 
 		OrderHeaderWorkEffort orderHeaderWorkEffortToBeAdded = new OrderHeaderWorkEffort();
 		try {
@@ -86,7 +84,7 @@ public class OrderHeaderWorkEffortController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createOrderHeaderWorkEffort(orderHeaderWorkEffortToBeAdded);
@@ -101,63 +99,15 @@ public class OrderHeaderWorkEffortController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOrderHeaderWorkEffort(@RequestBody OrderHeaderWorkEffort orderHeaderWorkEffortToBeAdded) throws Exception {
+	public ResponseEntity<OrderHeaderWorkEffort> createOrderHeaderWorkEffort(@RequestBody OrderHeaderWorkEffort orderHeaderWorkEffortToBeAdded) throws Exception {
 
 		AddOrderHeaderWorkEffort command = new AddOrderHeaderWorkEffort(orderHeaderWorkEffortToBeAdded);
 		OrderHeaderWorkEffort orderHeaderWorkEffort = ((OrderHeaderWorkEffortAdded) Scheduler.execute(command).data()).getAddedOrderHeaderWorkEffort();
 		
 		if (orderHeaderWorkEffort != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(orderHeaderWorkEffort);
+			return successful(orderHeaderWorkEffort);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OrderHeaderWorkEffort could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateOrderHeaderWorkEffort(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OrderHeaderWorkEffort orderHeaderWorkEffortToBeUpdated = new OrderHeaderWorkEffort();
-
-		try {
-			orderHeaderWorkEffortToBeUpdated = OrderHeaderWorkEffortMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOrderHeaderWorkEffort(orderHeaderWorkEffortToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class OrderHeaderWorkEffortController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOrderHeaderWorkEffort(@RequestBody OrderHeaderWorkEffort orderHeaderWorkEffortToBeUpdated,
+	public ResponseEntity<String> updateOrderHeaderWorkEffort(@RequestBody OrderHeaderWorkEffort orderHeaderWorkEffortToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		orderHeaderWorkEffortToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class OrderHeaderWorkEffortController {
 
 		try {
 			if(((OrderHeaderWorkEffortUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{orderHeaderWorkEffortId}")
-	public ResponseEntity<Object> findById(@PathVariable String orderHeaderWorkEffortId) throws Exception {
+	public ResponseEntity<OrderHeaderWorkEffort> findById(@PathVariable String orderHeaderWorkEffortId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderHeaderWorkEffortId", orderHeaderWorkEffortId);
 		try {
 
-			Object foundOrderHeaderWorkEffort = findOrderHeaderWorkEffortsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOrderHeaderWorkEffort);
+			List<OrderHeaderWorkEffort> foundOrderHeaderWorkEffort = findOrderHeaderWorkEffortsBy(requestParams).getBody();
+			if(foundOrderHeaderWorkEffort.size()==1){				return successful(foundOrderHeaderWorkEffort.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{orderHeaderWorkEffortId}")
-	public ResponseEntity<Object> deleteOrderHeaderWorkEffortByIdUpdated(@PathVariable String orderHeaderWorkEffortId) throws Exception {
+	public ResponseEntity<String> deleteOrderHeaderWorkEffortByIdUpdated(@PathVariable String orderHeaderWorkEffortId) throws Exception {
 		DeleteOrderHeaderWorkEffort command = new DeleteOrderHeaderWorkEffort(orderHeaderWorkEffortId);
 
 		try {
 			if (((OrderHeaderWorkEffortDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("OrderHeaderWorkEffort could not be deleted");
+		return conflict();
 
 	}
 

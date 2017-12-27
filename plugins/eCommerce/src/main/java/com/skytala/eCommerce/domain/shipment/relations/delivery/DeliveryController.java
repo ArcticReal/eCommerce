@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.shipment.relations.delivery.query.FindDelive
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/shipment/deliverys")
 public class DeliveryController {
@@ -52,7 +54,7 @@ public class DeliveryController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findDeliverysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<Delivery>> findDeliverysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDeliverysBy query = new FindDeliverysBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class DeliveryController {
 		}
 
 		List<Delivery> deliverys =((DeliveryFound) Scheduler.execute(query).data()).getDeliverys();
-
-		if (deliverys.size() == 1) {
-			return ResponseEntity.ok().body(deliverys.get(0));
-		}
 
 		return ResponseEntity.ok().body(deliverys);
 
@@ -78,7 +76,7 @@ public class DeliveryController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createDelivery(HttpServletRequest request) throws Exception {
+	public ResponseEntity<Delivery> createDelivery(HttpServletRequest request) throws Exception {
 
 		Delivery deliveryToBeAdded = new Delivery();
 		try {
@@ -86,7 +84,7 @@ public class DeliveryController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createDelivery(deliveryToBeAdded);
@@ -101,63 +99,15 @@ public class DeliveryController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createDelivery(@RequestBody Delivery deliveryToBeAdded) throws Exception {
+	public ResponseEntity<Delivery> createDelivery(@RequestBody Delivery deliveryToBeAdded) throws Exception {
 
 		AddDelivery command = new AddDelivery(deliveryToBeAdded);
 		Delivery delivery = ((DeliveryAdded) Scheduler.execute(command).data()).getAddedDelivery();
 		
 		if (delivery != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(delivery);
+			return successful(delivery);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("Delivery could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateDelivery(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		Delivery deliveryToBeUpdated = new Delivery();
-
-		try {
-			deliveryToBeUpdated = DeliveryMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateDelivery(deliveryToBeUpdated, deliveryToBeUpdated.getDeliveryId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class DeliveryController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{deliveryId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateDelivery(@RequestBody Delivery deliveryToBeUpdated,
+	public ResponseEntity<String> updateDelivery(@RequestBody Delivery deliveryToBeUpdated,
 			@PathVariable String deliveryId) throws Exception {
 
 		deliveryToBeUpdated.setDeliveryId(deliveryId);
@@ -178,41 +128,44 @@ public class DeliveryController {
 
 		try {
 			if(((DeliveryUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{deliveryId}")
-	public ResponseEntity<Object> findById(@PathVariable String deliveryId) throws Exception {
+	public ResponseEntity<Delivery> findById(@PathVariable String deliveryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("deliveryId", deliveryId);
 		try {
 
-			Object foundDelivery = findDeliverysBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundDelivery);
+			List<Delivery> foundDelivery = findDeliverysBy(requestParams).getBody();
+			if(foundDelivery.size()==1){				return successful(foundDelivery.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{deliveryId}")
-	public ResponseEntity<Object> deleteDeliveryByIdUpdated(@PathVariable String deliveryId) throws Exception {
+	public ResponseEntity<String> deleteDeliveryByIdUpdated(@PathVariable String deliveryId) throws Exception {
 		DeleteDelivery command = new DeleteDelivery(deliveryId);
 
 		try {
 			if (((DeliveryDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("Delivery could not be deleted");
+		return conflict();
 
 	}
 

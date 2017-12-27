@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.giftCard.query.FindGift
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/giftCards")
 public class GiftCardController {
@@ -52,7 +54,7 @@ public class GiftCardController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findGiftCardsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<GiftCard>> findGiftCardsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGiftCardsBy query = new FindGiftCardsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class GiftCardController {
 		}
 
 		List<GiftCard> giftCards =((GiftCardFound) Scheduler.execute(query).data()).getGiftCards();
-
-		if (giftCards.size() == 1) {
-			return ResponseEntity.ok().body(giftCards.get(0));
-		}
 
 		return ResponseEntity.ok().body(giftCards);
 
@@ -78,7 +76,7 @@ public class GiftCardController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createGiftCard(HttpServletRequest request) throws Exception {
+	public ResponseEntity<GiftCard> createGiftCard(HttpServletRequest request) throws Exception {
 
 		GiftCard giftCardToBeAdded = new GiftCard();
 		try {
@@ -86,7 +84,7 @@ public class GiftCardController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createGiftCard(giftCardToBeAdded);
@@ -101,63 +99,15 @@ public class GiftCardController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createGiftCard(@RequestBody GiftCard giftCardToBeAdded) throws Exception {
+	public ResponseEntity<GiftCard> createGiftCard(@RequestBody GiftCard giftCardToBeAdded) throws Exception {
 
 		AddGiftCard command = new AddGiftCard(giftCardToBeAdded);
 		GiftCard giftCard = ((GiftCardAdded) Scheduler.execute(command).data()).getAddedGiftCard();
 		
 		if (giftCard != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(giftCard);
+			return successful(giftCard);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("GiftCard could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateGiftCard(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		GiftCard giftCardToBeUpdated = new GiftCard();
-
-		try {
-			giftCardToBeUpdated = GiftCardMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateGiftCard(giftCardToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class GiftCardController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateGiftCard(@RequestBody GiftCard giftCardToBeUpdated,
+	public ResponseEntity<String> updateGiftCard(@RequestBody GiftCard giftCardToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		giftCardToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class GiftCardController {
 
 		try {
 			if(((GiftCardUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{giftCardId}")
-	public ResponseEntity<Object> findById(@PathVariable String giftCardId) throws Exception {
+	public ResponseEntity<GiftCard> findById(@PathVariable String giftCardId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("giftCardId", giftCardId);
 		try {
 
-			Object foundGiftCard = findGiftCardsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundGiftCard);
+			List<GiftCard> foundGiftCard = findGiftCardsBy(requestParams).getBody();
+			if(foundGiftCard.size()==1){				return successful(foundGiftCard.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{giftCardId}")
-	public ResponseEntity<Object> deleteGiftCardByIdUpdated(@PathVariable String giftCardId) throws Exception {
+	public ResponseEntity<String> deleteGiftCardByIdUpdated(@PathVariable String giftCardId) throws Exception {
 		DeleteGiftCard command = new DeleteGiftCard(giftCardId);
 
 		try {
 			if (((GiftCardDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("GiftCard could not be deleted");
+		return conflict();
 
 	}
 

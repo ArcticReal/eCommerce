@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.humanres.relations.payrollPreference.query.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/humanres/payrollPreferences")
 public class PayrollPreferenceController {
@@ -52,7 +54,7 @@ public class PayrollPreferenceController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPayrollPreferencesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PayrollPreference>> findPayrollPreferencesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPayrollPreferencesBy query = new FindPayrollPreferencesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PayrollPreferenceController {
 		}
 
 		List<PayrollPreference> payrollPreferences =((PayrollPreferenceFound) Scheduler.execute(query).data()).getPayrollPreferences();
-
-		if (payrollPreferences.size() == 1) {
-			return ResponseEntity.ok().body(payrollPreferences.get(0));
-		}
 
 		return ResponseEntity.ok().body(payrollPreferences);
 
@@ -78,7 +76,7 @@ public class PayrollPreferenceController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPayrollPreference(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PayrollPreference> createPayrollPreference(HttpServletRequest request) throws Exception {
 
 		PayrollPreference payrollPreferenceToBeAdded = new PayrollPreference();
 		try {
@@ -86,7 +84,7 @@ public class PayrollPreferenceController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPayrollPreference(payrollPreferenceToBeAdded);
@@ -101,63 +99,15 @@ public class PayrollPreferenceController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPayrollPreference(@RequestBody PayrollPreference payrollPreferenceToBeAdded) throws Exception {
+	public ResponseEntity<PayrollPreference> createPayrollPreference(@RequestBody PayrollPreference payrollPreferenceToBeAdded) throws Exception {
 
 		AddPayrollPreference command = new AddPayrollPreference(payrollPreferenceToBeAdded);
 		PayrollPreference payrollPreference = ((PayrollPreferenceAdded) Scheduler.execute(command).data()).getAddedPayrollPreference();
 		
 		if (payrollPreference != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(payrollPreference);
+			return successful(payrollPreference);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PayrollPreference could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePayrollPreference(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PayrollPreference payrollPreferenceToBeUpdated = new PayrollPreference();
-
-		try {
-			payrollPreferenceToBeUpdated = PayrollPreferenceMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePayrollPreference(payrollPreferenceToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PayrollPreferenceController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePayrollPreference(@RequestBody PayrollPreference payrollPreferenceToBeUpdated,
+	public ResponseEntity<String> updatePayrollPreference(@RequestBody PayrollPreference payrollPreferenceToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		payrollPreferenceToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class PayrollPreferenceController {
 
 		try {
 			if(((PayrollPreferenceUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{payrollPreferenceId}")
-	public ResponseEntity<Object> findById(@PathVariable String payrollPreferenceId) throws Exception {
+	public ResponseEntity<PayrollPreference> findById(@PathVariable String payrollPreferenceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("payrollPreferenceId", payrollPreferenceId);
 		try {
 
-			Object foundPayrollPreference = findPayrollPreferencesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPayrollPreference);
+			List<PayrollPreference> foundPayrollPreference = findPayrollPreferencesBy(requestParams).getBody();
+			if(foundPayrollPreference.size()==1){				return successful(foundPayrollPreference.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{payrollPreferenceId}")
-	public ResponseEntity<Object> deletePayrollPreferenceByIdUpdated(@PathVariable String payrollPreferenceId) throws Exception {
+	public ResponseEntity<String> deletePayrollPreferenceByIdUpdated(@PathVariable String payrollPreferenceId) throws Exception {
 		DeletePayrollPreference command = new DeletePayrollPreference(payrollPreferenceId);
 
 		try {
 			if (((PayrollPreferenceDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PayrollPreference could not be deleted");
+		return conflict();
 
 	}
 

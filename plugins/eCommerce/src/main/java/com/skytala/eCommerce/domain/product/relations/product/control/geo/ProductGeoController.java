@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.geo.FindProd
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productGeos")
 public class ProductGeoController {
@@ -52,7 +54,7 @@ public class ProductGeoController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductGeosBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductGeo>> findProductGeosBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductGeosBy query = new FindProductGeosBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductGeoController {
 		}
 
 		List<ProductGeo> productGeos =((ProductGeoFound) Scheduler.execute(query).data()).getProductGeos();
-
-		if (productGeos.size() == 1) {
-			return ResponseEntity.ok().body(productGeos.get(0));
-		}
 
 		return ResponseEntity.ok().body(productGeos);
 
@@ -78,7 +76,7 @@ public class ProductGeoController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductGeo(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductGeo> createProductGeo(HttpServletRequest request) throws Exception {
 
 		ProductGeo productGeoToBeAdded = new ProductGeo();
 		try {
@@ -86,7 +84,7 @@ public class ProductGeoController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductGeo(productGeoToBeAdded);
@@ -101,63 +99,15 @@ public class ProductGeoController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductGeo(@RequestBody ProductGeo productGeoToBeAdded) throws Exception {
+	public ResponseEntity<ProductGeo> createProductGeo(@RequestBody ProductGeo productGeoToBeAdded) throws Exception {
 
 		AddProductGeo command = new AddProductGeo(productGeoToBeAdded);
 		ProductGeo productGeo = ((ProductGeoAdded) Scheduler.execute(command).data()).getAddedProductGeo();
 		
 		if (productGeo != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productGeo);
+			return successful(productGeo);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductGeo could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductGeo(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductGeo productGeoToBeUpdated = new ProductGeo();
-
-		try {
-			productGeoToBeUpdated = ProductGeoMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductGeo(productGeoToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductGeoController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductGeo(@RequestBody ProductGeo productGeoToBeUpdated,
+	public ResponseEntity<String> updateProductGeo(@RequestBody ProductGeo productGeoToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		productGeoToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ProductGeoController {
 
 		try {
 			if(((ProductGeoUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productGeoId}")
-	public ResponseEntity<Object> findById(@PathVariable String productGeoId) throws Exception {
+	public ResponseEntity<ProductGeo> findById(@PathVariable String productGeoId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productGeoId", productGeoId);
 		try {
 
-			Object foundProductGeo = findProductGeosBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductGeo);
+			List<ProductGeo> foundProductGeo = findProductGeosBy(requestParams).getBody();
+			if(foundProductGeo.size()==1){				return successful(foundProductGeo.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productGeoId}")
-	public ResponseEntity<Object> deleteProductGeoByIdUpdated(@PathVariable String productGeoId) throws Exception {
+	public ResponseEntity<String> deleteProductGeoByIdUpdated(@PathVariable String productGeoId) throws Exception {
 		DeleteProductGeo command = new DeleteProductGeo(productGeoId);
 
 		try {
 			if (((ProductGeoDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductGeo could not be deleted");
+		return conflict();
 
 	}
 

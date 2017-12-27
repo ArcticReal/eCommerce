@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.orderItem.query.shipGroupAss
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/orderItem/orderItemShipGroupAssocs")
 public class OrderItemShipGroupAssocController {
@@ -52,7 +54,7 @@ public class OrderItemShipGroupAssocController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findOrderItemShipGroupAssocsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OrderItemShipGroupAssoc>> findOrderItemShipGroupAssocsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderItemShipGroupAssocsBy query = new FindOrderItemShipGroupAssocsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class OrderItemShipGroupAssocController {
 		}
 
 		List<OrderItemShipGroupAssoc> orderItemShipGroupAssocs =((OrderItemShipGroupAssocFound) Scheduler.execute(query).data()).getOrderItemShipGroupAssocs();
-
-		if (orderItemShipGroupAssocs.size() == 1) {
-			return ResponseEntity.ok().body(orderItemShipGroupAssocs.get(0));
-		}
 
 		return ResponseEntity.ok().body(orderItemShipGroupAssocs);
 
@@ -78,7 +76,7 @@ public class OrderItemShipGroupAssocController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOrderItemShipGroupAssoc(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OrderItemShipGroupAssoc> createOrderItemShipGroupAssoc(HttpServletRequest request) throws Exception {
 
 		OrderItemShipGroupAssoc orderItemShipGroupAssocToBeAdded = new OrderItemShipGroupAssoc();
 		try {
@@ -86,7 +84,7 @@ public class OrderItemShipGroupAssocController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createOrderItemShipGroupAssoc(orderItemShipGroupAssocToBeAdded);
@@ -101,63 +99,15 @@ public class OrderItemShipGroupAssocController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOrderItemShipGroupAssoc(@RequestBody OrderItemShipGroupAssoc orderItemShipGroupAssocToBeAdded) throws Exception {
+	public ResponseEntity<OrderItemShipGroupAssoc> createOrderItemShipGroupAssoc(@RequestBody OrderItemShipGroupAssoc orderItemShipGroupAssocToBeAdded) throws Exception {
 
 		AddOrderItemShipGroupAssoc command = new AddOrderItemShipGroupAssoc(orderItemShipGroupAssocToBeAdded);
 		OrderItemShipGroupAssoc orderItemShipGroupAssoc = ((OrderItemShipGroupAssocAdded) Scheduler.execute(command).data()).getAddedOrderItemShipGroupAssoc();
 		
 		if (orderItemShipGroupAssoc != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(orderItemShipGroupAssoc);
+			return successful(orderItemShipGroupAssoc);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OrderItemShipGroupAssoc could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateOrderItemShipGroupAssoc(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OrderItemShipGroupAssoc orderItemShipGroupAssocToBeUpdated = new OrderItemShipGroupAssoc();
-
-		try {
-			orderItemShipGroupAssocToBeUpdated = OrderItemShipGroupAssocMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOrderItemShipGroupAssoc(orderItemShipGroupAssocToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class OrderItemShipGroupAssocController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOrderItemShipGroupAssoc(@RequestBody OrderItemShipGroupAssoc orderItemShipGroupAssocToBeUpdated,
+	public ResponseEntity<String> updateOrderItemShipGroupAssoc(@RequestBody OrderItemShipGroupAssoc orderItemShipGroupAssocToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		orderItemShipGroupAssocToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class OrderItemShipGroupAssocController {
 
 		try {
 			if(((OrderItemShipGroupAssocUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{orderItemShipGroupAssocId}")
-	public ResponseEntity<Object> findById(@PathVariable String orderItemShipGroupAssocId) throws Exception {
+	public ResponseEntity<OrderItemShipGroupAssoc> findById(@PathVariable String orderItemShipGroupAssocId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderItemShipGroupAssocId", orderItemShipGroupAssocId);
 		try {
 
-			Object foundOrderItemShipGroupAssoc = findOrderItemShipGroupAssocsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOrderItemShipGroupAssoc);
+			List<OrderItemShipGroupAssoc> foundOrderItemShipGroupAssoc = findOrderItemShipGroupAssocsBy(requestParams).getBody();
+			if(foundOrderItemShipGroupAssoc.size()==1){				return successful(foundOrderItemShipGroupAssoc.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{orderItemShipGroupAssocId}")
-	public ResponseEntity<Object> deleteOrderItemShipGroupAssocByIdUpdated(@PathVariable String orderItemShipGroupAssocId) throws Exception {
+	public ResponseEntity<String> deleteOrderItemShipGroupAssocByIdUpdated(@PathVariable String orderItemShipGroupAssocId) throws Exception {
 		DeleteOrderItemShipGroupAssoc command = new DeleteOrderItemShipGroupAssoc(orderItemShipGroupAssocId);
 
 		try {
 			if (((OrderItemShipGroupAssocDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("OrderItemShipGroupAssoc could not be deleted");
+		return conflict();
 
 	}
 

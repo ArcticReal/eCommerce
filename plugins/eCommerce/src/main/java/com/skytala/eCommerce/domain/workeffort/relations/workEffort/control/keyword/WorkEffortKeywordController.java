@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.workeffort.relations.workEffort.query.keywor
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/workeffort/workEffort/workEffortKeywords")
 public class WorkEffortKeywordController {
@@ -52,7 +54,7 @@ public class WorkEffortKeywordController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWorkEffortKeywordsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WorkEffortKeyword>> findWorkEffortKeywordsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortKeywordsBy query = new FindWorkEffortKeywordsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WorkEffortKeywordController {
 		}
 
 		List<WorkEffortKeyword> workEffortKeywords =((WorkEffortKeywordFound) Scheduler.execute(query).data()).getWorkEffortKeywords();
-
-		if (workEffortKeywords.size() == 1) {
-			return ResponseEntity.ok().body(workEffortKeywords.get(0));
-		}
 
 		return ResponseEntity.ok().body(workEffortKeywords);
 
@@ -78,7 +76,7 @@ public class WorkEffortKeywordController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWorkEffortKeyword(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WorkEffortKeyword> createWorkEffortKeyword(HttpServletRequest request) throws Exception {
 
 		WorkEffortKeyword workEffortKeywordToBeAdded = new WorkEffortKeyword();
 		try {
@@ -86,7 +84,7 @@ public class WorkEffortKeywordController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWorkEffortKeyword(workEffortKeywordToBeAdded);
@@ -101,63 +99,15 @@ public class WorkEffortKeywordController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWorkEffortKeyword(@RequestBody WorkEffortKeyword workEffortKeywordToBeAdded) throws Exception {
+	public ResponseEntity<WorkEffortKeyword> createWorkEffortKeyword(@RequestBody WorkEffortKeyword workEffortKeywordToBeAdded) throws Exception {
 
 		AddWorkEffortKeyword command = new AddWorkEffortKeyword(workEffortKeywordToBeAdded);
 		WorkEffortKeyword workEffortKeyword = ((WorkEffortKeywordAdded) Scheduler.execute(command).data()).getAddedWorkEffortKeyword();
 		
 		if (workEffortKeyword != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(workEffortKeyword);
+			return successful(workEffortKeyword);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WorkEffortKeyword could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWorkEffortKeyword(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WorkEffortKeyword workEffortKeywordToBeUpdated = new WorkEffortKeyword();
-
-		try {
-			workEffortKeywordToBeUpdated = WorkEffortKeywordMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWorkEffortKeyword(workEffortKeywordToBeUpdated, workEffortKeywordToBeUpdated.getKeyword()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WorkEffortKeywordController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{keyword}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWorkEffortKeyword(@RequestBody WorkEffortKeyword workEffortKeywordToBeUpdated,
+	public ResponseEntity<String> updateWorkEffortKeyword(@RequestBody WorkEffortKeyword workEffortKeywordToBeUpdated,
 			@PathVariable String keyword) throws Exception {
 
 		workEffortKeywordToBeUpdated.setKeyword(keyword);
@@ -178,41 +128,44 @@ public class WorkEffortKeywordController {
 
 		try {
 			if(((WorkEffortKeywordUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{workEffortKeywordId}")
-	public ResponseEntity<Object> findById(@PathVariable String workEffortKeywordId) throws Exception {
+	public ResponseEntity<WorkEffortKeyword> findById(@PathVariable String workEffortKeywordId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortKeywordId", workEffortKeywordId);
 		try {
 
-			Object foundWorkEffortKeyword = findWorkEffortKeywordsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWorkEffortKeyword);
+			List<WorkEffortKeyword> foundWorkEffortKeyword = findWorkEffortKeywordsBy(requestParams).getBody();
+			if(foundWorkEffortKeyword.size()==1){				return successful(foundWorkEffortKeyword.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{workEffortKeywordId}")
-	public ResponseEntity<Object> deleteWorkEffortKeywordByIdUpdated(@PathVariable String workEffortKeywordId) throws Exception {
+	public ResponseEntity<String> deleteWorkEffortKeywordByIdUpdated(@PathVariable String workEffortKeywordId) throws Exception {
 		DeleteWorkEffortKeyword command = new DeleteWorkEffortKeyword(workEffortKeywordId);
 
 		try {
 			if (((WorkEffortKeywordDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WorkEffortKeyword could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.shipment.relations.shipment.query.contactMec
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/shipment/shipment/shipmentContactMechTypes")
 public class ShipmentContactMechTypeController {
@@ -52,7 +54,7 @@ public class ShipmentContactMechTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findShipmentContactMechTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ShipmentContactMechType>> findShipmentContactMechTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentContactMechTypesBy query = new FindShipmentContactMechTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ShipmentContactMechTypeController {
 		}
 
 		List<ShipmentContactMechType> shipmentContactMechTypes =((ShipmentContactMechTypeFound) Scheduler.execute(query).data()).getShipmentContactMechTypes();
-
-		if (shipmentContactMechTypes.size() == 1) {
-			return ResponseEntity.ok().body(shipmentContactMechTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(shipmentContactMechTypes);
 
@@ -78,7 +76,7 @@ public class ShipmentContactMechTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createShipmentContactMechType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ShipmentContactMechType> createShipmentContactMechType(HttpServletRequest request) throws Exception {
 
 		ShipmentContactMechType shipmentContactMechTypeToBeAdded = new ShipmentContactMechType();
 		try {
@@ -86,7 +84,7 @@ public class ShipmentContactMechTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createShipmentContactMechType(shipmentContactMechTypeToBeAdded);
@@ -101,63 +99,15 @@ public class ShipmentContactMechTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createShipmentContactMechType(@RequestBody ShipmentContactMechType shipmentContactMechTypeToBeAdded) throws Exception {
+	public ResponseEntity<ShipmentContactMechType> createShipmentContactMechType(@RequestBody ShipmentContactMechType shipmentContactMechTypeToBeAdded) throws Exception {
 
 		AddShipmentContactMechType command = new AddShipmentContactMechType(shipmentContactMechTypeToBeAdded);
 		ShipmentContactMechType shipmentContactMechType = ((ShipmentContactMechTypeAdded) Scheduler.execute(command).data()).getAddedShipmentContactMechType();
 		
 		if (shipmentContactMechType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(shipmentContactMechType);
+			return successful(shipmentContactMechType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ShipmentContactMechType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateShipmentContactMechType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ShipmentContactMechType shipmentContactMechTypeToBeUpdated = new ShipmentContactMechType();
-
-		try {
-			shipmentContactMechTypeToBeUpdated = ShipmentContactMechTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateShipmentContactMechType(shipmentContactMechTypeToBeUpdated, shipmentContactMechTypeToBeUpdated.getShipmentContactMechTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ShipmentContactMechTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{shipmentContactMechTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateShipmentContactMechType(@RequestBody ShipmentContactMechType shipmentContactMechTypeToBeUpdated,
+	public ResponseEntity<String> updateShipmentContactMechType(@RequestBody ShipmentContactMechType shipmentContactMechTypeToBeUpdated,
 			@PathVariable String shipmentContactMechTypeId) throws Exception {
 
 		shipmentContactMechTypeToBeUpdated.setShipmentContactMechTypeId(shipmentContactMechTypeId);
@@ -178,41 +128,44 @@ public class ShipmentContactMechTypeController {
 
 		try {
 			if(((ShipmentContactMechTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{shipmentContactMechTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String shipmentContactMechTypeId) throws Exception {
+	public ResponseEntity<ShipmentContactMechType> findById(@PathVariable String shipmentContactMechTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentContactMechTypeId", shipmentContactMechTypeId);
 		try {
 
-			Object foundShipmentContactMechType = findShipmentContactMechTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundShipmentContactMechType);
+			List<ShipmentContactMechType> foundShipmentContactMechType = findShipmentContactMechTypesBy(requestParams).getBody();
+			if(foundShipmentContactMechType.size()==1){				return successful(foundShipmentContactMechType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{shipmentContactMechTypeId}")
-	public ResponseEntity<Object> deleteShipmentContactMechTypeByIdUpdated(@PathVariable String shipmentContactMechTypeId) throws Exception {
+	public ResponseEntity<String> deleteShipmentContactMechTypeByIdUpdated(@PathVariable String shipmentContactMechTypeId) throws Exception {
 		DeleteShipmentContactMechType command = new DeleteShipmentContactMechType(shipmentContactMechTypeId);
 
 		try {
 			if (((ShipmentContactMechTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ShipmentContactMechType could not be deleted");
+		return conflict();
 
 	}
 

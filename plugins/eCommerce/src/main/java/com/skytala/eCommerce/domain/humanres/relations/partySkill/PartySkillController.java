@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.humanres.relations.partySkill.query.FindPart
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/humanres/partySkills")
 public class PartySkillController {
@@ -52,7 +54,7 @@ public class PartySkillController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPartySkillsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PartySkill>> findPartySkillsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartySkillsBy query = new FindPartySkillsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PartySkillController {
 		}
 
 		List<PartySkill> partySkills =((PartySkillFound) Scheduler.execute(query).data()).getPartySkills();
-
-		if (partySkills.size() == 1) {
-			return ResponseEntity.ok().body(partySkills.get(0));
-		}
 
 		return ResponseEntity.ok().body(partySkills);
 
@@ -78,7 +76,7 @@ public class PartySkillController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPartySkill(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PartySkill> createPartySkill(HttpServletRequest request) throws Exception {
 
 		PartySkill partySkillToBeAdded = new PartySkill();
 		try {
@@ -86,7 +84,7 @@ public class PartySkillController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPartySkill(partySkillToBeAdded);
@@ -101,63 +99,15 @@ public class PartySkillController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPartySkill(@RequestBody PartySkill partySkillToBeAdded) throws Exception {
+	public ResponseEntity<PartySkill> createPartySkill(@RequestBody PartySkill partySkillToBeAdded) throws Exception {
 
 		AddPartySkill command = new AddPartySkill(partySkillToBeAdded);
 		PartySkill partySkill = ((PartySkillAdded) Scheduler.execute(command).data()).getAddedPartySkill();
 		
 		if (partySkill != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(partySkill);
+			return successful(partySkill);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PartySkill could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePartySkill(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PartySkill partySkillToBeUpdated = new PartySkill();
-
-		try {
-			partySkillToBeUpdated = PartySkillMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePartySkill(partySkillToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PartySkillController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePartySkill(@RequestBody PartySkill partySkillToBeUpdated,
+	public ResponseEntity<String> updatePartySkill(@RequestBody PartySkill partySkillToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		partySkillToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class PartySkillController {
 
 		try {
 			if(((PartySkillUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{partySkillId}")
-	public ResponseEntity<Object> findById(@PathVariable String partySkillId) throws Exception {
+	public ResponseEntity<PartySkill> findById(@PathVariable String partySkillId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partySkillId", partySkillId);
 		try {
 
-			Object foundPartySkill = findPartySkillsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPartySkill);
+			List<PartySkill> foundPartySkill = findPartySkillsBy(requestParams).getBody();
+			if(foundPartySkill.size()==1){				return successful(foundPartySkill.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{partySkillId}")
-	public ResponseEntity<Object> deletePartySkillByIdUpdated(@PathVariable String partySkillId) throws Exception {
+	public ResponseEntity<String> deletePartySkillByIdUpdated(@PathVariable String partySkillId) throws Exception {
 		DeletePartySkill command = new DeletePartySkill(partySkillId);
 
 		try {
 			if (((PartySkillDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PartySkill could not be deleted");
+		return conflict();
 
 	}
 

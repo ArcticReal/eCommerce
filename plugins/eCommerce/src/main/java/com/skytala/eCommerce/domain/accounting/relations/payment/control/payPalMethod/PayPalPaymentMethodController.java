@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.payment.query.payPalMet
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/payment/payPalPaymentMethods")
 public class PayPalPaymentMethodController {
@@ -52,7 +54,7 @@ public class PayPalPaymentMethodController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPayPalPaymentMethodsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PayPalPaymentMethod>> findPayPalPaymentMethodsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPayPalPaymentMethodsBy query = new FindPayPalPaymentMethodsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PayPalPaymentMethodController {
 		}
 
 		List<PayPalPaymentMethod> payPalPaymentMethods =((PayPalPaymentMethodFound) Scheduler.execute(query).data()).getPayPalPaymentMethods();
-
-		if (payPalPaymentMethods.size() == 1) {
-			return ResponseEntity.ok().body(payPalPaymentMethods.get(0));
-		}
 
 		return ResponseEntity.ok().body(payPalPaymentMethods);
 
@@ -78,7 +76,7 @@ public class PayPalPaymentMethodController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPayPalPaymentMethod(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PayPalPaymentMethod> createPayPalPaymentMethod(HttpServletRequest request) throws Exception {
 
 		PayPalPaymentMethod payPalPaymentMethodToBeAdded = new PayPalPaymentMethod();
 		try {
@@ -86,7 +84,7 @@ public class PayPalPaymentMethodController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPayPalPaymentMethod(payPalPaymentMethodToBeAdded);
@@ -101,63 +99,15 @@ public class PayPalPaymentMethodController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPayPalPaymentMethod(@RequestBody PayPalPaymentMethod payPalPaymentMethodToBeAdded) throws Exception {
+	public ResponseEntity<PayPalPaymentMethod> createPayPalPaymentMethod(@RequestBody PayPalPaymentMethod payPalPaymentMethodToBeAdded) throws Exception {
 
 		AddPayPalPaymentMethod command = new AddPayPalPaymentMethod(payPalPaymentMethodToBeAdded);
 		PayPalPaymentMethod payPalPaymentMethod = ((PayPalPaymentMethodAdded) Scheduler.execute(command).data()).getAddedPayPalPaymentMethod();
 		
 		if (payPalPaymentMethod != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(payPalPaymentMethod);
+			return successful(payPalPaymentMethod);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PayPalPaymentMethod could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePayPalPaymentMethod(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PayPalPaymentMethod payPalPaymentMethodToBeUpdated = new PayPalPaymentMethod();
-
-		try {
-			payPalPaymentMethodToBeUpdated = PayPalPaymentMethodMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePayPalPaymentMethod(payPalPaymentMethodToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PayPalPaymentMethodController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePayPalPaymentMethod(@RequestBody PayPalPaymentMethod payPalPaymentMethodToBeUpdated,
+	public ResponseEntity<String> updatePayPalPaymentMethod(@RequestBody PayPalPaymentMethod payPalPaymentMethodToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		payPalPaymentMethodToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class PayPalPaymentMethodController {
 
 		try {
 			if(((PayPalPaymentMethodUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{payPalPaymentMethodId}")
-	public ResponseEntity<Object> findById(@PathVariable String payPalPaymentMethodId) throws Exception {
+	public ResponseEntity<PayPalPaymentMethod> findById(@PathVariable String payPalPaymentMethodId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("payPalPaymentMethodId", payPalPaymentMethodId);
 		try {
 
-			Object foundPayPalPaymentMethod = findPayPalPaymentMethodsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPayPalPaymentMethod);
+			List<PayPalPaymentMethod> foundPayPalPaymentMethod = findPayPalPaymentMethodsBy(requestParams).getBody();
+			if(foundPayPalPaymentMethod.size()==1){				return successful(foundPayPalPaymentMethod.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{payPalPaymentMethodId}")
-	public ResponseEntity<Object> deletePayPalPaymentMethodByIdUpdated(@PathVariable String payPalPaymentMethodId) throws Exception {
+	public ResponseEntity<String> deletePayPalPaymentMethodByIdUpdated(@PathVariable String payPalPaymentMethodId) throws Exception {
 		DeletePayPalPaymentMethod command = new DeletePayPalPaymentMethod(payPalPaymentMethodId);
 
 		try {
 			if (((PayPalPaymentMethodDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PayPalPaymentMethod could not be deleted");
+		return conflict();
 
 	}
 

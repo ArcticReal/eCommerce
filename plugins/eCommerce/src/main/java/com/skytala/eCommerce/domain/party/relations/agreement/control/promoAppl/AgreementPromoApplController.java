@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.agreement.query.promoAppl.Fi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/agreement/agreementPromoAppls")
 public class AgreementPromoApplController {
@@ -52,7 +54,7 @@ public class AgreementPromoApplController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findAgreementPromoApplsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<AgreementPromoAppl>> findAgreementPromoApplsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAgreementPromoApplsBy query = new FindAgreementPromoApplsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class AgreementPromoApplController {
 		}
 
 		List<AgreementPromoAppl> agreementPromoAppls =((AgreementPromoApplFound) Scheduler.execute(query).data()).getAgreementPromoAppls();
-
-		if (agreementPromoAppls.size() == 1) {
-			return ResponseEntity.ok().body(agreementPromoAppls.get(0));
-		}
 
 		return ResponseEntity.ok().body(agreementPromoAppls);
 
@@ -78,7 +76,7 @@ public class AgreementPromoApplController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createAgreementPromoAppl(HttpServletRequest request) throws Exception {
+	public ResponseEntity<AgreementPromoAppl> createAgreementPromoAppl(HttpServletRequest request) throws Exception {
 
 		AgreementPromoAppl agreementPromoApplToBeAdded = new AgreementPromoAppl();
 		try {
@@ -86,7 +84,7 @@ public class AgreementPromoApplController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createAgreementPromoAppl(agreementPromoApplToBeAdded);
@@ -101,63 +99,15 @@ public class AgreementPromoApplController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createAgreementPromoAppl(@RequestBody AgreementPromoAppl agreementPromoApplToBeAdded) throws Exception {
+	public ResponseEntity<AgreementPromoAppl> createAgreementPromoAppl(@RequestBody AgreementPromoAppl agreementPromoApplToBeAdded) throws Exception {
 
 		AddAgreementPromoAppl command = new AddAgreementPromoAppl(agreementPromoApplToBeAdded);
 		AgreementPromoAppl agreementPromoAppl = ((AgreementPromoApplAdded) Scheduler.execute(command).data()).getAddedAgreementPromoAppl();
 		
 		if (agreementPromoAppl != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(agreementPromoAppl);
+			return successful(agreementPromoAppl);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("AgreementPromoAppl could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateAgreementPromoAppl(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		AgreementPromoAppl agreementPromoApplToBeUpdated = new AgreementPromoAppl();
-
-		try {
-			agreementPromoApplToBeUpdated = AgreementPromoApplMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateAgreementPromoAppl(agreementPromoApplToBeUpdated, agreementPromoApplToBeUpdated.getAgreementItemSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class AgreementPromoApplController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{agreementItemSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateAgreementPromoAppl(@RequestBody AgreementPromoAppl agreementPromoApplToBeUpdated,
+	public ResponseEntity<String> updateAgreementPromoAppl(@RequestBody AgreementPromoAppl agreementPromoApplToBeUpdated,
 			@PathVariable String agreementItemSeqId) throws Exception {
 
 		agreementPromoApplToBeUpdated.setAgreementItemSeqId(agreementItemSeqId);
@@ -178,41 +128,44 @@ public class AgreementPromoApplController {
 
 		try {
 			if(((AgreementPromoApplUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{agreementPromoApplId}")
-	public ResponseEntity<Object> findById(@PathVariable String agreementPromoApplId) throws Exception {
+	public ResponseEntity<AgreementPromoAppl> findById(@PathVariable String agreementPromoApplId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("agreementPromoApplId", agreementPromoApplId);
 		try {
 
-			Object foundAgreementPromoAppl = findAgreementPromoApplsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundAgreementPromoAppl);
+			List<AgreementPromoAppl> foundAgreementPromoAppl = findAgreementPromoApplsBy(requestParams).getBody();
+			if(foundAgreementPromoAppl.size()==1){				return successful(foundAgreementPromoAppl.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{agreementPromoApplId}")
-	public ResponseEntity<Object> deleteAgreementPromoApplByIdUpdated(@PathVariable String agreementPromoApplId) throws Exception {
+	public ResponseEntity<String> deleteAgreementPromoApplByIdUpdated(@PathVariable String agreementPromoApplId) throws Exception {
 		DeleteAgreementPromoAppl command = new DeleteAgreementPromoAppl(agreementPromoApplId);
 
 		try {
 			if (((AgreementPromoApplDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("AgreementPromoAppl could not be deleted");
+		return conflict();
 
 	}
 

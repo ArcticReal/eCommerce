@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.container.query.geoPoint.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/container/containerGeoPoints")
 public class ContainerGeoPointController {
@@ -52,7 +54,7 @@ public class ContainerGeoPointController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findContainerGeoPointsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ContainerGeoPoint>> findContainerGeoPointsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContainerGeoPointsBy query = new FindContainerGeoPointsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ContainerGeoPointController {
 		}
 
 		List<ContainerGeoPoint> containerGeoPoints =((ContainerGeoPointFound) Scheduler.execute(query).data()).getContainerGeoPoints();
-
-		if (containerGeoPoints.size() == 1) {
-			return ResponseEntity.ok().body(containerGeoPoints.get(0));
-		}
 
 		return ResponseEntity.ok().body(containerGeoPoints);
 
@@ -78,7 +76,7 @@ public class ContainerGeoPointController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createContainerGeoPoint(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ContainerGeoPoint> createContainerGeoPoint(HttpServletRequest request) throws Exception {
 
 		ContainerGeoPoint containerGeoPointToBeAdded = new ContainerGeoPoint();
 		try {
@@ -86,7 +84,7 @@ public class ContainerGeoPointController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createContainerGeoPoint(containerGeoPointToBeAdded);
@@ -101,63 +99,15 @@ public class ContainerGeoPointController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createContainerGeoPoint(@RequestBody ContainerGeoPoint containerGeoPointToBeAdded) throws Exception {
+	public ResponseEntity<ContainerGeoPoint> createContainerGeoPoint(@RequestBody ContainerGeoPoint containerGeoPointToBeAdded) throws Exception {
 
 		AddContainerGeoPoint command = new AddContainerGeoPoint(containerGeoPointToBeAdded);
 		ContainerGeoPoint containerGeoPoint = ((ContainerGeoPointAdded) Scheduler.execute(command).data()).getAddedContainerGeoPoint();
 		
 		if (containerGeoPoint != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(containerGeoPoint);
+			return successful(containerGeoPoint);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ContainerGeoPoint could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateContainerGeoPoint(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ContainerGeoPoint containerGeoPointToBeUpdated = new ContainerGeoPoint();
-
-		try {
-			containerGeoPointToBeUpdated = ContainerGeoPointMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateContainerGeoPoint(containerGeoPointToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ContainerGeoPointController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateContainerGeoPoint(@RequestBody ContainerGeoPoint containerGeoPointToBeUpdated,
+	public ResponseEntity<String> updateContainerGeoPoint(@RequestBody ContainerGeoPoint containerGeoPointToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		containerGeoPointToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ContainerGeoPointController {
 
 		try {
 			if(((ContainerGeoPointUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{containerGeoPointId}")
-	public ResponseEntity<Object> findById(@PathVariable String containerGeoPointId) throws Exception {
+	public ResponseEntity<ContainerGeoPoint> findById(@PathVariable String containerGeoPointId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("containerGeoPointId", containerGeoPointId);
 		try {
 
-			Object foundContainerGeoPoint = findContainerGeoPointsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundContainerGeoPoint);
+			List<ContainerGeoPoint> foundContainerGeoPoint = findContainerGeoPointsBy(requestParams).getBody();
+			if(foundContainerGeoPoint.size()==1){				return successful(foundContainerGeoPoint.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{containerGeoPointId}")
-	public ResponseEntity<Object> deleteContainerGeoPointByIdUpdated(@PathVariable String containerGeoPointId) throws Exception {
+	public ResponseEntity<String> deleteContainerGeoPointByIdUpdated(@PathVariable String containerGeoPointId) throws Exception {
 		DeleteContainerGeoPoint command = new DeleteContainerGeoPoint(containerGeoPointId);
 
 		try {
 			if (((ContainerGeoPointDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ContainerGeoPoint could not be deleted");
+		return conflict();
 
 	}
 

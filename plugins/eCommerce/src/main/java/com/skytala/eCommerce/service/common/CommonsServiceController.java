@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/commons")
 public class CommonsServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateNote")
-	public ResponseEntity<Object> updateNote(HttpSession session, @RequestParam(value="noteId") String noteId, @RequestParam(value="noteName", required=false) String noteName, @RequestParam(value="noteDateTime", required=false) Timestamp noteDateTime, @RequestParam(value="noteInfo", required=false) String noteInfo) {
+	public ResponseEntity<Map<String, Object>> updateNote(HttpSession session, @RequestParam(value="noteId") String noteId, @RequestParam(value="noteName", required=false) String noteName, @RequestParam(value="noteDateTime", required=false) Timestamp noteDateTime, @RequestParam(value="noteInfo", required=false) String noteInfo) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("noteId",noteId);
@@ -42,23 +44,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/ftpInterface")
-	public ResponseEntity<Object> ftpInterface(HttpSession session, @RequestParam(value="hostname") String hostname, @RequestParam(value="password") String password, @RequestParam(value="remoteFilename") String remoteFilename, @RequestParam(value="localFilename") String localFilename, @RequestParam(value="username") String username, @RequestParam(value="defaultTimeout", required=false) Integer defaultTimeout, @RequestParam(value="binaryTransfer", required=false) Boolean binaryTransfer, @RequestParam(value="passiveMode", required=false) Boolean passiveMode) {
+	public ResponseEntity<Map<String, Object>> ftpInterface(HttpSession session, @RequestParam(value="hostname") String hostname, @RequestParam(value="password") String password, @RequestParam(value="remoteFilename") String remoteFilename, @RequestParam(value="localFilename") String localFilename, @RequestParam(value="username") String username, @RequestParam(value="defaultTimeout", required=false) Integer defaultTimeout, @RequestParam(value="binaryTransfer", required=false) Boolean binaryTransfer, @RequestParam(value="passiveMode", required=false) Boolean passiveMode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("hostname",hostname);
@@ -78,23 +80,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createDataSourceType")
-	public ResponseEntity<Object> createDataSourceType(HttpSession session, @RequestParam(value="dataSourceTypeId") String dataSourceTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createDataSourceType(HttpSession session, @RequestParam(value="dataSourceTypeId") String dataSourceTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("dataSourceTypeId",dataSourceTypeId);
@@ -108,23 +110,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteGeoType")
-	public ResponseEntity<Object> deleteGeoType(HttpSession session, @RequestParam(value="geoTypeId") String geoTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteGeoType(HttpSession session, @RequestParam(value="geoTypeId") String geoTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("geoTypeId",geoTypeId);
@@ -137,23 +139,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/performFind")
-	public ResponseEntity<Object> performFind(HttpSession session, @RequestParam(value="inputFields") java.util.Map inputFields, @RequestParam(value="entityName") String entityName, @RequestParam(value="viewSize", required=false) Integer viewSize, @RequestParam(value="filterByDate", required=false) String filterByDate, @RequestParam(value="filterByDateValue", required=false) Timestamp filterByDateValue, @RequestParam(value="thruDateName", required=false) String thruDateName, @RequestParam(value="orderBy", required=false) String orderBy, @RequestParam(value="noConditionFind", required=false) String noConditionFind, @RequestParam(value="distinct", required=false) String distinct, @RequestParam(value="viewIndex", required=false) Integer viewIndex, @RequestParam(value="fieldList", required=false) java.util.List fieldList, @RequestParam(value="fromDateName", required=false) String fromDateName) {
+	public ResponseEntity<Map<String, Object>> performFind(HttpSession session, @RequestParam(value="inputFields") java.util.Map inputFields, @RequestParam(value="entityName") String entityName, @RequestParam(value="viewSize", required=false) Integer viewSize, @RequestParam(value="filterByDate", required=false) String filterByDate, @RequestParam(value="filterByDateValue", required=false) Timestamp filterByDateValue, @RequestParam(value="thruDateName", required=false) String thruDateName, @RequestParam(value="orderBy", required=false) String orderBy, @RequestParam(value="noConditionFind", required=false) String noConditionFind, @RequestParam(value="distinct", required=false) String distinct, @RequestParam(value="viewIndex", required=false) Integer viewIndex, @RequestParam(value="fieldList", required=false) java.util.List fieldList, @RequestParam(value="fromDateName", required=false) String fromDateName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("inputFields",inputFields);
@@ -177,23 +179,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createPortalPagePortlet")
-	public ResponseEntity<Object> createPortalPagePortlet(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="portalPortletId") String portalPortletId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="columnSeqId", required=false) String columnSeqId) {
+	public ResponseEntity<Map<String, Object>> createPortalPagePortlet(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="portalPortletId") String portalPortletId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="columnSeqId", required=false) String columnSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("portalPageId",portalPageId);
@@ -209,23 +211,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createPeriodType")
-	public ResponseEntity<Object> createPeriodType(HttpSession session, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="periodLength", required=false) Long periodLength, @RequestParam(value="uomId", required=false) String uomId) {
+	public ResponseEntity<Map<String, Object>> createPeriodType(HttpSession session, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="periodLength", required=false) Long periodLength, @RequestParam(value="uomId", required=false) String uomId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("periodTypeId",periodTypeId);
@@ -241,23 +243,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/preferenceGetSetPermission")
-	public ResponseEntity<Object> preferenceGetSetPermission(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="userPrefLoginId", required=false) String userPrefLoginId, @RequestParam(value="mainAction", required=false) String mainAction) {
+	public ResponseEntity<Map<String, Object>> preferenceGetSetPermission(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="userPrefLoginId", required=false) String userPrefLoginId, @RequestParam(value="mainAction", required=false) String mainAction) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("primaryPermission",primaryPermission);
@@ -274,23 +276,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/movePortletToPortalPage")
-	public ResponseEntity<Object> movePortletToPortalPage(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="portletSeqId") String portletSeqId, @RequestParam(value="newPortalPageId") String newPortalPageId, @RequestParam(value="portalPortletId") String portalPortletId) {
+	public ResponseEntity<Map<String, Object>> movePortletToPortalPage(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="portletSeqId") String portletSeqId, @RequestParam(value="newPortalPageId") String newPortalPageId, @RequestParam(value="portalPortletId") String portalPortletId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("portalPageId",portalPageId);
@@ -306,23 +308,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getServerTimestampAsLong")
-	public ResponseEntity<Object> getServerTimestampAsLong(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> getServerTimestampAsLong(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -334,23 +336,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/performFindItem")
-	public ResponseEntity<Object> performFindItem(HttpSession session, @RequestParam(value="inputFields") java.util.Map inputFields, @RequestParam(value="entityName") String entityName, @RequestParam(value="filterByDate", required=false) String filterByDate, @RequestParam(value="filterByDateValue", required=false) Timestamp filterByDateValue, @RequestParam(value="orderBy", required=false) String orderBy) {
+	public ResponseEntity<Map<String, Object>> performFindItem(HttpSession session, @RequestParam(value="inputFields") java.util.Map inputFields, @RequestParam(value="entityName") String entityName, @RequestParam(value="filterByDate", required=false) String filterByDate, @RequestParam(value="filterByDateValue", required=false) Timestamp filterByDateValue, @RequestParam(value="orderBy", required=false) String orderBy) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("inputFields",inputFields);
@@ -367,23 +369,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/genericBasePermissionCheck")
-	public ResponseEntity<Object> genericBasePermissionCheck(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="mainAction", required=false) String mainAction) {
+	public ResponseEntity<Map<String, Object>> genericBasePermissionCheck(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="mainAction", required=false) String mainAction) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("primaryPermission",primaryPermission);
@@ -399,23 +401,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createUserLogin")
-	public ResponseEntity<Object> createUserLogin(HttpSession session, @RequestParam(value="userLoginId") String userLoginId, @RequestParam(value="currentPasswordVerify") String currentPasswordVerify, @RequestParam(value="currentPassword") String currentPassword, @RequestParam(value="passwordHint", required=false) String passwordHint, @RequestParam(value="securityQuestion", required=false) String securityQuestion, @RequestParam(value="securityAnswer", required=false) String securityAnswer, @RequestParam(value="externalAuthId", required=false) String externalAuthId, @RequestParam(value="requirePasswordChange", required=false) String requirePasswordChange, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="enabled", required=false) String enabled) {
+	public ResponseEntity<Map<String, Object>> createUserLogin(HttpSession session, @RequestParam(value="userLoginId") String userLoginId, @RequestParam(value="currentPasswordVerify") String currentPasswordVerify, @RequestParam(value="currentPassword") String currentPassword, @RequestParam(value="passwordHint", required=false) String passwordHint, @RequestParam(value="securityQuestion", required=false) String securityQuestion, @RequestParam(value="securityAnswer", required=false) String securityAnswer, @RequestParam(value="externalAuthId", required=false) String externalAuthId, @RequestParam(value="requirePasswordChange", required=false) String requirePasswordChange, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="enabled", required=false) String enabled) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLoginId",userLoginId);
@@ -437,23 +439,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/interfaceDataSource")
-	public ResponseEntity<Object> interfaceDataSource(HttpSession session, @RequestParam(value="dataSourceId") String dataSourceId, @RequestParam(value="dataSourceTypeId") String dataSourceTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> interfaceDataSource(HttpSession session, @RequestParam(value="dataSourceId") String dataSourceId, @RequestParam(value="dataSourceTypeId") String dataSourceTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("dataSourceId",dataSourceId);
@@ -468,23 +470,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateGeo")
-	public ResponseEntity<Object> updateGeo(HttpSession session, @RequestParam(value="geoId") String geoId, @RequestParam(value="geoName", required=false) String geoName, @RequestParam(value="geoTypeId", required=false) String geoTypeId, @RequestParam(value="geoCode", required=false) String geoCode, @RequestParam(value="abbreviation", required=false) String abbreviation, @RequestParam(value="geoSecCode", required=false) String geoSecCode, @RequestParam(value="wellKnownText", required=false) String wellKnownText) {
+	public ResponseEntity<Map<String, Object>> updateGeo(HttpSession session, @RequestParam(value="geoId") String geoId, @RequestParam(value="geoName", required=false) String geoName, @RequestParam(value="geoTypeId", required=false) String geoTypeId, @RequestParam(value="geoCode", required=false) String geoCode, @RequestParam(value="abbreviation", required=false) String abbreviation, @RequestParam(value="geoSecCode", required=false) String geoSecCode, @RequestParam(value="wellKnownText", required=false) String wellKnownText) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("geoId",geoId);
@@ -503,23 +505,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deletePortalPagePortlet")
-	public ResponseEntity<Object> deletePortalPagePortlet(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="portletSeqId") String portletSeqId, @RequestParam(value="portalPortletId") String portalPortletId) {
+	public ResponseEntity<Map<String, Object>> deletePortalPagePortlet(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="portletSeqId") String portletSeqId, @RequestParam(value="portalPortletId") String portalPortletId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("portalPageId",portalPageId);
@@ -534,23 +536,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createGeo")
-	public ResponseEntity<Object> createGeo(HttpSession session, @RequestParam(value="geoName") String geoName, @RequestParam(value="geoTypeId") String geoTypeId, @RequestParam(value="geoId", required=false) String geoId, @RequestParam(value="geoCode", required=false) String geoCode, @RequestParam(value="abbreviation", required=false) String abbreviation, @RequestParam(value="geoSecCode", required=false) String geoSecCode, @RequestParam(value="wellKnownText", required=false) String wellKnownText) {
+	public ResponseEntity<Map<String, Object>> createGeo(HttpSession session, @RequestParam(value="geoName") String geoName, @RequestParam(value="geoTypeId") String geoTypeId, @RequestParam(value="geoId", required=false) String geoId, @RequestParam(value="geoCode", required=false) String geoCode, @RequestParam(value="abbreviation", required=false) String abbreviation, @RequestParam(value="geoSecCode", required=false) String geoSecCode, @RequestParam(value="wellKnownText", required=false) String wellKnownText) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("geoName",geoName);
@@ -569,23 +571,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/convertUomCustom")
-	public ResponseEntity<Object> convertUomCustom(HttpSession session, @RequestParam(value="originalValue") BigDecimal originalValue, @RequestParam(value="uomId") String uomId, @RequestParam(value="uomConversion") Map uomConversion, @RequestParam(value="uomIdTo") String uomIdTo, @RequestParam(value="conversionParameters", required=false) Map conversionParameters) {
+	public ResponseEntity<Map<String, Object>> convertUomCustom(HttpSession session, @RequestParam(value="originalValue") BigDecimal originalValue, @RequestParam(value="uomId") String uomId, @RequestParam(value="uomConversion") Map uomConversion, @RequestParam(value="uomIdTo") String uomIdTo, @RequestParam(value="conversionParameters", required=false) Map conversionParameters) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("originalValue",originalValue);
@@ -602,23 +604,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updatePeriodType")
-	public ResponseEntity<Object> updatePeriodType(HttpSession session, @RequestParam(value="periodTypeId") String periodTypeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="periodLength", required=false) Long periodLength, @RequestParam(value="uomId", required=false) String uomId) {
+	public ResponseEntity<Map<String, Object>> updatePeriodType(HttpSession session, @RequestParam(value="periodTypeId") String periodTypeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="periodLength", required=false) Long periodLength, @RequestParam(value="uomId", required=false) String uomId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("periodTypeId",periodTypeId);
@@ -634,23 +636,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteUserPrefGroupType")
-	public ResponseEntity<Object> deleteUserPrefGroupType(HttpSession session, @RequestParam(value="userPrefGroupTypeId") String userPrefGroupTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteUserPrefGroupType(HttpSession session, @RequestParam(value="userPrefGroupTypeId") String userPrefGroupTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userPrefGroupTypeId",userPrefGroupTypeId);
@@ -663,23 +665,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createDataSource")
-	public ResponseEntity<Object> createDataSource(HttpSession session, @RequestParam(value="dataSourceId") String dataSourceId, @RequestParam(value="dataSourceTypeId") String dataSourceTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createDataSource(HttpSession session, @RequestParam(value="dataSourceId") String dataSourceId, @RequestParam(value="dataSourceTypeId") String dataSourceTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("dataSourceId",dataSourceId);
@@ -694,23 +696,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteEnumeration")
-	public ResponseEntity<Object> deleteEnumeration(HttpSession session, @RequestParam(value="enumId") String enumId) {
+	public ResponseEntity<Map<String, Object>> deleteEnumeration(HttpSession session, @RequestParam(value="enumId") String enumId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("enumId",enumId);
@@ -723,23 +725,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updatePortalPagePortlet")
-	public ResponseEntity<Object> updatePortalPagePortlet(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="portletSeqId") String portletSeqId, @RequestParam(value="portalPortletId") String portalPortletId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="columnSeqId", required=false) String columnSeqId) {
+	public ResponseEntity<Map<String, Object>> updatePortalPagePortlet(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="portletSeqId") String portletSeqId, @RequestParam(value="portalPortletId") String portalPortletId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="columnSeqId", required=false) String columnSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("portalPageId",portalPageId);
@@ -756,23 +758,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteCustomTimePeriod")
-	public ResponseEntity<Object> deleteCustomTimePeriod(HttpSession session, @RequestParam(value="customTimePeriodId") String customTimePeriodId) {
+	public ResponseEntity<Map<String, Object>> deleteCustomTimePeriod(HttpSession session, @RequestParam(value="customTimePeriodId") String customTimePeriodId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("customTimePeriodId",customTimePeriodId);
@@ -785,23 +787,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateGeoType")
-	public ResponseEntity<Object> updateGeoType(HttpSession session, @RequestParam(value="geoTypeId") String geoTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateGeoType(HttpSession session, @RequestParam(value="geoTypeId") String geoTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("geoTypeId",geoTypeId);
@@ -817,23 +819,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteDataSourceType")
-	public ResponseEntity<Object> deleteDataSourceType(HttpSession session, @RequestParam(value="dataSourceTypeId") String dataSourceTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteDataSourceType(HttpSession session, @RequestParam(value="dataSourceTypeId") String dataSourceTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("dataSourceTypeId",dataSourceTypeId);
@@ -846,23 +848,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteGeo")
-	public ResponseEntity<Object> deleteGeo(HttpSession session, @RequestParam(value="geoId") String geoId) {
+	public ResponseEntity<Map<String, Object>> deleteGeo(HttpSession session, @RequestParam(value="geoId") String geoId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("geoId",geoId);
@@ -875,23 +877,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getStatusItems")
-	public ResponseEntity<Object> getStatusItems(HttpSession session, @RequestParam(value="statusTypeIds") List statusTypeIds) {
+	public ResponseEntity<Map<String, Object>> getStatusItems(HttpSession session, @RequestParam(value="statusTypeIds") List statusTypeIds) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("statusTypeIds",statusTypeIds);
@@ -904,23 +906,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createPortletAttribute")
-	public ResponseEntity<Object> createPortletAttribute(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="portletSeqId") String portletSeqId, @RequestParam(value="portalPortletId") String portalPortletId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue, @RequestParam(value="attrType", required=false) Long attrType) {
+	public ResponseEntity<Map<String, Object>> createPortletAttribute(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="portletSeqId") String portletSeqId, @RequestParam(value="portalPortletId") String portalPortletId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue, @RequestParam(value="attrType", required=false) Long attrType) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("portalPageId",portalPageId);
@@ -939,23 +941,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCustomTimePeriod")
-	public ResponseEntity<Object> createCustomTimePeriod(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="periodTypeId") String periodTypeId, @RequestParam(value="organizationPartyId") String organizationPartyId, @RequestParam(value="thruDate") Timestamp thruDate, @RequestParam(value="periodNum", required=false) Long periodNum, @RequestParam(value="isClosed", required=false) String isClosed, @RequestParam(value="periodName", required=false) String periodName, @RequestParam(value="parentPeriodId", required=false) String parentPeriodId) {
+	public ResponseEntity<Map<String, Object>> createCustomTimePeriod(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="periodTypeId") String periodTypeId, @RequestParam(value="organizationPartyId") String organizationPartyId, @RequestParam(value="thruDate") Timestamp thruDate, @RequestParam(value="periodNum", required=false) Long periodNum, @RequestParam(value="isClosed", required=false) String isClosed, @RequestParam(value="periodName", required=false) String periodName, @RequestParam(value="parentPeriodId", required=false) String parentPeriodId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -975,23 +977,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/resetMetric")
-	public ResponseEntity<Object> resetMetric(HttpSession session, @RequestParam(value="name") String name) {
+	public ResponseEntity<Map<String, Object>> resetMetric(HttpSession session, @RequestParam(value="name") String name) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("name",name);
@@ -1004,23 +1006,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateStatusValidChange")
-	public ResponseEntity<Object> updateStatusValidChange(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="statusIdTo") String statusIdTo, @RequestParam(value="conditionExpression", required=false) String conditionExpression, @RequestParam(value="transitionName", required=false) String transitionName) {
+	public ResponseEntity<Map<String, Object>> updateStatusValidChange(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="statusIdTo") String statusIdTo, @RequestParam(value="conditionExpression", required=false) String conditionExpression, @RequestParam(value="transitionName", required=false) String transitionName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("statusId",statusId);
@@ -1036,23 +1038,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteDataSource")
-	public ResponseEntity<Object> deleteDataSource(HttpSession session, @RequestParam(value="dataSourceId") String dataSourceId) {
+	public ResponseEntity<Map<String, Object>> deleteDataSource(HttpSession session, @RequestParam(value="dataSourceId") String dataSourceId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("dataSourceId",dataSourceId);
@@ -1065,23 +1067,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateTemporalExpression")
-	public ResponseEntity<Object> updateTemporalExpression(HttpSession session, @RequestParam(value="tempExprId") String tempExprId, @RequestParam(value="string1", required=false) String string1, @RequestParam(value="string2", required=false) String string2, @RequestParam(value="description", required=false) String description, @RequestParam(value="integer1", required=false) Long integer1, @RequestParam(value="date2", required=false) Timestamp date2, @RequestParam(value="date1", required=false) Timestamp date1, @RequestParam(value="tempExprTypeId", required=false) String tempExprTypeId, @RequestParam(value="integer2", required=false) Long integer2) {
+	public ResponseEntity<Map<String, Object>> updateTemporalExpression(HttpSession session, @RequestParam(value="tempExprId") String tempExprId, @RequestParam(value="string1", required=false) String string1, @RequestParam(value="string2", required=false) String string2, @RequestParam(value="description", required=false) String description, @RequestParam(value="integer1", required=false) Long integer1, @RequestParam(value="date2", required=false) Timestamp date2, @RequestParam(value="date1", required=false) Timestamp date1, @RequestParam(value="tempExprTypeId", required=false) String tempExprTypeId, @RequestParam(value="integer2", required=false) Long integer2) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("tempExprId",tempExprId);
@@ -1102,23 +1104,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/adjustDebugLevels")
-	public ResponseEntity<Object> adjustDebugLevels(HttpSession session, @RequestParam(value="important", required=false) String important, @RequestParam(value="timing", required=false) String timing, @RequestParam(value="warning", required=false) String warning, @RequestParam(value="error", required=false) String error, @RequestParam(value="fatal", required=false) String fatal, @RequestParam(value="info", required=false) String info, @RequestParam(value="verbose", required=false) String verbose) {
+	public ResponseEntity<Map<String, Object>> adjustDebugLevels(HttpSession session, @RequestParam(value="important", required=false) String important, @RequestParam(value="timing", required=false) String timing, @RequestParam(value="warning", required=false) String warning, @RequestParam(value="error", required=false) String error, @RequestParam(value="fatal", required=false) String fatal, @RequestParam(value="info", required=false) String info, @RequestParam(value="verbose", required=false) String verbose) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("important",important);
@@ -1137,23 +1139,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updatePortalPage")
-	public ResponseEntity<Object> updatePortalPage(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="originalPortalPageId", required=false) String originalPortalPageId, @RequestParam(value="securityGroupId", required=false) String securityGroupId, @RequestParam(value="parentPortalPageId", required=false) String parentPortalPageId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="helpContentId", required=false) String helpContentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="ownerUserLoginId", required=false) String ownerUserLoginId, @RequestParam(value="portalPageName", required=false) String portalPageName) {
+	public ResponseEntity<Map<String, Object>> updatePortalPage(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="originalPortalPageId", required=false) String originalPortalPageId, @RequestParam(value="securityGroupId", required=false) String securityGroupId, @RequestParam(value="parentPortalPageId", required=false) String parentPortalPageId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="helpContentId", required=false) String helpContentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="ownerUserLoginId", required=false) String ownerUserLoginId, @RequestParam(value="portalPageName", required=false) String portalPageName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("portalPageId",portalPageId);
@@ -1174,23 +1176,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateUomType")
-	public ResponseEntity<Object> updateUomType(HttpSession session, @RequestParam(value="uomTypeId") String uomTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateUomType(HttpSession session, @RequestParam(value="uomTypeId") String uomTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("uomTypeId",uomTypeId);
@@ -1206,23 +1208,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/tempExprPermissionCheck")
-	public ResponseEntity<Object> tempExprPermissionCheck(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="mainAction", required=false) String mainAction) {
+	public ResponseEntity<Map<String, Object>> tempExprPermissionCheck(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="mainAction", required=false) String mainAction) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("primaryPermission",primaryPermission);
@@ -1238,23 +1240,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteGeoAssoc")
-	public ResponseEntity<Object> deleteGeoAssoc(HttpSession session, @RequestParam(value="geoId") String geoId, @RequestParam(value="geoIdTo") String geoIdTo) {
+	public ResponseEntity<Map<String, Object>> deleteGeoAssoc(HttpSession session, @RequestParam(value="geoId") String geoId, @RequestParam(value="geoIdTo") String geoIdTo) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("geoId",geoId);
@@ -1268,23 +1270,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/interfaceDataSourceType")
-	public ResponseEntity<Object> interfaceDataSourceType(HttpSession session, @RequestParam(value="dataSourceTypeId") String dataSourceTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> interfaceDataSourceType(HttpSession session, @RequestParam(value="dataSourceTypeId") String dataSourceTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("dataSourceTypeId",dataSourceTypeId);
@@ -1298,23 +1300,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createVisualThemeResource")
-	public ResponseEntity<Object> createVisualThemeResource(HttpSession session, @RequestParam(value="resourceTypeEnumId") String resourceTypeEnumId, @RequestParam(value="visualThemeId") String visualThemeId, @RequestParam(value="resourceValue", required=false) Long resourceValue) {
+	public ResponseEntity<Map<String, Object>> createVisualThemeResource(HttpSession session, @RequestParam(value="resourceTypeEnumId") String resourceTypeEnumId, @RequestParam(value="visualThemeId") String visualThemeId, @RequestParam(value="resourceValue", required=false) Long resourceValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("resourceTypeEnumId",resourceTypeEnumId);
@@ -1329,23 +1331,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createEnumeration")
-	public ResponseEntity<Object> createEnumeration(HttpSession session, @RequestParam(value="enumTypeId") String enumTypeId, @RequestParam(value="description") String description, @RequestParam(value="enumCode", required=false) String enumCode, @RequestParam(value="sequenceId", required=false) String sequenceId) {
+	public ResponseEntity<Map<String, Object>> createEnumeration(HttpSession session, @RequestParam(value="enumTypeId") String enumTypeId, @RequestParam(value="description") String description, @RequestParam(value="enumCode", required=false) String enumCode, @RequestParam(value="sequenceId", required=false) String sequenceId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("enumTypeId",enumTypeId);
@@ -1361,23 +1363,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateEnumeration")
-	public ResponseEntity<Object> updateEnumeration(HttpSession session, @RequestParam(value="enumTypeId") String enumTypeId, @RequestParam(value="enumId") String enumId, @RequestParam(value="description") String description, @RequestParam(value="enumCode", required=false) String enumCode, @RequestParam(value="sequenceId", required=false) String sequenceId) {
+	public ResponseEntity<Map<String, Object>> updateEnumeration(HttpSession session, @RequestParam(value="enumTypeId") String enumTypeId, @RequestParam(value="enumId") String enumId, @RequestParam(value="description") String description, @RequestParam(value="enumCode", required=false) String enumCode, @RequestParam(value="sequenceId", required=false) String sequenceId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("enumTypeId",enumTypeId);
@@ -1394,23 +1396,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteUomType")
-	public ResponseEntity<Object> deleteUomType(HttpSession session, @RequestParam(value="uomTypeId") String uomTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteUomType(HttpSession session, @RequestParam(value="uomTypeId") String uomTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("uomTypeId",uomTypeId);
@@ -1423,23 +1425,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/executeFind")
-	public ResponseEntity<Object> executeFind(HttpSession session, @RequestParam(value="entityName") String entityName, @RequestParam(value="orderByList", required=false) java.util.List orderByList, @RequestParam(value="maxRows", required=false) Integer maxRows, @RequestParam(value="entityConditionList", required=false) org.apache.ofbiz.entity.condition.EntityConditionList entityConditionList, @RequestParam(value="noConditionFind", required=false) String noConditionFind, @RequestParam(value="distinct", required=false) String distinct, @RequestParam(value="fieldList", required=false) java.util.List fieldList) {
+	public ResponseEntity<Map<String, Object>> executeFind(HttpSession session, @RequestParam(value="entityName") String entityName, @RequestParam(value="orderByList", required=false) java.util.List orderByList, @RequestParam(value="maxRows", required=false) Integer maxRows, @RequestParam(value="entityConditionList", required=false) org.apache.ofbiz.entity.condition.EntityConditionList entityConditionList, @RequestParam(value="noConditionFind", required=false) String noConditionFind, @RequestParam(value="distinct", required=false) String distinct, @RequestParam(value="fieldList", required=false) java.util.List fieldList) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("entityName",entityName);
@@ -1458,23 +1460,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateDataSource")
-	public ResponseEntity<Object> updateDataSource(HttpSession session, @RequestParam(value="dataSourceId") String dataSourceId, @RequestParam(value="dataSourceTypeId") String dataSourceTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateDataSource(HttpSession session, @RequestParam(value="dataSourceId") String dataSourceId, @RequestParam(value="dataSourceTypeId") String dataSourceTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("dataSourceId",dataSourceId);
@@ -1489,23 +1491,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateUom")
-	public ResponseEntity<Object> updateUom(HttpSession session, @RequestParam(value="uomId") String uomId, @RequestParam(value="description", required=false) String description, @RequestParam(value="abbreviation", required=false) String abbreviation, @RequestParam(value="uomTypeId", required=false) String uomTypeId) {
+	public ResponseEntity<Map<String, Object>> updateUom(HttpSession session, @RequestParam(value="uomId") String uomId, @RequestParam(value="description", required=false) String description, @RequestParam(value="abbreviation", required=false) String abbreviation, @RequestParam(value="uomTypeId", required=false) String uomTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("uomId",uomId);
@@ -1521,23 +1523,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/echoService")
-	public ResponseEntity<Object> echoService(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> echoService(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -1549,23 +1551,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createVisualTheme")
-	public ResponseEntity<Object> createVisualTheme(HttpSession session, @RequestParam(value="visualThemeId") String visualThemeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="visualThemeSetId", required=false) String visualThemeSetId) {
+	public ResponseEntity<Map<String, Object>> createVisualTheme(HttpSession session, @RequestParam(value="visualThemeId") String visualThemeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="visualThemeSetId", required=false) String visualThemeSetId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("visualThemeId",visualThemeId);
@@ -1580,23 +1582,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/checkUomConversion")
-	public ResponseEntity<Object> checkUomConversion(HttpSession session, @RequestParam(value="uomId") String uomId, @RequestParam(value="uomIdTo") String uomIdTo) {
+	public ResponseEntity<Map<String, Object>> checkUomConversion(HttpSession session, @RequestParam(value="uomId") String uomId, @RequestParam(value="uomIdTo") String uomIdTo) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("uomId",uomId);
@@ -1610,23 +1612,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/rssFeedInterface")
-	public ResponseEntity<Object> rssFeedInterface(HttpSession session, @RequestParam(value="entryLink") String entryLink, @RequestParam(value="feedType") String feedType, @RequestParam(value="mainLink") String mainLink) {
+	public ResponseEntity<Map<String, Object>> rssFeedInterface(HttpSession session, @RequestParam(value="entryLink") String entryLink, @RequestParam(value="feedType") String feedType, @RequestParam(value="mainLink") String mainLink) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("entryLink",entryLink);
@@ -1641,23 +1643,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getUserPreferenceGroup")
-	public ResponseEntity<Object> getUserPreferenceGroup(HttpSession session, @RequestParam(value="userPrefGroupTypeId") String userPrefGroupTypeId, @RequestParam(value="userPrefLoginId", required=false) String userPrefLoginId) {
+	public ResponseEntity<Map<String, Object>> getUserPreferenceGroup(HttpSession session, @RequestParam(value="userPrefGroupTypeId") String userPrefGroupTypeId, @RequestParam(value="userPrefLoginId", required=false) String userPrefLoginId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userPrefGroupTypeId",userPrefGroupTypeId);
@@ -1671,23 +1673,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addPortalPageColumn")
-	public ResponseEntity<Object> addPortalPageColumn(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="columnWidthPixels", required=false) Long columnWidthPixels, @RequestParam(value="columnWidthPercentage", required=false) Long columnWidthPercentage, @RequestParam(value="columnSeqId", required=false) String columnSeqId) {
+	public ResponseEntity<Map<String, Object>> addPortalPageColumn(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="columnWidthPixels", required=false) Long columnWidthPixels, @RequestParam(value="columnWidthPercentage", required=false) Long columnWidthPercentage, @RequestParam(value="columnSeqId", required=false) String columnSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("portalPageId",portalPageId);
@@ -1703,23 +1705,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createStatusValidChange")
-	public ResponseEntity<Object> createStatusValidChange(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="statusIdTo") String statusIdTo, @RequestParam(value="conditionExpression", required=false) String conditionExpression, @RequestParam(value="transitionName", required=false) String transitionName) {
+	public ResponseEntity<Map<String, Object>> createStatusValidChange(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="statusIdTo") String statusIdTo, @RequestParam(value="conditionExpression", required=false) String conditionExpression, @RequestParam(value="transitionName", required=false) String transitionName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("statusId",statusId);
@@ -1735,23 +1737,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updatePortalPageSeq")
-	public ResponseEntity<Object> updatePortalPageSeq(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="mode") String mode, @RequestParam(value="originalPortalPageId", required=false) String originalPortalPageId, @RequestParam(value="securityGroupId", required=false) String securityGroupId, @RequestParam(value="parentPortalPageId", required=false) String parentPortalPageId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="helpContentId", required=false) String helpContentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="ownerUserLoginId", required=false) String ownerUserLoginId, @RequestParam(value="portalPageName", required=false) String portalPageName) {
+	public ResponseEntity<Map<String, Object>> updatePortalPageSeq(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="mode") String mode, @RequestParam(value="originalPortalPageId", required=false) String originalPortalPageId, @RequestParam(value="securityGroupId", required=false) String securityGroupId, @RequestParam(value="parentPortalPageId", required=false) String parentPortalPageId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="helpContentId", required=false) String helpContentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="ownerUserLoginId", required=false) String ownerUserLoginId, @RequestParam(value="portalPageName", required=false) String portalPageName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("portalPageId",portalPageId);
@@ -1773,23 +1775,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/userLogin")
-	public ResponseEntity<Object> userLogin(HttpSession session, @RequestParam(value="login.username") String loginusername, @RequestParam(value="login.password") String loginpassword, @RequestParam(value="visitId", required=false) String visitId, @RequestParam(value="isServiceAuth", required=false) Boolean isServiceAuth) {
+	public ResponseEntity<Map<String, Object>> userLogin(HttpSession session, @RequestParam(value="login.username") String loginusername, @RequestParam(value="login.password") String loginpassword, @RequestParam(value="visitId", required=false) String visitId, @RequestParam(value="isServiceAuth", required=false) Boolean isServiceAuth) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("login.username",loginusername);
@@ -1805,23 +1807,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getUserPreference")
-	public ResponseEntity<Object> getUserPreference(HttpSession session, @RequestParam(value="userPrefTypeId") String userPrefTypeId, @RequestParam(value="userPrefGroupTypeId", required=false) String userPrefGroupTypeId, @RequestParam(value="userPrefLoginId", required=false) String userPrefLoginId) {
+	public ResponseEntity<Map<String, Object>> getUserPreference(HttpSession session, @RequestParam(value="userPrefTypeId") String userPrefTypeId, @RequestParam(value="userPrefGroupTypeId", required=false) String userPrefGroupTypeId, @RequestParam(value="userPrefLoginId", required=false) String userPrefLoginId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userPrefTypeId",userPrefTypeId);
@@ -1836,23 +1838,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/forceGarbageCollection")
-	public ResponseEntity<Object> forceGarbageCollection(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> forceGarbageCollection(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -1864,23 +1866,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteGeoAssocType")
-	public ResponseEntity<Object> deleteGeoAssocType(HttpSession session, @RequestParam(value="geoAssocTypeId") String geoAssocTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteGeoAssocType(HttpSession session, @RequestParam(value="geoAssocTypeId") String geoAssocTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("geoAssocTypeId",geoAssocTypeId);
@@ -1893,23 +1895,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createTemporalExpression")
-	public ResponseEntity<Object> createTemporalExpression(HttpSession session, @RequestParam(value="string1", required=false) String string1, @RequestParam(value="string2", required=false) String string2, @RequestParam(value="description", required=false) String description, @RequestParam(value="integer1", required=false) Long integer1, @RequestParam(value="tempExprId", required=false) String tempExprId, @RequestParam(value="date2", required=false) Timestamp date2, @RequestParam(value="date1", required=false) Timestamp date1, @RequestParam(value="tempExprTypeId", required=false) String tempExprTypeId, @RequestParam(value="integer2", required=false) Long integer2) {
+	public ResponseEntity<Map<String, Object>> createTemporalExpression(HttpSession session, @RequestParam(value="string1", required=false) String string1, @RequestParam(value="string2", required=false) String string2, @RequestParam(value="description", required=false) String description, @RequestParam(value="integer1", required=false) Long integer1, @RequestParam(value="tempExprId", required=false) String tempExprId, @RequestParam(value="date2", required=false) Timestamp date2, @RequestParam(value="date1", required=false) Timestamp date1, @RequestParam(value="tempExprTypeId", required=false) String tempExprTypeId, @RequestParam(value="integer2", required=false) Long integer2) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("string1",string1);
@@ -1930,23 +1932,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/visualThemePermissionCheck")
-	public ResponseEntity<Object> visualThemePermissionCheck(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="mainAction", required=false) String mainAction) {
+	public ResponseEntity<Map<String, Object>> visualThemePermissionCheck(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="mainAction", required=false) String mainAction) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("primaryPermission",primaryPermission);
@@ -1962,23 +1964,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateVisualTheme")
-	public ResponseEntity<Object> updateVisualTheme(HttpSession session, @RequestParam(value="visualThemeId") String visualThemeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="visualThemeSetId", required=false) String visualThemeSetId) {
+	public ResponseEntity<Map<String, Object>> updateVisualTheme(HttpSession session, @RequestParam(value="visualThemeId") String visualThemeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="visualThemeSetId", required=false) String visualThemeSetId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("visualThemeId",visualThemeId);
@@ -1993,23 +1995,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deletePortalPage")
-	public ResponseEntity<Object> deletePortalPage(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="originalPortalPageId", required=false) String originalPortalPageId, @RequestParam(value="securityGroupId", required=false) String securityGroupId, @RequestParam(value="parentPortalPageId", required=false) String parentPortalPageId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="helpContentId", required=false) String helpContentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="ownerUserLoginId", required=false) String ownerUserLoginId, @RequestParam(value="portalPageName", required=false) String portalPageName) {
+	public ResponseEntity<Map<String, Object>> deletePortalPage(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="originalPortalPageId", required=false) String originalPortalPageId, @RequestParam(value="securityGroupId", required=false) String securityGroupId, @RequestParam(value="parentPortalPageId", required=false) String parentPortalPageId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="helpContentId", required=false) String helpContentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="ownerUserLoginId", required=false) String ownerUserLoginId, @RequestParam(value="portalPageName", required=false) String portalPageName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("portalPageId",portalPageId);
@@ -2030,23 +2032,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/linkGeos")
-	public ResponseEntity<Object> linkGeos(HttpSession session, @RequestParam(value="geoId") String geoId, @RequestParam(value="geoAssocTypeId") String geoAssocTypeId, @RequestParam(value="geoIds", required=false) List geoIds) {
+	public ResponseEntity<Map<String, Object>> linkGeos(HttpSession session, @RequestParam(value="geoId") String geoId, @RequestParam(value="geoAssocTypeId") String geoAssocTypeId, @RequestParam(value="geoIds", required=false) List geoIds) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("geoId",geoId);
@@ -2061,23 +2063,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateUserPrefGroupType")
-	public ResponseEntity<Object> updateUserPrefGroupType(HttpSession session, @RequestParam(value="userPrefGroupTypeId") String userPrefGroupTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateUserPrefGroupType(HttpSession session, @RequestParam(value="userPrefGroupTypeId") String userPrefGroupTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userPrefGroupTypeId",userPrefGroupTypeId);
@@ -2091,23 +2093,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createJsLanguageFileMapping")
-	public ResponseEntity<Object> createJsLanguageFileMapping(HttpSession session, @RequestParam(value="encoding", required=false) String encoding) {
+	public ResponseEntity<Map<String, Object>> createJsLanguageFileMapping(HttpSession session, @RequestParam(value="encoding", required=false) String encoding) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("encoding",encoding);
@@ -2120,23 +2122,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/performFindList")
-	public ResponseEntity<Object> performFindList(HttpSession session, @RequestParam(value="inputFields") java.util.Map inputFields, @RequestParam(value="entityName") String entityName, @RequestParam(value="viewSize", required=false) Integer viewSize, @RequestParam(value="filterByDate", required=false) String filterByDate, @RequestParam(value="filterByDateValue", required=false) Timestamp filterByDateValue, @RequestParam(value="orderBy", required=false) String orderBy, @RequestParam(value="noConditionFind", required=false) String noConditionFind, @RequestParam(value="viewIndex", required=false) Integer viewIndex) {
+	public ResponseEntity<Map<String, Object>> performFindList(HttpSession session, @RequestParam(value="inputFields") java.util.Map inputFields, @RequestParam(value="entityName") String entityName, @RequestParam(value="viewSize", required=false) Integer viewSize, @RequestParam(value="filterByDate", required=false) String filterByDate, @RequestParam(value="filterByDateValue", required=false) Timestamp filterByDateValue, @RequestParam(value="orderBy", required=false) String orderBy, @RequestParam(value="noConditionFind", required=false) String noConditionFind, @RequestParam(value="viewIndex", required=false) Integer viewIndex) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("inputFields",inputFields);
@@ -2156,23 +2158,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/setUserPreferenceGroup")
-	public ResponseEntity<Object> setUserPreferenceGroup(HttpSession session, @RequestParam(value="userPrefGroupTypeId") String userPrefGroupTypeId, @RequestParam(value="userPrefMap") Map userPrefMap, @RequestParam(value="userPrefLoginId", required=false) String userPrefLoginId) {
+	public ResponseEntity<Map<String, Object>> setUserPreferenceGroup(HttpSession session, @RequestParam(value="userPrefGroupTypeId") String userPrefGroupTypeId, @RequestParam(value="userPrefMap") Map userPrefMap, @RequestParam(value="userPrefLoginId", required=false) String userPrefLoginId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userPrefGroupTypeId",userPrefGroupTypeId);
@@ -2187,23 +2189,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/preferenceCopyPermission")
-	public ResponseEntity<Object> preferenceCopyPermission(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="mainAction", required=false) String mainAction) {
+	public ResponseEntity<Map<String, Object>> preferenceCopyPermission(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="mainAction", required=false) String mainAction) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("primaryPermission",primaryPermission);
@@ -2219,23 +2221,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getServerTimestamp")
-	public ResponseEntity<Object> getServerTimestamp(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> getServerTimestamp(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -2247,23 +2249,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteKeywordThesaurus")
-	public ResponseEntity<Object> deleteKeywordThesaurus(HttpSession session, @RequestParam(value="enteredKeyword") String enteredKeyword, @RequestParam(value="alternateKeyword", required=false) String alternateKeyword) {
+	public ResponseEntity<Map<String, Object>> deleteKeywordThesaurus(HttpSession session, @RequestParam(value="enteredKeyword") String enteredKeyword, @RequestParam(value="alternateKeyword", required=false) String alternateKeyword) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("enteredKeyword",enteredKeyword);
@@ -2277,23 +2279,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/checkUomConversionDated")
-	public ResponseEntity<Object> checkUomConversionDated(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="uomId") String uomId, @RequestParam(value="uomIdTo") String uomIdTo) {
+	public ResponseEntity<Map<String, Object>> checkUomConversionDated(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="uomId") String uomId, @RequestParam(value="uomIdTo") String uomIdTo) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -2308,23 +2310,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/commonGenericPermission")
-	public ResponseEntity<Object> commonGenericPermission(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="mainAction", required=false) String mainAction) {
+	public ResponseEntity<Map<String, Object>> commonGenericPermission(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="mainAction", required=false) String mainAction) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("primaryPermission",primaryPermission);
@@ -2340,23 +2342,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteUomGroup")
-	public ResponseEntity<Object> deleteUomGroup(HttpSession session, @RequestParam(value="uomGroupId") String uomGroupId, @RequestParam(value="uomId") String uomId) {
+	public ResponseEntity<Map<String, Object>> deleteUomGroup(HttpSession session, @RequestParam(value="uomGroupId") String uomGroupId, @RequestParam(value="uomId") String uomId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("uomGroupId",uomGroupId);
@@ -2370,23 +2372,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/setUserPreference")
-	public ResponseEntity<Object> setUserPreference(HttpSession session, @RequestParam(value="userPrefValue") String userPrefValue, @RequestParam(value="userPrefTypeId") String userPrefTypeId, @RequestParam(value="userPrefGroupTypeId", required=false) String userPrefGroupTypeId, @RequestParam(value="userPrefLoginId", required=false) String userPrefLoginId) {
+	public ResponseEntity<Map<String, Object>> setUserPreference(HttpSession session, @RequestParam(value="userPrefValue") String userPrefValue, @RequestParam(value="userPrefTypeId") String userPrefTypeId, @RequestParam(value="userPrefGroupTypeId", required=false) String userPrefGroupTypeId, @RequestParam(value="userPrefLoginId", required=false) String userPrefLoginId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userPrefValue",userPrefValue);
@@ -2402,23 +2404,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createTemporalExpressionAssoc")
-	public ResponseEntity<Object> createTemporalExpressionAssoc(HttpSession session, @RequestParam(value="fromTempExprId") String fromTempExprId, @RequestParam(value="toTempExprId") String toTempExprId, @RequestParam(value="exprAssocType", required=false) String exprAssocType) {
+	public ResponseEntity<Map<String, Object>> createTemporalExpressionAssoc(HttpSession session, @RequestParam(value="fromTempExprId") String fromTempExprId, @RequestParam(value="toTempExprId") String toTempExprId, @RequestParam(value="exprAssocType", required=false) String exprAssocType) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromTempExprId",fromTempExprId);
@@ -2433,23 +2435,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/ftpPutFile")
-	public ResponseEntity<Object> ftpPutFile(HttpSession session, @RequestParam(value="hostname") String hostname, @RequestParam(value="password") String password, @RequestParam(value="remoteFilename") String remoteFilename, @RequestParam(value="localFilename") String localFilename, @RequestParam(value="username") String username, @RequestParam(value="defaultTimeout", required=false) Integer defaultTimeout, @RequestParam(value="binaryTransfer", required=false) Boolean binaryTransfer, @RequestParam(value="siteCommands", required=false) List siteCommands, @RequestParam(value="passiveMode", required=false) Boolean passiveMode) {
+	public ResponseEntity<Map<String, Object>> ftpPutFile(HttpSession session, @RequestParam(value="hostname") String hostname, @RequestParam(value="password") String password, @RequestParam(value="remoteFilename") String remoteFilename, @RequestParam(value="localFilename") String localFilename, @RequestParam(value="username") String username, @RequestParam(value="defaultTimeout", required=false) Integer defaultTimeout, @RequestParam(value="binaryTransfer", required=false) Boolean binaryTransfer, @RequestParam(value="siteCommands", required=false) List siteCommands, @RequestParam(value="passiveMode", required=false) Boolean passiveMode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("hostname",hostname);
@@ -2470,23 +2472,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createUomGroup")
-	public ResponseEntity<Object> createUomGroup(HttpSession session, @RequestParam(value="uomGroupId") String uomGroupId, @RequestParam(value="uomId") String uomId) {
+	public ResponseEntity<Map<String, Object>> createUomGroup(HttpSession session, @RequestParam(value="uomGroupId") String uomGroupId, @RequestParam(value="uomId") String uomId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("uomGroupId",uomGroupId);
@@ -2500,23 +2502,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createNote")
-	public ResponseEntity<Object> createNote(HttpSession session, @RequestParam(value="note") String note, @RequestParam(value="noteName", required=false) String noteName, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Map<String, Object>> createNote(HttpSession session, @RequestParam(value="note") String note, @RequestParam(value="noteName", required=false) String noteName, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("note",note);
@@ -2531,23 +2533,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updatePortletSeqDragDrop")
-	public ResponseEntity<Object> updatePortletSeqDragDrop(HttpSession session, @RequestParam(value="mode") String mode, @RequestParam(value="o_portalPortletId") String o_portalPortletId, @RequestParam(value="o_portalPageId") String o_portalPageId, @RequestParam(value="o_portletSeqId") String o_portletSeqId, @RequestParam(value="d_portalPortletId", required=false) String d_portalPortletId, @RequestParam(value="d_portalPageId", required=false) String d_portalPageId, @RequestParam(value="d_portletSeqId", required=false) String d_portletSeqId, @RequestParam(value="destinationColumn", required=false) String destinationColumn) {
+	public ResponseEntity<Map<String, Object>> updatePortletSeqDragDrop(HttpSession session, @RequestParam(value="mode") String mode, @RequestParam(value="o_portalPortletId") String o_portalPortletId, @RequestParam(value="o_portalPageId") String o_portalPageId, @RequestParam(value="o_portletSeqId") String o_portletSeqId, @RequestParam(value="d_portalPortletId", required=false) String d_portalPortletId, @RequestParam(value="d_portalPageId", required=false) String d_portalPageId, @RequestParam(value="d_portletSeqId", required=false) String d_portletSeqId, @RequestParam(value="destinationColumn", required=false) String destinationColumn) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("mode",mode);
@@ -2567,23 +2569,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/returnErrorService")
-	public ResponseEntity<Object> returnErrorService(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> returnErrorService(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -2595,23 +2597,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getFileUploadProgressStatus")
-	public ResponseEntity<Object> getFileUploadProgressStatus(HttpSession session, @RequestParam(value="uploadProgressListener", required=false) org.apache.ofbiz.webapp.event.FileUploadProgressListener uploadProgressListener) {
+	public ResponseEntity<Map<String, Object>> getFileUploadProgressStatus(HttpSession session, @RequestParam(value="uploadProgressListener", required=false) org.apache.ofbiz.webapp.event.FileUploadProgressListener uploadProgressListener) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("uploadProgressListener",uploadProgressListener);
@@ -2624,23 +2626,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateGeoAssocType")
-	public ResponseEntity<Object> updateGeoAssocType(HttpSession session, @RequestParam(value="geoAssocTypeId") String geoAssocTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateGeoAssocType(HttpSession session, @RequestParam(value="geoAssocTypeId") String geoAssocTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("geoAssocTypeId",geoAssocTypeId);
@@ -2654,23 +2656,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getServerTimeZone")
-	public ResponseEntity<Object> getServerTimeZone(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> getServerTimeZone(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -2682,23 +2684,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteGeoPoint")
-	public ResponseEntity<Object> deleteGeoPoint(HttpSession session, @RequestParam(value="geoPointId") String geoPointId) {
+	public ResponseEntity<Map<String, Object>> deleteGeoPoint(HttpSession session, @RequestParam(value="geoPointId") String geoPointId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("geoPointId",geoPointId);
@@ -2711,23 +2713,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/commonGetAllCrudPermissions")
-	public ResponseEntity<Object> commonGetAllCrudPermissions(HttpSession session, @RequestParam(value="primaryPermission") String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission) {
+	public ResponseEntity<Map<String, Object>> commonGetAllCrudPermissions(HttpSession session, @RequestParam(value="primaryPermission") String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("primaryPermission",primaryPermission);
@@ -2741,23 +2743,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateDataSourceType")
-	public ResponseEntity<Object> updateDataSourceType(HttpSession session, @RequestParam(value="dataSourceTypeId") String dataSourceTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateDataSourceType(HttpSession session, @RequestParam(value="dataSourceTypeId") String dataSourceTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("dataSourceTypeId",dataSourceTypeId);
@@ -2771,23 +2773,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/convertUom")
-	public ResponseEntity<Object> convertUom(HttpSession session, @RequestParam(value="originalValue") BigDecimal originalValue, @RequestParam(value="uomId") String uomId, @RequestParam(value="uomIdTo") String uomIdTo, @RequestParam(value="defaultRoundingMode", required=false) String defaultRoundingMode, @RequestParam(value="purposeEnumId", required=false) String purposeEnumId, @RequestParam(value="conversionParameters", required=false) Map conversionParameters, @RequestParam(value="defaultDecimalScale", required=false) Long defaultDecimalScale, @RequestParam(value="asOfDate", required=false) Timestamp asOfDate) {
+	public ResponseEntity<Map<String, Object>> convertUom(HttpSession session, @RequestParam(value="originalValue") BigDecimal originalValue, @RequestParam(value="uomId") String uomId, @RequestParam(value="uomIdTo") String uomIdTo, @RequestParam(value="defaultRoundingMode", required=false) String defaultRoundingMode, @RequestParam(value="purposeEnumId", required=false) String purposeEnumId, @RequestParam(value="conversionParameters", required=false) Map conversionParameters, @RequestParam(value="defaultDecimalScale", required=false) Long defaultDecimalScale, @RequestParam(value="asOfDate", required=false) Timestamp asOfDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("originalValue",originalValue);
@@ -2807,23 +2809,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createGeoType")
-	public ResponseEntity<Object> createGeoType(HttpSession session, @RequestParam(value="geoTypeId", required=false) String geoTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createGeoType(HttpSession session, @RequestParam(value="geoTypeId", required=false) String geoTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("geoTypeId",geoTypeId);
@@ -2839,23 +2841,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createGeoPoint")
-	public ResponseEntity<Object> createGeoPoint(HttpSession session, @RequestParam(value="dataSourceId") String dataSourceId, @RequestParam(value="latitude") String latitude, @RequestParam(value="longitude") String longitude, @RequestParam(value="elevation", required=false) BigDecimal elevation, @RequestParam(value="elevationUomId", required=false) String elevationUomId, @RequestParam(value="geoPointTypeEnumId", required=false) String geoPointTypeEnumId, @RequestParam(value="description", required=false) String description, @RequestParam(value="information", required=false) String information) {
+	public ResponseEntity<Map<String, Object>> createGeoPoint(HttpSession session, @RequestParam(value="dataSourceId") String dataSourceId, @RequestParam(value="latitude") String latitude, @RequestParam(value="longitude") String longitude, @RequestParam(value="elevation", required=false) BigDecimal elevation, @RequestParam(value="elevationUomId", required=false) String elevationUomId, @RequestParam(value="geoPointTypeEnumId", required=false) String geoPointTypeEnumId, @RequestParam(value="description", required=false) String description, @RequestParam(value="information", required=false) String information) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("dataSourceId",dataSourceId);
@@ -2875,23 +2877,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createKeywordThesaurus")
-	public ResponseEntity<Object> createKeywordThesaurus(HttpSession session, @RequestParam(value="enteredKeyword") String enteredKeyword, @RequestParam(value="alternateKeyword") String alternateKeyword, @RequestParam(value="relationshipEnumId", required=false) String relationshipEnumId) {
+	public ResponseEntity<Map<String, Object>> createKeywordThesaurus(HttpSession session, @RequestParam(value="enteredKeyword") String enteredKeyword, @RequestParam(value="alternateKeyword") String alternateKeyword, @RequestParam(value="relationshipEnumId", required=false) String relationshipEnumId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("enteredKeyword",enteredKeyword);
@@ -2906,23 +2908,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteVisualThemeResource")
-	public ResponseEntity<Object> deleteVisualThemeResource(HttpSession session, @RequestParam(value="resourceTypeEnumId") String resourceTypeEnumId, @RequestParam(value="visualThemeId") String visualThemeId, @RequestParam(value="sequenceId") String sequenceId) {
+	public ResponseEntity<Map<String, Object>> deleteVisualThemeResource(HttpSession session, @RequestParam(value="resourceTypeEnumId") String resourceTypeEnumId, @RequestParam(value="visualThemeId") String visualThemeId, @RequestParam(value="sequenceId") String sequenceId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("resourceTypeEnumId",resourceTypeEnumId);
@@ -2937,23 +2939,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/ftpGetFile")
-	public ResponseEntity<Object> ftpGetFile(HttpSession session, @RequestParam(value="hostname") String hostname, @RequestParam(value="password") String password, @RequestParam(value="remoteFilename") String remoteFilename, @RequestParam(value="localFilename") String localFilename, @RequestParam(value="username") String username, @RequestParam(value="defaultTimeout", required=false) Integer defaultTimeout, @RequestParam(value="binaryTransfer", required=false) Boolean binaryTransfer, @RequestParam(value="passiveMode", required=false) Boolean passiveMode) {
+	public ResponseEntity<Map<String, Object>> ftpGetFile(HttpSession session, @RequestParam(value="hostname") String hostname, @RequestParam(value="password") String password, @RequestParam(value="remoteFilename") String remoteFilename, @RequestParam(value="localFilename") String localFilename, @RequestParam(value="username") String username, @RequestParam(value="defaultTimeout", required=false) Integer defaultTimeout, @RequestParam(value="binaryTransfer", required=false) Boolean binaryTransfer, @RequestParam(value="passiveMode", required=false) Boolean passiveMode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("hostname",hostname);
@@ -2973,23 +2975,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteTemporalExpressionAssoc")
-	public ResponseEntity<Object> deleteTemporalExpressionAssoc(HttpSession session, @RequestParam(value="fromTempExprId") String fromTempExprId, @RequestParam(value="toTempExprId") String toTempExprId) {
+	public ResponseEntity<Map<String, Object>> deleteTemporalExpressionAssoc(HttpSession session, @RequestParam(value="fromTempExprId") String fromTempExprId, @RequestParam(value="toTempExprId") String toTempExprId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromTempExprId",fromTempExprId);
@@ -3003,23 +3005,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeUserPreference")
-	public ResponseEntity<Object> removeUserPreference(HttpSession session, @RequestParam(value="userPrefTypeId") String userPrefTypeId, @RequestParam(value="userPrefLoginId", required=false) String userPrefLoginId) {
+	public ResponseEntity<Map<String, Object>> removeUserPreference(HttpSession session, @RequestParam(value="userPrefTypeId") String userPrefTypeId, @RequestParam(value="userPrefLoginId", required=false) String userPrefLoginId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userPrefTypeId",userPrefTypeId);
@@ -3033,23 +3035,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updatePortalPageColumn")
-	public ResponseEntity<Object> updatePortalPageColumn(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="columnSeqId") String columnSeqId, @RequestParam(value="columnWidthPixels", required=false) Long columnWidthPixels, @RequestParam(value="columnWidthPercentage", required=false) Long columnWidthPercentage) {
+	public ResponseEntity<Map<String, Object>> updatePortalPageColumn(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="columnSeqId") String columnSeqId, @RequestParam(value="columnWidthPixels", required=false) Long columnWidthPixels, @RequestParam(value="columnWidthPercentage", required=false) Long columnWidthPercentage) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("portalPageId",portalPageId);
@@ -3065,23 +3067,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/copyUserPrefGroup")
-	public ResponseEntity<Object> copyUserPrefGroup(HttpSession session, @RequestParam(value="userPrefGroupTypeId") String userPrefGroupTypeId, @RequestParam(value="fromUserLoginId") String fromUserLoginId, @RequestParam(value="userPrefLoginId", required=false) String userPrefLoginId) {
+	public ResponseEntity<Map<String, Object>> copyUserPrefGroup(HttpSession session, @RequestParam(value="userPrefGroupTypeId") String userPrefGroupTypeId, @RequestParam(value="fromUserLoginId") String fromUserLoginId, @RequestParam(value="userPrefLoginId", required=false) String userPrefLoginId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userPrefGroupTypeId",userPrefGroupTypeId);
@@ -3096,23 +3098,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getStatusValidChangeToDetails")
-	public ResponseEntity<Object> getStatusValidChangeToDetails(HttpSession session, @RequestParam(value="statusId") String statusId) {
+	public ResponseEntity<Map<String, Object>> getStatusValidChangeToDetails(HttpSession session, @RequestParam(value="statusId") String statusId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("statusId",statusId);
@@ -3125,23 +3127,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getVisualThemeResources")
-	public ResponseEntity<Object> getVisualThemeResources(HttpSession session, @RequestParam(value="themeResources", required=false) Map themeResources, @RequestParam(value="visualThemeId", required=false) String visualThemeId) {
+	public ResponseEntity<Map<String, Object>> getVisualThemeResources(HttpSession session, @RequestParam(value="themeResources", required=false) Map themeResources, @RequestParam(value="visualThemeId", required=false) String visualThemeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("themeResources",themeResources);
@@ -3155,23 +3157,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createUserPrefGroupType")
-	public ResponseEntity<Object> createUserPrefGroupType(HttpSession session, @RequestParam(value="userPrefGroupTypeId", required=false) String userPrefGroupTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createUserPrefGroupType(HttpSession session, @RequestParam(value="userPrefGroupTypeId", required=false) String userPrefGroupTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userPrefGroupTypeId",userPrefGroupTypeId);
@@ -3185,23 +3187,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getPortletAttributes")
-	public ResponseEntity<Object> getPortletAttributes(HttpSession session, @RequestParam(value="portalPortletId") String portalPortletId, @RequestParam(value="portalPageId", required=false) String portalPageId, @RequestParam(value="portletSeqId", required=false) String portletSeqId, @RequestParam(value="ownerUserLoginId", required=false) String ownerUserLoginId) {
+	public ResponseEntity<Map<String, Object>> getPortletAttributes(HttpSession session, @RequestParam(value="portalPortletId") String portalPortletId, @RequestParam(value="portalPageId", required=false) String portalPageId, @RequestParam(value="portletSeqId", required=false) String portletSeqId, @RequestParam(value="ownerUserLoginId", required=false) String ownerUserLoginId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("portalPortletId",portalPortletId);
@@ -3217,23 +3219,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getCountryList")
-	public ResponseEntity<Object> getCountryList(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> getCountryList(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -3245,23 +3247,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deletePortalPageColumn")
-	public ResponseEntity<Object> deletePortalPageColumn(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="columnSeqId") String columnSeqId) {
+	public ResponseEntity<Map<String, Object>> deletePortalPageColumn(HttpSession session, @RequestParam(value="portalPageId") String portalPageId, @RequestParam(value="columnSeqId") String columnSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("portalPageId",portalPageId);
@@ -3275,23 +3277,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateUserLoginSecurity")
-	public ResponseEntity<Object> updateUserLoginSecurity(HttpSession session, @RequestParam(value="userLoginId") String userLoginId, @RequestParam(value="enabled") String enabled, @RequestParam(value="disabledDateTime", required=false) java.sql.Timestamp disabledDateTime, @RequestParam(value="disabledBy", required=false) String disabledBy, @RequestParam(value="successiveFailedLogins", required=false) Long successiveFailedLogins, @RequestParam(value="userLdapDn", required=false) String userLdapDn, @RequestParam(value="externalAuthId", required=false) String externalAuthId, @RequestParam(value="requirePasswordChange", required=false) String requirePasswordChange) {
+	public ResponseEntity<Map<String, Object>> updateUserLoginSecurity(HttpSession session, @RequestParam(value="userLoginId") String userLoginId, @RequestParam(value="enabled") String enabled, @RequestParam(value="disabledDateTime", required=false) java.sql.Timestamp disabledDateTime, @RequestParam(value="disabledBy", required=false) String disabledBy, @RequestParam(value="successiveFailedLogins", required=false) Long successiveFailedLogins, @RequestParam(value="userLdapDn", required=false) String userLdapDn, @RequestParam(value="externalAuthId", required=false) String externalAuthId, @RequestParam(value="requirePasswordChange", required=false) String requirePasswordChange) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLoginId",userLoginId);
@@ -3311,23 +3313,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/prepareFind")
-	public ResponseEntity<Object> prepareFind(HttpSession session, @RequestParam(value="inputFields") java.util.Map inputFields, @RequestParam(value="entityName") String entityName, @RequestParam(value="filterByDate", required=false) String filterByDate, @RequestParam(value="filterByDateValue", required=false) Timestamp filterByDateValue, @RequestParam(value="thruDateName", required=false) String thruDateName, @RequestParam(value="orderBy", required=false) String orderBy, @RequestParam(value="noConditionFind", required=false) String noConditionFind, @RequestParam(value="fromDateName", required=false) String fromDateName) {
+	public ResponseEntity<Map<String, Object>> prepareFind(HttpSession session, @RequestParam(value="inputFields") java.util.Map inputFields, @RequestParam(value="entityName") String entityName, @RequestParam(value="filterByDate", required=false) String filterByDate, @RequestParam(value="filterByDateValue", required=false) Timestamp filterByDateValue, @RequestParam(value="thruDateName", required=false) String thruDateName, @RequestParam(value="orderBy", required=false) String orderBy, @RequestParam(value="noConditionFind", required=false) String noConditionFind, @RequestParam(value="fromDateName", required=false) String fromDateName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("inputFields",inputFields);
@@ -3347,23 +3349,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCustomTimePeriod")
-	public ResponseEntity<Object> updateCustomTimePeriod(HttpSession session, @RequestParam(value="customTimePeriodId") String customTimePeriodId, @RequestParam(value="periodNum", required=false) Long periodNum, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="isClosed", required=false) String isClosed, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="periodName", required=false) String periodName, @RequestParam(value="parentPeriodId", required=false) String parentPeriodId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateCustomTimePeriod(HttpSession session, @RequestParam(value="customTimePeriodId") String customTimePeriodId, @RequestParam(value="periodNum", required=false) Long periodNum, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="isClosed", required=false) String isClosed, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="periodName", required=false) String periodName, @RequestParam(value="parentPeriodId", required=false) String parentPeriodId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("customTimePeriodId",customTimePeriodId);
@@ -3383,23 +3385,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createUom")
-	public ResponseEntity<Object> createUom(HttpSession session, @RequestParam(value="description", required=false) String description, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="abbreviation", required=false) String abbreviation, @RequestParam(value="uomTypeId", required=false) String uomTypeId) {
+	public ResponseEntity<Map<String, Object>> createUom(HttpSession session, @RequestParam(value="description", required=false) String description, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="abbreviation", required=false) String abbreviation, @RequestParam(value="uomTypeId", required=false) String uomTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("description",description);
@@ -3415,23 +3417,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteVisualTheme")
-	public ResponseEntity<Object> deleteVisualTheme(HttpSession session, @RequestParam(value="visualThemeId") String visualThemeId) {
+	public ResponseEntity<Map<String, Object>> deleteVisualTheme(HttpSession session, @RequestParam(value="visualThemeId") String visualThemeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("visualThemeId",visualThemeId);
@@ -3444,23 +3446,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteStatusValidChange")
-	public ResponseEntity<Object> deleteStatusValidChange(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="statusIdTo") String statusIdTo) {
+	public ResponseEntity<Map<String, Object>> deleteStatusValidChange(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="statusIdTo") String statusIdTo) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("statusId",statusId);
@@ -3474,23 +3476,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createUomConversionDated")
-	public ResponseEntity<Object> createUomConversionDated(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="uomId") String uomId, @RequestParam(value="uomIdTo") String uomIdTo, @RequestParam(value="roundingMode", required=false) String roundingMode, @RequestParam(value="purposeEnumId", required=false) String purposeEnumId, @RequestParam(value="conversionFactor", required=false) BigDecimal conversionFactor, @RequestParam(value="decimalScale", required=false) Long decimalScale, @RequestParam(value="customMethodId", required=false) String customMethodId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createUomConversionDated(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="uomId") String uomId, @RequestParam(value="uomIdTo") String uomIdTo, @RequestParam(value="roundingMode", required=false) String roundingMode, @RequestParam(value="purposeEnumId", required=false) String purposeEnumId, @RequestParam(value="conversionFactor", required=false) BigDecimal conversionFactor, @RequestParam(value="decimalScale", required=false) Long decimalScale, @RequestParam(value="customMethodId", required=false) String customMethodId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -3511,23 +3513,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updatePassword")
-	public ResponseEntity<Object> updatePassword(HttpSession session, @RequestParam(value="userLoginId", required=false) String userLoginId, @RequestParam(value="newPasswordVerify", required=false) String newPasswordVerify, @RequestParam(value="passwordHint", required=false) String passwordHint, @RequestParam(value="newPassword", required=false) String newPassword, @RequestParam(value="currentPassword", required=false) String currentPassword) {
+	public ResponseEntity<Map<String, Object>> updatePassword(HttpSession session, @RequestParam(value="userLoginId", required=false) String userLoginId, @RequestParam(value="newPasswordVerify", required=false) String newPasswordVerify, @RequestParam(value="passwordHint", required=false) String passwordHint, @RequestParam(value="newPassword", required=false) String newPassword, @RequestParam(value="currentPassword", required=false) String currentPassword) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLoginId",userLoginId);
@@ -3544,23 +3546,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getAssociatedStateList")
-	public ResponseEntity<Object> getAssociatedStateList(HttpSession session, @RequestParam(value="countryGeoId") String countryGeoId, @RequestParam(value="listOrderBy", required=false) String listOrderBy) {
+	public ResponseEntity<Map<String, Object>> getAssociatedStateList(HttpSession session, @RequestParam(value="countryGeoId") String countryGeoId, @RequestParam(value="listOrderBy", required=false) String listOrderBy) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("countryGeoId",countryGeoId);
@@ -3574,23 +3576,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createUomType")
-	public ResponseEntity<Object> createUomType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description, @RequestParam(value="uomTypeId", required=false) String uomTypeId) {
+	public ResponseEntity<Map<String, Object>> createUomType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description, @RequestParam(value="uomTypeId", required=false) String uomTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("parentTypeId",parentTypeId);
@@ -3606,23 +3608,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createPortalPage")
-	public ResponseEntity<Object> createPortalPage(HttpSession session, @RequestParam(value="portalPageId", required=false) String portalPageId, @RequestParam(value="originalPortalPageId", required=false) String originalPortalPageId, @RequestParam(value="securityGroupId", required=false) String securityGroupId, @RequestParam(value="parentPortalPageId", required=false) String parentPortalPageId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="helpContentId", required=false) String helpContentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="ownerUserLoginId", required=false) String ownerUserLoginId, @RequestParam(value="portalPageName", required=false) String portalPageName) {
+	public ResponseEntity<Map<String, Object>> createPortalPage(HttpSession session, @RequestParam(value="portalPageId", required=false) String portalPageId, @RequestParam(value="originalPortalPageId", required=false) String originalPortalPageId, @RequestParam(value="securityGroupId", required=false) String securityGroupId, @RequestParam(value="parentPortalPageId", required=false) String parentPortalPageId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="helpContentId", required=false) String helpContentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="ownerUserLoginId", required=false) String ownerUserLoginId, @RequestParam(value="portalPageName", required=false) String portalPageName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("portalPageId",portalPageId);
@@ -3643,23 +3645,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deletePeriodType")
-	public ResponseEntity<Object> deletePeriodType(HttpSession session, @RequestParam(value="periodTypeId") String periodTypeId) {
+	public ResponseEntity<Map<String, Object>> deletePeriodType(HttpSession session, @RequestParam(value="periodTypeId") String periodTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("periodTypeId",periodTypeId);
@@ -3672,23 +3674,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateUserLoginId")
-	public ResponseEntity<Object> updateUserLoginId(HttpSession session, @RequestParam(value="userLoginId") String userLoginId) {
+	public ResponseEntity<Map<String, Object>> updateUserLoginId(HttpSession session, @RequestParam(value="userLoginId") String userLoginId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLoginId",userLoginId);
@@ -3701,23 +3703,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateVisualThemeResource")
-	public ResponseEntity<Object> updateVisualThemeResource(HttpSession session, @RequestParam(value="resourceTypeEnumId") String resourceTypeEnumId, @RequestParam(value="visualThemeId") String visualThemeId, @RequestParam(value="sequenceId") String sequenceId, @RequestParam(value="resourceValue", required=false) Long resourceValue) {
+	public ResponseEntity<Map<String, Object>> updateVisualThemeResource(HttpSession session, @RequestParam(value="resourceTypeEnumId") String resourceTypeEnumId, @RequestParam(value="visualThemeId") String visualThemeId, @RequestParam(value="sequenceId") String sequenceId, @RequestParam(value="resourceValue", required=false) Long resourceValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("resourceTypeEnumId",resourceTypeEnumId);
@@ -3733,23 +3735,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateKeywordThesaurus")
-	public ResponseEntity<Object> updateKeywordThesaurus(HttpSession session, @RequestParam(value="enteredKeyword") String enteredKeyword, @RequestParam(value="alternateKeyword") String alternateKeyword, @RequestParam(value="relationshipEnumId", required=false) String relationshipEnumId) {
+	public ResponseEntity<Map<String, Object>> updateKeywordThesaurus(HttpSession session, @RequestParam(value="enteredKeyword") String enteredKeyword, @RequestParam(value="alternateKeyword") String alternateKeyword, @RequestParam(value="relationshipEnumId", required=false) String relationshipEnumId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("enteredKeyword",enteredKeyword);
@@ -3764,23 +3766,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getRelatedGeos")
-	public ResponseEntity<Object> getRelatedGeos(HttpSession session, @RequestParam(value="geoId") String geoId, @RequestParam(value="geoAssocTypeId") String geoAssocTypeId) {
+	public ResponseEntity<Map<String, Object>> getRelatedGeos(HttpSession session, @RequestParam(value="geoId") String geoId, @RequestParam(value="geoAssocTypeId") String geoAssocTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("geoId",geoId);
@@ -3794,23 +3796,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteUom")
-	public ResponseEntity<Object> deleteUom(HttpSession session, @RequestParam(value="uomId") String uomId) {
+	public ResponseEntity<Map<String, Object>> deleteUom(HttpSession session, @RequestParam(value="uomId") String uomId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("uomId",uomId);
@@ -3823,23 +3825,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateGeoPoint")
-	public ResponseEntity<Object> updateGeoPoint(HttpSession session, @RequestParam(value="dataSourceId") String dataSourceId, @RequestParam(value="latitude") String latitude, @RequestParam(value="geoPointId") String geoPointId, @RequestParam(value="longitude") String longitude, @RequestParam(value="elevation", required=false) BigDecimal elevation, @RequestParam(value="elevationUomId", required=false) String elevationUomId, @RequestParam(value="geoPointTypeEnumId", required=false) String geoPointTypeEnumId, @RequestParam(value="description", required=false) String description, @RequestParam(value="information", required=false) String information) {
+	public ResponseEntity<Map<String, Object>> updateGeoPoint(HttpSession session, @RequestParam(value="dataSourceId") String dataSourceId, @RequestParam(value="latitude") String latitude, @RequestParam(value="geoPointId") String geoPointId, @RequestParam(value="longitude") String longitude, @RequestParam(value="elevation", required=false) BigDecimal elevation, @RequestParam(value="elevationUomId", required=false) String elevationUomId, @RequestParam(value="geoPointTypeEnumId", required=false) String geoPointTypeEnumId, @RequestParam(value="description", required=false) String description, @RequestParam(value="information", required=false) String information) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("dataSourceId",dataSourceId);
@@ -3860,23 +3862,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createGeoAssocType")
-	public ResponseEntity<Object> createGeoAssocType(HttpSession session, @RequestParam(value="geoAssocTypeId", required=false) String geoAssocTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createGeoAssocType(HttpSession session, @RequestParam(value="geoAssocTypeId", required=false) String geoAssocTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("geoAssocTypeId",geoAssocTypeId);
@@ -3890,23 +3892,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getAllMetrics")
-	public ResponseEntity<Object> getAllMetrics(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> getAllMetrics(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -3918,23 +3920,23 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/displayXaDebugInfo")
-	public ResponseEntity<Object> displayXaDebugInfo(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> displayXaDebugInfo(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -3946,19 +3948,19 @@ public class CommonsServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.custRequest.query.requiremen
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/custRequest/requirementCustRequests")
 public class RequirementCustRequestController {
@@ -52,7 +54,7 @@ public class RequirementCustRequestController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findRequirementCustRequestsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<RequirementCustRequest>> findRequirementCustRequestsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindRequirementCustRequestsBy query = new FindRequirementCustRequestsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class RequirementCustRequestController {
 		}
 
 		List<RequirementCustRequest> requirementCustRequests =((RequirementCustRequestFound) Scheduler.execute(query).data()).getRequirementCustRequests();
-
-		if (requirementCustRequests.size() == 1) {
-			return ResponseEntity.ok().body(requirementCustRequests.get(0));
-		}
 
 		return ResponseEntity.ok().body(requirementCustRequests);
 
@@ -78,7 +76,7 @@ public class RequirementCustRequestController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createRequirementCustRequest(HttpServletRequest request) throws Exception {
+	public ResponseEntity<RequirementCustRequest> createRequirementCustRequest(HttpServletRequest request) throws Exception {
 
 		RequirementCustRequest requirementCustRequestToBeAdded = new RequirementCustRequest();
 		try {
@@ -86,7 +84,7 @@ public class RequirementCustRequestController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createRequirementCustRequest(requirementCustRequestToBeAdded);
@@ -101,63 +99,15 @@ public class RequirementCustRequestController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createRequirementCustRequest(@RequestBody RequirementCustRequest requirementCustRequestToBeAdded) throws Exception {
+	public ResponseEntity<RequirementCustRequest> createRequirementCustRequest(@RequestBody RequirementCustRequest requirementCustRequestToBeAdded) throws Exception {
 
 		AddRequirementCustRequest command = new AddRequirementCustRequest(requirementCustRequestToBeAdded);
 		RequirementCustRequest requirementCustRequest = ((RequirementCustRequestAdded) Scheduler.execute(command).data()).getAddedRequirementCustRequest();
 		
 		if (requirementCustRequest != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(requirementCustRequest);
+			return successful(requirementCustRequest);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("RequirementCustRequest could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateRequirementCustRequest(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		RequirementCustRequest requirementCustRequestToBeUpdated = new RequirementCustRequest();
-
-		try {
-			requirementCustRequestToBeUpdated = RequirementCustRequestMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateRequirementCustRequest(requirementCustRequestToBeUpdated, requirementCustRequestToBeUpdated.getCustRequestItemSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class RequirementCustRequestController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{custRequestItemSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateRequirementCustRequest(@RequestBody RequirementCustRequest requirementCustRequestToBeUpdated,
+	public ResponseEntity<String> updateRequirementCustRequest(@RequestBody RequirementCustRequest requirementCustRequestToBeUpdated,
 			@PathVariable String custRequestItemSeqId) throws Exception {
 
 		requirementCustRequestToBeUpdated.setCustRequestItemSeqId(custRequestItemSeqId);
@@ -178,41 +128,44 @@ public class RequirementCustRequestController {
 
 		try {
 			if(((RequirementCustRequestUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{requirementCustRequestId}")
-	public ResponseEntity<Object> findById(@PathVariable String requirementCustRequestId) throws Exception {
+	public ResponseEntity<RequirementCustRequest> findById(@PathVariable String requirementCustRequestId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("requirementCustRequestId", requirementCustRequestId);
 		try {
 
-			Object foundRequirementCustRequest = findRequirementCustRequestsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundRequirementCustRequest);
+			List<RequirementCustRequest> foundRequirementCustRequest = findRequirementCustRequestsBy(requestParams).getBody();
+			if(foundRequirementCustRequest.size()==1){				return successful(foundRequirementCustRequest.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{requirementCustRequestId}")
-	public ResponseEntity<Object> deleteRequirementCustRequestByIdUpdated(@PathVariable String requirementCustRequestId) throws Exception {
+	public ResponseEntity<String> deleteRequirementCustRequestByIdUpdated(@PathVariable String requirementCustRequestId) throws Exception {
 		DeleteRequirementCustRequest command = new DeleteRequirementCustRequest(requirementCustRequestId);
 
 		try {
 			if (((RequirementCustRequestDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("RequirementCustRequest could not be deleted");
+		return conflict();
 
 	}
 

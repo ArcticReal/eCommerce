@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.settlementTerm.query.Fi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/settlementTerms")
 public class SettlementTermController {
@@ -52,7 +54,7 @@ public class SettlementTermController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findSettlementTermsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<SettlementTerm>> findSettlementTermsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSettlementTermsBy query = new FindSettlementTermsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class SettlementTermController {
 		}
 
 		List<SettlementTerm> settlementTerms =((SettlementTermFound) Scheduler.execute(query).data()).getSettlementTerms();
-
-		if (settlementTerms.size() == 1) {
-			return ResponseEntity.ok().body(settlementTerms.get(0));
-		}
 
 		return ResponseEntity.ok().body(settlementTerms);
 
@@ -78,7 +76,7 @@ public class SettlementTermController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createSettlementTerm(HttpServletRequest request) throws Exception {
+	public ResponseEntity<SettlementTerm> createSettlementTerm(HttpServletRequest request) throws Exception {
 
 		SettlementTerm settlementTermToBeAdded = new SettlementTerm();
 		try {
@@ -86,7 +84,7 @@ public class SettlementTermController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createSettlementTerm(settlementTermToBeAdded);
@@ -101,63 +99,15 @@ public class SettlementTermController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createSettlementTerm(@RequestBody SettlementTerm settlementTermToBeAdded) throws Exception {
+	public ResponseEntity<SettlementTerm> createSettlementTerm(@RequestBody SettlementTerm settlementTermToBeAdded) throws Exception {
 
 		AddSettlementTerm command = new AddSettlementTerm(settlementTermToBeAdded);
 		SettlementTerm settlementTerm = ((SettlementTermAdded) Scheduler.execute(command).data()).getAddedSettlementTerm();
 		
 		if (settlementTerm != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(settlementTerm);
+			return successful(settlementTerm);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("SettlementTerm could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateSettlementTerm(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		SettlementTerm settlementTermToBeUpdated = new SettlementTerm();
-
-		try {
-			settlementTermToBeUpdated = SettlementTermMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateSettlementTerm(settlementTermToBeUpdated, settlementTermToBeUpdated.getSettlementTermId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class SettlementTermController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{settlementTermId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateSettlementTerm(@RequestBody SettlementTerm settlementTermToBeUpdated,
+	public ResponseEntity<String> updateSettlementTerm(@RequestBody SettlementTerm settlementTermToBeUpdated,
 			@PathVariable String settlementTermId) throws Exception {
 
 		settlementTermToBeUpdated.setSettlementTermId(settlementTermId);
@@ -178,41 +128,44 @@ public class SettlementTermController {
 
 		try {
 			if(((SettlementTermUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{settlementTermId}")
-	public ResponseEntity<Object> findById(@PathVariable String settlementTermId) throws Exception {
+	public ResponseEntity<SettlementTerm> findById(@PathVariable String settlementTermId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("settlementTermId", settlementTermId);
 		try {
 
-			Object foundSettlementTerm = findSettlementTermsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundSettlementTerm);
+			List<SettlementTerm> foundSettlementTerm = findSettlementTermsBy(requestParams).getBody();
+			if(foundSettlementTerm.size()==1){				return successful(foundSettlementTerm.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{settlementTermId}")
-	public ResponseEntity<Object> deleteSettlementTermByIdUpdated(@PathVariable String settlementTermId) throws Exception {
+	public ResponseEntity<String> deleteSettlementTermByIdUpdated(@PathVariable String settlementTermId) throws Exception {
 		DeleteSettlementTerm command = new DeleteSettlementTerm(settlementTermId);
 
 		try {
 			if (((SettlementTermDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("SettlementTerm could not be deleted");
+		return conflict();
 
 	}
 

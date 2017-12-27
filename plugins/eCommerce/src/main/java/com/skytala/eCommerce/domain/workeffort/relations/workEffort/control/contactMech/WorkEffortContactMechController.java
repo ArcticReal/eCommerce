@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.workeffort.relations.workEffort.query.contac
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/workeffort/workEffort/workEffortContactMechs")
 public class WorkEffortContactMechController {
@@ -52,7 +54,7 @@ public class WorkEffortContactMechController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWorkEffortContactMechsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WorkEffortContactMech>> findWorkEffortContactMechsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortContactMechsBy query = new FindWorkEffortContactMechsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WorkEffortContactMechController {
 		}
 
 		List<WorkEffortContactMech> workEffortContactMechs =((WorkEffortContactMechFound) Scheduler.execute(query).data()).getWorkEffortContactMechs();
-
-		if (workEffortContactMechs.size() == 1) {
-			return ResponseEntity.ok().body(workEffortContactMechs.get(0));
-		}
 
 		return ResponseEntity.ok().body(workEffortContactMechs);
 
@@ -78,7 +76,7 @@ public class WorkEffortContactMechController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWorkEffortContactMech(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WorkEffortContactMech> createWorkEffortContactMech(HttpServletRequest request) throws Exception {
 
 		WorkEffortContactMech workEffortContactMechToBeAdded = new WorkEffortContactMech();
 		try {
@@ -86,7 +84,7 @@ public class WorkEffortContactMechController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWorkEffortContactMech(workEffortContactMechToBeAdded);
@@ -101,63 +99,15 @@ public class WorkEffortContactMechController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWorkEffortContactMech(@RequestBody WorkEffortContactMech workEffortContactMechToBeAdded) throws Exception {
+	public ResponseEntity<WorkEffortContactMech> createWorkEffortContactMech(@RequestBody WorkEffortContactMech workEffortContactMechToBeAdded) throws Exception {
 
 		AddWorkEffortContactMech command = new AddWorkEffortContactMech(workEffortContactMechToBeAdded);
 		WorkEffortContactMech workEffortContactMech = ((WorkEffortContactMechAdded) Scheduler.execute(command).data()).getAddedWorkEffortContactMech();
 		
 		if (workEffortContactMech != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(workEffortContactMech);
+			return successful(workEffortContactMech);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WorkEffortContactMech could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWorkEffortContactMech(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WorkEffortContactMech workEffortContactMechToBeUpdated = new WorkEffortContactMech();
-
-		try {
-			workEffortContactMechToBeUpdated = WorkEffortContactMechMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWorkEffortContactMech(workEffortContactMechToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WorkEffortContactMechController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWorkEffortContactMech(@RequestBody WorkEffortContactMech workEffortContactMechToBeUpdated,
+	public ResponseEntity<String> updateWorkEffortContactMech(@RequestBody WorkEffortContactMech workEffortContactMechToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		workEffortContactMechToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class WorkEffortContactMechController {
 
 		try {
 			if(((WorkEffortContactMechUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{workEffortContactMechId}")
-	public ResponseEntity<Object> findById(@PathVariable String workEffortContactMechId) throws Exception {
+	public ResponseEntity<WorkEffortContactMech> findById(@PathVariable String workEffortContactMechId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortContactMechId", workEffortContactMechId);
 		try {
 
-			Object foundWorkEffortContactMech = findWorkEffortContactMechsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWorkEffortContactMech);
+			List<WorkEffortContactMech> foundWorkEffortContactMech = findWorkEffortContactMechsBy(requestParams).getBody();
+			if(foundWorkEffortContactMech.size()==1){				return successful(foundWorkEffortContactMech.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{workEffortContactMechId}")
-	public ResponseEntity<Object> deleteWorkEffortContactMechByIdUpdated(@PathVariable String workEffortContactMechId) throws Exception {
+	public ResponseEntity<String> deleteWorkEffortContactMechByIdUpdated(@PathVariable String workEffortContactMechId) throws Exception {
 		DeleteWorkEffortContactMech command = new DeleteWorkEffortContactMech(workEffortContactMechId);
 
 		try {
 			if (((WorkEffortContactMechDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WorkEffortContactMech could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.facility.query.content.Fin
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/facility/facilityContents")
 public class FacilityContentController {
@@ -52,7 +54,7 @@ public class FacilityContentController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findFacilityContentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<FacilityContent>> findFacilityContentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFacilityContentsBy query = new FindFacilityContentsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class FacilityContentController {
 		}
 
 		List<FacilityContent> facilityContents =((FacilityContentFound) Scheduler.execute(query).data()).getFacilityContents();
-
-		if (facilityContents.size() == 1) {
-			return ResponseEntity.ok().body(facilityContents.get(0));
-		}
 
 		return ResponseEntity.ok().body(facilityContents);
 
@@ -78,7 +76,7 @@ public class FacilityContentController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createFacilityContent(HttpServletRequest request) throws Exception {
+	public ResponseEntity<FacilityContent> createFacilityContent(HttpServletRequest request) throws Exception {
 
 		FacilityContent facilityContentToBeAdded = new FacilityContent();
 		try {
@@ -86,7 +84,7 @@ public class FacilityContentController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createFacilityContent(facilityContentToBeAdded);
@@ -101,63 +99,15 @@ public class FacilityContentController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createFacilityContent(@RequestBody FacilityContent facilityContentToBeAdded) throws Exception {
+	public ResponseEntity<FacilityContent> createFacilityContent(@RequestBody FacilityContent facilityContentToBeAdded) throws Exception {
 
 		AddFacilityContent command = new AddFacilityContent(facilityContentToBeAdded);
 		FacilityContent facilityContent = ((FacilityContentAdded) Scheduler.execute(command).data()).getAddedFacilityContent();
 		
 		if (facilityContent != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(facilityContent);
+			return successful(facilityContent);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("FacilityContent could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateFacilityContent(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		FacilityContent facilityContentToBeUpdated = new FacilityContent();
-
-		try {
-			facilityContentToBeUpdated = FacilityContentMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateFacilityContent(facilityContentToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class FacilityContentController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateFacilityContent(@RequestBody FacilityContent facilityContentToBeUpdated,
+	public ResponseEntity<String> updateFacilityContent(@RequestBody FacilityContent facilityContentToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		facilityContentToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class FacilityContentController {
 
 		try {
 			if(((FacilityContentUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{facilityContentId}")
-	public ResponseEntity<Object> findById(@PathVariable String facilityContentId) throws Exception {
+	public ResponseEntity<FacilityContent> findById(@PathVariable String facilityContentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("facilityContentId", facilityContentId);
 		try {
 
-			Object foundFacilityContent = findFacilityContentsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundFacilityContent);
+			List<FacilityContent> foundFacilityContent = findFacilityContentsBy(requestParams).getBody();
+			if(foundFacilityContent.size()==1){				return successful(foundFacilityContent.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{facilityContentId}")
-	public ResponseEntity<Object> deleteFacilityContentByIdUpdated(@PathVariable String facilityContentId) throws Exception {
+	public ResponseEntity<String> deleteFacilityContentByIdUpdated(@PathVariable String facilityContentId) throws Exception {
 		DeleteFacilityContent command = new DeleteFacilityContent(facilityContentId);
 
 		try {
 			if (((FacilityContentDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("FacilityContent could not be deleted");
+		return conflict();
 
 	}
 

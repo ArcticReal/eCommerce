@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.shipment.relations.shipment.query.gatewayDhl
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/shipment/shipment/shipmentGatewayDhls")
 public class ShipmentGatewayDhlController {
@@ -52,7 +54,7 @@ public class ShipmentGatewayDhlController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findShipmentGatewayDhlsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ShipmentGatewayDhl>> findShipmentGatewayDhlsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentGatewayDhlsBy query = new FindShipmentGatewayDhlsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ShipmentGatewayDhlController {
 		}
 
 		List<ShipmentGatewayDhl> shipmentGatewayDhls =((ShipmentGatewayDhlFound) Scheduler.execute(query).data()).getShipmentGatewayDhls();
-
-		if (shipmentGatewayDhls.size() == 1) {
-			return ResponseEntity.ok().body(shipmentGatewayDhls.get(0));
-		}
 
 		return ResponseEntity.ok().body(shipmentGatewayDhls);
 
@@ -78,7 +76,7 @@ public class ShipmentGatewayDhlController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createShipmentGatewayDhl(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ShipmentGatewayDhl> createShipmentGatewayDhl(HttpServletRequest request) throws Exception {
 
 		ShipmentGatewayDhl shipmentGatewayDhlToBeAdded = new ShipmentGatewayDhl();
 		try {
@@ -86,7 +84,7 @@ public class ShipmentGatewayDhlController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createShipmentGatewayDhl(shipmentGatewayDhlToBeAdded);
@@ -101,63 +99,15 @@ public class ShipmentGatewayDhlController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createShipmentGatewayDhl(@RequestBody ShipmentGatewayDhl shipmentGatewayDhlToBeAdded) throws Exception {
+	public ResponseEntity<ShipmentGatewayDhl> createShipmentGatewayDhl(@RequestBody ShipmentGatewayDhl shipmentGatewayDhlToBeAdded) throws Exception {
 
 		AddShipmentGatewayDhl command = new AddShipmentGatewayDhl(shipmentGatewayDhlToBeAdded);
 		ShipmentGatewayDhl shipmentGatewayDhl = ((ShipmentGatewayDhlAdded) Scheduler.execute(command).data()).getAddedShipmentGatewayDhl();
 		
 		if (shipmentGatewayDhl != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(shipmentGatewayDhl);
+			return successful(shipmentGatewayDhl);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ShipmentGatewayDhl could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateShipmentGatewayDhl(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ShipmentGatewayDhl shipmentGatewayDhlToBeUpdated = new ShipmentGatewayDhl();
-
-		try {
-			shipmentGatewayDhlToBeUpdated = ShipmentGatewayDhlMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateShipmentGatewayDhl(shipmentGatewayDhlToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ShipmentGatewayDhlController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateShipmentGatewayDhl(@RequestBody ShipmentGatewayDhl shipmentGatewayDhlToBeUpdated,
+	public ResponseEntity<String> updateShipmentGatewayDhl(@RequestBody ShipmentGatewayDhl shipmentGatewayDhlToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		shipmentGatewayDhlToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ShipmentGatewayDhlController {
 
 		try {
 			if(((ShipmentGatewayDhlUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{shipmentGatewayDhlId}")
-	public ResponseEntity<Object> findById(@PathVariable String shipmentGatewayDhlId) throws Exception {
+	public ResponseEntity<ShipmentGatewayDhl> findById(@PathVariable String shipmentGatewayDhlId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentGatewayDhlId", shipmentGatewayDhlId);
 		try {
 
-			Object foundShipmentGatewayDhl = findShipmentGatewayDhlsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundShipmentGatewayDhl);
+			List<ShipmentGatewayDhl> foundShipmentGatewayDhl = findShipmentGatewayDhlsBy(requestParams).getBody();
+			if(foundShipmentGatewayDhl.size()==1){				return successful(foundShipmentGatewayDhl.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{shipmentGatewayDhlId}")
-	public ResponseEntity<Object> deleteShipmentGatewayDhlByIdUpdated(@PathVariable String shipmentGatewayDhlId) throws Exception {
+	public ResponseEntity<String> deleteShipmentGatewayDhlByIdUpdated(@PathVariable String shipmentGatewayDhlId) throws Exception {
 		DeleteShipmentGatewayDhl command = new DeleteShipmentGatewayDhl(shipmentGatewayDhlId);
 
 		try {
 			if (((ShipmentGatewayDhlDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ShipmentGatewayDhl could not be deleted");
+		return conflict();
 
 	}
 

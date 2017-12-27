@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.marketing.relations.salesOpportunity.query.q
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/marketing/salesOpportunity/salesOpportunityQuotes")
 public class SalesOpportunityQuoteController {
@@ -52,7 +54,7 @@ public class SalesOpportunityQuoteController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findSalesOpportunityQuotesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<SalesOpportunityQuote>> findSalesOpportunityQuotesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSalesOpportunityQuotesBy query = new FindSalesOpportunityQuotesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class SalesOpportunityQuoteController {
 		}
 
 		List<SalesOpportunityQuote> salesOpportunityQuotes =((SalesOpportunityQuoteFound) Scheduler.execute(query).data()).getSalesOpportunityQuotes();
-
-		if (salesOpportunityQuotes.size() == 1) {
-			return ResponseEntity.ok().body(salesOpportunityQuotes.get(0));
-		}
 
 		return ResponseEntity.ok().body(salesOpportunityQuotes);
 
@@ -78,7 +76,7 @@ public class SalesOpportunityQuoteController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createSalesOpportunityQuote(HttpServletRequest request) throws Exception {
+	public ResponseEntity<SalesOpportunityQuote> createSalesOpportunityQuote(HttpServletRequest request) throws Exception {
 
 		SalesOpportunityQuote salesOpportunityQuoteToBeAdded = new SalesOpportunityQuote();
 		try {
@@ -86,7 +84,7 @@ public class SalesOpportunityQuoteController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createSalesOpportunityQuote(salesOpportunityQuoteToBeAdded);
@@ -101,63 +99,15 @@ public class SalesOpportunityQuoteController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createSalesOpportunityQuote(@RequestBody SalesOpportunityQuote salesOpportunityQuoteToBeAdded) throws Exception {
+	public ResponseEntity<SalesOpportunityQuote> createSalesOpportunityQuote(@RequestBody SalesOpportunityQuote salesOpportunityQuoteToBeAdded) throws Exception {
 
 		AddSalesOpportunityQuote command = new AddSalesOpportunityQuote(salesOpportunityQuoteToBeAdded);
 		SalesOpportunityQuote salesOpportunityQuote = ((SalesOpportunityQuoteAdded) Scheduler.execute(command).data()).getAddedSalesOpportunityQuote();
 		
 		if (salesOpportunityQuote != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(salesOpportunityQuote);
+			return successful(salesOpportunityQuote);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("SalesOpportunityQuote could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateSalesOpportunityQuote(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		SalesOpportunityQuote salesOpportunityQuoteToBeUpdated = new SalesOpportunityQuote();
-
-		try {
-			salesOpportunityQuoteToBeUpdated = SalesOpportunityQuoteMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateSalesOpportunityQuote(salesOpportunityQuoteToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class SalesOpportunityQuoteController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateSalesOpportunityQuote(@RequestBody SalesOpportunityQuote salesOpportunityQuoteToBeUpdated,
+	public ResponseEntity<String> updateSalesOpportunityQuote(@RequestBody SalesOpportunityQuote salesOpportunityQuoteToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		salesOpportunityQuoteToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class SalesOpportunityQuoteController {
 
 		try {
 			if(((SalesOpportunityQuoteUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{salesOpportunityQuoteId}")
-	public ResponseEntity<Object> findById(@PathVariable String salesOpportunityQuoteId) throws Exception {
+	public ResponseEntity<SalesOpportunityQuote> findById(@PathVariable String salesOpportunityQuoteId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("salesOpportunityQuoteId", salesOpportunityQuoteId);
 		try {
 
-			Object foundSalesOpportunityQuote = findSalesOpportunityQuotesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundSalesOpportunityQuote);
+			List<SalesOpportunityQuote> foundSalesOpportunityQuote = findSalesOpportunityQuotesBy(requestParams).getBody();
+			if(foundSalesOpportunityQuote.size()==1){				return successful(foundSalesOpportunityQuote.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{salesOpportunityQuoteId}")
-	public ResponseEntity<Object> deleteSalesOpportunityQuoteByIdUpdated(@PathVariable String salesOpportunityQuoteId) throws Exception {
+	public ResponseEntity<String> deleteSalesOpportunityQuoteByIdUpdated(@PathVariable String salesOpportunityQuoteId) throws Exception {
 		DeleteSalesOpportunityQuote command = new DeleteSalesOpportunityQuote(salesOpportunityQuoteId);
 
 		try {
 			if (((SalesOpportunityQuoteDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("SalesOpportunityQuote could not be deleted");
+		return conflict();
 
 	}
 

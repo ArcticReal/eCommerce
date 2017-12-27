@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.orderType.query.attr.FindOrd
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/orderType/orderTypeAttrs")
 public class OrderTypeAttrController {
@@ -52,7 +54,7 @@ public class OrderTypeAttrController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findOrderTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OrderTypeAttr>> findOrderTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderTypeAttrsBy query = new FindOrderTypeAttrsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class OrderTypeAttrController {
 		}
 
 		List<OrderTypeAttr> orderTypeAttrs =((OrderTypeAttrFound) Scheduler.execute(query).data()).getOrderTypeAttrs();
-
-		if (orderTypeAttrs.size() == 1) {
-			return ResponseEntity.ok().body(orderTypeAttrs.get(0));
-		}
 
 		return ResponseEntity.ok().body(orderTypeAttrs);
 
@@ -78,7 +76,7 @@ public class OrderTypeAttrController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOrderTypeAttr(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OrderTypeAttr> createOrderTypeAttr(HttpServletRequest request) throws Exception {
 
 		OrderTypeAttr orderTypeAttrToBeAdded = new OrderTypeAttr();
 		try {
@@ -86,7 +84,7 @@ public class OrderTypeAttrController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createOrderTypeAttr(orderTypeAttrToBeAdded);
@@ -101,63 +99,15 @@ public class OrderTypeAttrController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOrderTypeAttr(@RequestBody OrderTypeAttr orderTypeAttrToBeAdded) throws Exception {
+	public ResponseEntity<OrderTypeAttr> createOrderTypeAttr(@RequestBody OrderTypeAttr orderTypeAttrToBeAdded) throws Exception {
 
 		AddOrderTypeAttr command = new AddOrderTypeAttr(orderTypeAttrToBeAdded);
 		OrderTypeAttr orderTypeAttr = ((OrderTypeAttrAdded) Scheduler.execute(command).data()).getAddedOrderTypeAttr();
 		
 		if (orderTypeAttr != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(orderTypeAttr);
+			return successful(orderTypeAttr);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OrderTypeAttr could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateOrderTypeAttr(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OrderTypeAttr orderTypeAttrToBeUpdated = new OrderTypeAttr();
-
-		try {
-			orderTypeAttrToBeUpdated = OrderTypeAttrMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOrderTypeAttr(orderTypeAttrToBeUpdated, orderTypeAttrToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class OrderTypeAttrController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOrderTypeAttr(@RequestBody OrderTypeAttr orderTypeAttrToBeUpdated,
+	public ResponseEntity<String> updateOrderTypeAttr(@RequestBody OrderTypeAttr orderTypeAttrToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		orderTypeAttrToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class OrderTypeAttrController {
 
 		try {
 			if(((OrderTypeAttrUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{orderTypeAttrId}")
-	public ResponseEntity<Object> findById(@PathVariable String orderTypeAttrId) throws Exception {
+	public ResponseEntity<OrderTypeAttr> findById(@PathVariable String orderTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderTypeAttrId", orderTypeAttrId);
 		try {
 
-			Object foundOrderTypeAttr = findOrderTypeAttrsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOrderTypeAttr);
+			List<OrderTypeAttr> foundOrderTypeAttr = findOrderTypeAttrsBy(requestParams).getBody();
+			if(foundOrderTypeAttr.size()==1){				return successful(foundOrderTypeAttr.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{orderTypeAttrId}")
-	public ResponseEntity<Object> deleteOrderTypeAttrByIdUpdated(@PathVariable String orderTypeAttrId) throws Exception {
+	public ResponseEntity<String> deleteOrderTypeAttrByIdUpdated(@PathVariable String orderTypeAttrId) throws Exception {
 		DeleteOrderTypeAttr command = new DeleteOrderTypeAttr(orderTypeAttrId);
 
 		try {
 			if (((OrderTypeAttrDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("OrderTypeAttr could not be deleted");
+		return conflict();
 
 	}
 

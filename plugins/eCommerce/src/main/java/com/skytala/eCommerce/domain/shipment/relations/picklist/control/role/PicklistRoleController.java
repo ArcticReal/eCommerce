@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.shipment.relations.picklist.query.role.FindP
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/shipment/picklist/picklistRoles")
 public class PicklistRoleController {
@@ -52,7 +54,7 @@ public class PicklistRoleController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPicklistRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PicklistRole>> findPicklistRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPicklistRolesBy query = new FindPicklistRolesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PicklistRoleController {
 		}
 
 		List<PicklistRole> picklistRoles =((PicklistRoleFound) Scheduler.execute(query).data()).getPicklistRoles();
-
-		if (picklistRoles.size() == 1) {
-			return ResponseEntity.ok().body(picklistRoles.get(0));
-		}
 
 		return ResponseEntity.ok().body(picklistRoles);
 
@@ -78,7 +76,7 @@ public class PicklistRoleController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPicklistRole(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PicklistRole> createPicklistRole(HttpServletRequest request) throws Exception {
 
 		PicklistRole picklistRoleToBeAdded = new PicklistRole();
 		try {
@@ -86,7 +84,7 @@ public class PicklistRoleController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPicklistRole(picklistRoleToBeAdded);
@@ -101,63 +99,15 @@ public class PicklistRoleController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPicklistRole(@RequestBody PicklistRole picklistRoleToBeAdded) throws Exception {
+	public ResponseEntity<PicklistRole> createPicklistRole(@RequestBody PicklistRole picklistRoleToBeAdded) throws Exception {
 
 		AddPicklistRole command = new AddPicklistRole(picklistRoleToBeAdded);
 		PicklistRole picklistRole = ((PicklistRoleAdded) Scheduler.execute(command).data()).getAddedPicklistRole();
 		
 		if (picklistRole != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(picklistRole);
+			return successful(picklistRole);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PicklistRole could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePicklistRole(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PicklistRole picklistRoleToBeUpdated = new PicklistRole();
-
-		try {
-			picklistRoleToBeUpdated = PicklistRoleMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePicklistRole(picklistRoleToBeUpdated, picklistRoleToBeUpdated.getRoleTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PicklistRoleController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{roleTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePicklistRole(@RequestBody PicklistRole picklistRoleToBeUpdated,
+	public ResponseEntity<String> updatePicklistRole(@RequestBody PicklistRole picklistRoleToBeUpdated,
 			@PathVariable String roleTypeId) throws Exception {
 
 		picklistRoleToBeUpdated.setRoleTypeId(roleTypeId);
@@ -178,41 +128,44 @@ public class PicklistRoleController {
 
 		try {
 			if(((PicklistRoleUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{picklistRoleId}")
-	public ResponseEntity<Object> findById(@PathVariable String picklistRoleId) throws Exception {
+	public ResponseEntity<PicklistRole> findById(@PathVariable String picklistRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("picklistRoleId", picklistRoleId);
 		try {
 
-			Object foundPicklistRole = findPicklistRolesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPicklistRole);
+			List<PicklistRole> foundPicklistRole = findPicklistRolesBy(requestParams).getBody();
+			if(foundPicklistRole.size()==1){				return successful(foundPicklistRole.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{picklistRoleId}")
-	public ResponseEntity<Object> deletePicklistRoleByIdUpdated(@PathVariable String picklistRoleId) throws Exception {
+	public ResponseEntity<String> deletePicklistRoleByIdUpdated(@PathVariable String picklistRoleId) throws Exception {
 		DeletePicklistRole command = new DeletePicklistRole(picklistRoleId);
 
 		try {
 			if (((PicklistRoleDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PicklistRole could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.workeffort.relations.workEffort.query.review
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/workeffort/workEffort/workEffortReviews")
 public class WorkEffortReviewController {
@@ -52,7 +54,7 @@ public class WorkEffortReviewController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWorkEffortReviewsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WorkEffortReview>> findWorkEffortReviewsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortReviewsBy query = new FindWorkEffortReviewsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WorkEffortReviewController {
 		}
 
 		List<WorkEffortReview> workEffortReviews =((WorkEffortReviewFound) Scheduler.execute(query).data()).getWorkEffortReviews();
-
-		if (workEffortReviews.size() == 1) {
-			return ResponseEntity.ok().body(workEffortReviews.get(0));
-		}
 
 		return ResponseEntity.ok().body(workEffortReviews);
 
@@ -78,7 +76,7 @@ public class WorkEffortReviewController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWorkEffortReview(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WorkEffortReview> createWorkEffortReview(HttpServletRequest request) throws Exception {
 
 		WorkEffortReview workEffortReviewToBeAdded = new WorkEffortReview();
 		try {
@@ -86,7 +84,7 @@ public class WorkEffortReviewController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWorkEffortReview(workEffortReviewToBeAdded);
@@ -101,63 +99,15 @@ public class WorkEffortReviewController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWorkEffortReview(@RequestBody WorkEffortReview workEffortReviewToBeAdded) throws Exception {
+	public ResponseEntity<WorkEffortReview> createWorkEffortReview(@RequestBody WorkEffortReview workEffortReviewToBeAdded) throws Exception {
 
 		AddWorkEffortReview command = new AddWorkEffortReview(workEffortReviewToBeAdded);
 		WorkEffortReview workEffortReview = ((WorkEffortReviewAdded) Scheduler.execute(command).data()).getAddedWorkEffortReview();
 		
 		if (workEffortReview != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(workEffortReview);
+			return successful(workEffortReview);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WorkEffortReview could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWorkEffortReview(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WorkEffortReview workEffortReviewToBeUpdated = new WorkEffortReview();
-
-		try {
-			workEffortReviewToBeUpdated = WorkEffortReviewMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWorkEffortReview(workEffortReviewToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WorkEffortReviewController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWorkEffortReview(@RequestBody WorkEffortReview workEffortReviewToBeUpdated,
+	public ResponseEntity<String> updateWorkEffortReview(@RequestBody WorkEffortReview workEffortReviewToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		workEffortReviewToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class WorkEffortReviewController {
 
 		try {
 			if(((WorkEffortReviewUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{workEffortReviewId}")
-	public ResponseEntity<Object> findById(@PathVariable String workEffortReviewId) throws Exception {
+	public ResponseEntity<WorkEffortReview> findById(@PathVariable String workEffortReviewId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortReviewId", workEffortReviewId);
 		try {
 
-			Object foundWorkEffortReview = findWorkEffortReviewsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWorkEffortReview);
+			List<WorkEffortReview> foundWorkEffortReview = findWorkEffortReviewsBy(requestParams).getBody();
+			if(foundWorkEffortReview.size()==1){				return successful(foundWorkEffortReview.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{workEffortReviewId}")
-	public ResponseEntity<Object> deleteWorkEffortReviewByIdUpdated(@PathVariable String workEffortReviewId) throws Exception {
+	public ResponseEntity<String> deleteWorkEffortReviewByIdUpdated(@PathVariable String workEffortReviewId) throws Exception {
 		DeleteWorkEffortReview command = new DeleteWorkEffortReview(workEffortReviewId);
 
 		try {
 			if (((WorkEffortReviewDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WorkEffortReview could not be deleted");
+		return conflict();
 
 	}
 

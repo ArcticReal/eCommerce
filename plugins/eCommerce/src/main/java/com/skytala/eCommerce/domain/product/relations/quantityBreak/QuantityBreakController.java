@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.quantityBreak.query.FindQu
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/quantityBreaks")
 public class QuantityBreakController {
@@ -52,7 +54,7 @@ public class QuantityBreakController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findQuantityBreaksBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<QuantityBreak>> findQuantityBreaksBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindQuantityBreaksBy query = new FindQuantityBreaksBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class QuantityBreakController {
 		}
 
 		List<QuantityBreak> quantityBreaks =((QuantityBreakFound) Scheduler.execute(query).data()).getQuantityBreaks();
-
-		if (quantityBreaks.size() == 1) {
-			return ResponseEntity.ok().body(quantityBreaks.get(0));
-		}
 
 		return ResponseEntity.ok().body(quantityBreaks);
 
@@ -78,7 +76,7 @@ public class QuantityBreakController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createQuantityBreak(HttpServletRequest request) throws Exception {
+	public ResponseEntity<QuantityBreak> createQuantityBreak(HttpServletRequest request) throws Exception {
 
 		QuantityBreak quantityBreakToBeAdded = new QuantityBreak();
 		try {
@@ -86,7 +84,7 @@ public class QuantityBreakController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createQuantityBreak(quantityBreakToBeAdded);
@@ -101,63 +99,15 @@ public class QuantityBreakController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createQuantityBreak(@RequestBody QuantityBreak quantityBreakToBeAdded) throws Exception {
+	public ResponseEntity<QuantityBreak> createQuantityBreak(@RequestBody QuantityBreak quantityBreakToBeAdded) throws Exception {
 
 		AddQuantityBreak command = new AddQuantityBreak(quantityBreakToBeAdded);
 		QuantityBreak quantityBreak = ((QuantityBreakAdded) Scheduler.execute(command).data()).getAddedQuantityBreak();
 		
 		if (quantityBreak != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(quantityBreak);
+			return successful(quantityBreak);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("QuantityBreak could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateQuantityBreak(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		QuantityBreak quantityBreakToBeUpdated = new QuantityBreak();
-
-		try {
-			quantityBreakToBeUpdated = QuantityBreakMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateQuantityBreak(quantityBreakToBeUpdated, quantityBreakToBeUpdated.getQuantityBreakId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class QuantityBreakController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{quantityBreakId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateQuantityBreak(@RequestBody QuantityBreak quantityBreakToBeUpdated,
+	public ResponseEntity<String> updateQuantityBreak(@RequestBody QuantityBreak quantityBreakToBeUpdated,
 			@PathVariable String quantityBreakId) throws Exception {
 
 		quantityBreakToBeUpdated.setQuantityBreakId(quantityBreakId);
@@ -178,41 +128,44 @@ public class QuantityBreakController {
 
 		try {
 			if(((QuantityBreakUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{quantityBreakId}")
-	public ResponseEntity<Object> findById(@PathVariable String quantityBreakId) throws Exception {
+	public ResponseEntity<QuantityBreak> findById(@PathVariable String quantityBreakId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("quantityBreakId", quantityBreakId);
 		try {
 
-			Object foundQuantityBreak = findQuantityBreaksBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundQuantityBreak);
+			List<QuantityBreak> foundQuantityBreak = findQuantityBreaksBy(requestParams).getBody();
+			if(foundQuantityBreak.size()==1){				return successful(foundQuantityBreak.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{quantityBreakId}")
-	public ResponseEntity<Object> deleteQuantityBreakByIdUpdated(@PathVariable String quantityBreakId) throws Exception {
+	public ResponseEntity<String> deleteQuantityBreakByIdUpdated(@PathVariable String quantityBreakId) throws Exception {
 		DeleteQuantityBreak command = new DeleteQuantityBreak(quantityBreakId);
 
 		try {
 			if (((QuantityBreakDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("QuantityBreak could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.quote.query.workEffort.FindQ
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/quote/quoteWorkEfforts")
 public class QuoteWorkEffortController {
@@ -52,7 +54,7 @@ public class QuoteWorkEffortController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findQuoteWorkEffortsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<QuoteWorkEffort>> findQuoteWorkEffortsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindQuoteWorkEffortsBy query = new FindQuoteWorkEffortsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class QuoteWorkEffortController {
 		}
 
 		List<QuoteWorkEffort> quoteWorkEfforts =((QuoteWorkEffortFound) Scheduler.execute(query).data()).getQuoteWorkEfforts();
-
-		if (quoteWorkEfforts.size() == 1) {
-			return ResponseEntity.ok().body(quoteWorkEfforts.get(0));
-		}
 
 		return ResponseEntity.ok().body(quoteWorkEfforts);
 
@@ -78,7 +76,7 @@ public class QuoteWorkEffortController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createQuoteWorkEffort(HttpServletRequest request) throws Exception {
+	public ResponseEntity<QuoteWorkEffort> createQuoteWorkEffort(HttpServletRequest request) throws Exception {
 
 		QuoteWorkEffort quoteWorkEffortToBeAdded = new QuoteWorkEffort();
 		try {
@@ -86,7 +84,7 @@ public class QuoteWorkEffortController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createQuoteWorkEffort(quoteWorkEffortToBeAdded);
@@ -101,63 +99,15 @@ public class QuoteWorkEffortController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createQuoteWorkEffort(@RequestBody QuoteWorkEffort quoteWorkEffortToBeAdded) throws Exception {
+	public ResponseEntity<QuoteWorkEffort> createQuoteWorkEffort(@RequestBody QuoteWorkEffort quoteWorkEffortToBeAdded) throws Exception {
 
 		AddQuoteWorkEffort command = new AddQuoteWorkEffort(quoteWorkEffortToBeAdded);
 		QuoteWorkEffort quoteWorkEffort = ((QuoteWorkEffortAdded) Scheduler.execute(command).data()).getAddedQuoteWorkEffort();
 		
 		if (quoteWorkEffort != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(quoteWorkEffort);
+			return successful(quoteWorkEffort);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("QuoteWorkEffort could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateQuoteWorkEffort(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		QuoteWorkEffort quoteWorkEffortToBeUpdated = new QuoteWorkEffort();
-
-		try {
-			quoteWorkEffortToBeUpdated = QuoteWorkEffortMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateQuoteWorkEffort(quoteWorkEffortToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class QuoteWorkEffortController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateQuoteWorkEffort(@RequestBody QuoteWorkEffort quoteWorkEffortToBeUpdated,
+	public ResponseEntity<String> updateQuoteWorkEffort(@RequestBody QuoteWorkEffort quoteWorkEffortToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		quoteWorkEffortToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class QuoteWorkEffortController {
 
 		try {
 			if(((QuoteWorkEffortUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{quoteWorkEffortId}")
-	public ResponseEntity<Object> findById(@PathVariable String quoteWorkEffortId) throws Exception {
+	public ResponseEntity<QuoteWorkEffort> findById(@PathVariable String quoteWorkEffortId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("quoteWorkEffortId", quoteWorkEffortId);
 		try {
 
-			Object foundQuoteWorkEffort = findQuoteWorkEffortsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundQuoteWorkEffort);
+			List<QuoteWorkEffort> foundQuoteWorkEffort = findQuoteWorkEffortsBy(requestParams).getBody();
+			if(foundQuoteWorkEffort.size()==1){				return successful(foundQuoteWorkEffort.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{quoteWorkEffortId}")
-	public ResponseEntity<Object> deleteQuoteWorkEffortByIdUpdated(@PathVariable String quoteWorkEffortId) throws Exception {
+	public ResponseEntity<String> deleteQuoteWorkEffortByIdUpdated(@PathVariable String quoteWorkEffortId) throws Exception {
 		DeleteQuoteWorkEffort command = new DeleteQuoteWorkEffort(quoteWorkEffortId);
 
 		try {
 			if (((QuoteWorkEffortDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("QuoteWorkEffort could not be deleted");
+		return conflict();
 
 	}
 

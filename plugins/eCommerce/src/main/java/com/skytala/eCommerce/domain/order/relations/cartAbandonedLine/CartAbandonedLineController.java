@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.cartAbandonedLine.query.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/cartAbandonedLines")
 public class CartAbandonedLineController {
@@ -52,7 +54,7 @@ public class CartAbandonedLineController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findCartAbandonedLinesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<CartAbandonedLine>> findCartAbandonedLinesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCartAbandonedLinesBy query = new FindCartAbandonedLinesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class CartAbandonedLineController {
 		}
 
 		List<CartAbandonedLine> cartAbandonedLines =((CartAbandonedLineFound) Scheduler.execute(query).data()).getCartAbandonedLines();
-
-		if (cartAbandonedLines.size() == 1) {
-			return ResponseEntity.ok().body(cartAbandonedLines.get(0));
-		}
 
 		return ResponseEntity.ok().body(cartAbandonedLines);
 
@@ -78,7 +76,7 @@ public class CartAbandonedLineController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createCartAbandonedLine(HttpServletRequest request) throws Exception {
+	public ResponseEntity<CartAbandonedLine> createCartAbandonedLine(HttpServletRequest request) throws Exception {
 
 		CartAbandonedLine cartAbandonedLineToBeAdded = new CartAbandonedLine();
 		try {
@@ -86,7 +84,7 @@ public class CartAbandonedLineController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createCartAbandonedLine(cartAbandonedLineToBeAdded);
@@ -101,63 +99,15 @@ public class CartAbandonedLineController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createCartAbandonedLine(@RequestBody CartAbandonedLine cartAbandonedLineToBeAdded) throws Exception {
+	public ResponseEntity<CartAbandonedLine> createCartAbandonedLine(@RequestBody CartAbandonedLine cartAbandonedLineToBeAdded) throws Exception {
 
 		AddCartAbandonedLine command = new AddCartAbandonedLine(cartAbandonedLineToBeAdded);
 		CartAbandonedLine cartAbandonedLine = ((CartAbandonedLineAdded) Scheduler.execute(command).data()).getAddedCartAbandonedLine();
 		
 		if (cartAbandonedLine != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(cartAbandonedLine);
+			return successful(cartAbandonedLine);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("CartAbandonedLine could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateCartAbandonedLine(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		CartAbandonedLine cartAbandonedLineToBeUpdated = new CartAbandonedLine();
-
-		try {
-			cartAbandonedLineToBeUpdated = CartAbandonedLineMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateCartAbandonedLine(cartAbandonedLineToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class CartAbandonedLineController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateCartAbandonedLine(@RequestBody CartAbandonedLine cartAbandonedLineToBeUpdated,
+	public ResponseEntity<String> updateCartAbandonedLine(@RequestBody CartAbandonedLine cartAbandonedLineToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		cartAbandonedLineToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class CartAbandonedLineController {
 
 		try {
 			if(((CartAbandonedLineUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{cartAbandonedLineId}")
-	public ResponseEntity<Object> findById(@PathVariable String cartAbandonedLineId) throws Exception {
+	public ResponseEntity<CartAbandonedLine> findById(@PathVariable String cartAbandonedLineId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("cartAbandonedLineId", cartAbandonedLineId);
 		try {
 
-			Object foundCartAbandonedLine = findCartAbandonedLinesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundCartAbandonedLine);
+			List<CartAbandonedLine> foundCartAbandonedLine = findCartAbandonedLinesBy(requestParams).getBody();
+			if(foundCartAbandonedLine.size()==1){				return successful(foundCartAbandonedLine.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{cartAbandonedLineId}")
-	public ResponseEntity<Object> deleteCartAbandonedLineByIdUpdated(@PathVariable String cartAbandonedLineId) throws Exception {
+	public ResponseEntity<String> deleteCartAbandonedLineByIdUpdated(@PathVariable String cartAbandonedLineId) throws Exception {
 		DeleteCartAbandonedLine command = new DeleteCartAbandonedLine(cartAbandonedLineId);
 
 		try {
 			if (((CartAbandonedLineDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("CartAbandonedLine could not be deleted");
+		return conflict();
 
 	}
 

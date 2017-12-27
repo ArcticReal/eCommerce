@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.quote.query.type.FindQuoteTy
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/quote/quoteTypes")
 public class QuoteTypeController {
@@ -52,7 +54,7 @@ public class QuoteTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findQuoteTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<QuoteType>> findQuoteTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindQuoteTypesBy query = new FindQuoteTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class QuoteTypeController {
 		}
 
 		List<QuoteType> quoteTypes =((QuoteTypeFound) Scheduler.execute(query).data()).getQuoteTypes();
-
-		if (quoteTypes.size() == 1) {
-			return ResponseEntity.ok().body(quoteTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(quoteTypes);
 
@@ -78,7 +76,7 @@ public class QuoteTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createQuoteType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<QuoteType> createQuoteType(HttpServletRequest request) throws Exception {
 
 		QuoteType quoteTypeToBeAdded = new QuoteType();
 		try {
@@ -86,7 +84,7 @@ public class QuoteTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createQuoteType(quoteTypeToBeAdded);
@@ -101,63 +99,15 @@ public class QuoteTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createQuoteType(@RequestBody QuoteType quoteTypeToBeAdded) throws Exception {
+	public ResponseEntity<QuoteType> createQuoteType(@RequestBody QuoteType quoteTypeToBeAdded) throws Exception {
 
 		AddQuoteType command = new AddQuoteType(quoteTypeToBeAdded);
 		QuoteType quoteType = ((QuoteTypeAdded) Scheduler.execute(command).data()).getAddedQuoteType();
 		
 		if (quoteType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(quoteType);
+			return successful(quoteType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("QuoteType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateQuoteType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		QuoteType quoteTypeToBeUpdated = new QuoteType();
-
-		try {
-			quoteTypeToBeUpdated = QuoteTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateQuoteType(quoteTypeToBeUpdated, quoteTypeToBeUpdated.getQuoteTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class QuoteTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{quoteTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateQuoteType(@RequestBody QuoteType quoteTypeToBeUpdated,
+	public ResponseEntity<String> updateQuoteType(@RequestBody QuoteType quoteTypeToBeUpdated,
 			@PathVariable String quoteTypeId) throws Exception {
 
 		quoteTypeToBeUpdated.setQuoteTypeId(quoteTypeId);
@@ -178,41 +128,44 @@ public class QuoteTypeController {
 
 		try {
 			if(((QuoteTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{quoteTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String quoteTypeId) throws Exception {
+	public ResponseEntity<QuoteType> findById(@PathVariable String quoteTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("quoteTypeId", quoteTypeId);
 		try {
 
-			Object foundQuoteType = findQuoteTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundQuoteType);
+			List<QuoteType> foundQuoteType = findQuoteTypesBy(requestParams).getBody();
+			if(foundQuoteType.size()==1){				return successful(foundQuoteType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{quoteTypeId}")
-	public ResponseEntity<Object> deleteQuoteTypeByIdUpdated(@PathVariable String quoteTypeId) throws Exception {
+	public ResponseEntity<String> deleteQuoteTypeByIdUpdated(@PathVariable String quoteTypeId) throws Exception {
 		DeleteQuoteType command = new DeleteQuoteType(quoteTypeId);
 
 		try {
 			if (((QuoteTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("QuoteType could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.content.query.purpose.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/content/contentPurposes")
 public class ContentPurposeController {
@@ -52,7 +54,7 @@ public class ContentPurposeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findContentPurposesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ContentPurpose>> findContentPurposesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContentPurposesBy query = new FindContentPurposesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ContentPurposeController {
 		}
 
 		List<ContentPurpose> contentPurposes =((ContentPurposeFound) Scheduler.execute(query).data()).getContentPurposes();
-
-		if (contentPurposes.size() == 1) {
-			return ResponseEntity.ok().body(contentPurposes.get(0));
-		}
 
 		return ResponseEntity.ok().body(contentPurposes);
 
@@ -78,7 +76,7 @@ public class ContentPurposeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createContentPurpose(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ContentPurpose> createContentPurpose(HttpServletRequest request) throws Exception {
 
 		ContentPurpose contentPurposeToBeAdded = new ContentPurpose();
 		try {
@@ -86,7 +84,7 @@ public class ContentPurposeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createContentPurpose(contentPurposeToBeAdded);
@@ -101,63 +99,15 @@ public class ContentPurposeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createContentPurpose(@RequestBody ContentPurpose contentPurposeToBeAdded) throws Exception {
+	public ResponseEntity<ContentPurpose> createContentPurpose(@RequestBody ContentPurpose contentPurposeToBeAdded) throws Exception {
 
 		AddContentPurpose command = new AddContentPurpose(contentPurposeToBeAdded);
 		ContentPurpose contentPurpose = ((ContentPurposeAdded) Scheduler.execute(command).data()).getAddedContentPurpose();
 		
 		if (contentPurpose != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(contentPurpose);
+			return successful(contentPurpose);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ContentPurpose could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateContentPurpose(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ContentPurpose contentPurposeToBeUpdated = new ContentPurpose();
-
-		try {
-			contentPurposeToBeUpdated = ContentPurposeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateContentPurpose(contentPurposeToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ContentPurposeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateContentPurpose(@RequestBody ContentPurpose contentPurposeToBeUpdated,
+	public ResponseEntity<String> updateContentPurpose(@RequestBody ContentPurpose contentPurposeToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		contentPurposeToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ContentPurposeController {
 
 		try {
 			if(((ContentPurposeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{contentPurposeId}")
-	public ResponseEntity<Object> findById(@PathVariable String contentPurposeId) throws Exception {
+	public ResponseEntity<ContentPurpose> findById(@PathVariable String contentPurposeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contentPurposeId", contentPurposeId);
 		try {
 
-			Object foundContentPurpose = findContentPurposesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundContentPurpose);
+			List<ContentPurpose> foundContentPurpose = findContentPurposesBy(requestParams).getBody();
+			if(foundContentPurpose.size()==1){				return successful(foundContentPurpose.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{contentPurposeId}")
-	public ResponseEntity<Object> deleteContentPurposeByIdUpdated(@PathVariable String contentPurposeId) throws Exception {
+	public ResponseEntity<String> deleteContentPurposeByIdUpdated(@PathVariable String contentPurposeId) throws Exception {
 		DeleteContentPurpose command = new DeleteContentPurpose(contentPurposeId);
 
 		try {
 			if (((ContentPurposeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ContentPurpose could not be deleted");
+		return conflict();
 
 	}
 

@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/commonTest")
 public class CommonTestServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testScv")
-	public ResponseEntity<Object> testScv(HttpSession session, @RequestParam(value="defaultValue") Double defaultValue, @RequestParam(value="message", required=false) String message) {
+	public ResponseEntity<Map<String, Object>> testScv(HttpSession session, @RequestParam(value="defaultValue") Double defaultValue, @RequestParam(value="message", required=false) String message) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("defaultValue",defaultValue);
@@ -40,23 +42,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/ping")
-	public ResponseEntity<Object> ping(HttpSession session, @RequestParam(value="message", required=false) String message) {
+	public ResponseEntity<Map<String, Object>> ping(HttpSession session, @RequestParam(value="message", required=false) String message) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("message",message);
@@ -69,23 +71,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testSOAPScv")
-	public ResponseEntity<Object> testSOAPScv(HttpSession session, @RequestParam(value="testing") org.apache.ofbiz.entity.GenericValue testing) {
+	public ResponseEntity<Map<String, Object>> testSOAPScv(HttpSession session, @RequestParam(value="testing") org.apache.ofbiz.entity.GenericValue testing) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("testing",testing);
@@ -98,23 +100,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/blockingTestScv")
-	public ResponseEntity<Object> blockingTestScv(HttpSession session, @RequestParam(value="duration", required=false) Long duration, @RequestParam(value="message", required=false) String message) {
+	public ResponseEntity<Map<String, Object>> blockingTestScv(HttpSession session, @RequestParam(value="duration", required=false) Long duration, @RequestParam(value="message", required=false) String message) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("duration",duration);
@@ -128,23 +130,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testRemoteSoap3")
-	public ResponseEntity<Object> testRemoteSoap3(HttpSession session, @RequestParam(value="ZipCode") String ZipCode, @RequestParam(value="invoke") String invoke) {
+	public ResponseEntity<Map<String, Object>> testRemoteSoap3(HttpSession session, @RequestParam(value="ZipCode") String ZipCode, @RequestParam(value="invoke") String invoke) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("ZipCode",ZipCode);
@@ -158,23 +160,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testSoapSimple")
-	public ResponseEntity<Object> testSoapSimple(HttpSession session, @RequestParam(value="defaultValue") Double defaultValue, @RequestParam(value="message", required=false) String message) {
+	public ResponseEntity<Map<String, Object>> testSoapSimple(HttpSession session, @RequestParam(value="defaultValue") Double defaultValue, @RequestParam(value="message", required=false) String message) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("defaultValue",defaultValue);
@@ -188,23 +190,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testRemoteSoap4")
-	public ResponseEntity<Object> testRemoteSoap4(HttpSession session, @RequestParam(value="invoke") String invoke) {
+	public ResponseEntity<Map<String, Object>> testRemoteSoap4(HttpSession session, @RequestParam(value="invoke") String invoke) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("invoke",invoke);
@@ -217,23 +219,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testCommit")
-	public ResponseEntity<Object> testCommit(HttpSession session, @RequestParam(value="message", required=false) String message) {
+	public ResponseEntity<Map<String, Object>> testCommit(HttpSession session, @RequestParam(value="message", required=false) String message) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("message",message);
@@ -246,23 +248,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testJMSQueue")
-	public ResponseEntity<Object> testJMSQueue(HttpSession session, @RequestParam(value="message") String message) {
+	public ResponseEntity<Map<String, Object>> testJMSQueue(HttpSession session, @RequestParam(value="message") String message) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("message",message);
@@ -275,23 +277,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testRollback")
-	public ResponseEntity<Object> testRollback(HttpSession session, @RequestParam(value="message", required=false) String message) {
+	public ResponseEntity<Map<String, Object>> testRollback(HttpSession session, @RequestParam(value="message", required=false) String message) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("message",message);
@@ -304,23 +306,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testGroovyMethod")
-	public ResponseEntity<Object> testGroovyMethod(HttpSession session, @RequestParam(value="message", required=false) String message) {
+	public ResponseEntity<Map<String, Object>> testGroovyMethod(HttpSession session, @RequestParam(value="message", required=false) String message) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("message",message);
@@ -333,23 +335,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testRemoteSoap1")
-	public ResponseEntity<Object> testRemoteSoap1(HttpSession session, @RequestParam(value="ZipCode") String ZipCode, @RequestParam(value="invoke") String invoke) {
+	public ResponseEntity<Map<String, Object>> testRemoteSoap1(HttpSession session, @RequestParam(value="ZipCode") String ZipCode, @RequestParam(value="invoke") String invoke) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("ZipCode",ZipCode);
@@ -363,23 +365,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testRemoteSoap2")
-	public ResponseEntity<Object> testRemoteSoap2(HttpSession session, @RequestParam(value="invoke") String invoke, @RequestParam(value="CityName") String CityName) {
+	public ResponseEntity<Map<String, Object>> testRemoteSoap2(HttpSession session, @RequestParam(value="invoke") String invoke, @RequestParam(value="CityName") String CityName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("invoke",invoke);
@@ -393,23 +395,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testEntityFailure")
-	public ResponseEntity<Object> testEntityFailure(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> testEntityFailure(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -421,23 +423,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testScriptEngineJavaScriptFunction")
-	public ResponseEntity<Object> testScriptEngineJavaScriptFunction(HttpSession session, @RequestParam(value="message", required=false) String message) {
+	public ResponseEntity<Map<String, Object>> testScriptEngineJavaScriptFunction(HttpSession session, @RequestParam(value="message", required=false) String message) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("message",message);
@@ -450,23 +452,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/serviceStreamTest")
-	public ResponseEntity<Object> serviceStreamTest(HttpSession session, @RequestParam(value="inputStream") java.io.InputStream inputStream, @RequestParam(value="outputStream") java.io.OutputStream outputStream) {
+	public ResponseEntity<Map<String, Object>> serviceStreamTest(HttpSession session, @RequestParam(value="inputStream") java.io.InputStream inputStream, @RequestParam(value="outputStream") java.io.OutputStream outputStream) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("inputStream",inputStream);
@@ -480,23 +482,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testSoap")
-	public ResponseEntity<Object> testSoap(HttpSession session, @RequestParam(value="testing") org.apache.ofbiz.entity.GenericValue testing) {
+	public ResponseEntity<Map<String, Object>> testSoap(HttpSession session, @RequestParam(value="testing") org.apache.ofbiz.entity.GenericValue testing) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("testing",testing);
@@ -509,23 +511,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testScriptEngineGroovyMethod")
-	public ResponseEntity<Object> testScriptEngineGroovyMethod(HttpSession session, @RequestParam(value="message", required=false) String message) {
+	public ResponseEntity<Map<String, Object>> testScriptEngineGroovyMethod(HttpSession session, @RequestParam(value="message", required=false) String message) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("message",message);
@@ -538,23 +540,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testHttp")
-	public ResponseEntity<Object> testHttp(HttpSession session, @RequestParam(value="message", required=false) String message) {
+	public ResponseEntity<Map<String, Object>> testHttp(HttpSession session, @RequestParam(value="message", required=false) String message) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("message",message);
@@ -567,23 +569,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/uploadContentTest")
-	public ResponseEntity<Object> uploadContentTest(HttpSession session, @RequestParam(value="uploadFile") java.nio.ByteBuffer uploadFile, @RequestParam(value="_uploadFile_fileName") String _uploadFile_fileName, @RequestParam(value="_uploadFile_contentType") String _uploadFile_contentType) {
+	public ResponseEntity<Map<String, Object>> uploadContentTest(HttpSession session, @RequestParam(value="uploadFile") java.nio.ByteBuffer uploadFile, @RequestParam(value="_uploadFile_fileName") String _uploadFile_fileName, @RequestParam(value="_uploadFile_contentType") String _uploadFile_contentType) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("uploadFile",uploadFile);
@@ -598,23 +600,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testScriptEngineJavaScript")
-	public ResponseEntity<Object> testScriptEngineJavaScript(HttpSession session, @RequestParam(value="exampleId", required=false) String exampleId, @RequestParam(value="message", required=false) String message) {
+	public ResponseEntity<Map<String, Object>> testScriptEngineJavaScript(HttpSession session, @RequestParam(value="exampleId", required=false) String exampleId, @RequestParam(value="message", required=false) String message) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("exampleId",exampleId);
@@ -628,23 +630,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testRemoteSoap")
-	public ResponseEntity<Object> testRemoteSoap(HttpSession session, @RequestParam(value="defaultValue") Double defaultValue, @RequestParam(value="message", required=false) String message) {
+	public ResponseEntity<Map<String, Object>> testRemoteSoap(HttpSession session, @RequestParam(value="defaultValue") Double defaultValue, @RequestParam(value="message", required=false) String message) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("defaultValue",defaultValue);
@@ -658,23 +660,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testGroovy")
-	public ResponseEntity<Object> testGroovy(HttpSession session, @RequestParam(value="message", required=false) String message) {
+	public ResponseEntity<Map<String, Object>> testGroovy(HttpSession session, @RequestParam(value="message", required=false) String message) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("message",message);
@@ -687,23 +689,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testScriptEngineGroovy")
-	public ResponseEntity<Object> testScriptEngineGroovy(HttpSession session, @RequestParam(value="message", required=false) String message) {
+	public ResponseEntity<Map<String, Object>> testScriptEngineGroovy(HttpSession session, @RequestParam(value="message", required=false) String message) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("message",message);
@@ -716,23 +718,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/byteBufferTest")
-	public ResponseEntity<Object> byteBufferTest(HttpSession session, @RequestParam(value="byteBuffer2") java.nio.ByteBuffer byteBuffer2, @RequestParam(value="byteBuffer1") java.nio.ByteBuffer byteBuffer1, @RequestParam(value="saveAsFileName1") String saveAsFileName1, @RequestParam(value="saveAsFileName2") String saveAsFileName2) {
+	public ResponseEntity<Map<String, Object>> byteBufferTest(HttpSession session, @RequestParam(value="byteBuffer2") java.nio.ByteBuffer byteBuffer2, @RequestParam(value="byteBuffer1") java.nio.ByteBuffer byteBuffer1, @RequestParam(value="saveAsFileName1") String saveAsFileName1, @RequestParam(value="saveAsFileName2") String saveAsFileName2) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("byteBuffer2",byteBuffer2);
@@ -748,23 +750,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testJavaScript")
-	public ResponseEntity<Object> testJavaScript(HttpSession session, @RequestParam(value="message", required=false) String message) {
+	public ResponseEntity<Map<String, Object>> testJavaScript(HttpSession session, @RequestParam(value="message", required=false) String message) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("message",message);
@@ -777,23 +779,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/makeALotOfVisits")
-	public ResponseEntity<Object> makeALotOfVisits(HttpSession session, @RequestParam(value="count") Integer count, @RequestParam(value="rollback", required=false) Boolean rollback) {
+	public ResponseEntity<Map<String, Object>> makeALotOfVisits(HttpSession session, @RequestParam(value="count") Integer count, @RequestParam(value="rollback", required=false) Boolean rollback) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("count",count);
@@ -807,23 +809,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testRmi")
-	public ResponseEntity<Object> testRmi(HttpSession session, @RequestParam(value="defaultValue") Double defaultValue, @RequestParam(value="message", required=false) String message) {
+	public ResponseEntity<Map<String, Object>> testRmi(HttpSession session, @RequestParam(value="defaultValue") Double defaultValue, @RequestParam(value="message", required=false) String message) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("defaultValue",defaultValue);
@@ -837,23 +839,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/groupTest")
-	public ResponseEntity<Object> groupTest(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> groupTest(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -865,23 +867,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/simpleMapListTest")
-	public ResponseEntity<Object> simpleMapListTest(HttpSession session, @RequestParam(value="listOfStrings") List listOfStrings, @RequestParam(value="mapOfStrings") Map mapOfStrings) {
+	public ResponseEntity<Map<String, Object>> simpleMapListTest(HttpSession session, @RequestParam(value="listOfStrings") List listOfStrings, @RequestParam(value="mapOfStrings") Map mapOfStrings) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("listOfStrings",listOfStrings);
@@ -895,23 +897,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testError")
-	public ResponseEntity<Object> testError(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> testError(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -923,23 +925,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testMca")
-	public ResponseEntity<Object> testMca(HttpSession session, @RequestParam(value="messageWrapper") org.apache.ofbiz.service.mail.MimeMessageWrapper messageWrapper) {
+	public ResponseEntity<Map<String, Object>> testMca(HttpSession session, @RequestParam(value="messageWrapper") org.apache.ofbiz.service.mail.MimeMessageWrapper messageWrapper) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("messageWrapper",messageWrapper);
@@ -952,23 +954,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/conditionReturnTrue")
-	public ResponseEntity<Object> conditionReturnTrue(HttpSession session, @RequestParam(value="serviceContext") Map serviceContext, @RequestParam(value="serviceName") String serviceName) {
+	public ResponseEntity<Map<String, Object>> conditionReturnTrue(HttpSession session, @RequestParam(value="serviceContext") Map serviceContext, @RequestParam(value="serviceName") String serviceName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("serviceContext",serviceContext);
@@ -982,23 +984,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/entitySortTest")
-	public ResponseEntity<Object> entitySortTest(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> entitySortTest(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -1010,23 +1012,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testJMSTopic")
-	public ResponseEntity<Object> testJMSTopic(HttpSession session, @RequestParam(value="message") String message) {
+	public ResponseEntity<Map<String, Object>> testJMSTopic(HttpSession session, @RequestParam(value="message") String message) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("message",message);
@@ -1039,23 +1041,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testRoute")
-	public ResponseEntity<Object> testRoute(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> testRoute(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -1067,23 +1069,23 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/conditionReturnFalse")
-	public ResponseEntity<Object> conditionReturnFalse(HttpSession session, @RequestParam(value="serviceContext") Map serviceContext, @RequestParam(value="serviceName") String serviceName) {
+	public ResponseEntity<Map<String, Object>> conditionReturnFalse(HttpSession session, @RequestParam(value="serviceContext") Map serviceContext, @RequestParam(value="serviceName") String serviceName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("serviceContext",serviceContext);
@@ -1097,19 +1099,19 @@ public class CommonTestServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

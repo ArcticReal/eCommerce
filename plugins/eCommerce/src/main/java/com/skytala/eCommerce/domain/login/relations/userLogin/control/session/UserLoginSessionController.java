@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.login.relations.userLogin.query.session.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/login/userLogin/userLoginSessions")
 public class UserLoginSessionController {
@@ -52,7 +54,7 @@ public class UserLoginSessionController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findUserLoginSessionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<UserLoginSession>> findUserLoginSessionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindUserLoginSessionsBy query = new FindUserLoginSessionsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class UserLoginSessionController {
 		}
 
 		List<UserLoginSession> userLoginSessions =((UserLoginSessionFound) Scheduler.execute(query).data()).getUserLoginSessions();
-
-		if (userLoginSessions.size() == 1) {
-			return ResponseEntity.ok().body(userLoginSessions.get(0));
-		}
 
 		return ResponseEntity.ok().body(userLoginSessions);
 
@@ -78,7 +76,7 @@ public class UserLoginSessionController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createUserLoginSession(HttpServletRequest request) throws Exception {
+	public ResponseEntity<UserLoginSession> createUserLoginSession(HttpServletRequest request) throws Exception {
 
 		UserLoginSession userLoginSessionToBeAdded = new UserLoginSession();
 		try {
@@ -86,7 +84,7 @@ public class UserLoginSessionController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createUserLoginSession(userLoginSessionToBeAdded);
@@ -101,63 +99,15 @@ public class UserLoginSessionController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createUserLoginSession(@RequestBody UserLoginSession userLoginSessionToBeAdded) throws Exception {
+	public ResponseEntity<UserLoginSession> createUserLoginSession(@RequestBody UserLoginSession userLoginSessionToBeAdded) throws Exception {
 
 		AddUserLoginSession command = new AddUserLoginSession(userLoginSessionToBeAdded);
 		UserLoginSession userLoginSession = ((UserLoginSessionAdded) Scheduler.execute(command).data()).getAddedUserLoginSession();
 		
 		if (userLoginSession != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(userLoginSession);
+			return successful(userLoginSession);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("UserLoginSession could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateUserLoginSession(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		UserLoginSession userLoginSessionToBeUpdated = new UserLoginSession();
-
-		try {
-			userLoginSessionToBeUpdated = UserLoginSessionMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateUserLoginSession(userLoginSessionToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class UserLoginSessionController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateUserLoginSession(@RequestBody UserLoginSession userLoginSessionToBeUpdated,
+	public ResponseEntity<String> updateUserLoginSession(@RequestBody UserLoginSession userLoginSessionToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		userLoginSessionToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class UserLoginSessionController {
 
 		try {
 			if(((UserLoginSessionUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{userLoginSessionId}")
-	public ResponseEntity<Object> findById(@PathVariable String userLoginSessionId) throws Exception {
+	public ResponseEntity<UserLoginSession> findById(@PathVariable String userLoginSessionId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("userLoginSessionId", userLoginSessionId);
 		try {
 
-			Object foundUserLoginSession = findUserLoginSessionsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundUserLoginSession);
+			List<UserLoginSession> foundUserLoginSession = findUserLoginSessionsBy(requestParams).getBody();
+			if(foundUserLoginSession.size()==1){				return successful(foundUserLoginSession.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{userLoginSessionId}")
-	public ResponseEntity<Object> deleteUserLoginSessionByIdUpdated(@PathVariable String userLoginSessionId) throws Exception {
+	public ResponseEntity<String> deleteUserLoginSessionByIdUpdated(@PathVariable String userLoginSessionId) throws Exception {
 		DeleteUserLoginSession command = new DeleteUserLoginSession(userLoginSessionId);
 
 		try {
 			if (((UserLoginSessionDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("UserLoginSession could not be deleted");
+		return conflict();
 
 	}
 

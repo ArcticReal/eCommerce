@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.returnItem.query.response.Fi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/returnItem/returnItemResponses")
 public class ReturnItemResponseController {
@@ -52,7 +54,7 @@ public class ReturnItemResponseController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findReturnItemResponsesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ReturnItemResponse>> findReturnItemResponsesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindReturnItemResponsesBy query = new FindReturnItemResponsesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ReturnItemResponseController {
 		}
 
 		List<ReturnItemResponse> returnItemResponses =((ReturnItemResponseFound) Scheduler.execute(query).data()).getReturnItemResponses();
-
-		if (returnItemResponses.size() == 1) {
-			return ResponseEntity.ok().body(returnItemResponses.get(0));
-		}
 
 		return ResponseEntity.ok().body(returnItemResponses);
 
@@ -78,7 +76,7 @@ public class ReturnItemResponseController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createReturnItemResponse(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ReturnItemResponse> createReturnItemResponse(HttpServletRequest request) throws Exception {
 
 		ReturnItemResponse returnItemResponseToBeAdded = new ReturnItemResponse();
 		try {
@@ -86,7 +84,7 @@ public class ReturnItemResponseController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createReturnItemResponse(returnItemResponseToBeAdded);
@@ -101,63 +99,15 @@ public class ReturnItemResponseController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createReturnItemResponse(@RequestBody ReturnItemResponse returnItemResponseToBeAdded) throws Exception {
+	public ResponseEntity<ReturnItemResponse> createReturnItemResponse(@RequestBody ReturnItemResponse returnItemResponseToBeAdded) throws Exception {
 
 		AddReturnItemResponse command = new AddReturnItemResponse(returnItemResponseToBeAdded);
 		ReturnItemResponse returnItemResponse = ((ReturnItemResponseAdded) Scheduler.execute(command).data()).getAddedReturnItemResponse();
 		
 		if (returnItemResponse != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(returnItemResponse);
+			return successful(returnItemResponse);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ReturnItemResponse could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateReturnItemResponse(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ReturnItemResponse returnItemResponseToBeUpdated = new ReturnItemResponse();
-
-		try {
-			returnItemResponseToBeUpdated = ReturnItemResponseMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateReturnItemResponse(returnItemResponseToBeUpdated, returnItemResponseToBeUpdated.getReturnItemResponseId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ReturnItemResponseController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{returnItemResponseId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateReturnItemResponse(@RequestBody ReturnItemResponse returnItemResponseToBeUpdated,
+	public ResponseEntity<String> updateReturnItemResponse(@RequestBody ReturnItemResponse returnItemResponseToBeUpdated,
 			@PathVariable String returnItemResponseId) throws Exception {
 
 		returnItemResponseToBeUpdated.setReturnItemResponseId(returnItemResponseId);
@@ -178,41 +128,44 @@ public class ReturnItemResponseController {
 
 		try {
 			if(((ReturnItemResponseUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{returnItemResponseId}")
-	public ResponseEntity<Object> findById(@PathVariable String returnItemResponseId) throws Exception {
+	public ResponseEntity<ReturnItemResponse> findById(@PathVariable String returnItemResponseId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("returnItemResponseId", returnItemResponseId);
 		try {
 
-			Object foundReturnItemResponse = findReturnItemResponsesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundReturnItemResponse);
+			List<ReturnItemResponse> foundReturnItemResponse = findReturnItemResponsesBy(requestParams).getBody();
+			if(foundReturnItemResponse.size()==1){				return successful(foundReturnItemResponse.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{returnItemResponseId}")
-	public ResponseEntity<Object> deleteReturnItemResponseByIdUpdated(@PathVariable String returnItemResponseId) throws Exception {
+	public ResponseEntity<String> deleteReturnItemResponseByIdUpdated(@PathVariable String returnItemResponseId) throws Exception {
 		DeleteReturnItemResponse command = new DeleteReturnItemResponse(returnItemResponseId);
 
 		try {
 			if (((ReturnItemResponseDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ReturnItemResponse could not be deleted");
+		return conflict();
 
 	}
 

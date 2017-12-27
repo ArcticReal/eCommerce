@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.login.relations.userLogin.query.passwordHist
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/login/userLogin/userLoginPasswordHistorys")
 public class UserLoginPasswordHistoryController {
@@ -52,7 +54,7 @@ public class UserLoginPasswordHistoryController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findUserLoginPasswordHistorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<UserLoginPasswordHistory>> findUserLoginPasswordHistorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindUserLoginPasswordHistorysBy query = new FindUserLoginPasswordHistorysBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class UserLoginPasswordHistoryController {
 		}
 
 		List<UserLoginPasswordHistory> userLoginPasswordHistorys =((UserLoginPasswordHistoryFound) Scheduler.execute(query).data()).getUserLoginPasswordHistorys();
-
-		if (userLoginPasswordHistorys.size() == 1) {
-			return ResponseEntity.ok().body(userLoginPasswordHistorys.get(0));
-		}
 
 		return ResponseEntity.ok().body(userLoginPasswordHistorys);
 
@@ -78,7 +76,7 @@ public class UserLoginPasswordHistoryController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createUserLoginPasswordHistory(HttpServletRequest request) throws Exception {
+	public ResponseEntity<UserLoginPasswordHistory> createUserLoginPasswordHistory(HttpServletRequest request) throws Exception {
 
 		UserLoginPasswordHistory userLoginPasswordHistoryToBeAdded = new UserLoginPasswordHistory();
 		try {
@@ -86,7 +84,7 @@ public class UserLoginPasswordHistoryController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createUserLoginPasswordHistory(userLoginPasswordHistoryToBeAdded);
@@ -101,63 +99,15 @@ public class UserLoginPasswordHistoryController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createUserLoginPasswordHistory(@RequestBody UserLoginPasswordHistory userLoginPasswordHistoryToBeAdded) throws Exception {
+	public ResponseEntity<UserLoginPasswordHistory> createUserLoginPasswordHistory(@RequestBody UserLoginPasswordHistory userLoginPasswordHistoryToBeAdded) throws Exception {
 
 		AddUserLoginPasswordHistory command = new AddUserLoginPasswordHistory(userLoginPasswordHistoryToBeAdded);
 		UserLoginPasswordHistory userLoginPasswordHistory = ((UserLoginPasswordHistoryAdded) Scheduler.execute(command).data()).getAddedUserLoginPasswordHistory();
 		
 		if (userLoginPasswordHistory != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(userLoginPasswordHistory);
+			return successful(userLoginPasswordHistory);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("UserLoginPasswordHistory could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateUserLoginPasswordHistory(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		UserLoginPasswordHistory userLoginPasswordHistoryToBeUpdated = new UserLoginPasswordHistory();
-
-		try {
-			userLoginPasswordHistoryToBeUpdated = UserLoginPasswordHistoryMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateUserLoginPasswordHistory(userLoginPasswordHistoryToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class UserLoginPasswordHistoryController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateUserLoginPasswordHistory(@RequestBody UserLoginPasswordHistory userLoginPasswordHistoryToBeUpdated,
+	public ResponseEntity<String> updateUserLoginPasswordHistory(@RequestBody UserLoginPasswordHistory userLoginPasswordHistoryToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		userLoginPasswordHistoryToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class UserLoginPasswordHistoryController {
 
 		try {
 			if(((UserLoginPasswordHistoryUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{userLoginPasswordHistoryId}")
-	public ResponseEntity<Object> findById(@PathVariable String userLoginPasswordHistoryId) throws Exception {
+	public ResponseEntity<UserLoginPasswordHistory> findById(@PathVariable String userLoginPasswordHistoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("userLoginPasswordHistoryId", userLoginPasswordHistoryId);
 		try {
 
-			Object foundUserLoginPasswordHistory = findUserLoginPasswordHistorysBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundUserLoginPasswordHistory);
+			List<UserLoginPasswordHistory> foundUserLoginPasswordHistory = findUserLoginPasswordHistorysBy(requestParams).getBody();
+			if(foundUserLoginPasswordHistory.size()==1){				return successful(foundUserLoginPasswordHistory.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{userLoginPasswordHistoryId}")
-	public ResponseEntity<Object> deleteUserLoginPasswordHistoryByIdUpdated(@PathVariable String userLoginPasswordHistoryId) throws Exception {
+	public ResponseEntity<String> deleteUserLoginPasswordHistoryByIdUpdated(@PathVariable String userLoginPasswordHistoryId) throws Exception {
 		DeleteUserLoginPasswordHistory command = new DeleteUserLoginPasswordHistory(userLoginPasswordHistoryId);
 
 		try {
 			if (((UserLoginPasswordHistoryDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("UserLoginPasswordHistory could not be deleted");
+		return conflict();
 
 	}
 

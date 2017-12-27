@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.marketing.relations.salesForecast.query.hist
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/marketing/salesForecast/salesForecastHistorys")
 public class SalesForecastHistoryController {
@@ -52,7 +54,7 @@ public class SalesForecastHistoryController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findSalesForecastHistorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<SalesForecastHistory>> findSalesForecastHistorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSalesForecastHistorysBy query = new FindSalesForecastHistorysBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class SalesForecastHistoryController {
 		}
 
 		List<SalesForecastHistory> salesForecastHistorys =((SalesForecastHistoryFound) Scheduler.execute(query).data()).getSalesForecastHistorys();
-
-		if (salesForecastHistorys.size() == 1) {
-			return ResponseEntity.ok().body(salesForecastHistorys.get(0));
-		}
 
 		return ResponseEntity.ok().body(salesForecastHistorys);
 
@@ -78,7 +76,7 @@ public class SalesForecastHistoryController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createSalesForecastHistory(HttpServletRequest request) throws Exception {
+	public ResponseEntity<SalesForecastHistory> createSalesForecastHistory(HttpServletRequest request) throws Exception {
 
 		SalesForecastHistory salesForecastHistoryToBeAdded = new SalesForecastHistory();
 		try {
@@ -86,7 +84,7 @@ public class SalesForecastHistoryController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createSalesForecastHistory(salesForecastHistoryToBeAdded);
@@ -101,63 +99,15 @@ public class SalesForecastHistoryController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createSalesForecastHistory(@RequestBody SalesForecastHistory salesForecastHistoryToBeAdded) throws Exception {
+	public ResponseEntity<SalesForecastHistory> createSalesForecastHistory(@RequestBody SalesForecastHistory salesForecastHistoryToBeAdded) throws Exception {
 
 		AddSalesForecastHistory command = new AddSalesForecastHistory(salesForecastHistoryToBeAdded);
 		SalesForecastHistory salesForecastHistory = ((SalesForecastHistoryAdded) Scheduler.execute(command).data()).getAddedSalesForecastHistory();
 		
 		if (salesForecastHistory != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(salesForecastHistory);
+			return successful(salesForecastHistory);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("SalesForecastHistory could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateSalesForecastHistory(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		SalesForecastHistory salesForecastHistoryToBeUpdated = new SalesForecastHistory();
-
-		try {
-			salesForecastHistoryToBeUpdated = SalesForecastHistoryMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateSalesForecastHistory(salesForecastHistoryToBeUpdated, salesForecastHistoryToBeUpdated.getSalesForecastHistoryId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class SalesForecastHistoryController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{salesForecastHistoryId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateSalesForecastHistory(@RequestBody SalesForecastHistory salesForecastHistoryToBeUpdated,
+	public ResponseEntity<String> updateSalesForecastHistory(@RequestBody SalesForecastHistory salesForecastHistoryToBeUpdated,
 			@PathVariable String salesForecastHistoryId) throws Exception {
 
 		salesForecastHistoryToBeUpdated.setSalesForecastHistoryId(salesForecastHistoryId);
@@ -178,41 +128,44 @@ public class SalesForecastHistoryController {
 
 		try {
 			if(((SalesForecastHistoryUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{salesForecastHistoryId}")
-	public ResponseEntity<Object> findById(@PathVariable String salesForecastHistoryId) throws Exception {
+	public ResponseEntity<SalesForecastHistory> findById(@PathVariable String salesForecastHistoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("salesForecastHistoryId", salesForecastHistoryId);
 		try {
 
-			Object foundSalesForecastHistory = findSalesForecastHistorysBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundSalesForecastHistory);
+			List<SalesForecastHistory> foundSalesForecastHistory = findSalesForecastHistorysBy(requestParams).getBody();
+			if(foundSalesForecastHistory.size()==1){				return successful(foundSalesForecastHistory.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{salesForecastHistoryId}")
-	public ResponseEntity<Object> deleteSalesForecastHistoryByIdUpdated(@PathVariable String salesForecastHistoryId) throws Exception {
+	public ResponseEntity<String> deleteSalesForecastHistoryByIdUpdated(@PathVariable String salesForecastHistoryId) throws Exception {
 		DeleteSalesForecastHistory command = new DeleteSalesForecastHistory(salesForecastHistoryId);
 
 		try {
 			if (((SalesForecastHistoryDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("SalesForecastHistory could not be deleted");
+		return conflict();
 
 	}
 

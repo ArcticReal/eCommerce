@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.valueLinkKey.query.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/valueLinkKeys")
 public class ValueLinkKeyController {
@@ -52,7 +54,7 @@ public class ValueLinkKeyController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findValueLinkKeysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ValueLinkKey>> findValueLinkKeysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindValueLinkKeysBy query = new FindValueLinkKeysBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ValueLinkKeyController {
 		}
 
 		List<ValueLinkKey> valueLinkKeys =((ValueLinkKeyFound) Scheduler.execute(query).data()).getValueLinkKeys();
-
-		if (valueLinkKeys.size() == 1) {
-			return ResponseEntity.ok().body(valueLinkKeys.get(0));
-		}
 
 		return ResponseEntity.ok().body(valueLinkKeys);
 
@@ -78,7 +76,7 @@ public class ValueLinkKeyController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createValueLinkKey(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ValueLinkKey> createValueLinkKey(HttpServletRequest request) throws Exception {
 
 		ValueLinkKey valueLinkKeyToBeAdded = new ValueLinkKey();
 		try {
@@ -86,7 +84,7 @@ public class ValueLinkKeyController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createValueLinkKey(valueLinkKeyToBeAdded);
@@ -101,63 +99,15 @@ public class ValueLinkKeyController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createValueLinkKey(@RequestBody ValueLinkKey valueLinkKeyToBeAdded) throws Exception {
+	public ResponseEntity<ValueLinkKey> createValueLinkKey(@RequestBody ValueLinkKey valueLinkKeyToBeAdded) throws Exception {
 
 		AddValueLinkKey command = new AddValueLinkKey(valueLinkKeyToBeAdded);
 		ValueLinkKey valueLinkKey = ((ValueLinkKeyAdded) Scheduler.execute(command).data()).getAddedValueLinkKey();
 		
 		if (valueLinkKey != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(valueLinkKey);
+			return successful(valueLinkKey);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ValueLinkKey could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateValueLinkKey(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ValueLinkKey valueLinkKeyToBeUpdated = new ValueLinkKey();
-
-		try {
-			valueLinkKeyToBeUpdated = ValueLinkKeyMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateValueLinkKey(valueLinkKeyToBeUpdated, valueLinkKeyToBeUpdated.getMerchantId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ValueLinkKeyController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{merchantId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateValueLinkKey(@RequestBody ValueLinkKey valueLinkKeyToBeUpdated,
+	public ResponseEntity<String> updateValueLinkKey(@RequestBody ValueLinkKey valueLinkKeyToBeUpdated,
 			@PathVariable String merchantId) throws Exception {
 
 		valueLinkKeyToBeUpdated.setMerchantId(merchantId);
@@ -178,41 +128,44 @@ public class ValueLinkKeyController {
 
 		try {
 			if(((ValueLinkKeyUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{valueLinkKeyId}")
-	public ResponseEntity<Object> findById(@PathVariable String valueLinkKeyId) throws Exception {
+	public ResponseEntity<ValueLinkKey> findById(@PathVariable String valueLinkKeyId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("valueLinkKeyId", valueLinkKeyId);
 		try {
 
-			Object foundValueLinkKey = findValueLinkKeysBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundValueLinkKey);
+			List<ValueLinkKey> foundValueLinkKey = findValueLinkKeysBy(requestParams).getBody();
+			if(foundValueLinkKey.size()==1){				return successful(foundValueLinkKey.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{valueLinkKeyId}")
-	public ResponseEntity<Object> deleteValueLinkKeyByIdUpdated(@PathVariable String valueLinkKeyId) throws Exception {
+	public ResponseEntity<String> deleteValueLinkKeyByIdUpdated(@PathVariable String valueLinkKeyId) throws Exception {
 		DeleteValueLinkKey command = new DeleteValueLinkKey(valueLinkKeyId);
 
 		try {
 			if (((ValueLinkKeyDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ValueLinkKey could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.container.query.type.FindC
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/container/containerTypes")
 public class ContainerTypeController {
@@ -52,7 +54,7 @@ public class ContainerTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findContainerTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ContainerType>> findContainerTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContainerTypesBy query = new FindContainerTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ContainerTypeController {
 		}
 
 		List<ContainerType> containerTypes =((ContainerTypeFound) Scheduler.execute(query).data()).getContainerTypes();
-
-		if (containerTypes.size() == 1) {
-			return ResponseEntity.ok().body(containerTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(containerTypes);
 
@@ -78,7 +76,7 @@ public class ContainerTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createContainerType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ContainerType> createContainerType(HttpServletRequest request) throws Exception {
 
 		ContainerType containerTypeToBeAdded = new ContainerType();
 		try {
@@ -86,7 +84,7 @@ public class ContainerTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createContainerType(containerTypeToBeAdded);
@@ -101,63 +99,15 @@ public class ContainerTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createContainerType(@RequestBody ContainerType containerTypeToBeAdded) throws Exception {
+	public ResponseEntity<ContainerType> createContainerType(@RequestBody ContainerType containerTypeToBeAdded) throws Exception {
 
 		AddContainerType command = new AddContainerType(containerTypeToBeAdded);
 		ContainerType containerType = ((ContainerTypeAdded) Scheduler.execute(command).data()).getAddedContainerType();
 		
 		if (containerType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(containerType);
+			return successful(containerType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ContainerType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateContainerType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ContainerType containerTypeToBeUpdated = new ContainerType();
-
-		try {
-			containerTypeToBeUpdated = ContainerTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateContainerType(containerTypeToBeUpdated, containerTypeToBeUpdated.getContainerTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ContainerTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{containerTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateContainerType(@RequestBody ContainerType containerTypeToBeUpdated,
+	public ResponseEntity<String> updateContainerType(@RequestBody ContainerType containerTypeToBeUpdated,
 			@PathVariable String containerTypeId) throws Exception {
 
 		containerTypeToBeUpdated.setContainerTypeId(containerTypeId);
@@ -178,41 +128,44 @@ public class ContainerTypeController {
 
 		try {
 			if(((ContainerTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{containerTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String containerTypeId) throws Exception {
+	public ResponseEntity<ContainerType> findById(@PathVariable String containerTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("containerTypeId", containerTypeId);
 		try {
 
-			Object foundContainerType = findContainerTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundContainerType);
+			List<ContainerType> foundContainerType = findContainerTypesBy(requestParams).getBody();
+			if(foundContainerType.size()==1){				return successful(foundContainerType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{containerTypeId}")
-	public ResponseEntity<Object> deleteContainerTypeByIdUpdated(@PathVariable String containerTypeId) throws Exception {
+	public ResponseEntity<String> deleteContainerTypeByIdUpdated(@PathVariable String containerTypeId) throws Exception {
 		DeleteContainerType command = new DeleteContainerType(containerTypeId);
 
 		try {
 			if (((ContainerTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ContainerType could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.subscription.query.commEve
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/subscription/subscriptionCommEvents")
 public class SubscriptionCommEventController {
@@ -52,7 +54,7 @@ public class SubscriptionCommEventController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findSubscriptionCommEventsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<SubscriptionCommEvent>> findSubscriptionCommEventsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSubscriptionCommEventsBy query = new FindSubscriptionCommEventsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class SubscriptionCommEventController {
 		}
 
 		List<SubscriptionCommEvent> subscriptionCommEvents =((SubscriptionCommEventFound) Scheduler.execute(query).data()).getSubscriptionCommEvents();
-
-		if (subscriptionCommEvents.size() == 1) {
-			return ResponseEntity.ok().body(subscriptionCommEvents.get(0));
-		}
 
 		return ResponseEntity.ok().body(subscriptionCommEvents);
 
@@ -78,7 +76,7 @@ public class SubscriptionCommEventController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createSubscriptionCommEvent(HttpServletRequest request) throws Exception {
+	public ResponseEntity<SubscriptionCommEvent> createSubscriptionCommEvent(HttpServletRequest request) throws Exception {
 
 		SubscriptionCommEvent subscriptionCommEventToBeAdded = new SubscriptionCommEvent();
 		try {
@@ -86,7 +84,7 @@ public class SubscriptionCommEventController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createSubscriptionCommEvent(subscriptionCommEventToBeAdded);
@@ -101,63 +99,15 @@ public class SubscriptionCommEventController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createSubscriptionCommEvent(@RequestBody SubscriptionCommEvent subscriptionCommEventToBeAdded) throws Exception {
+	public ResponseEntity<SubscriptionCommEvent> createSubscriptionCommEvent(@RequestBody SubscriptionCommEvent subscriptionCommEventToBeAdded) throws Exception {
 
 		AddSubscriptionCommEvent command = new AddSubscriptionCommEvent(subscriptionCommEventToBeAdded);
 		SubscriptionCommEvent subscriptionCommEvent = ((SubscriptionCommEventAdded) Scheduler.execute(command).data()).getAddedSubscriptionCommEvent();
 		
 		if (subscriptionCommEvent != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(subscriptionCommEvent);
+			return successful(subscriptionCommEvent);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("SubscriptionCommEvent could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateSubscriptionCommEvent(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		SubscriptionCommEvent subscriptionCommEventToBeUpdated = new SubscriptionCommEvent();
-
-		try {
-			subscriptionCommEventToBeUpdated = SubscriptionCommEventMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateSubscriptionCommEvent(subscriptionCommEventToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class SubscriptionCommEventController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateSubscriptionCommEvent(@RequestBody SubscriptionCommEvent subscriptionCommEventToBeUpdated,
+	public ResponseEntity<String> updateSubscriptionCommEvent(@RequestBody SubscriptionCommEvent subscriptionCommEventToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		subscriptionCommEventToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class SubscriptionCommEventController {
 
 		try {
 			if(((SubscriptionCommEventUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{subscriptionCommEventId}")
-	public ResponseEntity<Object> findById(@PathVariable String subscriptionCommEventId) throws Exception {
+	public ResponseEntity<SubscriptionCommEvent> findById(@PathVariable String subscriptionCommEventId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("subscriptionCommEventId", subscriptionCommEventId);
 		try {
 
-			Object foundSubscriptionCommEvent = findSubscriptionCommEventsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundSubscriptionCommEvent);
+			List<SubscriptionCommEvent> foundSubscriptionCommEvent = findSubscriptionCommEventsBy(requestParams).getBody();
+			if(foundSubscriptionCommEvent.size()==1){				return successful(foundSubscriptionCommEvent.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{subscriptionCommEventId}")
-	public ResponseEntity<Object> deleteSubscriptionCommEventByIdUpdated(@PathVariable String subscriptionCommEventId) throws Exception {
+	public ResponseEntity<String> deleteSubscriptionCommEventByIdUpdated(@PathVariable String subscriptionCommEventId) throws Exception {
 		DeleteSubscriptionCommEvent command = new DeleteSubscriptionCommEvent(subscriptionCommEventId);
 
 		try {
 			if (((SubscriptionCommEventDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("SubscriptionCommEvent could not be deleted");
+		return conflict();
 
 	}
 

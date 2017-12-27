@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.workeffort.relations.workEffort.query.FindWo
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/workeffort/workEfforts")
 public class WorkEffortController {
@@ -52,7 +54,7 @@ public class WorkEffortController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWorkEffortsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WorkEffort>> findWorkEffortsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortsBy query = new FindWorkEffortsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WorkEffortController {
 		}
 
 		List<WorkEffort> workEfforts =((WorkEffortFound) Scheduler.execute(query).data()).getWorkEfforts();
-
-		if (workEfforts.size() == 1) {
-			return ResponseEntity.ok().body(workEfforts.get(0));
-		}
 
 		return ResponseEntity.ok().body(workEfforts);
 
@@ -78,7 +76,7 @@ public class WorkEffortController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWorkEffort(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WorkEffort> createWorkEffort(HttpServletRequest request) throws Exception {
 
 		WorkEffort workEffortToBeAdded = new WorkEffort();
 		try {
@@ -86,7 +84,7 @@ public class WorkEffortController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWorkEffort(workEffortToBeAdded);
@@ -101,63 +99,15 @@ public class WorkEffortController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWorkEffort(@RequestBody WorkEffort workEffortToBeAdded) throws Exception {
+	public ResponseEntity<WorkEffort> createWorkEffort(@RequestBody WorkEffort workEffortToBeAdded) throws Exception {
 
 		AddWorkEffort command = new AddWorkEffort(workEffortToBeAdded);
 		WorkEffort workEffort = ((WorkEffortAdded) Scheduler.execute(command).data()).getAddedWorkEffort();
 		
 		if (workEffort != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(workEffort);
+			return successful(workEffort);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WorkEffort could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWorkEffort(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WorkEffort workEffortToBeUpdated = new WorkEffort();
-
-		try {
-			workEffortToBeUpdated = WorkEffortMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWorkEffort(workEffortToBeUpdated, workEffortToBeUpdated.getWorkEffortId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WorkEffortController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{workEffortId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWorkEffort(@RequestBody WorkEffort workEffortToBeUpdated,
+	public ResponseEntity<String> updateWorkEffort(@RequestBody WorkEffort workEffortToBeUpdated,
 			@PathVariable String workEffortId) throws Exception {
 
 		workEffortToBeUpdated.setWorkEffortId(workEffortId);
@@ -178,41 +128,44 @@ public class WorkEffortController {
 
 		try {
 			if(((WorkEffortUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{workEffortId}")
-	public ResponseEntity<Object> findById(@PathVariable String workEffortId) throws Exception {
+	public ResponseEntity<WorkEffort> findById(@PathVariable String workEffortId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortId", workEffortId);
 		try {
 
-			Object foundWorkEffort = findWorkEffortsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWorkEffort);
+			List<WorkEffort> foundWorkEffort = findWorkEffortsBy(requestParams).getBody();
+			if(foundWorkEffort.size()==1){				return successful(foundWorkEffort.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{workEffortId}")
-	public ResponseEntity<Object> deleteWorkEffortByIdUpdated(@PathVariable String workEffortId) throws Exception {
+	public ResponseEntity<String> deleteWorkEffortByIdUpdated(@PathVariable String workEffortId) throws Exception {
 		DeleteWorkEffort command = new DeleteWorkEffort(workEffortId);
 
 		try {
 			if (((WorkEffortDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WorkEffort could not be deleted");
+		return conflict();
 
 	}
 

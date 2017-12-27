@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.party.query.role.FindPartyRo
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/party/partyRoles")
 public class PartyRoleController {
@@ -52,7 +54,7 @@ public class PartyRoleController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPartyRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PartyRole>> findPartyRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyRolesBy query = new FindPartyRolesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PartyRoleController {
 		}
 
 		List<PartyRole> partyRoles =((PartyRoleFound) Scheduler.execute(query).data()).getPartyRoles();
-
-		if (partyRoles.size() == 1) {
-			return ResponseEntity.ok().body(partyRoles.get(0));
-		}
 
 		return ResponseEntity.ok().body(partyRoles);
 
@@ -78,7 +76,7 @@ public class PartyRoleController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPartyRole(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PartyRole> createPartyRole(HttpServletRequest request) throws Exception {
 
 		PartyRole partyRoleToBeAdded = new PartyRole();
 		try {
@@ -86,7 +84,7 @@ public class PartyRoleController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPartyRole(partyRoleToBeAdded);
@@ -101,63 +99,15 @@ public class PartyRoleController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPartyRole(@RequestBody PartyRole partyRoleToBeAdded) throws Exception {
+	public ResponseEntity<PartyRole> createPartyRole(@RequestBody PartyRole partyRoleToBeAdded) throws Exception {
 
 		AddPartyRole command = new AddPartyRole(partyRoleToBeAdded);
 		PartyRole partyRole = ((PartyRoleAdded) Scheduler.execute(command).data()).getAddedPartyRole();
 		
 		if (partyRole != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(partyRole);
+			return successful(partyRole);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PartyRole could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePartyRole(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PartyRole partyRoleToBeUpdated = new PartyRole();
-
-		try {
-			partyRoleToBeUpdated = PartyRoleMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePartyRole(partyRoleToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PartyRoleController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePartyRole(@RequestBody PartyRole partyRoleToBeUpdated,
+	public ResponseEntity<String> updatePartyRole(@RequestBody PartyRole partyRoleToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		partyRoleToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class PartyRoleController {
 
 		try {
 			if(((PartyRoleUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{partyRoleId}")
-	public ResponseEntity<Object> findById(@PathVariable String partyRoleId) throws Exception {
+	public ResponseEntity<PartyRole> findById(@PathVariable String partyRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyRoleId", partyRoleId);
 		try {
 
-			Object foundPartyRole = findPartyRolesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPartyRole);
+			List<PartyRole> foundPartyRole = findPartyRolesBy(requestParams).getBody();
+			if(foundPartyRole.size()==1){				return successful(foundPartyRole.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{partyRoleId}")
-	public ResponseEntity<Object> deletePartyRoleByIdUpdated(@PathVariable String partyRoleId) throws Exception {
+	public ResponseEntity<String> deletePartyRoleByIdUpdated(@PathVariable String partyRoleId) throws Exception {
 		DeletePartyRole command = new DeletePartyRole(partyRoleId);
 
 		try {
 			if (((PartyRoleDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PartyRole could not be deleted");
+		return conflict();
 
 	}
 

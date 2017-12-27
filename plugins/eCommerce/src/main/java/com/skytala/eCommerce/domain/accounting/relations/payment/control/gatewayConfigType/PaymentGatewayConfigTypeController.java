@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.payment.query.gatewayCo
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/payment/paymentGatewayConfigTypes")
 public class PaymentGatewayConfigTypeController {
@@ -52,7 +54,7 @@ public class PaymentGatewayConfigTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPaymentGatewayConfigTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PaymentGatewayConfigType>> findPaymentGatewayConfigTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentGatewayConfigTypesBy query = new FindPaymentGatewayConfigTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PaymentGatewayConfigTypeController {
 		}
 
 		List<PaymentGatewayConfigType> paymentGatewayConfigTypes =((PaymentGatewayConfigTypeFound) Scheduler.execute(query).data()).getPaymentGatewayConfigTypes();
-
-		if (paymentGatewayConfigTypes.size() == 1) {
-			return ResponseEntity.ok().body(paymentGatewayConfigTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(paymentGatewayConfigTypes);
 
@@ -78,7 +76,7 @@ public class PaymentGatewayConfigTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPaymentGatewayConfigType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PaymentGatewayConfigType> createPaymentGatewayConfigType(HttpServletRequest request) throws Exception {
 
 		PaymentGatewayConfigType paymentGatewayConfigTypeToBeAdded = new PaymentGatewayConfigType();
 		try {
@@ -86,7 +84,7 @@ public class PaymentGatewayConfigTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPaymentGatewayConfigType(paymentGatewayConfigTypeToBeAdded);
@@ -101,63 +99,15 @@ public class PaymentGatewayConfigTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPaymentGatewayConfigType(@RequestBody PaymentGatewayConfigType paymentGatewayConfigTypeToBeAdded) throws Exception {
+	public ResponseEntity<PaymentGatewayConfigType> createPaymentGatewayConfigType(@RequestBody PaymentGatewayConfigType paymentGatewayConfigTypeToBeAdded) throws Exception {
 
 		AddPaymentGatewayConfigType command = new AddPaymentGatewayConfigType(paymentGatewayConfigTypeToBeAdded);
 		PaymentGatewayConfigType paymentGatewayConfigType = ((PaymentGatewayConfigTypeAdded) Scheduler.execute(command).data()).getAddedPaymentGatewayConfigType();
 		
 		if (paymentGatewayConfigType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(paymentGatewayConfigType);
+			return successful(paymentGatewayConfigType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PaymentGatewayConfigType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePaymentGatewayConfigType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PaymentGatewayConfigType paymentGatewayConfigTypeToBeUpdated = new PaymentGatewayConfigType();
-
-		try {
-			paymentGatewayConfigTypeToBeUpdated = PaymentGatewayConfigTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePaymentGatewayConfigType(paymentGatewayConfigTypeToBeUpdated, paymentGatewayConfigTypeToBeUpdated.getPaymentGatewayConfigTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PaymentGatewayConfigTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{paymentGatewayConfigTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePaymentGatewayConfigType(@RequestBody PaymentGatewayConfigType paymentGatewayConfigTypeToBeUpdated,
+	public ResponseEntity<String> updatePaymentGatewayConfigType(@RequestBody PaymentGatewayConfigType paymentGatewayConfigTypeToBeUpdated,
 			@PathVariable String paymentGatewayConfigTypeId) throws Exception {
 
 		paymentGatewayConfigTypeToBeUpdated.setPaymentGatewayConfigTypeId(paymentGatewayConfigTypeId);
@@ -178,41 +128,44 @@ public class PaymentGatewayConfigTypeController {
 
 		try {
 			if(((PaymentGatewayConfigTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{paymentGatewayConfigTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String paymentGatewayConfigTypeId) throws Exception {
+	public ResponseEntity<PaymentGatewayConfigType> findById(@PathVariable String paymentGatewayConfigTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentGatewayConfigTypeId", paymentGatewayConfigTypeId);
 		try {
 
-			Object foundPaymentGatewayConfigType = findPaymentGatewayConfigTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPaymentGatewayConfigType);
+			List<PaymentGatewayConfigType> foundPaymentGatewayConfigType = findPaymentGatewayConfigTypesBy(requestParams).getBody();
+			if(foundPaymentGatewayConfigType.size()==1){				return successful(foundPaymentGatewayConfigType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{paymentGatewayConfigTypeId}")
-	public ResponseEntity<Object> deletePaymentGatewayConfigTypeByIdUpdated(@PathVariable String paymentGatewayConfigTypeId) throws Exception {
+	public ResponseEntity<String> deletePaymentGatewayConfigTypeByIdUpdated(@PathVariable String paymentGatewayConfigTypeId) throws Exception {
 		DeletePaymentGatewayConfigType command = new DeletePaymentGatewayConfigType(paymentGatewayConfigTypeId);
 
 		try {
 			if (((PaymentGatewayConfigTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PaymentGatewayConfigType could not be deleted");
+		return conflict();
 
 	}
 

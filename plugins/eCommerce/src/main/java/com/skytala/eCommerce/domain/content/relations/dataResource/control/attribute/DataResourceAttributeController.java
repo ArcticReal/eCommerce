@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.dataResource.query.attribu
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/dataResource/dataResourceAttributes")
 public class DataResourceAttributeController {
@@ -52,7 +54,7 @@ public class DataResourceAttributeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findDataResourceAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<DataResourceAttribute>> findDataResourceAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDataResourceAttributesBy query = new FindDataResourceAttributesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class DataResourceAttributeController {
 		}
 
 		List<DataResourceAttribute> dataResourceAttributes =((DataResourceAttributeFound) Scheduler.execute(query).data()).getDataResourceAttributes();
-
-		if (dataResourceAttributes.size() == 1) {
-			return ResponseEntity.ok().body(dataResourceAttributes.get(0));
-		}
 
 		return ResponseEntity.ok().body(dataResourceAttributes);
 
@@ -78,7 +76,7 @@ public class DataResourceAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createDataResourceAttribute(HttpServletRequest request) throws Exception {
+	public ResponseEntity<DataResourceAttribute> createDataResourceAttribute(HttpServletRequest request) throws Exception {
 
 		DataResourceAttribute dataResourceAttributeToBeAdded = new DataResourceAttribute();
 		try {
@@ -86,7 +84,7 @@ public class DataResourceAttributeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createDataResourceAttribute(dataResourceAttributeToBeAdded);
@@ -101,63 +99,15 @@ public class DataResourceAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createDataResourceAttribute(@RequestBody DataResourceAttribute dataResourceAttributeToBeAdded) throws Exception {
+	public ResponseEntity<DataResourceAttribute> createDataResourceAttribute(@RequestBody DataResourceAttribute dataResourceAttributeToBeAdded) throws Exception {
 
 		AddDataResourceAttribute command = new AddDataResourceAttribute(dataResourceAttributeToBeAdded);
 		DataResourceAttribute dataResourceAttribute = ((DataResourceAttributeAdded) Scheduler.execute(command).data()).getAddedDataResourceAttribute();
 		
 		if (dataResourceAttribute != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(dataResourceAttribute);
+			return successful(dataResourceAttribute);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("DataResourceAttribute could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateDataResourceAttribute(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		DataResourceAttribute dataResourceAttributeToBeUpdated = new DataResourceAttribute();
-
-		try {
-			dataResourceAttributeToBeUpdated = DataResourceAttributeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateDataResourceAttribute(dataResourceAttributeToBeUpdated, dataResourceAttributeToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class DataResourceAttributeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateDataResourceAttribute(@RequestBody DataResourceAttribute dataResourceAttributeToBeUpdated,
+	public ResponseEntity<String> updateDataResourceAttribute(@RequestBody DataResourceAttribute dataResourceAttributeToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		dataResourceAttributeToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class DataResourceAttributeController {
 
 		try {
 			if(((DataResourceAttributeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{dataResourceAttributeId}")
-	public ResponseEntity<Object> findById(@PathVariable String dataResourceAttributeId) throws Exception {
+	public ResponseEntity<DataResourceAttribute> findById(@PathVariable String dataResourceAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("dataResourceAttributeId", dataResourceAttributeId);
 		try {
 
-			Object foundDataResourceAttribute = findDataResourceAttributesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundDataResourceAttribute);
+			List<DataResourceAttribute> foundDataResourceAttribute = findDataResourceAttributesBy(requestParams).getBody();
+			if(foundDataResourceAttribute.size()==1){				return successful(foundDataResourceAttribute.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{dataResourceAttributeId}")
-	public ResponseEntity<Object> deleteDataResourceAttributeByIdUpdated(@PathVariable String dataResourceAttributeId) throws Exception {
+	public ResponseEntity<String> deleteDataResourceAttributeByIdUpdated(@PathVariable String dataResourceAttributeId) throws Exception {
 		DeleteDataResourceAttribute command = new DeleteDataResourceAttribute(dataResourceAttributeId);
 
 		try {
 			if (((DataResourceAttributeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("DataResourceAttribute could not be deleted");
+		return conflict();
 
 	}
 

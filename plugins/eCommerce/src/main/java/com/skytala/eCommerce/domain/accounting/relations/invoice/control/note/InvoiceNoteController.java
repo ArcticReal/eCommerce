@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.invoice.query.note.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/invoice/invoiceNotes")
 public class InvoiceNoteController {
@@ -52,7 +54,7 @@ public class InvoiceNoteController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findInvoiceNotesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<InvoiceNote>> findInvoiceNotesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInvoiceNotesBy query = new FindInvoiceNotesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class InvoiceNoteController {
 		}
 
 		List<InvoiceNote> invoiceNotes =((InvoiceNoteFound) Scheduler.execute(query).data()).getInvoiceNotes();
-
-		if (invoiceNotes.size() == 1) {
-			return ResponseEntity.ok().body(invoiceNotes.get(0));
-		}
 
 		return ResponseEntity.ok().body(invoiceNotes);
 
@@ -78,7 +76,7 @@ public class InvoiceNoteController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createInvoiceNote(HttpServletRequest request) throws Exception {
+	public ResponseEntity<InvoiceNote> createInvoiceNote(HttpServletRequest request) throws Exception {
 
 		InvoiceNote invoiceNoteToBeAdded = new InvoiceNote();
 		try {
@@ -86,7 +84,7 @@ public class InvoiceNoteController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createInvoiceNote(invoiceNoteToBeAdded);
@@ -101,63 +99,15 @@ public class InvoiceNoteController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createInvoiceNote(@RequestBody InvoiceNote invoiceNoteToBeAdded) throws Exception {
+	public ResponseEntity<InvoiceNote> createInvoiceNote(@RequestBody InvoiceNote invoiceNoteToBeAdded) throws Exception {
 
 		AddInvoiceNote command = new AddInvoiceNote(invoiceNoteToBeAdded);
 		InvoiceNote invoiceNote = ((InvoiceNoteAdded) Scheduler.execute(command).data()).getAddedInvoiceNote();
 		
 		if (invoiceNote != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(invoiceNote);
+			return successful(invoiceNote);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("InvoiceNote could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateInvoiceNote(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		InvoiceNote invoiceNoteToBeUpdated = new InvoiceNote();
-
-		try {
-			invoiceNoteToBeUpdated = InvoiceNoteMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateInvoiceNote(invoiceNoteToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class InvoiceNoteController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateInvoiceNote(@RequestBody InvoiceNote invoiceNoteToBeUpdated,
+	public ResponseEntity<String> updateInvoiceNote(@RequestBody InvoiceNote invoiceNoteToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		invoiceNoteToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class InvoiceNoteController {
 
 		try {
 			if(((InvoiceNoteUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{invoiceNoteId}")
-	public ResponseEntity<Object> findById(@PathVariable String invoiceNoteId) throws Exception {
+	public ResponseEntity<InvoiceNote> findById(@PathVariable String invoiceNoteId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("invoiceNoteId", invoiceNoteId);
 		try {
 
-			Object foundInvoiceNote = findInvoiceNotesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundInvoiceNote);
+			List<InvoiceNote> foundInvoiceNote = findInvoiceNotesBy(requestParams).getBody();
+			if(foundInvoiceNote.size()==1){				return successful(foundInvoiceNote.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{invoiceNoteId}")
-	public ResponseEntity<Object> deleteInvoiceNoteByIdUpdated(@PathVariable String invoiceNoteId) throws Exception {
+	public ResponseEntity<String> deleteInvoiceNoteByIdUpdated(@PathVariable String invoiceNoteId) throws Exception {
 		DeleteInvoiceNote command = new DeleteInvoiceNote(invoiceNoteId);
 
 		try {
 			if (((InvoiceNoteDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("InvoiceNote could not be deleted");
+		return conflict();
 
 	}
 

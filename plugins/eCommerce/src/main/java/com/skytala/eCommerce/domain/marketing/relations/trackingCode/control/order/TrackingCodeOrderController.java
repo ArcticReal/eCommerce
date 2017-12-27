@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.marketing.relations.trackingCode.query.order
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/marketing/trackingCode/trackingCodeOrders")
 public class TrackingCodeOrderController {
@@ -52,7 +54,7 @@ public class TrackingCodeOrderController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findTrackingCodeOrdersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<TrackingCodeOrder>> findTrackingCodeOrdersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTrackingCodeOrdersBy query = new FindTrackingCodeOrdersBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class TrackingCodeOrderController {
 		}
 
 		List<TrackingCodeOrder> trackingCodeOrders =((TrackingCodeOrderFound) Scheduler.execute(query).data()).getTrackingCodeOrders();
-
-		if (trackingCodeOrders.size() == 1) {
-			return ResponseEntity.ok().body(trackingCodeOrders.get(0));
-		}
 
 		return ResponseEntity.ok().body(trackingCodeOrders);
 
@@ -78,7 +76,7 @@ public class TrackingCodeOrderController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createTrackingCodeOrder(HttpServletRequest request) throws Exception {
+	public ResponseEntity<TrackingCodeOrder> createTrackingCodeOrder(HttpServletRequest request) throws Exception {
 
 		TrackingCodeOrder trackingCodeOrderToBeAdded = new TrackingCodeOrder();
 		try {
@@ -86,7 +84,7 @@ public class TrackingCodeOrderController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createTrackingCodeOrder(trackingCodeOrderToBeAdded);
@@ -101,63 +99,15 @@ public class TrackingCodeOrderController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createTrackingCodeOrder(@RequestBody TrackingCodeOrder trackingCodeOrderToBeAdded) throws Exception {
+	public ResponseEntity<TrackingCodeOrder> createTrackingCodeOrder(@RequestBody TrackingCodeOrder trackingCodeOrderToBeAdded) throws Exception {
 
 		AddTrackingCodeOrder command = new AddTrackingCodeOrder(trackingCodeOrderToBeAdded);
 		TrackingCodeOrder trackingCodeOrder = ((TrackingCodeOrderAdded) Scheduler.execute(command).data()).getAddedTrackingCodeOrder();
 		
 		if (trackingCodeOrder != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(trackingCodeOrder);
+			return successful(trackingCodeOrder);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("TrackingCodeOrder could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateTrackingCodeOrder(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		TrackingCodeOrder trackingCodeOrderToBeUpdated = new TrackingCodeOrder();
-
-		try {
-			trackingCodeOrderToBeUpdated = TrackingCodeOrderMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateTrackingCodeOrder(trackingCodeOrderToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class TrackingCodeOrderController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateTrackingCodeOrder(@RequestBody TrackingCodeOrder trackingCodeOrderToBeUpdated,
+	public ResponseEntity<String> updateTrackingCodeOrder(@RequestBody TrackingCodeOrder trackingCodeOrderToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		trackingCodeOrderToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class TrackingCodeOrderController {
 
 		try {
 			if(((TrackingCodeOrderUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{trackingCodeOrderId}")
-	public ResponseEntity<Object> findById(@PathVariable String trackingCodeOrderId) throws Exception {
+	public ResponseEntity<TrackingCodeOrder> findById(@PathVariable String trackingCodeOrderId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("trackingCodeOrderId", trackingCodeOrderId);
 		try {
 
-			Object foundTrackingCodeOrder = findTrackingCodeOrdersBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundTrackingCodeOrder);
+			List<TrackingCodeOrder> foundTrackingCodeOrder = findTrackingCodeOrdersBy(requestParams).getBody();
+			if(foundTrackingCodeOrder.size()==1){				return successful(foundTrackingCodeOrder.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{trackingCodeOrderId}")
-	public ResponseEntity<Object> deleteTrackingCodeOrderByIdUpdated(@PathVariable String trackingCodeOrderId) throws Exception {
+	public ResponseEntity<String> deleteTrackingCodeOrderByIdUpdated(@PathVariable String trackingCodeOrderId) throws Exception {
 		DeleteTrackingCodeOrder command = new DeleteTrackingCodeOrder(trackingCodeOrderId);
 
 		try {
 			if (((TrackingCodeOrderDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("TrackingCodeOrder could not be deleted");
+		return conflict();
 
 	}
 

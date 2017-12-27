@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/orderReturn")
 public class OrderReturnServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getReturnAmountByOrder")
-	public ResponseEntity<Object> getReturnAmountByOrder(HttpSession session, @RequestParam(value="returnId") String returnId) {
+	public ResponseEntity<Map<String, Object>> getReturnAmountByOrder(HttpSession session, @RequestParam(value="returnId") String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -39,23 +41,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createReturnItem")
-	public ResponseEntity<Object> createReturnItem(HttpSession session, @RequestParam(value="returnQuantity") BigDecimal returnQuantity, @RequestParam(value="returnItemTypeId") String returnItemTypeId, @RequestParam(value="orderId") String orderId, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnTypeId") String returnTypeId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="includeAdjustments", required=false) String includeAdjustments, @RequestParam(value="returnItemResponseId", required=false) String returnItemResponseId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="returnReasonId", required=false) String returnReasonId, @RequestParam(value="receivedQuantity", required=false) BigDecimal receivedQuantity, @RequestParam(value="description", required=false) String description, @RequestParam(value="expectedItemStatus", required=false) String expectedItemStatus, @RequestParam(value="returnPrice", required=false) BigDecimal returnPrice) {
+	public ResponseEntity<Map<String, Object>> createReturnItem(HttpSession session, @RequestParam(value="returnQuantity") BigDecimal returnQuantity, @RequestParam(value="returnItemTypeId") String returnItemTypeId, @RequestParam(value="orderId") String orderId, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnTypeId") String returnTypeId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="includeAdjustments", required=false) String includeAdjustments, @RequestParam(value="returnItemResponseId", required=false) String returnItemResponseId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="returnReasonId", required=false) String returnReasonId, @RequestParam(value="receivedQuantity", required=false) BigDecimal receivedQuantity, @RequestParam(value="description", required=false) String description, @RequestParam(value="expectedItemStatus", required=false) String expectedItemStatus, @RequestParam(value="returnPrice", required=false) BigDecimal returnPrice) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnQuantity",returnQuantity);
@@ -82,23 +84,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateReturnAdjustment")
-	public ResponseEntity<Object> updateReturnAdjustment(HttpSession session, @RequestParam(value="returnAdjustmentId") String returnAdjustmentId, @RequestParam(value="customerReferenceId", required=false) String customerReferenceId, @RequestParam(value="correspondingProductId", required=false) String correspondingProductId, @RequestParam(value="includeInShipping", required=false) String includeInShipping, @RequestParam(value="description", required=false) String description, @RequestParam(value="returnTypeId", required=false) String returnTypeId, @RequestParam(value="exemptAmount", required=false) BigDecimal exemptAmount, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="returnAdjustmentTypeId", required=false) String returnAdjustmentTypeId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="primaryGeoId", required=false) String primaryGeoId, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="secondaryGeoId", required=false) String secondaryGeoId, @RequestParam(value="originalReturnQuantity", required=false) BigDecimal originalReturnQuantity, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="orderAdjustmentId", required=false) String orderAdjustmentId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="sourceReferenceId", required=false) String sourceReferenceId, @RequestParam(value="productPromoRuleId", required=false) String productPromoRuleId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="taxAuthorityRateSeqId", required=false) String taxAuthorityRateSeqId, @RequestParam(value="overrideGlAccountId", required=false) String overrideGlAccountId, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId, @RequestParam(value="includeInTax", required=false) String includeInTax, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="productPromoActionSeqId", required=false) String productPromoActionSeqId, @RequestParam(value="sourcePercentage", required=false) BigDecimal sourcePercentage, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId, @RequestParam(value="originalReturnPrice", required=false) BigDecimal originalReturnPrice) {
+	public ResponseEntity<Map<String, Object>> updateReturnAdjustment(HttpSession session, @RequestParam(value="returnAdjustmentId") String returnAdjustmentId, @RequestParam(value="customerReferenceId", required=false) String customerReferenceId, @RequestParam(value="correspondingProductId", required=false) String correspondingProductId, @RequestParam(value="includeInShipping", required=false) String includeInShipping, @RequestParam(value="description", required=false) String description, @RequestParam(value="returnTypeId", required=false) String returnTypeId, @RequestParam(value="exemptAmount", required=false) BigDecimal exemptAmount, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="returnAdjustmentTypeId", required=false) String returnAdjustmentTypeId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="primaryGeoId", required=false) String primaryGeoId, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="secondaryGeoId", required=false) String secondaryGeoId, @RequestParam(value="originalReturnQuantity", required=false) BigDecimal originalReturnQuantity, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="orderAdjustmentId", required=false) String orderAdjustmentId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="sourceReferenceId", required=false) String sourceReferenceId, @RequestParam(value="productPromoRuleId", required=false) String productPromoRuleId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="taxAuthorityRateSeqId", required=false) String taxAuthorityRateSeqId, @RequestParam(value="overrideGlAccountId", required=false) String overrideGlAccountId, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId, @RequestParam(value="includeInTax", required=false) String includeInTax, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="productPromoActionSeqId", required=false) String productPromoActionSeqId, @RequestParam(value="sourcePercentage", required=false) BigDecimal sourcePercentage, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId, @RequestParam(value="originalReturnPrice", required=false) BigDecimal originalReturnPrice) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnAdjustmentId",returnAdjustmentId);
@@ -143,23 +145,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateReturnType")
-	public ResponseEntity<Object> updateReturnType(HttpSession session, @RequestParam(value="returnTypeId") String returnTypeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="sequenceId", required=false) String sequenceId) {
+	public ResponseEntity<Map<String, Object>> updateReturnType(HttpSession session, @RequestParam(value="returnTypeId") String returnTypeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="sequenceId", required=false) String sequenceId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnTypeId",returnTypeId);
@@ -174,23 +176,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteReturnItemTypeMap")
-	public ResponseEntity<Object> deleteReturnItemTypeMap(HttpSession session, @RequestParam(value="returnItemMapKey") String returnItemMapKey, @RequestParam(value="returnHeaderTypeId") String returnHeaderTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteReturnItemTypeMap(HttpSession session, @RequestParam(value="returnItemMapKey") String returnItemMapKey, @RequestParam(value="returnHeaderTypeId") String returnHeaderTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnItemMapKey",returnItemMapKey);
@@ -204,23 +206,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteReturnReason")
-	public ResponseEntity<Object> deleteReturnReason(HttpSession session, @RequestParam(value="returnReasonId") String returnReasonId) {
+	public ResponseEntity<Map<String, Object>> deleteReturnReason(HttpSession session, @RequestParam(value="returnReasonId") String returnReasonId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnReasonId",returnReasonId);
@@ -233,23 +235,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/autoCancelReplacementOrders")
-	public ResponseEntity<Object> autoCancelReplacementOrders(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> autoCancelReplacementOrders(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -261,23 +263,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/processRefundReturnForReplacement")
-	public ResponseEntity<Object> processRefundReturnForReplacement(HttpSession session, @RequestParam(value="orderId") String orderId) {
+	public ResponseEntity<Map<String, Object>> processRefundReturnForReplacement(HttpSession session, @RequestParam(value="orderId") String orderId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderId",orderId);
@@ -290,23 +292,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteReturnContactMech")
-	public ResponseEntity<Object> deleteReturnContactMech(HttpSession session, @RequestParam(value="contactMechPurposeTypeId") String contactMechPurposeTypeId, @RequestParam(value="returnId") String returnId, @RequestParam(value="contactMechId") String contactMechId) {
+	public ResponseEntity<Map<String, Object>> deleteReturnContactMech(HttpSession session, @RequestParam(value="contactMechPurposeTypeId") String contactMechPurposeTypeId, @RequestParam(value="returnId") String returnId, @RequestParam(value="contactMechId") String contactMechId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("contactMechPurposeTypeId",contactMechPurposeTypeId);
@@ -321,23 +323,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateReturnHeaderType")
-	public ResponseEntity<Object> updateReturnHeaderType(HttpSession session, @RequestParam(value="returnHeaderTypeId") String returnHeaderTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateReturnHeaderType(HttpSession session, @RequestParam(value="returnHeaderTypeId") String returnHeaderTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnHeaderTypeId",returnHeaderTypeId);
@@ -352,23 +354,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateReturnItemType")
-	public ResponseEntity<Object> updateReturnItemType(HttpSession session, @RequestParam(value="returnItemTypeId") String returnItemTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateReturnItemType(HttpSession session, @RequestParam(value="returnItemTypeId") String returnItemTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnItemTypeId",returnItemTypeId);
@@ -383,23 +385,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createReturnAndItemOrAdjustment")
-	public ResponseEntity<Object> createReturnAndItemOrAdjustment(HttpSession session, @RequestParam(value="returnQuantity", required=false) BigDecimal returnQuantity, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="includeInShipping", required=false) String includeInShipping, @RequestParam(value="returnTypeId", required=false) String returnTypeId, @RequestParam(value="billingAccountId", required=false) String billingAccountId, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="returnHeaderTypeId", required=false) String returnHeaderTypeId, @RequestParam(value="returnAdjustmentTypeId", required=false) String returnAdjustmentTypeId, @RequestParam(value="returnItemResponseId", required=false) String returnItemResponseId, @RequestParam(value="expectedItemStatus", required=false) String expectedItemStatus, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="entryDate", required=false) Timestamp entryDate, @RequestParam(value="productPromoRuleId", required=false) String productPromoRuleId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="taxAuthorityRateSeqId", required=false) String taxAuthorityRateSeqId, @RequestParam(value="overrideGlAccountId", required=false) String overrideGlAccountId, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId, @RequestParam(value="includeInTax", required=false) String includeInTax, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="productPromoActionSeqId", required=false) String productPromoActionSeqId, @RequestParam(value="receivedQuantity", required=false) BigDecimal receivedQuantity, @RequestParam(value="sourcePercentage", required=false) BigDecimal sourcePercentage, @RequestParam(value="toPartyId", required=false) String toPartyId, @RequestParam(value="customerReferenceId", required=false) String customerReferenceId, @RequestParam(value="fromPartyId", required=false) String fromPartyId, @RequestParam(value="correspondingProductId", required=false) String correspondingProductId, @RequestParam(value="description", required=false) String description, @RequestParam(value="exemptAmount", required=false) BigDecimal exemptAmount, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="returnReasonId", required=false) String returnReasonId, @RequestParam(value="paymentMethodId", required=false) String paymentMethodId, @RequestParam(value="primaryGeoId", required=false) String primaryGeoId, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="secondaryGeoId", required=false) String secondaryGeoId, @RequestParam(value="destinationFacilityId", required=false) String destinationFacilityId, @RequestParam(value="orderAdjustmentId", required=false) String orderAdjustmentId, @RequestParam(value="supplierRmaId", required=false) String supplierRmaId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="originContactMechId", required=false) String originContactMechId, @RequestParam(value="sourceReferenceId", required=false) String sourceReferenceId, @RequestParam(value="returnPrice", required=false) BigDecimal returnPrice, @RequestParam(value="returnAdjustmentId", required=false) String returnAdjustmentId, @RequestParam(value="finAccountId", required=false) String finAccountId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="createdBy", required=false) String createdBy, @RequestParam(value="returnItemTypeId", required=false) String returnItemTypeId, @RequestParam(value="needsInventoryReceive", required=false) String needsInventoryReceive, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId) {
+	public ResponseEntity<Map<String, Object>> createReturnAndItemOrAdjustment(HttpSession session, @RequestParam(value="returnQuantity", required=false) BigDecimal returnQuantity, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="includeInShipping", required=false) String includeInShipping, @RequestParam(value="returnTypeId", required=false) String returnTypeId, @RequestParam(value="billingAccountId", required=false) String billingAccountId, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="returnHeaderTypeId", required=false) String returnHeaderTypeId, @RequestParam(value="returnAdjustmentTypeId", required=false) String returnAdjustmentTypeId, @RequestParam(value="returnItemResponseId", required=false) String returnItemResponseId, @RequestParam(value="expectedItemStatus", required=false) String expectedItemStatus, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="entryDate", required=false) Timestamp entryDate, @RequestParam(value="productPromoRuleId", required=false) String productPromoRuleId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="taxAuthorityRateSeqId", required=false) String taxAuthorityRateSeqId, @RequestParam(value="overrideGlAccountId", required=false) String overrideGlAccountId, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId, @RequestParam(value="includeInTax", required=false) String includeInTax, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="productPromoActionSeqId", required=false) String productPromoActionSeqId, @RequestParam(value="receivedQuantity", required=false) BigDecimal receivedQuantity, @RequestParam(value="sourcePercentage", required=false) BigDecimal sourcePercentage, @RequestParam(value="toPartyId", required=false) String toPartyId, @RequestParam(value="customerReferenceId", required=false) String customerReferenceId, @RequestParam(value="fromPartyId", required=false) String fromPartyId, @RequestParam(value="correspondingProductId", required=false) String correspondingProductId, @RequestParam(value="description", required=false) String description, @RequestParam(value="exemptAmount", required=false) BigDecimal exemptAmount, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="returnReasonId", required=false) String returnReasonId, @RequestParam(value="paymentMethodId", required=false) String paymentMethodId, @RequestParam(value="primaryGeoId", required=false) String primaryGeoId, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="secondaryGeoId", required=false) String secondaryGeoId, @RequestParam(value="destinationFacilityId", required=false) String destinationFacilityId, @RequestParam(value="orderAdjustmentId", required=false) String orderAdjustmentId, @RequestParam(value="supplierRmaId", required=false) String supplierRmaId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="originContactMechId", required=false) String originContactMechId, @RequestParam(value="sourceReferenceId", required=false) String sourceReferenceId, @RequestParam(value="returnPrice", required=false) BigDecimal returnPrice, @RequestParam(value="returnAdjustmentId", required=false) String returnAdjustmentId, @RequestParam(value="finAccountId", required=false) String finAccountId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="createdBy", required=false) String createdBy, @RequestParam(value="returnItemTypeId", required=false) String returnItemTypeId, @RequestParam(value="needsInventoryReceive", required=false) String needsInventoryReceive, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnQuantity",returnQuantity);
@@ -466,23 +468,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateReturnHeader")
-	public ResponseEntity<Object> updateReturnHeader(HttpSession session, @RequestParam(value="returnId") String returnId, @RequestParam(value="fromPartyId", required=false) String fromPartyId, @RequestParam(value="entryDate", required=false) Timestamp entryDate, @RequestParam(value="originContactMechId", required=false) String originContactMechId, @RequestParam(value="billingAccountId", required=false) String billingAccountId, @RequestParam(value="returnHeaderTypeId", required=false) String returnHeaderTypeId, @RequestParam(value="finAccountId", required=false) String finAccountId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="createdBy", required=false) String createdBy, @RequestParam(value="paymentMethodId", required=false) String paymentMethodId, @RequestParam(value="needsInventoryReceive", required=false) String needsInventoryReceive, @RequestParam(value="toPartyId", required=false) String toPartyId, @RequestParam(value="destinationFacilityId", required=false) String destinationFacilityId, @RequestParam(value="supplierRmaId", required=false) String supplierRmaId) {
+	public ResponseEntity<Map<String, Object>> updateReturnHeader(HttpSession session, @RequestParam(value="returnId") String returnId, @RequestParam(value="fromPartyId", required=false) String fromPartyId, @RequestParam(value="entryDate", required=false) Timestamp entryDate, @RequestParam(value="originContactMechId", required=false) String originContactMechId, @RequestParam(value="billingAccountId", required=false) String billingAccountId, @RequestParam(value="returnHeaderTypeId", required=false) String returnHeaderTypeId, @RequestParam(value="finAccountId", required=false) String finAccountId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="createdBy", required=false) String createdBy, @RequestParam(value="paymentMethodId", required=false) String paymentMethodId, @RequestParam(value="needsInventoryReceive", required=false) String needsInventoryReceive, @RequestParam(value="toPartyId", required=false) String toPartyId, @RequestParam(value="destinationFacilityId", required=false) String destinationFacilityId, @RequestParam(value="supplierRmaId", required=false) String supplierRmaId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -509,23 +511,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createReturnItemTypeMap")
-	public ResponseEntity<Object> createReturnItemTypeMap(HttpSession session, @RequestParam(value="returnItemMapKey") String returnItemMapKey, @RequestParam(value="returnHeaderTypeId") String returnHeaderTypeId, @RequestParam(value="returnItemTypeId", required=false) String returnItemTypeId) {
+	public ResponseEntity<Map<String, Object>> createReturnItemTypeMap(HttpSession session, @RequestParam(value="returnItemMapKey") String returnItemMapKey, @RequestParam(value="returnHeaderTypeId") String returnHeaderTypeId, @RequestParam(value="returnItemTypeId", required=false) String returnItemTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnItemMapKey",returnItemMapKey);
@@ -540,23 +542,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/processCreditReturn")
-	public ResponseEntity<Object> processCreditReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
+	public ResponseEntity<Map<String, Object>> processCreditReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -569,23 +571,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createReturnHeader")
-	public ResponseEntity<Object> createReturnHeader(HttpSession session, @RequestParam(value="returnHeaderTypeId") String returnHeaderTypeId, @RequestParam(value="fromPartyId", required=false) String fromPartyId, @RequestParam(value="entryDate", required=false) Timestamp entryDate, @RequestParam(value="originContactMechId", required=false) String originContactMechId, @RequestParam(value="billingAccountId", required=false) String billingAccountId, @RequestParam(value="finAccountId", required=false) String finAccountId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="createdBy", required=false) String createdBy, @RequestParam(value="paymentMethodId", required=false) String paymentMethodId, @RequestParam(value="needsInventoryReceive", required=false) String needsInventoryReceive, @RequestParam(value="toPartyId", required=false) String toPartyId, @RequestParam(value="destinationFacilityId", required=false) String destinationFacilityId, @RequestParam(value="supplierRmaId", required=false) String supplierRmaId) {
+	public ResponseEntity<Map<String, Object>> createReturnHeader(HttpSession session, @RequestParam(value="returnHeaderTypeId") String returnHeaderTypeId, @RequestParam(value="fromPartyId", required=false) String fromPartyId, @RequestParam(value="entryDate", required=false) Timestamp entryDate, @RequestParam(value="originContactMechId", required=false) String originContactMechId, @RequestParam(value="billingAccountId", required=false) String billingAccountId, @RequestParam(value="finAccountId", required=false) String finAccountId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="createdBy", required=false) String createdBy, @RequestParam(value="paymentMethodId", required=false) String paymentMethodId, @RequestParam(value="needsInventoryReceive", required=false) String needsInventoryReceive, @RequestParam(value="toPartyId", required=false) String toPartyId, @RequestParam(value="destinationFacilityId", required=false) String destinationFacilityId, @RequestParam(value="supplierRmaId", required=false) String supplierRmaId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnHeaderTypeId",returnHeaderTypeId);
@@ -611,23 +613,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteReturnType")
-	public ResponseEntity<Object> deleteReturnType(HttpSession session, @RequestParam(value="returnTypeId") String returnTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteReturnType(HttpSession session, @RequestParam(value="returnTypeId") String returnTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnTypeId",returnTypeId);
@@ -640,23 +642,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/processRefundOnlyReturn")
-	public ResponseEntity<Object> processRefundOnlyReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
+	public ResponseEntity<Map<String, Object>> processRefundOnlyReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -669,23 +671,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/sendReturnCompleteNotification")
-	public ResponseEntity<Object> sendReturnCompleteNotification(HttpSession session, @RequestParam(value="returnId") String returnId) {
+	public ResponseEntity<Map<String, Object>> sendReturnCompleteNotification(HttpSession session, @RequestParam(value="returnId") String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -698,23 +700,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateReturnReason")
-	public ResponseEntity<Object> updateReturnReason(HttpSession session, @RequestParam(value="returnReasonId") String returnReasonId, @RequestParam(value="description", required=false) String description, @RequestParam(value="sequenceId", required=false) String sequenceId) {
+	public ResponseEntity<Map<String, Object>> updateReturnReason(HttpSession session, @RequestParam(value="returnReasonId") String returnReasonId, @RequestParam(value="description", required=false) String description, @RequestParam(value="sequenceId", required=false) String sequenceId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnReasonId",returnReasonId);
@@ -729,23 +731,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createReturnType")
-	public ResponseEntity<Object> createReturnType(HttpSession session, @RequestParam(value="returnTypeId", required=false) String returnTypeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="sequenceId", required=false) String sequenceId) {
+	public ResponseEntity<Map<String, Object>> createReturnType(HttpSession session, @RequestParam(value="returnTypeId", required=false) String returnTypeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="sequenceId", required=false) String sequenceId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnTypeId",returnTypeId);
@@ -760,23 +762,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createReturnItemShipment")
-	public ResponseEntity<Object> createReturnItemShipment(HttpSession session, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnItemSeqId") String returnItemSeqId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId) {
+	public ResponseEntity<Map<String, Object>> createReturnItemShipment(HttpSession session, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnItemSeqId") String returnItemSeqId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quantity",quantity);
@@ -793,23 +795,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateReturnItem")
-	public ResponseEntity<Object> updateReturnItem(HttpSession session, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnItemSeqId") String returnItemSeqId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="returnQuantity", required=false) BigDecimal returnQuantity, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="returnTypeId", required=false) String returnTypeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="returnPrice", required=false) BigDecimal returnPrice, @RequestParam(value="returnItemResponseId", required=false) String returnItemResponseId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="returnReasonId", required=false) String returnReasonId, @RequestParam(value="returnItemTypeId", required=false) String returnItemTypeId, @RequestParam(value="receivedQuantity", required=false) BigDecimal receivedQuantity, @RequestParam(value="expectedItemStatus", required=false) String expectedItemStatus) {
+	public ResponseEntity<Map<String, Object>> updateReturnItem(HttpSession session, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnItemSeqId") String returnItemSeqId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="returnQuantity", required=false) BigDecimal returnQuantity, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="returnTypeId", required=false) String returnTypeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="returnPrice", required=false) BigDecimal returnPrice, @RequestParam(value="returnItemResponseId", required=false) String returnItemResponseId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="returnReasonId", required=false) String returnReasonId, @RequestParam(value="returnItemTypeId", required=false) String returnItemTypeId, @RequestParam(value="receivedQuantity", required=false) BigDecimal receivedQuantity, @RequestParam(value="expectedItemStatus", required=false) String expectedItemStatus) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -836,23 +838,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createReturnItemType")
-	public ResponseEntity<Object> createReturnItemType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="returnItemTypeId", required=false) String returnItemTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createReturnItemType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="returnItemTypeId", required=false) String returnItemTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("parentTypeId",parentTypeId);
@@ -867,23 +869,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateReturnItemOrAdjustment")
-	public ResponseEntity<Object> updateReturnItemOrAdjustment(HttpSession session, @RequestParam(value="customerReferenceId", required=false) String customerReferenceId, @RequestParam(value="correspondingProductId", required=false) String correspondingProductId, @RequestParam(value="returnQuantity", required=false) BigDecimal returnQuantity, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="includeInShipping", required=false) String includeInShipping, @RequestParam(value="description", required=false) String description, @RequestParam(value="returnTypeId", required=false) String returnTypeId, @RequestParam(value="exemptAmount", required=false) BigDecimal exemptAmount, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="returnAdjustmentTypeId", required=false) String returnAdjustmentTypeId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="returnItemResponseId", required=false) String returnItemResponseId, @RequestParam(value="returnReasonId", required=false) String returnReasonId, @RequestParam(value="primaryGeoId", required=false) String primaryGeoId, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="expectedItemStatus", required=false) String expectedItemStatus, @RequestParam(value="secondaryGeoId", required=false) String secondaryGeoId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="orderAdjustmentId", required=false) String orderAdjustmentId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="sourceReferenceId", required=false) String sourceReferenceId, @RequestParam(value="productPromoRuleId", required=false) String productPromoRuleId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="taxAuthorityRateSeqId", required=false) String taxAuthorityRateSeqId, @RequestParam(value="overrideGlAccountId", required=false) String overrideGlAccountId, @RequestParam(value="returnPrice", required=false) BigDecimal returnPrice, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId, @RequestParam(value="includeInTax", required=false) String includeInTax, @RequestParam(value="returnAdjustmentId", required=false) String returnAdjustmentId, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="productPromoActionSeqId", required=false) String productPromoActionSeqId, @RequestParam(value="returnItemTypeId", required=false) String returnItemTypeId, @RequestParam(value="receivedQuantity", required=false) BigDecimal receivedQuantity, @RequestParam(value="sourcePercentage", required=false) BigDecimal sourcePercentage, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId) {
+	public ResponseEntity<Map<String, Object>> updateReturnItemOrAdjustment(HttpSession session, @RequestParam(value="customerReferenceId", required=false) String customerReferenceId, @RequestParam(value="correspondingProductId", required=false) String correspondingProductId, @RequestParam(value="returnQuantity", required=false) BigDecimal returnQuantity, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="includeInShipping", required=false) String includeInShipping, @RequestParam(value="description", required=false) String description, @RequestParam(value="returnTypeId", required=false) String returnTypeId, @RequestParam(value="exemptAmount", required=false) BigDecimal exemptAmount, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="returnAdjustmentTypeId", required=false) String returnAdjustmentTypeId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="returnItemResponseId", required=false) String returnItemResponseId, @RequestParam(value="returnReasonId", required=false) String returnReasonId, @RequestParam(value="primaryGeoId", required=false) String primaryGeoId, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="expectedItemStatus", required=false) String expectedItemStatus, @RequestParam(value="secondaryGeoId", required=false) String secondaryGeoId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="orderAdjustmentId", required=false) String orderAdjustmentId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="sourceReferenceId", required=false) String sourceReferenceId, @RequestParam(value="productPromoRuleId", required=false) String productPromoRuleId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="taxAuthorityRateSeqId", required=false) String taxAuthorityRateSeqId, @RequestParam(value="overrideGlAccountId", required=false) String overrideGlAccountId, @RequestParam(value="returnPrice", required=false) BigDecimal returnPrice, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId, @RequestParam(value="includeInTax", required=false) String includeInTax, @RequestParam(value="returnAdjustmentId", required=false) String returnAdjustmentId, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="productPromoActionSeqId", required=false) String productPromoActionSeqId, @RequestParam(value="returnItemTypeId", required=false) String returnItemTypeId, @RequestParam(value="receivedQuantity", required=false) BigDecimal receivedQuantity, @RequestParam(value="sourcePercentage", required=false) BigDecimal sourcePercentage, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("customerReferenceId",customerReferenceId);
@@ -937,23 +939,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/quickReturnOrder")
-	public ResponseEntity<Object> quickReturnOrder(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="returnHeaderTypeId") String returnHeaderTypeId, @RequestParam(value="returnReasonId", required=false) String returnReasonId, @RequestParam(value="returnTypeId", required=false) String returnTypeId, @RequestParam(value="receiveReturn", required=false) Boolean receiveReturn) {
+	public ResponseEntity<Map<String, Object>> quickReturnOrder(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="returnHeaderTypeId") String returnHeaderTypeId, @RequestParam(value="returnReasonId", required=false) String returnReasonId, @RequestParam(value="returnTypeId", required=false) String returnTypeId, @RequestParam(value="receiveReturn", required=false) Boolean receiveReturn) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderId",orderId);
@@ -970,23 +972,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/processRefundImmediatelyReturn")
-	public ResponseEntity<Object> processRefundImmediatelyReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
+	public ResponseEntity<Map<String, Object>> processRefundImmediatelyReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -999,23 +1001,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createPaymentApplicationsFromReturnItemResponse")
-	public ResponseEntity<Object> createPaymentApplicationsFromReturnItemResponse(HttpSession session, @RequestParam(value="returnItemResponseId") String returnItemResponseId) {
+	public ResponseEntity<Map<String, Object>> createPaymentApplicationsFromReturnItemResponse(HttpSession session, @RequestParam(value="returnItemResponseId") String returnItemResponseId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnItemResponseId",returnItemResponseId);
@@ -1028,23 +1030,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/refundBillingAccountPayment")
-	public ResponseEntity<Object> refundBillingAccountPayment(HttpSession session, @RequestParam(value="orderPaymentPreference") org.apache.ofbiz.entity.GenericValue orderPaymentPreference, @RequestParam(value="refundAmount") BigDecimal refundAmount) {
+	public ResponseEntity<Map<String, Object>> refundBillingAccountPayment(HttpSession session, @RequestParam(value="orderPaymentPreference") org.apache.ofbiz.entity.GenericValue orderPaymentPreference, @RequestParam(value="refundAmount") BigDecimal refundAmount) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderPaymentPreference",orderPaymentPreference);
@@ -1058,23 +1060,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createExchangeOrderAssoc")
-	public ResponseEntity<Object> createExchangeOrderAssoc(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="originOrderId") String originOrderId) {
+	public ResponseEntity<Map<String, Object>> createExchangeOrderAssoc(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="originOrderId") String originOrderId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderId",orderId);
@@ -1088,23 +1090,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getReturnItemInitialCost")
-	public ResponseEntity<Object> getReturnItemInitialCost(HttpSession session, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnItemSeqId") String returnItemSeqId) {
+	public ResponseEntity<Map<String, Object>> getReturnItemInitialCost(HttpSession session, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnItemSeqId") String returnItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -1118,23 +1120,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createReturnContactMech")
-	public ResponseEntity<Object> createReturnContactMech(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnItemSeqId") String returnItemSeqId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId) {
+	public ResponseEntity<Map<String, Object>> createReturnContactMech(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnItemSeqId") String returnItemSeqId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -1150,23 +1152,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateReturnItemTypeMap")
-	public ResponseEntity<Object> updateReturnItemTypeMap(HttpSession session, @RequestParam(value="returnItemMapKey") String returnItemMapKey, @RequestParam(value="returnHeaderTypeId") String returnHeaderTypeId, @RequestParam(value="returnItemTypeId", required=false) String returnItemTypeId) {
+	public ResponseEntity<Map<String, Object>> updateReturnItemTypeMap(HttpSession session, @RequestParam(value="returnItemMapKey") String returnItemMapKey, @RequestParam(value="returnHeaderTypeId") String returnHeaderTypeId, @RequestParam(value="returnItemTypeId", required=false) String returnItemTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnItemMapKey",returnItemMapKey);
@@ -1181,23 +1183,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getReturnableItems")
-	public ResponseEntity<Object> getReturnableItems(HttpSession session, @RequestParam(value="orderId") String orderId) {
+	public ResponseEntity<Map<String, Object>> getReturnableItems(HttpSession session, @RequestParam(value="orderId") String orderId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderId",orderId);
@@ -1210,23 +1212,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeReturnAdjustment")
-	public ResponseEntity<Object> removeReturnAdjustment(HttpSession session, @RequestParam(value="returnAdjustmentId") String returnAdjustmentId) {
+	public ResponseEntity<Map<String, Object>> removeReturnAdjustment(HttpSession session, @RequestParam(value="returnAdjustmentId") String returnAdjustmentId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnAdjustmentId",returnAdjustmentId);
@@ -1239,23 +1241,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createReturnAdjustment")
-	public ResponseEntity<Object> createReturnAdjustment(HttpSession session, @RequestParam(value="customerReferenceId", required=false) String customerReferenceId, @RequestParam(value="correspondingProductId", required=false) String correspondingProductId, @RequestParam(value="includeInShipping", required=false) String includeInShipping, @RequestParam(value="description", required=false) String description, @RequestParam(value="returnTypeId", required=false) String returnTypeId, @RequestParam(value="exemptAmount", required=false) BigDecimal exemptAmount, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="returnAdjustmentTypeId", required=false) String returnAdjustmentTypeId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="primaryGeoId", required=false) String primaryGeoId, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="secondaryGeoId", required=false) String secondaryGeoId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="orderAdjustmentId", required=false) String orderAdjustmentId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="sourceReferenceId", required=false) String sourceReferenceId, @RequestParam(value="productPromoRuleId", required=false) String productPromoRuleId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="taxAuthorityRateSeqId", required=false) String taxAuthorityRateSeqId, @RequestParam(value="overrideGlAccountId", required=false) String overrideGlAccountId, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId, @RequestParam(value="includeInTax", required=false) String includeInTax, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="productPromoActionSeqId", required=false) String productPromoActionSeqId, @RequestParam(value="sourcePercentage", required=false) BigDecimal sourcePercentage, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId) {
+	public ResponseEntity<Map<String, Object>> createReturnAdjustment(HttpSession session, @RequestParam(value="customerReferenceId", required=false) String customerReferenceId, @RequestParam(value="correspondingProductId", required=false) String correspondingProductId, @RequestParam(value="includeInShipping", required=false) String includeInShipping, @RequestParam(value="description", required=false) String description, @RequestParam(value="returnTypeId", required=false) String returnTypeId, @RequestParam(value="exemptAmount", required=false) BigDecimal exemptAmount, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="returnAdjustmentTypeId", required=false) String returnAdjustmentTypeId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="primaryGeoId", required=false) String primaryGeoId, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="secondaryGeoId", required=false) String secondaryGeoId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="orderAdjustmentId", required=false) String orderAdjustmentId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="sourceReferenceId", required=false) String sourceReferenceId, @RequestParam(value="productPromoRuleId", required=false) String productPromoRuleId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="taxAuthorityRateSeqId", required=false) String taxAuthorityRateSeqId, @RequestParam(value="overrideGlAccountId", required=false) String overrideGlAccountId, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId, @RequestParam(value="includeInTax", required=false) String includeInTax, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="productPromoActionSeqId", required=false) String productPromoActionSeqId, @RequestParam(value="sourcePercentage", required=false) BigDecimal sourcePercentage, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("customerReferenceId",customerReferenceId);
@@ -1297,23 +1299,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getReturnableQuantity")
-	public ResponseEntity<Object> getReturnableQuantity(HttpSession session, @RequestParam(value="orderItem") org.apache.ofbiz.entity.GenericValue orderItem) {
+	public ResponseEntity<Map<String, Object>> getReturnableQuantity(HttpSession session, @RequestParam(value="orderItem") org.apache.ofbiz.entity.GenericValue orderItem) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderItem",orderItem);
@@ -1326,23 +1328,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/processReplacementReturn")
-	public ResponseEntity<Object> processReplacementReturn(HttpSession session, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnTypeId") String returnTypeId) {
+	public ResponseEntity<Map<String, Object>> processReplacementReturn(HttpSession session, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnTypeId") String returnTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -1356,23 +1358,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createReturnAdjustmentType")
-	public ResponseEntity<Object> createReturnAdjustmentType(HttpSession session, @RequestParam(value="returnAdjustmentTypeId", required=false) String returnAdjustmentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createReturnAdjustmentType(HttpSession session, @RequestParam(value="returnAdjustmentTypeId", required=false) String returnAdjustmentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnAdjustmentTypeId",returnAdjustmentTypeId);
@@ -1388,23 +1390,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createReturnHeaderType")
-	public ResponseEntity<Object> createReturnHeaderType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="returnHeaderTypeId", required=false) String returnHeaderTypeId) {
+	public ResponseEntity<Map<String, Object>> createReturnHeaderType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="description", required=false) String description, @RequestParam(value="returnHeaderTypeId", required=false) String returnHeaderTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("parentTypeId",parentTypeId);
@@ -1419,23 +1421,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteReturnAdjustmentType")
-	public ResponseEntity<Object> deleteReturnAdjustmentType(HttpSession session, @RequestParam(value="returnAdjustmentTypeId") String returnAdjustmentTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteReturnAdjustmentType(HttpSession session, @RequestParam(value="returnAdjustmentTypeId") String returnAdjustmentTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnAdjustmentTypeId",returnAdjustmentTypeId);
@@ -1448,23 +1450,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createReturnReason")
-	public ResponseEntity<Object> createReturnReason(HttpSession session, @RequestParam(value="returnReasonId", required=false) String returnReasonId, @RequestParam(value="description", required=false) String description, @RequestParam(value="sequenceId", required=false) String sequenceId) {
+	public ResponseEntity<Map<String, Object>> createReturnReason(HttpSession session, @RequestParam(value="returnReasonId", required=false) String returnReasonId, @RequestParam(value="description", required=false) String description, @RequestParam(value="sequenceId", required=false) String sequenceId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnReasonId",returnReasonId);
@@ -1479,23 +1481,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getStatusItemsForReturn")
-	public ResponseEntity<Object> getStatusItemsForReturn(HttpSession session, @RequestParam(value="returnHeaderTypeId") String returnHeaderTypeId) {
+	public ResponseEntity<Map<String, Object>> getStatusItemsForReturn(HttpSession session, @RequestParam(value="returnHeaderTypeId") String returnHeaderTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnHeaderTypeId",returnHeaderTypeId);
@@ -1508,23 +1510,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateReturnItemsStatus")
-	public ResponseEntity<Object> updateReturnItemsStatus(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="returnId") String returnId) {
+	public ResponseEntity<Map<String, Object>> updateReturnItemsStatus(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="returnId") String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("statusId",statusId);
@@ -1538,23 +1540,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/processReplaceImmediatelyReturn")
-	public ResponseEntity<Object> processReplaceImmediatelyReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
+	public ResponseEntity<Map<String, Object>> processReplaceImmediatelyReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -1567,23 +1569,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/cancelReturnItems")
-	public ResponseEntity<Object> cancelReturnItems(HttpSession session, @RequestParam(value="returnId") String returnId) {
+	public ResponseEntity<Map<String, Object>> cancelReturnItems(HttpSession session, @RequestParam(value="returnId") String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -1596,23 +1598,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addProductsBackToCategory")
-	public ResponseEntity<Object> addProductsBackToCategory(HttpSession session, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="returnId", required=false) String returnId) {
+	public ResponseEntity<Map<String, Object>> addProductsBackToCategory(HttpSession session, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="returnId", required=false) String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("inventoryItemId",inventoryItemId);
@@ -1626,23 +1628,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/sendReturnAcceptNotification")
-	public ResponseEntity<Object> sendReturnAcceptNotification(HttpSession session, @RequestParam(value="returnId") String returnId) {
+	public ResponseEntity<Map<String, Object>> sendReturnAcceptNotification(HttpSession session, @RequestParam(value="returnId") String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -1655,23 +1657,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/processWaitReplacementReservedReturn")
-	public ResponseEntity<Object> processWaitReplacementReservedReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
+	public ResponseEntity<Map<String, Object>> processWaitReplacementReservedReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -1684,23 +1686,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteReturnItemType")
-	public ResponseEntity<Object> deleteReturnItemType(HttpSession session, @RequestParam(value="returnItemTypeId") String returnItemTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteReturnItemType(HttpSession session, @RequestParam(value="returnItemTypeId") String returnItemTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnItemTypeId",returnItemTypeId);
@@ -1713,23 +1715,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/checkPaymentAmountForRefund")
-	public ResponseEntity<Object> checkPaymentAmountForRefund(HttpSession session, @RequestParam(value="returnId") String returnId) {
+	public ResponseEntity<Map<String, Object>> checkPaymentAmountForRefund(HttpSession session, @RequestParam(value="returnId") String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -1742,23 +1744,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createReturnStatus")
-	public ResponseEntity<Object> createReturnStatus(HttpSession session, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId) {
+	public ResponseEntity<Map<String, Object>> createReturnStatus(HttpSession session, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -1772,23 +1774,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createReturnItemBilling")
-	public ResponseEntity<Object> createReturnItemBilling(HttpSession session, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnItemSeqId") String returnItemSeqId, @RequestParam(value="invoiceId") String invoiceId, @RequestParam(value="invoiceItemSeqId") String invoiceItemSeqId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="shipmentReceiptId", required=false) String shipmentReceiptId) {
+	public ResponseEntity<Map<String, Object>> createReturnItemBilling(HttpSession session, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnItemSeqId") String returnItemSeqId, @RequestParam(value="invoiceId") String invoiceId, @RequestParam(value="invoiceItemSeqId") String invoiceItemSeqId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="shipmentReceiptId", required=false) String shipmentReceiptId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -1807,23 +1809,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateReturnAdjustmentType")
-	public ResponseEntity<Object> updateReturnAdjustmentType(HttpSession session, @RequestParam(value="returnAdjustmentTypeId") String returnAdjustmentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateReturnAdjustmentType(HttpSession session, @RequestParam(value="returnAdjustmentTypeId") String returnAdjustmentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnAdjustmentTypeId",returnAdjustmentTypeId);
@@ -1839,23 +1841,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateReturnContactMech")
-	public ResponseEntity<Object> updateReturnContactMech(HttpSession session, @RequestParam(value="contactMechPurposeTypeId") String contactMechPurposeTypeId, @RequestParam(value="returnId") String returnId, @RequestParam(value="contactMechId") String contactMechId, @RequestParam(value="oldContactMechId", required=false) String oldContactMechId) {
+	public ResponseEntity<Map<String, Object>> updateReturnContactMech(HttpSession session, @RequestParam(value="contactMechPurposeTypeId") String contactMechPurposeTypeId, @RequestParam(value="returnId") String returnId, @RequestParam(value="contactMechId") String contactMechId, @RequestParam(value="oldContactMechId", required=false) String oldContactMechId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("contactMechPurposeTypeId",contactMechPurposeTypeId);
@@ -1871,23 +1873,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/processSubscriptionReturn")
-	public ResponseEntity<Object> processSubscriptionReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
+	public ResponseEntity<Map<String, Object>> processSubscriptionReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -1900,23 +1902,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/processWaitReplacementReturn")
-	public ResponseEntity<Object> processWaitReplacementReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
+	public ResponseEntity<Map<String, Object>> processWaitReplacementReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -1929,23 +1931,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeReturnItem")
-	public ResponseEntity<Object> removeReturnItem(HttpSession session, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnItemSeqId") String returnItemSeqId) {
+	public ResponseEntity<Map<String, Object>> removeReturnItem(HttpSession session, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnItemSeqId") String returnItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -1959,23 +1961,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/sendReturnCancelNotification")
-	public ResponseEntity<Object> sendReturnCancelNotification(HttpSession session, @RequestParam(value="returnId") String returnId) {
+	public ResponseEntity<Map<String, Object>> sendReturnCancelNotification(HttpSession session, @RequestParam(value="returnId") String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -1988,23 +1990,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/processCrossShipReplacementReturn")
-	public ResponseEntity<Object> processCrossShipReplacementReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
+	public ResponseEntity<Map<String, Object>> processCrossShipReplacementReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -2017,23 +2019,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getOrderAvailableReturnedTotal")
-	public ResponseEntity<Object> getOrderAvailableReturnedTotal(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="countNewReturnItems", required=false) Boolean countNewReturnItems, @RequestParam(value="adjustment", required=false) BigDecimal adjustment) {
+	public ResponseEntity<Map<String, Object>> getOrderAvailableReturnedTotal(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="countNewReturnItems", required=false) Boolean countNewReturnItems, @RequestParam(value="adjustment", required=false) BigDecimal adjustment) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderId",orderId);
@@ -2048,23 +2050,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteReturnHeaderType")
-	public ResponseEntity<Object> deleteReturnHeaderType(HttpSession session, @RequestParam(value="returnHeaderTypeId") String returnHeaderTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteReturnHeaderType(HttpSession session, @RequestParam(value="returnHeaderTypeId") String returnHeaderTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnHeaderTypeId",returnHeaderTypeId);
@@ -2077,23 +2079,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateReturnStatusFromReceipt")
-	public ResponseEntity<Object> updateReturnStatusFromReceipt(HttpSession session, @RequestParam(value="returnId") String returnId) {
+	public ResponseEntity<Map<String, Object>> updateReturnStatusFromReceipt(HttpSession session, @RequestParam(value="returnId") String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -2106,23 +2108,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createReturnItemOrAdjustment")
-	public ResponseEntity<Object> createReturnItemOrAdjustment(HttpSession session, @RequestParam(value="customerReferenceId", required=false) String customerReferenceId, @RequestParam(value="correspondingProductId", required=false) String correspondingProductId, @RequestParam(value="returnQuantity", required=false) BigDecimal returnQuantity, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="includeInShipping", required=false) String includeInShipping, @RequestParam(value="description", required=false) String description, @RequestParam(value="returnTypeId", required=false) String returnTypeId, @RequestParam(value="exemptAmount", required=false) BigDecimal exemptAmount, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="returnAdjustmentTypeId", required=false) String returnAdjustmentTypeId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="returnItemResponseId", required=false) String returnItemResponseId, @RequestParam(value="returnReasonId", required=false) String returnReasonId, @RequestParam(value="primaryGeoId", required=false) String primaryGeoId, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="expectedItemStatus", required=false) String expectedItemStatus, @RequestParam(value="secondaryGeoId", required=false) String secondaryGeoId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="orderAdjustmentId", required=false) String orderAdjustmentId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="sourceReferenceId", required=false) String sourceReferenceId, @RequestParam(value="productPromoRuleId", required=false) String productPromoRuleId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="taxAuthorityRateSeqId", required=false) String taxAuthorityRateSeqId, @RequestParam(value="overrideGlAccountId", required=false) String overrideGlAccountId, @RequestParam(value="returnPrice", required=false) BigDecimal returnPrice, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId, @RequestParam(value="includeInTax", required=false) String includeInTax, @RequestParam(value="returnAdjustmentId", required=false) String returnAdjustmentId, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="productPromoActionSeqId", required=false) String productPromoActionSeqId, @RequestParam(value="returnItemTypeId", required=false) String returnItemTypeId, @RequestParam(value="receivedQuantity", required=false) BigDecimal receivedQuantity, @RequestParam(value="sourcePercentage", required=false) BigDecimal sourcePercentage, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId) {
+	public ResponseEntity<Map<String, Object>> createReturnItemOrAdjustment(HttpSession session, @RequestParam(value="customerReferenceId", required=false) String customerReferenceId, @RequestParam(value="correspondingProductId", required=false) String correspondingProductId, @RequestParam(value="returnQuantity", required=false) BigDecimal returnQuantity, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="includeInShipping", required=false) String includeInShipping, @RequestParam(value="description", required=false) String description, @RequestParam(value="returnTypeId", required=false) String returnTypeId, @RequestParam(value="exemptAmount", required=false) BigDecimal exemptAmount, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="returnAdjustmentTypeId", required=false) String returnAdjustmentTypeId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="returnItemResponseId", required=false) String returnItemResponseId, @RequestParam(value="returnReasonId", required=false) String returnReasonId, @RequestParam(value="primaryGeoId", required=false) String primaryGeoId, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="expectedItemStatus", required=false) String expectedItemStatus, @RequestParam(value="secondaryGeoId", required=false) String secondaryGeoId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="orderAdjustmentId", required=false) String orderAdjustmentId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="sourceReferenceId", required=false) String sourceReferenceId, @RequestParam(value="productPromoRuleId", required=false) String productPromoRuleId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="taxAuthorityRateSeqId", required=false) String taxAuthorityRateSeqId, @RequestParam(value="overrideGlAccountId", required=false) String overrideGlAccountId, @RequestParam(value="returnPrice", required=false) BigDecimal returnPrice, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId, @RequestParam(value="includeInTax", required=false) String includeInTax, @RequestParam(value="returnAdjustmentId", required=false) String returnAdjustmentId, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="productPromoActionSeqId", required=false) String productPromoActionSeqId, @RequestParam(value="returnItemTypeId", required=false) String returnItemTypeId, @RequestParam(value="receivedQuantity", required=false) BigDecimal receivedQuantity, @RequestParam(value="sourcePercentage", required=false) BigDecimal sourcePercentage, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("customerReferenceId",customerReferenceId);
@@ -2176,23 +2178,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/checkReturnComplete")
-	public ResponseEntity<Object> checkReturnComplete(HttpSession session, @RequestParam(value="returnId") String returnId) {
+	public ResponseEntity<Map<String, Object>> checkReturnComplete(HttpSession session, @RequestParam(value="returnId") String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -2205,23 +2207,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/processRepairReplacementReturn")
-	public ResponseEntity<Object> processRepairReplacementReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
+	public ResponseEntity<Map<String, Object>> processRepairReplacementReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -2234,23 +2236,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createReturnItemForRental")
-	public ResponseEntity<Object> createReturnItemForRental(HttpSession session, @RequestParam(value="orderId") String orderId) {
+	public ResponseEntity<Map<String, Object>> createReturnItemForRental(HttpSession session, @RequestParam(value="orderId") String orderId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderId",orderId);
@@ -2263,23 +2265,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/processRefundReturn")
-	public ResponseEntity<Object> processRefundReturn(HttpSession session, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnTypeId") String returnTypeId) {
+	public ResponseEntity<Map<String, Object>> processRefundReturn(HttpSession session, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnTypeId") String returnTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -2293,23 +2295,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/cancelReplacementOrderItems")
-	public ResponseEntity<Object> cancelReplacementOrderItems(HttpSession session, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnItemSeqId") String returnItemSeqId) {
+	public ResponseEntity<Map<String, Object>> cancelReplacementOrderItems(HttpSession session, @RequestParam(value="returnId") String returnId, @RequestParam(value="returnItemSeqId") String returnItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -2323,23 +2325,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createReturnItemResponse")
-	public ResponseEntity<Object> createReturnItemResponse(HttpSession session, @RequestParam(value="replacementOrderId", required=false) String replacementOrderId, @RequestParam(value="finAccountTransId", required=false) String finAccountTransId, @RequestParam(value="orderPaymentPreferenceId", required=false) String orderPaymentPreferenceId, @RequestParam(value="responseAmount", required=false) BigDecimal responseAmount, @RequestParam(value="paymentId", required=false) String paymentId, @RequestParam(value="billingAccountId", required=false) String billingAccountId, @RequestParam(value="responseDate", required=false) Timestamp responseDate) {
+	public ResponseEntity<Map<String, Object>> createReturnItemResponse(HttpSession session, @RequestParam(value="replacementOrderId", required=false) String replacementOrderId, @RequestParam(value="finAccountTransId", required=false) String finAccountTransId, @RequestParam(value="orderPaymentPreferenceId", required=false) String orderPaymentPreferenceId, @RequestParam(value="responseAmount", required=false) BigDecimal responseAmount, @RequestParam(value="paymentId", required=false) String paymentId, @RequestParam(value="billingAccountId", required=false) String billingAccountId, @RequestParam(value="responseDate", required=false) Timestamp responseDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("replacementOrderId",replacementOrderId);
@@ -2358,23 +2360,23 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/returnAdjustmentInterface")
-	public ResponseEntity<Object> returnAdjustmentInterface(HttpSession session, @RequestParam(value="customerReferenceId", required=false) String customerReferenceId, @RequestParam(value="correspondingProductId", required=false) String correspondingProductId, @RequestParam(value="includeInShipping", required=false) String includeInShipping, @RequestParam(value="description", required=false) String description, @RequestParam(value="returnTypeId", required=false) String returnTypeId, @RequestParam(value="exemptAmount", required=false) BigDecimal exemptAmount, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="returnAdjustmentTypeId", required=false) String returnAdjustmentTypeId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="primaryGeoId", required=false) String primaryGeoId, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="secondaryGeoId", required=false) String secondaryGeoId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="orderAdjustmentId", required=false) String orderAdjustmentId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="sourceReferenceId", required=false) String sourceReferenceId, @RequestParam(value="productPromoRuleId", required=false) String productPromoRuleId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="taxAuthorityRateSeqId", required=false) String taxAuthorityRateSeqId, @RequestParam(value="overrideGlAccountId", required=false) String overrideGlAccountId, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId, @RequestParam(value="includeInTax", required=false) String includeInTax, @RequestParam(value="returnAdjustmentId", required=false) String returnAdjustmentId, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="productPromoActionSeqId", required=false) String productPromoActionSeqId, @RequestParam(value="sourcePercentage", required=false) BigDecimal sourcePercentage, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId) {
+	public ResponseEntity<Map<String, Object>> returnAdjustmentInterface(HttpSession session, @RequestParam(value="customerReferenceId", required=false) String customerReferenceId, @RequestParam(value="correspondingProductId", required=false) String correspondingProductId, @RequestParam(value="includeInShipping", required=false) String includeInShipping, @RequestParam(value="description", required=false) String description, @RequestParam(value="returnTypeId", required=false) String returnTypeId, @RequestParam(value="exemptAmount", required=false) BigDecimal exemptAmount, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="returnAdjustmentTypeId", required=false) String returnAdjustmentTypeId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="primaryGeoId", required=false) String primaryGeoId, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="secondaryGeoId", required=false) String secondaryGeoId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="orderAdjustmentId", required=false) String orderAdjustmentId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="sourceReferenceId", required=false) String sourceReferenceId, @RequestParam(value="productPromoRuleId", required=false) String productPromoRuleId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="taxAuthorityRateSeqId", required=false) String taxAuthorityRateSeqId, @RequestParam(value="overrideGlAccountId", required=false) String overrideGlAccountId, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId, @RequestParam(value="includeInTax", required=false) String includeInTax, @RequestParam(value="returnAdjustmentId", required=false) String returnAdjustmentId, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="productPromoActionSeqId", required=false) String productPromoActionSeqId, @RequestParam(value="sourcePercentage", required=false) BigDecimal sourcePercentage, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("customerReferenceId",customerReferenceId);
@@ -2417,19 +2419,19 @@ public class OrderReturnServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

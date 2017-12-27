@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.party.query.geoPoint.FindPar
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/party/partyGeoPoints")
 public class PartyGeoPointController {
@@ -52,7 +54,7 @@ public class PartyGeoPointController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPartyGeoPointsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PartyGeoPoint>> findPartyGeoPointsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyGeoPointsBy query = new FindPartyGeoPointsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PartyGeoPointController {
 		}
 
 		List<PartyGeoPoint> partyGeoPoints =((PartyGeoPointFound) Scheduler.execute(query).data()).getPartyGeoPoints();
-
-		if (partyGeoPoints.size() == 1) {
-			return ResponseEntity.ok().body(partyGeoPoints.get(0));
-		}
 
 		return ResponseEntity.ok().body(partyGeoPoints);
 
@@ -78,7 +76,7 @@ public class PartyGeoPointController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPartyGeoPoint(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PartyGeoPoint> createPartyGeoPoint(HttpServletRequest request) throws Exception {
 
 		PartyGeoPoint partyGeoPointToBeAdded = new PartyGeoPoint();
 		try {
@@ -86,7 +84,7 @@ public class PartyGeoPointController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPartyGeoPoint(partyGeoPointToBeAdded);
@@ -101,63 +99,15 @@ public class PartyGeoPointController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPartyGeoPoint(@RequestBody PartyGeoPoint partyGeoPointToBeAdded) throws Exception {
+	public ResponseEntity<PartyGeoPoint> createPartyGeoPoint(@RequestBody PartyGeoPoint partyGeoPointToBeAdded) throws Exception {
 
 		AddPartyGeoPoint command = new AddPartyGeoPoint(partyGeoPointToBeAdded);
 		PartyGeoPoint partyGeoPoint = ((PartyGeoPointAdded) Scheduler.execute(command).data()).getAddedPartyGeoPoint();
 		
 		if (partyGeoPoint != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(partyGeoPoint);
+			return successful(partyGeoPoint);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PartyGeoPoint could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePartyGeoPoint(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PartyGeoPoint partyGeoPointToBeUpdated = new PartyGeoPoint();
-
-		try {
-			partyGeoPointToBeUpdated = PartyGeoPointMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePartyGeoPoint(partyGeoPointToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PartyGeoPointController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePartyGeoPoint(@RequestBody PartyGeoPoint partyGeoPointToBeUpdated,
+	public ResponseEntity<String> updatePartyGeoPoint(@RequestBody PartyGeoPoint partyGeoPointToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		partyGeoPointToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class PartyGeoPointController {
 
 		try {
 			if(((PartyGeoPointUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{partyGeoPointId}")
-	public ResponseEntity<Object> findById(@PathVariable String partyGeoPointId) throws Exception {
+	public ResponseEntity<PartyGeoPoint> findById(@PathVariable String partyGeoPointId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyGeoPointId", partyGeoPointId);
 		try {
 
-			Object foundPartyGeoPoint = findPartyGeoPointsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPartyGeoPoint);
+			List<PartyGeoPoint> foundPartyGeoPoint = findPartyGeoPointsBy(requestParams).getBody();
+			if(foundPartyGeoPoint.size()==1){				return successful(foundPartyGeoPoint.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{partyGeoPointId}")
-	public ResponseEntity<Object> deletePartyGeoPointByIdUpdated(@PathVariable String partyGeoPointId) throws Exception {
+	public ResponseEntity<String> deletePartyGeoPointByIdUpdated(@PathVariable String partyGeoPointId) throws Exception {
 		DeletePartyGeoPoint command = new DeletePartyGeoPoint(partyGeoPointId);
 
 		try {
 			if (((PartyGeoPointDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PartyGeoPoint could not be deleted");
+		return conflict();
 
 	}
 

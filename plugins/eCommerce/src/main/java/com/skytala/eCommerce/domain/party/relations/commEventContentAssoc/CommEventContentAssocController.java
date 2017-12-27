@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.commEventContentAssoc.query.
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/commEventContentAssocs")
 public class CommEventContentAssocController {
@@ -52,7 +54,7 @@ public class CommEventContentAssocController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findCommEventContentAssocsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<CommEventContentAssoc>> findCommEventContentAssocsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCommEventContentAssocsBy query = new FindCommEventContentAssocsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class CommEventContentAssocController {
 		}
 
 		List<CommEventContentAssoc> commEventContentAssocs =((CommEventContentAssocFound) Scheduler.execute(query).data()).getCommEventContentAssocs();
-
-		if (commEventContentAssocs.size() == 1) {
-			return ResponseEntity.ok().body(commEventContentAssocs.get(0));
-		}
 
 		return ResponseEntity.ok().body(commEventContentAssocs);
 
@@ -78,7 +76,7 @@ public class CommEventContentAssocController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createCommEventContentAssoc(HttpServletRequest request) throws Exception {
+	public ResponseEntity<CommEventContentAssoc> createCommEventContentAssoc(HttpServletRequest request) throws Exception {
 
 		CommEventContentAssoc commEventContentAssocToBeAdded = new CommEventContentAssoc();
 		try {
@@ -86,7 +84,7 @@ public class CommEventContentAssocController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createCommEventContentAssoc(commEventContentAssocToBeAdded);
@@ -101,63 +99,15 @@ public class CommEventContentAssocController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createCommEventContentAssoc(@RequestBody CommEventContentAssoc commEventContentAssocToBeAdded) throws Exception {
+	public ResponseEntity<CommEventContentAssoc> createCommEventContentAssoc(@RequestBody CommEventContentAssoc commEventContentAssocToBeAdded) throws Exception {
 
 		AddCommEventContentAssoc command = new AddCommEventContentAssoc(commEventContentAssocToBeAdded);
 		CommEventContentAssoc commEventContentAssoc = ((CommEventContentAssocAdded) Scheduler.execute(command).data()).getAddedCommEventContentAssoc();
 		
 		if (commEventContentAssoc != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(commEventContentAssoc);
+			return successful(commEventContentAssoc);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("CommEventContentAssoc could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateCommEventContentAssoc(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		CommEventContentAssoc commEventContentAssocToBeUpdated = new CommEventContentAssoc();
-
-		try {
-			commEventContentAssocToBeUpdated = CommEventContentAssocMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateCommEventContentAssoc(commEventContentAssocToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class CommEventContentAssocController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateCommEventContentAssoc(@RequestBody CommEventContentAssoc commEventContentAssocToBeUpdated,
+	public ResponseEntity<String> updateCommEventContentAssoc(@RequestBody CommEventContentAssoc commEventContentAssocToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		commEventContentAssocToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class CommEventContentAssocController {
 
 		try {
 			if(((CommEventContentAssocUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{commEventContentAssocId}")
-	public ResponseEntity<Object> findById(@PathVariable String commEventContentAssocId) throws Exception {
+	public ResponseEntity<CommEventContentAssoc> findById(@PathVariable String commEventContentAssocId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("commEventContentAssocId", commEventContentAssocId);
 		try {
 
-			Object foundCommEventContentAssoc = findCommEventContentAssocsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundCommEventContentAssoc);
+			List<CommEventContentAssoc> foundCommEventContentAssoc = findCommEventContentAssocsBy(requestParams).getBody();
+			if(foundCommEventContentAssoc.size()==1){				return successful(foundCommEventContentAssoc.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{commEventContentAssocId}")
-	public ResponseEntity<Object> deleteCommEventContentAssocByIdUpdated(@PathVariable String commEventContentAssocId) throws Exception {
+	public ResponseEntity<String> deleteCommEventContentAssocByIdUpdated(@PathVariable String commEventContentAssocId) throws Exception {
 		DeleteCommEventContentAssoc command = new DeleteCommEventContentAssoc(commEventContentAssocId);
 
 		try {
 			if (((CommEventContentAssocDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("CommEventContentAssoc could not be deleted");
+		return conflict();
 
 	}
 

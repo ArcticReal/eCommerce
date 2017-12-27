@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/manufacturingBom")
 public class ManufacturingBomServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/initLowLevelCode")
-	public ResponseEntity<Object> initLowLevelCode(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> initLowLevelCode(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -38,23 +40,23 @@ public class ManufacturingBomServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/searchDuplicatedAncestor")
-	public ResponseEntity<Object> searchDuplicatedAncestor(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productIdTo") String productIdTo, @RequestParam(value="productAssocTypeId") String productAssocTypeId, @RequestParam(value="fromDate", required=false) Timestamp fromDate) {
+	public ResponseEntity<Map<String, Object>> searchDuplicatedAncestor(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productIdTo") String productIdTo, @RequestParam(value="productAssocTypeId") String productAssocTypeId, @RequestParam(value="fromDate", required=false) Timestamp fromDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -70,23 +72,23 @@ public class ManufacturingBomServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/copyBOMAssocs")
-	public ResponseEntity<Object> copyBOMAssocs(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productAssocTypeId") String productAssocTypeId, @RequestParam(value="copyToProductId") String copyToProductId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="productIdTo", required=false) String productIdTo) {
+	public ResponseEntity<Map<String, Object>> copyBOMAssocs(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productAssocTypeId") String productAssocTypeId, @RequestParam(value="copyToProductId") String copyToProductId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="productIdTo", required=false) String productIdTo) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -103,23 +105,23 @@ public class ManufacturingBomServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getManufacturingComponents")
-	public ResponseEntity<Object> getManufacturingComponents(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="fromDate", required=false) String fromDate, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="excludeWIPs", required=false) Boolean excludeWIPs) {
+	public ResponseEntity<Map<String, Object>> getManufacturingComponents(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="fromDate", required=false) String fromDate, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="excludeWIPs", required=false) Boolean excludeWIPs) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -136,23 +138,23 @@ public class ManufacturingBomServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getBOMTree")
-	public ResponseEntity<Object> getBOMTree(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="bomType") String bomType, @RequestParam(value="fromDate", required=false) String fromDate, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="type", required=false) Integer type) {
+	public ResponseEntity<Map<String, Object>> getBOMTree(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="bomType") String bomType, @RequestParam(value="fromDate", required=false) String fromDate, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="type", required=false) Integer type) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -170,23 +172,23 @@ public class ManufacturingBomServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getProductsInPackages")
-	public ResponseEntity<Object> getProductsInPackages(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="fromDate", required=false) String fromDate, @RequestParam(value="quantity", required=false) BigDecimal quantity) {
+	public ResponseEntity<Map<String, Object>> getProductsInPackages(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="fromDate", required=false) String fromDate, @RequestParam(value="quantity", required=false) BigDecimal quantity) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -201,23 +203,23 @@ public class ManufacturingBomServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateLowLevelCode")
-	public ResponseEntity<Object> updateLowLevelCode(HttpSession session, @RequestParam(value="productIdTo") String productIdTo, @RequestParam(value="alsoComponents", required=false) Boolean alsoComponents, @RequestParam(value="alsoVariants", required=false) Boolean alsoVariants) {
+	public ResponseEntity<Map<String, Object>> updateLowLevelCode(HttpSession session, @RequestParam(value="productIdTo") String productIdTo, @RequestParam(value="alsoComponents", required=false) Boolean alsoComponents, @RequestParam(value="alsoVariants", required=false) Boolean alsoVariants) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productIdTo",productIdTo);
@@ -232,23 +234,23 @@ public class ManufacturingBomServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addProductManufacturingRule")
-	public ResponseEntity<Object> addProductManufacturingRule(HttpSession session, @RequestParam(value="productIdIn") String productIdIn, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="ruleOperator", required=false) String ruleOperator, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="productIdFor", required=false) String productIdFor, @RequestParam(value="productIdInSubst", required=false) String productIdInSubst, @RequestParam(value="ruleId", required=false) String ruleId, @RequestParam(value="productFeature", required=false) String productFeature, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> addProductManufacturingRule(HttpSession session, @RequestParam(value="productIdIn") String productIdIn, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="ruleOperator", required=false) String ruleOperator, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="productIdFor", required=false) String productIdFor, @RequestParam(value="productIdInSubst", required=false) String productIdInSubst, @RequestParam(value="ruleId", required=false) String ruleId, @RequestParam(value="productFeature", required=false) String productFeature, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productIdIn",productIdIn);
@@ -270,23 +272,23 @@ public class ManufacturingBomServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getNotAssembledComponents")
-	public ResponseEntity<Object> getNotAssembledComponents(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="fromDate", required=false) String fromDate, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="quantity", required=false) BigDecimal quantity) {
+	public ResponseEntity<Map<String, Object>> getNotAssembledComponents(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="fromDate", required=false) String fromDate, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="quantity", required=false) BigDecimal quantity) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -302,23 +304,23 @@ public class ManufacturingBomServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductManufacturingRule")
-	public ResponseEntity<Object> deleteProductManufacturingRule(HttpSession session, @RequestParam(value="ruleId") String ruleId) {
+	public ResponseEntity<Map<String, Object>> deleteProductManufacturingRule(HttpSession session, @RequestParam(value="ruleId") String ruleId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("ruleId",ruleId);
@@ -331,23 +333,23 @@ public class ManufacturingBomServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createBOMAssoc")
-	public ResponseEntity<Object> createBOMAssoc(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productIdTo") String productIdTo, @RequestParam(value="productAssocTypeId") String productAssocTypeId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="reason", required=false) String reason, @RequestParam(value="scrapFactor", required=false) BigDecimal scrapFactor, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="recurrenceInfoId", required=false) String recurrenceInfoId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="estimateCalcMethod", required=false) String estimateCalcMethod, @RequestParam(value="instruction", required=false) String instruction, @RequestParam(value="routingWorkEffortId", required=false) String routingWorkEffortId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createBOMAssoc(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productIdTo") String productIdTo, @RequestParam(value="productAssocTypeId") String productAssocTypeId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="reason", required=false) String reason, @RequestParam(value="scrapFactor", required=false) BigDecimal scrapFactor, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="recurrenceInfoId", required=false) String recurrenceInfoId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="estimateCalcMethod", required=false) String estimateCalcMethod, @RequestParam(value="instruction", required=false) String instruction, @RequestParam(value="routingWorkEffortId", required=false) String routingWorkEffortId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -372,23 +374,23 @@ public class ManufacturingBomServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductManufacturingRule")
-	public ResponseEntity<Object> updateProductManufacturingRule(HttpSession session, @RequestParam(value="ruleId") String ruleId, @RequestParam(value="productIdIn") String productIdIn, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="ruleOperator", required=false) String ruleOperator, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="productIdFor", required=false) String productIdFor, @RequestParam(value="productIdInSubst", required=false) String productIdInSubst, @RequestParam(value="productFeature", required=false) String productFeature, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateProductManufacturingRule(HttpSession session, @RequestParam(value="ruleId") String ruleId, @RequestParam(value="productIdIn") String productIdIn, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="ruleOperator", required=false) String ruleOperator, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="productIdFor", required=false) String productIdFor, @RequestParam(value="productIdInSubst", required=false) String productIdInSubst, @RequestParam(value="productFeature", required=false) String productFeature, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("ruleId",ruleId);
@@ -410,23 +412,23 @@ public class ManufacturingBomServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getMaxDepth")
-	public ResponseEntity<Object> getMaxDepth(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="fromDate", required=false) String fromDate, @RequestParam(value="bomType", required=false) String bomType) {
+	public ResponseEntity<Map<String, Object>> getMaxDepth(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="fromDate", required=false) String fromDate, @RequestParam(value="bomType", required=false) String bomType) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -441,19 +443,19 @@ public class ManufacturingBomServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

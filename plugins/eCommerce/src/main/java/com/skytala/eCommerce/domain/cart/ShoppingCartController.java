@@ -22,6 +22,7 @@ import com.skytala.eCommerce.domain.product.relations.product.model.price.Produc
 import com.skytala.eCommerce.domain.product.relations.product.control.price.ProductPriceController;
 
 import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.badRequest;
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.notFound;
 import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.successful;
 import static com.skytala.eCommerce.framework.util.AuthorizeMethods.HAS_USER_AUTHORITY;
 
@@ -37,35 +38,35 @@ public class ShoppingCartController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/show")
 	@PreAuthorize(HAS_USER_AUTHORITY)
-	public ResponseEntity show(HttpSession session) {
+	public ResponseEntity<List<Position>> show(HttpSession session) {
 
 		if (session.getAttribute("cart") != null) {
 			ShoppingCart sc = new ShoppingCart();
 			sc = (ShoppingCart) session.getAttribute("cart");
 			return successful(sc.getPositions());
 		}
-		return null;
+		return notFound();
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/showId")
 	@PreAuthorize(HAS_USER_AUTHORITY)
-	public ResponseEntity showId(HttpSession session) {
+	public ResponseEntity<List<String>> showId(HttpSession session) {
 
-		LinkedList<String> mylist = new LinkedList<String>();
+		List<String> ids = new LinkedList<>();
 		if (session.getAttribute("cart") != null) {
 			ShoppingCart sc = new ShoppingCart();
 			sc = (ShoppingCart) session.getAttribute("cart");
 			for (int i = 0; i < sc.getPositions().size(); i++) {
-				mylist.add(sc.getPositions().get(i).getProduct().getProductId());
+				ids.add(sc.getPositions().get(i).getProduct().getProductId());
 			}
 		}
-		return successful(mylist);
+		return successful(ids);
 
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/total")
 	@PreAuthorize(HAS_USER_AUTHORITY)
-	public ResponseEntity showGrandTotal(HttpSession session) {
+	public ResponseEntity<BigDecimal> showGrandTotal(HttpSession session) {
 
 		BigDecimal grandTotal = new BigDecimal(0);
 		if (session.getAttribute("cart") != null) {
@@ -79,7 +80,7 @@ public class ShoppingCartController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/add")
 	@PreAuthorize(HAS_USER_AUTHORITY)
-	public ResponseEntity addToCart(HttpSession session, @RequestParam Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<String> addToCart(HttpSession session, @RequestParam Map<String, String> allRequestParams) throws Exception {
 
 		BigDecimal anz = new BigDecimal(1);
 
@@ -144,7 +145,7 @@ public class ShoppingCartController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/remove")
 	@PreAuthorize(HAS_USER_AUTHORITY)
-	public ResponseEntity removeFromCart(HttpSession session, @RequestParam Map<String, String> allRequestParams) {
+	public ResponseEntity<String> removeFromCart(HttpSession session, @RequestParam Map<String, String> allRequestParams) {
 
 		if (allRequestParams.get("productId") != null) {
 			int count = Integer.parseInt(allRequestParams.get("count"));

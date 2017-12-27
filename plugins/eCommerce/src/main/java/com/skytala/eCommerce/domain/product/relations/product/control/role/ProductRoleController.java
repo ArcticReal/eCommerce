@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.role.FindPro
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productRoles")
 public class ProductRoleController {
@@ -52,7 +54,7 @@ public class ProductRoleController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductRole>> findProductRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductRolesBy query = new FindProductRolesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductRoleController {
 		}
 
 		List<ProductRole> productRoles =((ProductRoleFound) Scheduler.execute(query).data()).getProductRoles();
-
-		if (productRoles.size() == 1) {
-			return ResponseEntity.ok().body(productRoles.get(0));
-		}
 
 		return ResponseEntity.ok().body(productRoles);
 
@@ -78,7 +76,7 @@ public class ProductRoleController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductRole(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductRole> createProductRole(HttpServletRequest request) throws Exception {
 
 		ProductRole productRoleToBeAdded = new ProductRole();
 		try {
@@ -86,7 +84,7 @@ public class ProductRoleController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductRole(productRoleToBeAdded);
@@ -101,63 +99,15 @@ public class ProductRoleController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductRole(@RequestBody ProductRole productRoleToBeAdded) throws Exception {
+	public ResponseEntity<ProductRole> createProductRole(@RequestBody ProductRole productRoleToBeAdded) throws Exception {
 
 		AddProductRole command = new AddProductRole(productRoleToBeAdded);
 		ProductRole productRole = ((ProductRoleAdded) Scheduler.execute(command).data()).getAddedProductRole();
 		
 		if (productRole != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productRole);
+			return successful(productRole);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductRole could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductRole(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductRole productRoleToBeUpdated = new ProductRole();
-
-		try {
-			productRoleToBeUpdated = ProductRoleMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductRole(productRoleToBeUpdated, productRoleToBeUpdated.getRoleTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductRoleController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{roleTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductRole(@RequestBody ProductRole productRoleToBeUpdated,
+	public ResponseEntity<String> updateProductRole(@RequestBody ProductRole productRoleToBeUpdated,
 			@PathVariable String roleTypeId) throws Exception {
 
 		productRoleToBeUpdated.setRoleTypeId(roleTypeId);
@@ -178,41 +128,44 @@ public class ProductRoleController {
 
 		try {
 			if(((ProductRoleUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productRoleId}")
-	public ResponseEntity<Object> findById(@PathVariable String productRoleId) throws Exception {
+	public ResponseEntity<ProductRole> findById(@PathVariable String productRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productRoleId", productRoleId);
 		try {
 
-			Object foundProductRole = findProductRolesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductRole);
+			List<ProductRole> foundProductRole = findProductRolesBy(requestParams).getBody();
+			if(foundProductRole.size()==1){				return successful(foundProductRole.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productRoleId}")
-	public ResponseEntity<Object> deleteProductRoleByIdUpdated(@PathVariable String productRoleId) throws Exception {
+	public ResponseEntity<String> deleteProductRoleByIdUpdated(@PathVariable String productRoleId) throws Exception {
 		DeleteProductRole command = new DeleteProductRole(productRoleId);
 
 		try {
 			if (((ProductRoleDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductRole could not be deleted");
+		return conflict();
 
 	}
 

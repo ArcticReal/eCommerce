@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.acctgTrans.query.typeAt
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/acctgTrans/acctgTransTypeAttrs")
 public class AcctgTransTypeAttrController {
@@ -52,7 +54,7 @@ public class AcctgTransTypeAttrController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findAcctgTransTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<AcctgTransTypeAttr>> findAcctgTransTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAcctgTransTypeAttrsBy query = new FindAcctgTransTypeAttrsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class AcctgTransTypeAttrController {
 		}
 
 		List<AcctgTransTypeAttr> acctgTransTypeAttrs =((AcctgTransTypeAttrFound) Scheduler.execute(query).data()).getAcctgTransTypeAttrs();
-
-		if (acctgTransTypeAttrs.size() == 1) {
-			return ResponseEntity.ok().body(acctgTransTypeAttrs.get(0));
-		}
 
 		return ResponseEntity.ok().body(acctgTransTypeAttrs);
 
@@ -78,7 +76,7 @@ public class AcctgTransTypeAttrController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createAcctgTransTypeAttr(HttpServletRequest request) throws Exception {
+	public ResponseEntity<AcctgTransTypeAttr> createAcctgTransTypeAttr(HttpServletRequest request) throws Exception {
 
 		AcctgTransTypeAttr acctgTransTypeAttrToBeAdded = new AcctgTransTypeAttr();
 		try {
@@ -86,7 +84,7 @@ public class AcctgTransTypeAttrController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createAcctgTransTypeAttr(acctgTransTypeAttrToBeAdded);
@@ -101,63 +99,15 @@ public class AcctgTransTypeAttrController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createAcctgTransTypeAttr(@RequestBody AcctgTransTypeAttr acctgTransTypeAttrToBeAdded) throws Exception {
+	public ResponseEntity<AcctgTransTypeAttr> createAcctgTransTypeAttr(@RequestBody AcctgTransTypeAttr acctgTransTypeAttrToBeAdded) throws Exception {
 
 		AddAcctgTransTypeAttr command = new AddAcctgTransTypeAttr(acctgTransTypeAttrToBeAdded);
 		AcctgTransTypeAttr acctgTransTypeAttr = ((AcctgTransTypeAttrAdded) Scheduler.execute(command).data()).getAddedAcctgTransTypeAttr();
 		
 		if (acctgTransTypeAttr != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(acctgTransTypeAttr);
+			return successful(acctgTransTypeAttr);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("AcctgTransTypeAttr could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateAcctgTransTypeAttr(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		AcctgTransTypeAttr acctgTransTypeAttrToBeUpdated = new AcctgTransTypeAttr();
-
-		try {
-			acctgTransTypeAttrToBeUpdated = AcctgTransTypeAttrMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateAcctgTransTypeAttr(acctgTransTypeAttrToBeUpdated, acctgTransTypeAttrToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class AcctgTransTypeAttrController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateAcctgTransTypeAttr(@RequestBody AcctgTransTypeAttr acctgTransTypeAttrToBeUpdated,
+	public ResponseEntity<String> updateAcctgTransTypeAttr(@RequestBody AcctgTransTypeAttr acctgTransTypeAttrToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		acctgTransTypeAttrToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class AcctgTransTypeAttrController {
 
 		try {
 			if(((AcctgTransTypeAttrUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{acctgTransTypeAttrId}")
-	public ResponseEntity<Object> findById(@PathVariable String acctgTransTypeAttrId) throws Exception {
+	public ResponseEntity<AcctgTransTypeAttr> findById(@PathVariable String acctgTransTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("acctgTransTypeAttrId", acctgTransTypeAttrId);
 		try {
 
-			Object foundAcctgTransTypeAttr = findAcctgTransTypeAttrsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundAcctgTransTypeAttr);
+			List<AcctgTransTypeAttr> foundAcctgTransTypeAttr = findAcctgTransTypeAttrsBy(requestParams).getBody();
+			if(foundAcctgTransTypeAttr.size()==1){				return successful(foundAcctgTransTypeAttr.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{acctgTransTypeAttrId}")
-	public ResponseEntity<Object> deleteAcctgTransTypeAttrByIdUpdated(@PathVariable String acctgTransTypeAttrId) throws Exception {
+	public ResponseEntity<String> deleteAcctgTransTypeAttrByIdUpdated(@PathVariable String acctgTransTypeAttrId) throws Exception {
 		DeleteAcctgTransTypeAttr command = new DeleteAcctgTransTypeAttr(acctgTransTypeAttrId);
 
 		try {
 			if (((AcctgTransTypeAttrDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("AcctgTransTypeAttr could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.returnAdjustment.query.type.
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/returnAdjustment/returnAdjustmentTypes")
 public class ReturnAdjustmentTypeController {
@@ -52,7 +54,7 @@ public class ReturnAdjustmentTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findReturnAdjustmentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ReturnAdjustmentType>> findReturnAdjustmentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindReturnAdjustmentTypesBy query = new FindReturnAdjustmentTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ReturnAdjustmentTypeController {
 		}
 
 		List<ReturnAdjustmentType> returnAdjustmentTypes =((ReturnAdjustmentTypeFound) Scheduler.execute(query).data()).getReturnAdjustmentTypes();
-
-		if (returnAdjustmentTypes.size() == 1) {
-			return ResponseEntity.ok().body(returnAdjustmentTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(returnAdjustmentTypes);
 
@@ -78,7 +76,7 @@ public class ReturnAdjustmentTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createReturnAdjustmentType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ReturnAdjustmentType> createReturnAdjustmentType(HttpServletRequest request) throws Exception {
 
 		ReturnAdjustmentType returnAdjustmentTypeToBeAdded = new ReturnAdjustmentType();
 		try {
@@ -86,7 +84,7 @@ public class ReturnAdjustmentTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createReturnAdjustmentType(returnAdjustmentTypeToBeAdded);
@@ -101,63 +99,15 @@ public class ReturnAdjustmentTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createReturnAdjustmentType(@RequestBody ReturnAdjustmentType returnAdjustmentTypeToBeAdded) throws Exception {
+	public ResponseEntity<ReturnAdjustmentType> createReturnAdjustmentType(@RequestBody ReturnAdjustmentType returnAdjustmentTypeToBeAdded) throws Exception {
 
 		AddReturnAdjustmentType command = new AddReturnAdjustmentType(returnAdjustmentTypeToBeAdded);
 		ReturnAdjustmentType returnAdjustmentType = ((ReturnAdjustmentTypeAdded) Scheduler.execute(command).data()).getAddedReturnAdjustmentType();
 		
 		if (returnAdjustmentType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(returnAdjustmentType);
+			return successful(returnAdjustmentType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ReturnAdjustmentType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateReturnAdjustmentType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ReturnAdjustmentType returnAdjustmentTypeToBeUpdated = new ReturnAdjustmentType();
-
-		try {
-			returnAdjustmentTypeToBeUpdated = ReturnAdjustmentTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateReturnAdjustmentType(returnAdjustmentTypeToBeUpdated, returnAdjustmentTypeToBeUpdated.getReturnAdjustmentTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ReturnAdjustmentTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{returnAdjustmentTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateReturnAdjustmentType(@RequestBody ReturnAdjustmentType returnAdjustmentTypeToBeUpdated,
+	public ResponseEntity<String> updateReturnAdjustmentType(@RequestBody ReturnAdjustmentType returnAdjustmentTypeToBeUpdated,
 			@PathVariable String returnAdjustmentTypeId) throws Exception {
 
 		returnAdjustmentTypeToBeUpdated.setReturnAdjustmentTypeId(returnAdjustmentTypeId);
@@ -178,41 +128,44 @@ public class ReturnAdjustmentTypeController {
 
 		try {
 			if(((ReturnAdjustmentTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{returnAdjustmentTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String returnAdjustmentTypeId) throws Exception {
+	public ResponseEntity<ReturnAdjustmentType> findById(@PathVariable String returnAdjustmentTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("returnAdjustmentTypeId", returnAdjustmentTypeId);
 		try {
 
-			Object foundReturnAdjustmentType = findReturnAdjustmentTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundReturnAdjustmentType);
+			List<ReturnAdjustmentType> foundReturnAdjustmentType = findReturnAdjustmentTypesBy(requestParams).getBody();
+			if(foundReturnAdjustmentType.size()==1){				return successful(foundReturnAdjustmentType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{returnAdjustmentTypeId}")
-	public ResponseEntity<Object> deleteReturnAdjustmentTypeByIdUpdated(@PathVariable String returnAdjustmentTypeId) throws Exception {
+	public ResponseEntity<String> deleteReturnAdjustmentTypeByIdUpdated(@PathVariable String returnAdjustmentTypeId) throws Exception {
 		DeleteReturnAdjustmentType command = new DeleteReturnAdjustmentType(returnAdjustmentTypeId);
 
 		try {
 			if (((ReturnAdjustmentTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ReturnAdjustmentType could not be deleted");
+		return conflict();
 
 	}
 

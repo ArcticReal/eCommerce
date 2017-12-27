@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.humanres.relations.jobInterview.query.type.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/humanres/jobInterview/jobInterviewTypes")
 public class JobInterviewTypeController {
@@ -52,7 +54,7 @@ public class JobInterviewTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findJobInterviewTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<JobInterviewType>> findJobInterviewTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindJobInterviewTypesBy query = new FindJobInterviewTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class JobInterviewTypeController {
 		}
 
 		List<JobInterviewType> jobInterviewTypes =((JobInterviewTypeFound) Scheduler.execute(query).data()).getJobInterviewTypes();
-
-		if (jobInterviewTypes.size() == 1) {
-			return ResponseEntity.ok().body(jobInterviewTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(jobInterviewTypes);
 
@@ -78,7 +76,7 @@ public class JobInterviewTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createJobInterviewType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<JobInterviewType> createJobInterviewType(HttpServletRequest request) throws Exception {
 
 		JobInterviewType jobInterviewTypeToBeAdded = new JobInterviewType();
 		try {
@@ -86,7 +84,7 @@ public class JobInterviewTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createJobInterviewType(jobInterviewTypeToBeAdded);
@@ -101,63 +99,15 @@ public class JobInterviewTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createJobInterviewType(@RequestBody JobInterviewType jobInterviewTypeToBeAdded) throws Exception {
+	public ResponseEntity<JobInterviewType> createJobInterviewType(@RequestBody JobInterviewType jobInterviewTypeToBeAdded) throws Exception {
 
 		AddJobInterviewType command = new AddJobInterviewType(jobInterviewTypeToBeAdded);
 		JobInterviewType jobInterviewType = ((JobInterviewTypeAdded) Scheduler.execute(command).data()).getAddedJobInterviewType();
 		
 		if (jobInterviewType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(jobInterviewType);
+			return successful(jobInterviewType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("JobInterviewType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateJobInterviewType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		JobInterviewType jobInterviewTypeToBeUpdated = new JobInterviewType();
-
-		try {
-			jobInterviewTypeToBeUpdated = JobInterviewTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateJobInterviewType(jobInterviewTypeToBeUpdated, jobInterviewTypeToBeUpdated.getJobInterviewTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class JobInterviewTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{jobInterviewTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateJobInterviewType(@RequestBody JobInterviewType jobInterviewTypeToBeUpdated,
+	public ResponseEntity<String> updateJobInterviewType(@RequestBody JobInterviewType jobInterviewTypeToBeUpdated,
 			@PathVariable String jobInterviewTypeId) throws Exception {
 
 		jobInterviewTypeToBeUpdated.setJobInterviewTypeId(jobInterviewTypeId);
@@ -178,41 +128,44 @@ public class JobInterviewTypeController {
 
 		try {
 			if(((JobInterviewTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{jobInterviewTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String jobInterviewTypeId) throws Exception {
+	public ResponseEntity<JobInterviewType> findById(@PathVariable String jobInterviewTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("jobInterviewTypeId", jobInterviewTypeId);
 		try {
 
-			Object foundJobInterviewType = findJobInterviewTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundJobInterviewType);
+			List<JobInterviewType> foundJobInterviewType = findJobInterviewTypesBy(requestParams).getBody();
+			if(foundJobInterviewType.size()==1){				return successful(foundJobInterviewType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{jobInterviewTypeId}")
-	public ResponseEntity<Object> deleteJobInterviewTypeByIdUpdated(@PathVariable String jobInterviewTypeId) throws Exception {
+	public ResponseEntity<String> deleteJobInterviewTypeByIdUpdated(@PathVariable String jobInterviewTypeId) throws Exception {
 		DeleteJobInterviewType command = new DeleteJobInterviewType(jobInterviewTypeId);
 
 		try {
 			if (((JobInterviewTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("JobInterviewType could not be deleted");
+		return conflict();
 
 	}
 

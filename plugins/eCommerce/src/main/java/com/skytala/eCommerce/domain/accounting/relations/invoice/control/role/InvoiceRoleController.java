@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.invoice.query.role.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/invoice/invoiceRoles")
 public class InvoiceRoleController {
@@ -52,7 +54,7 @@ public class InvoiceRoleController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findInvoiceRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<InvoiceRole>> findInvoiceRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInvoiceRolesBy query = new FindInvoiceRolesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class InvoiceRoleController {
 		}
 
 		List<InvoiceRole> invoiceRoles =((InvoiceRoleFound) Scheduler.execute(query).data()).getInvoiceRoles();
-
-		if (invoiceRoles.size() == 1) {
-			return ResponseEntity.ok().body(invoiceRoles.get(0));
-		}
 
 		return ResponseEntity.ok().body(invoiceRoles);
 
@@ -78,7 +76,7 @@ public class InvoiceRoleController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createInvoiceRole(HttpServletRequest request) throws Exception {
+	public ResponseEntity<InvoiceRole> createInvoiceRole(HttpServletRequest request) throws Exception {
 
 		InvoiceRole invoiceRoleToBeAdded = new InvoiceRole();
 		try {
@@ -86,7 +84,7 @@ public class InvoiceRoleController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createInvoiceRole(invoiceRoleToBeAdded);
@@ -101,63 +99,15 @@ public class InvoiceRoleController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createInvoiceRole(@RequestBody InvoiceRole invoiceRoleToBeAdded) throws Exception {
+	public ResponseEntity<InvoiceRole> createInvoiceRole(@RequestBody InvoiceRole invoiceRoleToBeAdded) throws Exception {
 
 		AddInvoiceRole command = new AddInvoiceRole(invoiceRoleToBeAdded);
 		InvoiceRole invoiceRole = ((InvoiceRoleAdded) Scheduler.execute(command).data()).getAddedInvoiceRole();
 		
 		if (invoiceRole != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(invoiceRole);
+			return successful(invoiceRole);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("InvoiceRole could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateInvoiceRole(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		InvoiceRole invoiceRoleToBeUpdated = new InvoiceRole();
-
-		try {
-			invoiceRoleToBeUpdated = InvoiceRoleMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateInvoiceRole(invoiceRoleToBeUpdated, invoiceRoleToBeUpdated.getRoleTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class InvoiceRoleController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{roleTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateInvoiceRole(@RequestBody InvoiceRole invoiceRoleToBeUpdated,
+	public ResponseEntity<String> updateInvoiceRole(@RequestBody InvoiceRole invoiceRoleToBeUpdated,
 			@PathVariable String roleTypeId) throws Exception {
 
 		invoiceRoleToBeUpdated.setRoleTypeId(roleTypeId);
@@ -178,41 +128,44 @@ public class InvoiceRoleController {
 
 		try {
 			if(((InvoiceRoleUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{invoiceRoleId}")
-	public ResponseEntity<Object> findById(@PathVariable String invoiceRoleId) throws Exception {
+	public ResponseEntity<InvoiceRole> findById(@PathVariable String invoiceRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("invoiceRoleId", invoiceRoleId);
 		try {
 
-			Object foundInvoiceRole = findInvoiceRolesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundInvoiceRole);
+			List<InvoiceRole> foundInvoiceRole = findInvoiceRolesBy(requestParams).getBody();
+			if(foundInvoiceRole.size()==1){				return successful(foundInvoiceRole.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{invoiceRoleId}")
-	public ResponseEntity<Object> deleteInvoiceRoleByIdUpdated(@PathVariable String invoiceRoleId) throws Exception {
+	public ResponseEntity<String> deleteInvoiceRoleByIdUpdated(@PathVariable String invoiceRoleId) throws Exception {
 		DeleteInvoiceRole command = new DeleteInvoiceRole(invoiceRoleId);
 
 		try {
 			if (((InvoiceRoleDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("InvoiceRole could not be deleted");
+		return conflict();
 
 	}
 

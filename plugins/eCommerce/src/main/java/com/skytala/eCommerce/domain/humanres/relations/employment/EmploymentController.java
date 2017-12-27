@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.humanres.relations.employment.query.FindEmpl
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/humanres/employments")
 public class EmploymentController {
@@ -52,7 +54,7 @@ public class EmploymentController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findEmploymentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<Employment>> findEmploymentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindEmploymentsBy query = new FindEmploymentsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class EmploymentController {
 		}
 
 		List<Employment> employments =((EmploymentFound) Scheduler.execute(query).data()).getEmployments();
-
-		if (employments.size() == 1) {
-			return ResponseEntity.ok().body(employments.get(0));
-		}
 
 		return ResponseEntity.ok().body(employments);
 
@@ -78,7 +76,7 @@ public class EmploymentController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createEmployment(HttpServletRequest request) throws Exception {
+	public ResponseEntity<Employment> createEmployment(HttpServletRequest request) throws Exception {
 
 		Employment employmentToBeAdded = new Employment();
 		try {
@@ -86,7 +84,7 @@ public class EmploymentController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createEmployment(employmentToBeAdded);
@@ -101,63 +99,15 @@ public class EmploymentController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createEmployment(@RequestBody Employment employmentToBeAdded) throws Exception {
+	public ResponseEntity<Employment> createEmployment(@RequestBody Employment employmentToBeAdded) throws Exception {
 
 		AddEmployment command = new AddEmployment(employmentToBeAdded);
 		Employment employment = ((EmploymentAdded) Scheduler.execute(command).data()).getAddedEmployment();
 		
 		if (employment != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(employment);
+			return successful(employment);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("Employment could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateEmployment(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		Employment employmentToBeUpdated = new Employment();
-
-		try {
-			employmentToBeUpdated = EmploymentMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateEmployment(employmentToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class EmploymentController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateEmployment(@RequestBody Employment employmentToBeUpdated,
+	public ResponseEntity<String> updateEmployment(@RequestBody Employment employmentToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		employmentToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class EmploymentController {
 
 		try {
 			if(((EmploymentUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{employmentId}")
-	public ResponseEntity<Object> findById(@PathVariable String employmentId) throws Exception {
+	public ResponseEntity<Employment> findById(@PathVariable String employmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("employmentId", employmentId);
 		try {
 
-			Object foundEmployment = findEmploymentsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundEmployment);
+			List<Employment> foundEmployment = findEmploymentsBy(requestParams).getBody();
+			if(foundEmployment.size()==1){				return successful(foundEmployment.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{employmentId}")
-	public ResponseEntity<Object> deleteEmploymentByIdUpdated(@PathVariable String employmentId) throws Exception {
+	public ResponseEntity<String> deleteEmploymentByIdUpdated(@PathVariable String employmentId) throws Exception {
 		DeleteEmployment command = new DeleteEmployment(employmentId);
 
 		try {
 			if (((EmploymentDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("Employment could not be deleted");
+		return conflict();
 
 	}
 

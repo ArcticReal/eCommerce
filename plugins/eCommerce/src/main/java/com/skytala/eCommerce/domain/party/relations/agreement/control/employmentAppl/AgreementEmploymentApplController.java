@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.agreement.query.employmentAp
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/agreement/agreementEmploymentAppls")
 public class AgreementEmploymentApplController {
@@ -52,7 +54,7 @@ public class AgreementEmploymentApplController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findAgreementEmploymentApplsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<AgreementEmploymentAppl>> findAgreementEmploymentApplsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAgreementEmploymentApplsBy query = new FindAgreementEmploymentApplsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class AgreementEmploymentApplController {
 		}
 
 		List<AgreementEmploymentAppl> agreementEmploymentAppls =((AgreementEmploymentApplFound) Scheduler.execute(query).data()).getAgreementEmploymentAppls();
-
-		if (agreementEmploymentAppls.size() == 1) {
-			return ResponseEntity.ok().body(agreementEmploymentAppls.get(0));
-		}
 
 		return ResponseEntity.ok().body(agreementEmploymentAppls);
 
@@ -78,7 +76,7 @@ public class AgreementEmploymentApplController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createAgreementEmploymentAppl(HttpServletRequest request) throws Exception {
+	public ResponseEntity<AgreementEmploymentAppl> createAgreementEmploymentAppl(HttpServletRequest request) throws Exception {
 
 		AgreementEmploymentAppl agreementEmploymentApplToBeAdded = new AgreementEmploymentAppl();
 		try {
@@ -86,7 +84,7 @@ public class AgreementEmploymentApplController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createAgreementEmploymentAppl(agreementEmploymentApplToBeAdded);
@@ -101,63 +99,15 @@ public class AgreementEmploymentApplController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createAgreementEmploymentAppl(@RequestBody AgreementEmploymentAppl agreementEmploymentApplToBeAdded) throws Exception {
+	public ResponseEntity<AgreementEmploymentAppl> createAgreementEmploymentAppl(@RequestBody AgreementEmploymentAppl agreementEmploymentApplToBeAdded) throws Exception {
 
 		AddAgreementEmploymentAppl command = new AddAgreementEmploymentAppl(agreementEmploymentApplToBeAdded);
 		AgreementEmploymentAppl agreementEmploymentAppl = ((AgreementEmploymentApplAdded) Scheduler.execute(command).data()).getAddedAgreementEmploymentAppl();
 		
 		if (agreementEmploymentAppl != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(agreementEmploymentAppl);
+			return successful(agreementEmploymentAppl);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("AgreementEmploymentAppl could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateAgreementEmploymentAppl(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		AgreementEmploymentAppl agreementEmploymentApplToBeUpdated = new AgreementEmploymentAppl();
-
-		try {
-			agreementEmploymentApplToBeUpdated = AgreementEmploymentApplMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateAgreementEmploymentAppl(agreementEmploymentApplToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class AgreementEmploymentApplController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateAgreementEmploymentAppl(@RequestBody AgreementEmploymentAppl agreementEmploymentApplToBeUpdated,
+	public ResponseEntity<String> updateAgreementEmploymentAppl(@RequestBody AgreementEmploymentAppl agreementEmploymentApplToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		agreementEmploymentApplToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class AgreementEmploymentApplController {
 
 		try {
 			if(((AgreementEmploymentApplUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{agreementEmploymentApplId}")
-	public ResponseEntity<Object> findById(@PathVariable String agreementEmploymentApplId) throws Exception {
+	public ResponseEntity<AgreementEmploymentAppl> findById(@PathVariable String agreementEmploymentApplId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("agreementEmploymentApplId", agreementEmploymentApplId);
 		try {
 
-			Object foundAgreementEmploymentAppl = findAgreementEmploymentApplsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundAgreementEmploymentAppl);
+			List<AgreementEmploymentAppl> foundAgreementEmploymentAppl = findAgreementEmploymentApplsBy(requestParams).getBody();
+			if(foundAgreementEmploymentAppl.size()==1){				return successful(foundAgreementEmploymentAppl.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{agreementEmploymentApplId}")
-	public ResponseEntity<Object> deleteAgreementEmploymentApplByIdUpdated(@PathVariable String agreementEmploymentApplId) throws Exception {
+	public ResponseEntity<String> deleteAgreementEmploymentApplByIdUpdated(@PathVariable String agreementEmploymentApplId) throws Exception {
 		DeleteAgreementEmploymentAppl command = new DeleteAgreementEmploymentAppl(agreementEmploymentApplId);
 
 		try {
 			if (((AgreementEmploymentApplDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("AgreementEmploymentAppl could not be deleted");
+		return conflict();
 
 	}
 

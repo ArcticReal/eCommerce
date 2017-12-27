@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.humanres.relations.terminationReason.query.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/humanres/terminationReasons")
 public class TerminationReasonController {
@@ -52,7 +54,7 @@ public class TerminationReasonController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findTerminationReasonsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<TerminationReason>> findTerminationReasonsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTerminationReasonsBy query = new FindTerminationReasonsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class TerminationReasonController {
 		}
 
 		List<TerminationReason> terminationReasons =((TerminationReasonFound) Scheduler.execute(query).data()).getTerminationReasons();
-
-		if (terminationReasons.size() == 1) {
-			return ResponseEntity.ok().body(terminationReasons.get(0));
-		}
 
 		return ResponseEntity.ok().body(terminationReasons);
 
@@ -78,7 +76,7 @@ public class TerminationReasonController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createTerminationReason(HttpServletRequest request) throws Exception {
+	public ResponseEntity<TerminationReason> createTerminationReason(HttpServletRequest request) throws Exception {
 
 		TerminationReason terminationReasonToBeAdded = new TerminationReason();
 		try {
@@ -86,7 +84,7 @@ public class TerminationReasonController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createTerminationReason(terminationReasonToBeAdded);
@@ -101,63 +99,15 @@ public class TerminationReasonController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createTerminationReason(@RequestBody TerminationReason terminationReasonToBeAdded) throws Exception {
+	public ResponseEntity<TerminationReason> createTerminationReason(@RequestBody TerminationReason terminationReasonToBeAdded) throws Exception {
 
 		AddTerminationReason command = new AddTerminationReason(terminationReasonToBeAdded);
 		TerminationReason terminationReason = ((TerminationReasonAdded) Scheduler.execute(command).data()).getAddedTerminationReason();
 		
 		if (terminationReason != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(terminationReason);
+			return successful(terminationReason);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("TerminationReason could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateTerminationReason(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		TerminationReason terminationReasonToBeUpdated = new TerminationReason();
-
-		try {
-			terminationReasonToBeUpdated = TerminationReasonMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateTerminationReason(terminationReasonToBeUpdated, terminationReasonToBeUpdated.getTerminationReasonId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class TerminationReasonController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{terminationReasonId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateTerminationReason(@RequestBody TerminationReason terminationReasonToBeUpdated,
+	public ResponseEntity<String> updateTerminationReason(@RequestBody TerminationReason terminationReasonToBeUpdated,
 			@PathVariable String terminationReasonId) throws Exception {
 
 		terminationReasonToBeUpdated.setTerminationReasonId(terminationReasonId);
@@ -178,41 +128,44 @@ public class TerminationReasonController {
 
 		try {
 			if(((TerminationReasonUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{terminationReasonId}")
-	public ResponseEntity<Object> findById(@PathVariable String terminationReasonId) throws Exception {
+	public ResponseEntity<TerminationReason> findById(@PathVariable String terminationReasonId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("terminationReasonId", terminationReasonId);
 		try {
 
-			Object foundTerminationReason = findTerminationReasonsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundTerminationReason);
+			List<TerminationReason> foundTerminationReason = findTerminationReasonsBy(requestParams).getBody();
+			if(foundTerminationReason.size()==1){				return successful(foundTerminationReason.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{terminationReasonId}")
-	public ResponseEntity<Object> deleteTerminationReasonByIdUpdated(@PathVariable String terminationReasonId) throws Exception {
+	public ResponseEntity<String> deleteTerminationReasonByIdUpdated(@PathVariable String terminationReasonId) throws Exception {
 		DeleteTerminationReason command = new DeleteTerminationReason(terminationReasonId);
 
 		try {
 			if (((TerminationReasonDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("TerminationReason could not be deleted");
+		return conflict();
 
 	}
 

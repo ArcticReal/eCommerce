@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.invoice.query.item.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/invoice/invoiceItems")
 public class InvoiceItemController {
@@ -52,7 +54,7 @@ public class InvoiceItemController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findInvoiceItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<InvoiceItem>> findInvoiceItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInvoiceItemsBy query = new FindInvoiceItemsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class InvoiceItemController {
 		}
 
 		List<InvoiceItem> invoiceItems =((InvoiceItemFound) Scheduler.execute(query).data()).getInvoiceItems();
-
-		if (invoiceItems.size() == 1) {
-			return ResponseEntity.ok().body(invoiceItems.get(0));
-		}
 
 		return ResponseEntity.ok().body(invoiceItems);
 
@@ -78,7 +76,7 @@ public class InvoiceItemController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createInvoiceItem(HttpServletRequest request) throws Exception {
+	public ResponseEntity<InvoiceItem> createInvoiceItem(HttpServletRequest request) throws Exception {
 
 		InvoiceItem invoiceItemToBeAdded = new InvoiceItem();
 		try {
@@ -86,7 +84,7 @@ public class InvoiceItemController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createInvoiceItem(invoiceItemToBeAdded);
@@ -101,63 +99,15 @@ public class InvoiceItemController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createInvoiceItem(@RequestBody InvoiceItem invoiceItemToBeAdded) throws Exception {
+	public ResponseEntity<InvoiceItem> createInvoiceItem(@RequestBody InvoiceItem invoiceItemToBeAdded) throws Exception {
 
 		AddInvoiceItem command = new AddInvoiceItem(invoiceItemToBeAdded);
 		InvoiceItem invoiceItem = ((InvoiceItemAdded) Scheduler.execute(command).data()).getAddedInvoiceItem();
 		
 		if (invoiceItem != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(invoiceItem);
+			return successful(invoiceItem);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("InvoiceItem could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateInvoiceItem(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		InvoiceItem invoiceItemToBeUpdated = new InvoiceItem();
-
-		try {
-			invoiceItemToBeUpdated = InvoiceItemMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateInvoiceItem(invoiceItemToBeUpdated, invoiceItemToBeUpdated.getInvoiceItemSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class InvoiceItemController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{invoiceItemSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateInvoiceItem(@RequestBody InvoiceItem invoiceItemToBeUpdated,
+	public ResponseEntity<String> updateInvoiceItem(@RequestBody InvoiceItem invoiceItemToBeUpdated,
 			@PathVariable String invoiceItemSeqId) throws Exception {
 
 		invoiceItemToBeUpdated.setInvoiceItemSeqId(invoiceItemSeqId);
@@ -178,41 +128,44 @@ public class InvoiceItemController {
 
 		try {
 			if(((InvoiceItemUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{invoiceItemId}")
-	public ResponseEntity<Object> findById(@PathVariable String invoiceItemId) throws Exception {
+	public ResponseEntity<InvoiceItem> findById(@PathVariable String invoiceItemId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("invoiceItemId", invoiceItemId);
 		try {
 
-			Object foundInvoiceItem = findInvoiceItemsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundInvoiceItem);
+			List<InvoiceItem> foundInvoiceItem = findInvoiceItemsBy(requestParams).getBody();
+			if(foundInvoiceItem.size()==1){				return successful(foundInvoiceItem.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{invoiceItemId}")
-	public ResponseEntity<Object> deleteInvoiceItemByIdUpdated(@PathVariable String invoiceItemId) throws Exception {
+	public ResponseEntity<String> deleteInvoiceItemByIdUpdated(@PathVariable String invoiceItemId) throws Exception {
 		DeleteInvoiceItem command = new DeleteInvoiceItem(invoiceItemId);
 
 		try {
 			if (((InvoiceItemDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("InvoiceItem could not be deleted");
+		return conflict();
 
 	}
 

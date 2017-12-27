@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.configOption
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productConfigOptionIactns")
 public class ProductConfigOptionIactnController {
@@ -52,7 +54,7 @@ public class ProductConfigOptionIactnController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductConfigOptionIactnsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductConfigOptionIactn>> findProductConfigOptionIactnsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductConfigOptionIactnsBy query = new FindProductConfigOptionIactnsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductConfigOptionIactnController {
 		}
 
 		List<ProductConfigOptionIactn> productConfigOptionIactns =((ProductConfigOptionIactnFound) Scheduler.execute(query).data()).getProductConfigOptionIactns();
-
-		if (productConfigOptionIactns.size() == 1) {
-			return ResponseEntity.ok().body(productConfigOptionIactns.get(0));
-		}
 
 		return ResponseEntity.ok().body(productConfigOptionIactns);
 
@@ -78,7 +76,7 @@ public class ProductConfigOptionIactnController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductConfigOptionIactn(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductConfigOptionIactn> createProductConfigOptionIactn(HttpServletRequest request) throws Exception {
 
 		ProductConfigOptionIactn productConfigOptionIactnToBeAdded = new ProductConfigOptionIactn();
 		try {
@@ -86,7 +84,7 @@ public class ProductConfigOptionIactnController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductConfigOptionIactn(productConfigOptionIactnToBeAdded);
@@ -101,63 +99,15 @@ public class ProductConfigOptionIactnController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductConfigOptionIactn(@RequestBody ProductConfigOptionIactn productConfigOptionIactnToBeAdded) throws Exception {
+	public ResponseEntity<ProductConfigOptionIactn> createProductConfigOptionIactn(@RequestBody ProductConfigOptionIactn productConfigOptionIactnToBeAdded) throws Exception {
 
 		AddProductConfigOptionIactn command = new AddProductConfigOptionIactn(productConfigOptionIactnToBeAdded);
 		ProductConfigOptionIactn productConfigOptionIactn = ((ProductConfigOptionIactnAdded) Scheduler.execute(command).data()).getAddedProductConfigOptionIactn();
 		
 		if (productConfigOptionIactn != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productConfigOptionIactn);
+			return successful(productConfigOptionIactn);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductConfigOptionIactn could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductConfigOptionIactn(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductConfigOptionIactn productConfigOptionIactnToBeUpdated = new ProductConfigOptionIactn();
-
-		try {
-			productConfigOptionIactnToBeUpdated = ProductConfigOptionIactnMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductConfigOptionIactn(productConfigOptionIactnToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductConfigOptionIactnController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductConfigOptionIactn(@RequestBody ProductConfigOptionIactn productConfigOptionIactnToBeUpdated,
+	public ResponseEntity<String> updateProductConfigOptionIactn(@RequestBody ProductConfigOptionIactn productConfigOptionIactnToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		productConfigOptionIactnToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ProductConfigOptionIactnController {
 
 		try {
 			if(((ProductConfigOptionIactnUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productConfigOptionIactnId}")
-	public ResponseEntity<Object> findById(@PathVariable String productConfigOptionIactnId) throws Exception {
+	public ResponseEntity<ProductConfigOptionIactn> findById(@PathVariable String productConfigOptionIactnId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productConfigOptionIactnId", productConfigOptionIactnId);
 		try {
 
-			Object foundProductConfigOptionIactn = findProductConfigOptionIactnsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductConfigOptionIactn);
+			List<ProductConfigOptionIactn> foundProductConfigOptionIactn = findProductConfigOptionIactnsBy(requestParams).getBody();
+			if(foundProductConfigOptionIactn.size()==1){				return successful(foundProductConfigOptionIactn.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productConfigOptionIactnId}")
-	public ResponseEntity<Object> deleteProductConfigOptionIactnByIdUpdated(@PathVariable String productConfigOptionIactnId) throws Exception {
+	public ResponseEntity<String> deleteProductConfigOptionIactnByIdUpdated(@PathVariable String productConfigOptionIactnId) throws Exception {
 		DeleteProductConfigOptionIactn command = new DeleteProductConfigOptionIactn(productConfigOptionIactnId);
 
 		try {
 			if (((ProductConfigOptionIactnDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductConfigOptionIactn could not be deleted");
+		return conflict();
 
 	}
 

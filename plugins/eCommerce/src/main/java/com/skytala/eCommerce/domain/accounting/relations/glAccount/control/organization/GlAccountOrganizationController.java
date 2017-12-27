@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.glAccount.query.organiz
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/glAccount/glAccountOrganizations")
 public class GlAccountOrganizationController {
@@ -52,7 +54,7 @@ public class GlAccountOrganizationController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findGlAccountOrganizationsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<GlAccountOrganization>> findGlAccountOrganizationsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGlAccountOrganizationsBy query = new FindGlAccountOrganizationsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class GlAccountOrganizationController {
 		}
 
 		List<GlAccountOrganization> glAccountOrganizations =((GlAccountOrganizationFound) Scheduler.execute(query).data()).getGlAccountOrganizations();
-
-		if (glAccountOrganizations.size() == 1) {
-			return ResponseEntity.ok().body(glAccountOrganizations.get(0));
-		}
 
 		return ResponseEntity.ok().body(glAccountOrganizations);
 
@@ -78,7 +76,7 @@ public class GlAccountOrganizationController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createGlAccountOrganization(HttpServletRequest request) throws Exception {
+	public ResponseEntity<GlAccountOrganization> createGlAccountOrganization(HttpServletRequest request) throws Exception {
 
 		GlAccountOrganization glAccountOrganizationToBeAdded = new GlAccountOrganization();
 		try {
@@ -86,7 +84,7 @@ public class GlAccountOrganizationController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createGlAccountOrganization(glAccountOrganizationToBeAdded);
@@ -101,63 +99,15 @@ public class GlAccountOrganizationController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createGlAccountOrganization(@RequestBody GlAccountOrganization glAccountOrganizationToBeAdded) throws Exception {
+	public ResponseEntity<GlAccountOrganization> createGlAccountOrganization(@RequestBody GlAccountOrganization glAccountOrganizationToBeAdded) throws Exception {
 
 		AddGlAccountOrganization command = new AddGlAccountOrganization(glAccountOrganizationToBeAdded);
 		GlAccountOrganization glAccountOrganization = ((GlAccountOrganizationAdded) Scheduler.execute(command).data()).getAddedGlAccountOrganization();
 		
 		if (glAccountOrganization != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(glAccountOrganization);
+			return successful(glAccountOrganization);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("GlAccountOrganization could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateGlAccountOrganization(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		GlAccountOrganization glAccountOrganizationToBeUpdated = new GlAccountOrganization();
-
-		try {
-			glAccountOrganizationToBeUpdated = GlAccountOrganizationMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateGlAccountOrganization(glAccountOrganizationToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class GlAccountOrganizationController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateGlAccountOrganization(@RequestBody GlAccountOrganization glAccountOrganizationToBeUpdated,
+	public ResponseEntity<String> updateGlAccountOrganization(@RequestBody GlAccountOrganization glAccountOrganizationToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		glAccountOrganizationToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class GlAccountOrganizationController {
 
 		try {
 			if(((GlAccountOrganizationUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{glAccountOrganizationId}")
-	public ResponseEntity<Object> findById(@PathVariable String glAccountOrganizationId) throws Exception {
+	public ResponseEntity<GlAccountOrganization> findById(@PathVariable String glAccountOrganizationId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("glAccountOrganizationId", glAccountOrganizationId);
 		try {
 
-			Object foundGlAccountOrganization = findGlAccountOrganizationsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundGlAccountOrganization);
+			List<GlAccountOrganization> foundGlAccountOrganization = findGlAccountOrganizationsBy(requestParams).getBody();
+			if(foundGlAccountOrganization.size()==1){				return successful(foundGlAccountOrganization.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{glAccountOrganizationId}")
-	public ResponseEntity<Object> deleteGlAccountOrganizationByIdUpdated(@PathVariable String glAccountOrganizationId) throws Exception {
+	public ResponseEntity<String> deleteGlAccountOrganizationByIdUpdated(@PathVariable String glAccountOrganizationId) throws Exception {
 		DeleteGlAccountOrganization command = new DeleteGlAccountOrganization(glAccountOrganizationId);
 
 		try {
 			if (((GlAccountOrganizationDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("GlAccountOrganization could not be deleted");
+		return conflict();
 
 	}
 

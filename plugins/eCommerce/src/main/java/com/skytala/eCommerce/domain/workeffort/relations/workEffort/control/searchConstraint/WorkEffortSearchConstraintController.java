@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.workeffort.relations.workEffort.query.search
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/workeffort/workEffort/workEffortSearchConstraints")
 public class WorkEffortSearchConstraintController {
@@ -52,7 +54,7 @@ public class WorkEffortSearchConstraintController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWorkEffortSearchConstraintsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WorkEffortSearchConstraint>> findWorkEffortSearchConstraintsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortSearchConstraintsBy query = new FindWorkEffortSearchConstraintsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WorkEffortSearchConstraintController {
 		}
 
 		List<WorkEffortSearchConstraint> workEffortSearchConstraints =((WorkEffortSearchConstraintFound) Scheduler.execute(query).data()).getWorkEffortSearchConstraints();
-
-		if (workEffortSearchConstraints.size() == 1) {
-			return ResponseEntity.ok().body(workEffortSearchConstraints.get(0));
-		}
 
 		return ResponseEntity.ok().body(workEffortSearchConstraints);
 
@@ -78,7 +76,7 @@ public class WorkEffortSearchConstraintController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWorkEffortSearchConstraint(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WorkEffortSearchConstraint> createWorkEffortSearchConstraint(HttpServletRequest request) throws Exception {
 
 		WorkEffortSearchConstraint workEffortSearchConstraintToBeAdded = new WorkEffortSearchConstraint();
 		try {
@@ -86,7 +84,7 @@ public class WorkEffortSearchConstraintController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWorkEffortSearchConstraint(workEffortSearchConstraintToBeAdded);
@@ -101,63 +99,15 @@ public class WorkEffortSearchConstraintController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWorkEffortSearchConstraint(@RequestBody WorkEffortSearchConstraint workEffortSearchConstraintToBeAdded) throws Exception {
+	public ResponseEntity<WorkEffortSearchConstraint> createWorkEffortSearchConstraint(@RequestBody WorkEffortSearchConstraint workEffortSearchConstraintToBeAdded) throws Exception {
 
 		AddWorkEffortSearchConstraint command = new AddWorkEffortSearchConstraint(workEffortSearchConstraintToBeAdded);
 		WorkEffortSearchConstraint workEffortSearchConstraint = ((WorkEffortSearchConstraintAdded) Scheduler.execute(command).data()).getAddedWorkEffortSearchConstraint();
 		
 		if (workEffortSearchConstraint != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(workEffortSearchConstraint);
+			return successful(workEffortSearchConstraint);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WorkEffortSearchConstraint could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWorkEffortSearchConstraint(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WorkEffortSearchConstraint workEffortSearchConstraintToBeUpdated = new WorkEffortSearchConstraint();
-
-		try {
-			workEffortSearchConstraintToBeUpdated = WorkEffortSearchConstraintMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWorkEffortSearchConstraint(workEffortSearchConstraintToBeUpdated, workEffortSearchConstraintToBeUpdated.getConstraintSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WorkEffortSearchConstraintController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{constraintSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWorkEffortSearchConstraint(@RequestBody WorkEffortSearchConstraint workEffortSearchConstraintToBeUpdated,
+	public ResponseEntity<String> updateWorkEffortSearchConstraint(@RequestBody WorkEffortSearchConstraint workEffortSearchConstraintToBeUpdated,
 			@PathVariable String constraintSeqId) throws Exception {
 
 		workEffortSearchConstraintToBeUpdated.setConstraintSeqId(constraintSeqId);
@@ -178,41 +128,44 @@ public class WorkEffortSearchConstraintController {
 
 		try {
 			if(((WorkEffortSearchConstraintUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{workEffortSearchConstraintId}")
-	public ResponseEntity<Object> findById(@PathVariable String workEffortSearchConstraintId) throws Exception {
+	public ResponseEntity<WorkEffortSearchConstraint> findById(@PathVariable String workEffortSearchConstraintId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortSearchConstraintId", workEffortSearchConstraintId);
 		try {
 
-			Object foundWorkEffortSearchConstraint = findWorkEffortSearchConstraintsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWorkEffortSearchConstraint);
+			List<WorkEffortSearchConstraint> foundWorkEffortSearchConstraint = findWorkEffortSearchConstraintsBy(requestParams).getBody();
+			if(foundWorkEffortSearchConstraint.size()==1){				return successful(foundWorkEffortSearchConstraint.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{workEffortSearchConstraintId}")
-	public ResponseEntity<Object> deleteWorkEffortSearchConstraintByIdUpdated(@PathVariable String workEffortSearchConstraintId) throws Exception {
+	public ResponseEntity<String> deleteWorkEffortSearchConstraintByIdUpdated(@PathVariable String workEffortSearchConstraintId) throws Exception {
 		DeleteWorkEffortSearchConstraint command = new DeleteWorkEffortSearchConstraint(workEffortSearchConstraintId);
 
 		try {
 			if (((WorkEffortSearchConstraintDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WorkEffortSearchConstraint could not be deleted");
+		return conflict();
 
 	}
 

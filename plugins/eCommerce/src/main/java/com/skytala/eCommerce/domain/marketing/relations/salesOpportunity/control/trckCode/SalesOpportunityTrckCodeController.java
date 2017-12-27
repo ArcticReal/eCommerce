@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.marketing.relations.salesOpportunity.query.t
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/marketing/salesOpportunity/salesOpportunityTrckCodes")
 public class SalesOpportunityTrckCodeController {
@@ -52,7 +54,7 @@ public class SalesOpportunityTrckCodeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findSalesOpportunityTrckCodesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<SalesOpportunityTrckCode>> findSalesOpportunityTrckCodesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSalesOpportunityTrckCodesBy query = new FindSalesOpportunityTrckCodesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class SalesOpportunityTrckCodeController {
 		}
 
 		List<SalesOpportunityTrckCode> salesOpportunityTrckCodes =((SalesOpportunityTrckCodeFound) Scheduler.execute(query).data()).getSalesOpportunityTrckCodes();
-
-		if (salesOpportunityTrckCodes.size() == 1) {
-			return ResponseEntity.ok().body(salesOpportunityTrckCodes.get(0));
-		}
 
 		return ResponseEntity.ok().body(salesOpportunityTrckCodes);
 
@@ -78,7 +76,7 @@ public class SalesOpportunityTrckCodeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createSalesOpportunityTrckCode(HttpServletRequest request) throws Exception {
+	public ResponseEntity<SalesOpportunityTrckCode> createSalesOpportunityTrckCode(HttpServletRequest request) throws Exception {
 
 		SalesOpportunityTrckCode salesOpportunityTrckCodeToBeAdded = new SalesOpportunityTrckCode();
 		try {
@@ -86,7 +84,7 @@ public class SalesOpportunityTrckCodeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createSalesOpportunityTrckCode(salesOpportunityTrckCodeToBeAdded);
@@ -101,63 +99,15 @@ public class SalesOpportunityTrckCodeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createSalesOpportunityTrckCode(@RequestBody SalesOpportunityTrckCode salesOpportunityTrckCodeToBeAdded) throws Exception {
+	public ResponseEntity<SalesOpportunityTrckCode> createSalesOpportunityTrckCode(@RequestBody SalesOpportunityTrckCode salesOpportunityTrckCodeToBeAdded) throws Exception {
 
 		AddSalesOpportunityTrckCode command = new AddSalesOpportunityTrckCode(salesOpportunityTrckCodeToBeAdded);
 		SalesOpportunityTrckCode salesOpportunityTrckCode = ((SalesOpportunityTrckCodeAdded) Scheduler.execute(command).data()).getAddedSalesOpportunityTrckCode();
 		
 		if (salesOpportunityTrckCode != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(salesOpportunityTrckCode);
+			return successful(salesOpportunityTrckCode);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("SalesOpportunityTrckCode could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateSalesOpportunityTrckCode(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		SalesOpportunityTrckCode salesOpportunityTrckCodeToBeUpdated = new SalesOpportunityTrckCode();
-
-		try {
-			salesOpportunityTrckCodeToBeUpdated = SalesOpportunityTrckCodeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateSalesOpportunityTrckCode(salesOpportunityTrckCodeToBeUpdated, salesOpportunityTrckCodeToBeUpdated.getTrackingCodeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class SalesOpportunityTrckCodeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{trackingCodeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateSalesOpportunityTrckCode(@RequestBody SalesOpportunityTrckCode salesOpportunityTrckCodeToBeUpdated,
+	public ResponseEntity<String> updateSalesOpportunityTrckCode(@RequestBody SalesOpportunityTrckCode salesOpportunityTrckCodeToBeUpdated,
 			@PathVariable String trackingCodeId) throws Exception {
 
 		salesOpportunityTrckCodeToBeUpdated.setTrackingCodeId(trackingCodeId);
@@ -178,41 +128,44 @@ public class SalesOpportunityTrckCodeController {
 
 		try {
 			if(((SalesOpportunityTrckCodeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{salesOpportunityTrckCodeId}")
-	public ResponseEntity<Object> findById(@PathVariable String salesOpportunityTrckCodeId) throws Exception {
+	public ResponseEntity<SalesOpportunityTrckCode> findById(@PathVariable String salesOpportunityTrckCodeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("salesOpportunityTrckCodeId", salesOpportunityTrckCodeId);
 		try {
 
-			Object foundSalesOpportunityTrckCode = findSalesOpportunityTrckCodesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundSalesOpportunityTrckCode);
+			List<SalesOpportunityTrckCode> foundSalesOpportunityTrckCode = findSalesOpportunityTrckCodesBy(requestParams).getBody();
+			if(foundSalesOpportunityTrckCode.size()==1){				return successful(foundSalesOpportunityTrckCode.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{salesOpportunityTrckCodeId}")
-	public ResponseEntity<Object> deleteSalesOpportunityTrckCodeByIdUpdated(@PathVariable String salesOpportunityTrckCodeId) throws Exception {
+	public ResponseEntity<String> deleteSalesOpportunityTrckCodeByIdUpdated(@PathVariable String salesOpportunityTrckCodeId) throws Exception {
 		DeleteSalesOpportunityTrckCode command = new DeleteSalesOpportunityTrckCode(salesOpportunityTrckCodeId);
 
 		try {
 			if (((SalesOpportunityTrckCodeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("SalesOpportunityTrckCode could not be deleted");
+		return conflict();
 
 	}
 

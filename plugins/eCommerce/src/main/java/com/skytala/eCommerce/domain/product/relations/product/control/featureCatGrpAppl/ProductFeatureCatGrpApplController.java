@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.featureCatGr
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productFeatureCatGrpAppls")
 public class ProductFeatureCatGrpApplController {
@@ -52,7 +54,7 @@ public class ProductFeatureCatGrpApplController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductFeatureCatGrpApplsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductFeatureCatGrpAppl>> findProductFeatureCatGrpApplsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductFeatureCatGrpApplsBy query = new FindProductFeatureCatGrpApplsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductFeatureCatGrpApplController {
 		}
 
 		List<ProductFeatureCatGrpAppl> productFeatureCatGrpAppls =((ProductFeatureCatGrpApplFound) Scheduler.execute(query).data()).getProductFeatureCatGrpAppls();
-
-		if (productFeatureCatGrpAppls.size() == 1) {
-			return ResponseEntity.ok().body(productFeatureCatGrpAppls.get(0));
-		}
 
 		return ResponseEntity.ok().body(productFeatureCatGrpAppls);
 
@@ -78,7 +76,7 @@ public class ProductFeatureCatGrpApplController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductFeatureCatGrpAppl(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductFeatureCatGrpAppl> createProductFeatureCatGrpAppl(HttpServletRequest request) throws Exception {
 
 		ProductFeatureCatGrpAppl productFeatureCatGrpApplToBeAdded = new ProductFeatureCatGrpAppl();
 		try {
@@ -86,7 +84,7 @@ public class ProductFeatureCatGrpApplController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductFeatureCatGrpAppl(productFeatureCatGrpApplToBeAdded);
@@ -101,63 +99,15 @@ public class ProductFeatureCatGrpApplController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductFeatureCatGrpAppl(@RequestBody ProductFeatureCatGrpAppl productFeatureCatGrpApplToBeAdded) throws Exception {
+	public ResponseEntity<ProductFeatureCatGrpAppl> createProductFeatureCatGrpAppl(@RequestBody ProductFeatureCatGrpAppl productFeatureCatGrpApplToBeAdded) throws Exception {
 
 		AddProductFeatureCatGrpAppl command = new AddProductFeatureCatGrpAppl(productFeatureCatGrpApplToBeAdded);
 		ProductFeatureCatGrpAppl productFeatureCatGrpAppl = ((ProductFeatureCatGrpApplAdded) Scheduler.execute(command).data()).getAddedProductFeatureCatGrpAppl();
 		
 		if (productFeatureCatGrpAppl != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productFeatureCatGrpAppl);
+			return successful(productFeatureCatGrpAppl);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductFeatureCatGrpAppl could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductFeatureCatGrpAppl(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductFeatureCatGrpAppl productFeatureCatGrpApplToBeUpdated = new ProductFeatureCatGrpAppl();
-
-		try {
-			productFeatureCatGrpApplToBeUpdated = ProductFeatureCatGrpApplMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductFeatureCatGrpAppl(productFeatureCatGrpApplToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductFeatureCatGrpApplController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductFeatureCatGrpAppl(@RequestBody ProductFeatureCatGrpAppl productFeatureCatGrpApplToBeUpdated,
+	public ResponseEntity<String> updateProductFeatureCatGrpAppl(@RequestBody ProductFeatureCatGrpAppl productFeatureCatGrpApplToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		productFeatureCatGrpApplToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ProductFeatureCatGrpApplController {
 
 		try {
 			if(((ProductFeatureCatGrpApplUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productFeatureCatGrpApplId}")
-	public ResponseEntity<Object> findById(@PathVariable String productFeatureCatGrpApplId) throws Exception {
+	public ResponseEntity<ProductFeatureCatGrpAppl> findById(@PathVariable String productFeatureCatGrpApplId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productFeatureCatGrpApplId", productFeatureCatGrpApplId);
 		try {
 
-			Object foundProductFeatureCatGrpAppl = findProductFeatureCatGrpApplsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductFeatureCatGrpAppl);
+			List<ProductFeatureCatGrpAppl> foundProductFeatureCatGrpAppl = findProductFeatureCatGrpApplsBy(requestParams).getBody();
+			if(foundProductFeatureCatGrpAppl.size()==1){				return successful(foundProductFeatureCatGrpAppl.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productFeatureCatGrpApplId}")
-	public ResponseEntity<Object> deleteProductFeatureCatGrpApplByIdUpdated(@PathVariable String productFeatureCatGrpApplId) throws Exception {
+	public ResponseEntity<String> deleteProductFeatureCatGrpApplByIdUpdated(@PathVariable String productFeatureCatGrpApplId) throws Exception {
 		DeleteProductFeatureCatGrpAppl command = new DeleteProductFeatureCatGrpAppl(productFeatureCatGrpApplId);
 
 		try {
 			if (((ProductFeatureCatGrpApplDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductFeatureCatGrpAppl could not be deleted");
+		return conflict();
 
 	}
 

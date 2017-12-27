@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.storeGroupRo
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productStoreGroupRollups")
 public class ProductStoreGroupRollupController {
@@ -52,7 +54,7 @@ public class ProductStoreGroupRollupController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductStoreGroupRollupsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductStoreGroupRollup>> findProductStoreGroupRollupsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductStoreGroupRollupsBy query = new FindProductStoreGroupRollupsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductStoreGroupRollupController {
 		}
 
 		List<ProductStoreGroupRollup> productStoreGroupRollups =((ProductStoreGroupRollupFound) Scheduler.execute(query).data()).getProductStoreGroupRollups();
-
-		if (productStoreGroupRollups.size() == 1) {
-			return ResponseEntity.ok().body(productStoreGroupRollups.get(0));
-		}
 
 		return ResponseEntity.ok().body(productStoreGroupRollups);
 
@@ -78,7 +76,7 @@ public class ProductStoreGroupRollupController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductStoreGroupRollup(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductStoreGroupRollup> createProductStoreGroupRollup(HttpServletRequest request) throws Exception {
 
 		ProductStoreGroupRollup productStoreGroupRollupToBeAdded = new ProductStoreGroupRollup();
 		try {
@@ -86,7 +84,7 @@ public class ProductStoreGroupRollupController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductStoreGroupRollup(productStoreGroupRollupToBeAdded);
@@ -101,63 +99,15 @@ public class ProductStoreGroupRollupController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductStoreGroupRollup(@RequestBody ProductStoreGroupRollup productStoreGroupRollupToBeAdded) throws Exception {
+	public ResponseEntity<ProductStoreGroupRollup> createProductStoreGroupRollup(@RequestBody ProductStoreGroupRollup productStoreGroupRollupToBeAdded) throws Exception {
 
 		AddProductStoreGroupRollup command = new AddProductStoreGroupRollup(productStoreGroupRollupToBeAdded);
 		ProductStoreGroupRollup productStoreGroupRollup = ((ProductStoreGroupRollupAdded) Scheduler.execute(command).data()).getAddedProductStoreGroupRollup();
 		
 		if (productStoreGroupRollup != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productStoreGroupRollup);
+			return successful(productStoreGroupRollup);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductStoreGroupRollup could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductStoreGroupRollup(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductStoreGroupRollup productStoreGroupRollupToBeUpdated = new ProductStoreGroupRollup();
-
-		try {
-			productStoreGroupRollupToBeUpdated = ProductStoreGroupRollupMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductStoreGroupRollup(productStoreGroupRollupToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductStoreGroupRollupController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductStoreGroupRollup(@RequestBody ProductStoreGroupRollup productStoreGroupRollupToBeUpdated,
+	public ResponseEntity<String> updateProductStoreGroupRollup(@RequestBody ProductStoreGroupRollup productStoreGroupRollupToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		productStoreGroupRollupToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ProductStoreGroupRollupController {
 
 		try {
 			if(((ProductStoreGroupRollupUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productStoreGroupRollupId}")
-	public ResponseEntity<Object> findById(@PathVariable String productStoreGroupRollupId) throws Exception {
+	public ResponseEntity<ProductStoreGroupRollup> findById(@PathVariable String productStoreGroupRollupId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productStoreGroupRollupId", productStoreGroupRollupId);
 		try {
 
-			Object foundProductStoreGroupRollup = findProductStoreGroupRollupsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductStoreGroupRollup);
+			List<ProductStoreGroupRollup> foundProductStoreGroupRollup = findProductStoreGroupRollupsBy(requestParams).getBody();
+			if(foundProductStoreGroupRollup.size()==1){				return successful(foundProductStoreGroupRollup.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productStoreGroupRollupId}")
-	public ResponseEntity<Object> deleteProductStoreGroupRollupByIdUpdated(@PathVariable String productStoreGroupRollupId) throws Exception {
+	public ResponseEntity<String> deleteProductStoreGroupRollupByIdUpdated(@PathVariable String productStoreGroupRollupId) throws Exception {
 		DeleteProductStoreGroupRollup command = new DeleteProductStoreGroupRollup(productStoreGroupRollupId);
 
 		try {
 			if (((ProductStoreGroupRollupDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductStoreGroupRollup could not be deleted");
+		return conflict();
 
 	}
 

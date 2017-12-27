@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.finAccount.query.transA
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/finAccount/finAccountTransAttributes")
 public class FinAccountTransAttributeController {
@@ -52,7 +54,7 @@ public class FinAccountTransAttributeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findFinAccountTransAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<FinAccountTransAttribute>> findFinAccountTransAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFinAccountTransAttributesBy query = new FindFinAccountTransAttributesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class FinAccountTransAttributeController {
 		}
 
 		List<FinAccountTransAttribute> finAccountTransAttributes =((FinAccountTransAttributeFound) Scheduler.execute(query).data()).getFinAccountTransAttributes();
-
-		if (finAccountTransAttributes.size() == 1) {
-			return ResponseEntity.ok().body(finAccountTransAttributes.get(0));
-		}
 
 		return ResponseEntity.ok().body(finAccountTransAttributes);
 
@@ -78,7 +76,7 @@ public class FinAccountTransAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createFinAccountTransAttribute(HttpServletRequest request) throws Exception {
+	public ResponseEntity<FinAccountTransAttribute> createFinAccountTransAttribute(HttpServletRequest request) throws Exception {
 
 		FinAccountTransAttribute finAccountTransAttributeToBeAdded = new FinAccountTransAttribute();
 		try {
@@ -86,7 +84,7 @@ public class FinAccountTransAttributeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createFinAccountTransAttribute(finAccountTransAttributeToBeAdded);
@@ -101,63 +99,15 @@ public class FinAccountTransAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createFinAccountTransAttribute(@RequestBody FinAccountTransAttribute finAccountTransAttributeToBeAdded) throws Exception {
+	public ResponseEntity<FinAccountTransAttribute> createFinAccountTransAttribute(@RequestBody FinAccountTransAttribute finAccountTransAttributeToBeAdded) throws Exception {
 
 		AddFinAccountTransAttribute command = new AddFinAccountTransAttribute(finAccountTransAttributeToBeAdded);
 		FinAccountTransAttribute finAccountTransAttribute = ((FinAccountTransAttributeAdded) Scheduler.execute(command).data()).getAddedFinAccountTransAttribute();
 		
 		if (finAccountTransAttribute != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(finAccountTransAttribute);
+			return successful(finAccountTransAttribute);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("FinAccountTransAttribute could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateFinAccountTransAttribute(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		FinAccountTransAttribute finAccountTransAttributeToBeUpdated = new FinAccountTransAttribute();
-
-		try {
-			finAccountTransAttributeToBeUpdated = FinAccountTransAttributeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateFinAccountTransAttribute(finAccountTransAttributeToBeUpdated, finAccountTransAttributeToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class FinAccountTransAttributeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateFinAccountTransAttribute(@RequestBody FinAccountTransAttribute finAccountTransAttributeToBeUpdated,
+	public ResponseEntity<String> updateFinAccountTransAttribute(@RequestBody FinAccountTransAttribute finAccountTransAttributeToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		finAccountTransAttributeToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class FinAccountTransAttributeController {
 
 		try {
 			if(((FinAccountTransAttributeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{finAccountTransAttributeId}")
-	public ResponseEntity<Object> findById(@PathVariable String finAccountTransAttributeId) throws Exception {
+	public ResponseEntity<FinAccountTransAttribute> findById(@PathVariable String finAccountTransAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("finAccountTransAttributeId", finAccountTransAttributeId);
 		try {
 
-			Object foundFinAccountTransAttribute = findFinAccountTransAttributesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundFinAccountTransAttribute);
+			List<FinAccountTransAttribute> foundFinAccountTransAttribute = findFinAccountTransAttributesBy(requestParams).getBody();
+			if(foundFinAccountTransAttribute.size()==1){				return successful(foundFinAccountTransAttribute.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{finAccountTransAttributeId}")
-	public ResponseEntity<Object> deleteFinAccountTransAttributeByIdUpdated(@PathVariable String finAccountTransAttributeId) throws Exception {
+	public ResponseEntity<String> deleteFinAccountTransAttributeByIdUpdated(@PathVariable String finAccountTransAttributeId) throws Exception {
 		DeleteFinAccountTransAttribute command = new DeleteFinAccountTransAttribute(finAccountTransAttributeId);
 
 		try {
 			if (((FinAccountTransAttributeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("FinAccountTransAttribute could not be deleted");
+		return conflict();
 
 	}
 

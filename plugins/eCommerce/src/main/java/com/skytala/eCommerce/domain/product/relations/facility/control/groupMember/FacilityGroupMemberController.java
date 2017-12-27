@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.facility.query.groupMember
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/facility/facilityGroupMembers")
 public class FacilityGroupMemberController {
@@ -52,7 +54,7 @@ public class FacilityGroupMemberController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findFacilityGroupMembersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<FacilityGroupMember>> findFacilityGroupMembersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFacilityGroupMembersBy query = new FindFacilityGroupMembersBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class FacilityGroupMemberController {
 		}
 
 		List<FacilityGroupMember> facilityGroupMembers =((FacilityGroupMemberFound) Scheduler.execute(query).data()).getFacilityGroupMembers();
-
-		if (facilityGroupMembers.size() == 1) {
-			return ResponseEntity.ok().body(facilityGroupMembers.get(0));
-		}
 
 		return ResponseEntity.ok().body(facilityGroupMembers);
 
@@ -78,7 +76,7 @@ public class FacilityGroupMemberController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createFacilityGroupMember(HttpServletRequest request) throws Exception {
+	public ResponseEntity<FacilityGroupMember> createFacilityGroupMember(HttpServletRequest request) throws Exception {
 
 		FacilityGroupMember facilityGroupMemberToBeAdded = new FacilityGroupMember();
 		try {
@@ -86,7 +84,7 @@ public class FacilityGroupMemberController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createFacilityGroupMember(facilityGroupMemberToBeAdded);
@@ -101,63 +99,15 @@ public class FacilityGroupMemberController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createFacilityGroupMember(@RequestBody FacilityGroupMember facilityGroupMemberToBeAdded) throws Exception {
+	public ResponseEntity<FacilityGroupMember> createFacilityGroupMember(@RequestBody FacilityGroupMember facilityGroupMemberToBeAdded) throws Exception {
 
 		AddFacilityGroupMember command = new AddFacilityGroupMember(facilityGroupMemberToBeAdded);
 		FacilityGroupMember facilityGroupMember = ((FacilityGroupMemberAdded) Scheduler.execute(command).data()).getAddedFacilityGroupMember();
 		
 		if (facilityGroupMember != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(facilityGroupMember);
+			return successful(facilityGroupMember);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("FacilityGroupMember could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateFacilityGroupMember(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		FacilityGroupMember facilityGroupMemberToBeUpdated = new FacilityGroupMember();
-
-		try {
-			facilityGroupMemberToBeUpdated = FacilityGroupMemberMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateFacilityGroupMember(facilityGroupMemberToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class FacilityGroupMemberController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateFacilityGroupMember(@RequestBody FacilityGroupMember facilityGroupMemberToBeUpdated,
+	public ResponseEntity<String> updateFacilityGroupMember(@RequestBody FacilityGroupMember facilityGroupMemberToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		facilityGroupMemberToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class FacilityGroupMemberController {
 
 		try {
 			if(((FacilityGroupMemberUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{facilityGroupMemberId}")
-	public ResponseEntity<Object> findById(@PathVariable String facilityGroupMemberId) throws Exception {
+	public ResponseEntity<FacilityGroupMember> findById(@PathVariable String facilityGroupMemberId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("facilityGroupMemberId", facilityGroupMemberId);
 		try {
 
-			Object foundFacilityGroupMember = findFacilityGroupMembersBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundFacilityGroupMember);
+			List<FacilityGroupMember> foundFacilityGroupMember = findFacilityGroupMembersBy(requestParams).getBody();
+			if(foundFacilityGroupMember.size()==1){				return successful(foundFacilityGroupMember.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{facilityGroupMemberId}")
-	public ResponseEntity<Object> deleteFacilityGroupMemberByIdUpdated(@PathVariable String facilityGroupMemberId) throws Exception {
+	public ResponseEntity<String> deleteFacilityGroupMemberByIdUpdated(@PathVariable String facilityGroupMemberId) throws Exception {
 		DeleteFacilityGroupMember command = new DeleteFacilityGroupMember(facilityGroupMemberId);
 
 		try {
 			if (((FacilityGroupMemberDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("FacilityGroupMember could not be deleted");
+		return conflict();
 
 	}
 

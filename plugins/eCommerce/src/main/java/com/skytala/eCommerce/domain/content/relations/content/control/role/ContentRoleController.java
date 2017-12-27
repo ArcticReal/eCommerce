@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.content.query.role.FindCon
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/content/contentRoles")
 public class ContentRoleController {
@@ -52,7 +54,7 @@ public class ContentRoleController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findContentRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ContentRole>> findContentRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContentRolesBy query = new FindContentRolesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ContentRoleController {
 		}
 
 		List<ContentRole> contentRoles =((ContentRoleFound) Scheduler.execute(query).data()).getContentRoles();
-
-		if (contentRoles.size() == 1) {
-			return ResponseEntity.ok().body(contentRoles.get(0));
-		}
 
 		return ResponseEntity.ok().body(contentRoles);
 
@@ -78,7 +76,7 @@ public class ContentRoleController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createContentRole(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ContentRole> createContentRole(HttpServletRequest request) throws Exception {
 
 		ContentRole contentRoleToBeAdded = new ContentRole();
 		try {
@@ -86,7 +84,7 @@ public class ContentRoleController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createContentRole(contentRoleToBeAdded);
@@ -101,63 +99,15 @@ public class ContentRoleController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createContentRole(@RequestBody ContentRole contentRoleToBeAdded) throws Exception {
+	public ResponseEntity<ContentRole> createContentRole(@RequestBody ContentRole contentRoleToBeAdded) throws Exception {
 
 		AddContentRole command = new AddContentRole(contentRoleToBeAdded);
 		ContentRole contentRole = ((ContentRoleAdded) Scheduler.execute(command).data()).getAddedContentRole();
 		
 		if (contentRole != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(contentRole);
+			return successful(contentRole);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ContentRole could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateContentRole(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ContentRole contentRoleToBeUpdated = new ContentRole();
-
-		try {
-			contentRoleToBeUpdated = ContentRoleMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateContentRole(contentRoleToBeUpdated, contentRoleToBeUpdated.getRoleTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ContentRoleController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{roleTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateContentRole(@RequestBody ContentRole contentRoleToBeUpdated,
+	public ResponseEntity<String> updateContentRole(@RequestBody ContentRole contentRoleToBeUpdated,
 			@PathVariable String roleTypeId) throws Exception {
 
 		contentRoleToBeUpdated.setRoleTypeId(roleTypeId);
@@ -178,41 +128,44 @@ public class ContentRoleController {
 
 		try {
 			if(((ContentRoleUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{contentRoleId}")
-	public ResponseEntity<Object> findById(@PathVariable String contentRoleId) throws Exception {
+	public ResponseEntity<ContentRole> findById(@PathVariable String contentRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contentRoleId", contentRoleId);
 		try {
 
-			Object foundContentRole = findContentRolesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundContentRole);
+			List<ContentRole> foundContentRole = findContentRolesBy(requestParams).getBody();
+			if(foundContentRole.size()==1){				return successful(foundContentRole.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{contentRoleId}")
-	public ResponseEntity<Object> deleteContentRoleByIdUpdated(@PathVariable String contentRoleId) throws Exception {
+	public ResponseEntity<String> deleteContentRoleByIdUpdated(@PathVariable String contentRoleId) throws Exception {
 		DeleteContentRole command = new DeleteContentRole(contentRoleId);
 
 		try {
 			if (((ContentRoleDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ContentRole could not be deleted");
+		return conflict();
 
 	}
 

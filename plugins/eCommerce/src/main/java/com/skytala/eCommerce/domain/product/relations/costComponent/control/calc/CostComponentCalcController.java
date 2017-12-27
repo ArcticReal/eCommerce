@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.costComponent.query.calc.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/costComponent/costComponentCalcs")
 public class CostComponentCalcController {
@@ -52,7 +54,7 @@ public class CostComponentCalcController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findCostComponentCalcsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<CostComponentCalc>> findCostComponentCalcsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCostComponentCalcsBy query = new FindCostComponentCalcsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class CostComponentCalcController {
 		}
 
 		List<CostComponentCalc> costComponentCalcs =((CostComponentCalcFound) Scheduler.execute(query).data()).getCostComponentCalcs();
-
-		if (costComponentCalcs.size() == 1) {
-			return ResponseEntity.ok().body(costComponentCalcs.get(0));
-		}
 
 		return ResponseEntity.ok().body(costComponentCalcs);
 
@@ -78,7 +76,7 @@ public class CostComponentCalcController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createCostComponentCalc(HttpServletRequest request) throws Exception {
+	public ResponseEntity<CostComponentCalc> createCostComponentCalc(HttpServletRequest request) throws Exception {
 
 		CostComponentCalc costComponentCalcToBeAdded = new CostComponentCalc();
 		try {
@@ -86,7 +84,7 @@ public class CostComponentCalcController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createCostComponentCalc(costComponentCalcToBeAdded);
@@ -101,63 +99,15 @@ public class CostComponentCalcController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createCostComponentCalc(@RequestBody CostComponentCalc costComponentCalcToBeAdded) throws Exception {
+	public ResponseEntity<CostComponentCalc> createCostComponentCalc(@RequestBody CostComponentCalc costComponentCalcToBeAdded) throws Exception {
 
 		AddCostComponentCalc command = new AddCostComponentCalc(costComponentCalcToBeAdded);
 		CostComponentCalc costComponentCalc = ((CostComponentCalcAdded) Scheduler.execute(command).data()).getAddedCostComponentCalc();
 		
 		if (costComponentCalc != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(costComponentCalc);
+			return successful(costComponentCalc);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("CostComponentCalc could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateCostComponentCalc(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		CostComponentCalc costComponentCalcToBeUpdated = new CostComponentCalc();
-
-		try {
-			costComponentCalcToBeUpdated = CostComponentCalcMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateCostComponentCalc(costComponentCalcToBeUpdated, costComponentCalcToBeUpdated.getCostComponentCalcId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class CostComponentCalcController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{costComponentCalcId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateCostComponentCalc(@RequestBody CostComponentCalc costComponentCalcToBeUpdated,
+	public ResponseEntity<String> updateCostComponentCalc(@RequestBody CostComponentCalc costComponentCalcToBeUpdated,
 			@PathVariable String costComponentCalcId) throws Exception {
 
 		costComponentCalcToBeUpdated.setCostComponentCalcId(costComponentCalcId);
@@ -178,41 +128,44 @@ public class CostComponentCalcController {
 
 		try {
 			if(((CostComponentCalcUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{costComponentCalcId}")
-	public ResponseEntity<Object> findById(@PathVariable String costComponentCalcId) throws Exception {
+	public ResponseEntity<CostComponentCalc> findById(@PathVariable String costComponentCalcId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("costComponentCalcId", costComponentCalcId);
 		try {
 
-			Object foundCostComponentCalc = findCostComponentCalcsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundCostComponentCalc);
+			List<CostComponentCalc> foundCostComponentCalc = findCostComponentCalcsBy(requestParams).getBody();
+			if(foundCostComponentCalc.size()==1){				return successful(foundCostComponentCalc.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{costComponentCalcId}")
-	public ResponseEntity<Object> deleteCostComponentCalcByIdUpdated(@PathVariable String costComponentCalcId) throws Exception {
+	public ResponseEntity<String> deleteCostComponentCalcByIdUpdated(@PathVariable String costComponentCalcId) throws Exception {
 		DeleteCostComponentCalc command = new DeleteCostComponentCalc(costComponentCalcId);
 
 		try {
 			if (((CostComponentCalcDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("CostComponentCalc could not be deleted");
+		return conflict();
 
 	}
 

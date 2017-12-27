@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/productShipment")
 public class ProductShipmentServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getQuantityForShipment")
-	public ResponseEntity<Object> getQuantityForShipment(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="orderId") String orderId) {
+	public ResponseEntity<Map<String, Object>> getQuantityForShipment(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="orderId") String orderId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderItemSeqId",orderItemSeqId);
@@ -40,23 +42,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/calcPackSessionAdditionalShippingCharge")
-	public ResponseEntity<Object> calcPackSessionAdditionalShippingCharge(HttpSession session, @RequestParam(value="carrierPartyId") String carrierPartyId, @RequestParam(value="shippingContactMechId") String shippingContactMechId, @RequestParam(value="carrierRoleTypeId") String carrierRoleTypeId, @RequestParam(value="productStoreId") String productStoreId, @RequestParam(value="packingSession") org.apache.ofbiz.shipment.packing.PackingSession packingSession, @RequestParam(value="shipmentMethodTypeId") String shipmentMethodTypeId, @RequestParam(value="weightUomId", required=false) String weightUomId, @RequestParam(value="packageWeights", required=false) Map packageWeights) {
+	public ResponseEntity<Map<String, Object>> calcPackSessionAdditionalShippingCharge(HttpSession session, @RequestParam(value="carrierPartyId") String carrierPartyId, @RequestParam(value="shippingContactMechId") String shippingContactMechId, @RequestParam(value="carrierRoleTypeId") String carrierRoleTypeId, @RequestParam(value="productStoreId") String productStoreId, @RequestParam(value="packingSession") org.apache.ofbiz.shipment.packing.PackingSession packingSession, @RequestParam(value="shipmentMethodTypeId") String shipmentMethodTypeId, @RequestParam(value="weightUomId", required=false) String weightUomId, @RequestParam(value="packageWeights", required=false) Map packageWeights) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("carrierPartyId",carrierPartyId);
@@ -76,23 +78,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createDelivery")
-	public ResponseEntity<Object> createDelivery(HttpSession session, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="destFacilityId", required=false) String destFacilityId, @RequestParam(value="actualArrivalDate", required=false) Timestamp actualArrivalDate, @RequestParam(value="deliveryId", required=false) String deliveryId, @RequestParam(value="estimatedStartDate", required=false) Timestamp estimatedStartDate, @RequestParam(value="fuelUsed", required=false) BigDecimal fuelUsed, @RequestParam(value="actualStartDate", required=false) Timestamp actualStartDate, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="startMileage", required=false) BigDecimal startMileage, @RequestParam(value="estimatedArrivalDate", required=false) Timestamp estimatedArrivalDate, @RequestParam(value="endMileage", required=false) BigDecimal endMileage) {
+	public ResponseEntity<Map<String, Object>> createDelivery(HttpSession session, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="destFacilityId", required=false) String destFacilityId, @RequestParam(value="actualArrivalDate", required=false) Timestamp actualArrivalDate, @RequestParam(value="deliveryId", required=false) String deliveryId, @RequestParam(value="estimatedStartDate", required=false) Timestamp estimatedStartDate, @RequestParam(value="fuelUsed", required=false) BigDecimal fuelUsed, @RequestParam(value="actualStartDate", required=false) Timestamp actualStartDate, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="startMileage", required=false) BigDecimal startMileage, @RequestParam(value="estimatedArrivalDate", required=false) Timestamp estimatedArrivalDate, @RequestParam(value="endMileage", required=false) BigDecimal endMileage) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("originFacilityId",originFacilityId);
@@ -115,23 +117,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteShipmentPackage")
-	public ResponseEntity<Object> deleteShipmentPackage(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentPackageSeqId") String shipmentPackageSeqId) {
+	public ResponseEntity<Map<String, Object>> deleteShipmentPackage(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentPackageSeqId") String shipmentPackageSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -145,23 +147,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteDelivery")
-	public ResponseEntity<Object> deleteDelivery(HttpSession session, @RequestParam(value="deliveryId") String deliveryId) {
+	public ResponseEntity<Map<String, Object>> deleteDelivery(HttpSession session, @RequestParam(value="deliveryId") String deliveryId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("deliveryId",deliveryId);
@@ -174,23 +176,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteShipmentRouteSegment")
-	public ResponseEntity<Object> deleteShipmentRouteSegment(HttpSession session, @RequestParam(value="shipmentRouteSegmentId") String shipmentRouteSegmentId, @RequestParam(value="shipmentId") String shipmentId) {
+	public ResponseEntity<Map<String, Object>> deleteShipmentRouteSegment(HttpSession session, @RequestParam(value="shipmentRouteSegmentId") String shipmentRouteSegmentId, @RequestParam(value="shipmentId") String shipmentId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentRouteSegmentId",shipmentRouteSegmentId);
@@ -204,23 +206,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteShipmentTypeAttr")
-	public ResponseEntity<Object> deleteShipmentTypeAttr(HttpSession session, @RequestParam(value="shipmentTypeId") String shipmentTypeId, @RequestParam(value="attrName") String attrName) {
+	public ResponseEntity<Map<String, Object>> deleteShipmentTypeAttr(HttpSession session, @RequestParam(value="shipmentTypeId") String shipmentTypeId, @RequestParam(value="attrName") String attrName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentTypeId",shipmentTypeId);
@@ -234,23 +236,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteShipmentBoxType")
-	public ResponseEntity<Object> deleteShipmentBoxType(HttpSession session, @RequestParam(value="shipmentBoxTypeId") String shipmentBoxTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteShipmentBoxType(HttpSession session, @RequestParam(value="shipmentBoxTypeId") String shipmentBoxTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentBoxTypeId",shipmentBoxTypeId);
@@ -263,23 +265,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipmentAndItemsForVendorReturn")
-	public ResponseEntity<Object> createShipmentAndItemsForVendorReturn(HttpSession session, @RequestParam(value="primaryReturnId") String primaryReturnId, @RequestParam(value="partyIdFrom", required=false) String partyIdFrom, @RequestParam(value="latestCancelDate", required=false) Timestamp latestCancelDate, @RequestParam(value="estimatedReadyDate", required=false) Timestamp estimatedReadyDate, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="estimatedArrivalWorkEffId", required=false) String estimatedArrivalWorkEffId, @RequestParam(value="additionalShippingCharge", required=false) BigDecimal additionalShippingCharge, @RequestParam(value="destinationTelecomNumberId", required=false) String destinationTelecomNumberId, @RequestParam(value="estimatedShipCost", required=false) BigDecimal estimatedShipCost, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="estimatedShipWorkEffId", required=false) String estimatedShipWorkEffId, @RequestParam(value="destinationFacilityId", required=false) String destinationFacilityId, @RequestParam(value="addtlShippingChargeDesc", required=false) String addtlShippingChargeDesc, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="originContactMechId", required=false) String originContactMechId, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="destinationContactMechId", required=false) String destinationContactMechId, @RequestParam(value="originTelecomNumberId", required=false) String originTelecomNumberId, @RequestParam(value="primaryOrderId", required=false) String primaryOrderId, @RequestParam(value="estimatedShipDate", required=false) Timestamp estimatedShipDate, @RequestParam(value="partyIdTo", required=false) String partyIdTo, @RequestParam(value="shipmentTypeId", required=false) String shipmentTypeId, @RequestParam(value="estimatedArrivalDate", required=false) Timestamp estimatedArrivalDate, @RequestParam(value="picklistBinId", required=false) String picklistBinId, @RequestParam(value="primaryShipGroupSeqId", required=false) String primaryShipGroupSeqId, @RequestParam(value="handlingInstructions", required=false) String handlingInstructions) {
+	public ResponseEntity<Map<String, Object>> createShipmentAndItemsForVendorReturn(HttpSession session, @RequestParam(value="primaryReturnId") String primaryReturnId, @RequestParam(value="partyIdFrom", required=false) String partyIdFrom, @RequestParam(value="latestCancelDate", required=false) Timestamp latestCancelDate, @RequestParam(value="estimatedReadyDate", required=false) Timestamp estimatedReadyDate, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="estimatedArrivalWorkEffId", required=false) String estimatedArrivalWorkEffId, @RequestParam(value="additionalShippingCharge", required=false) BigDecimal additionalShippingCharge, @RequestParam(value="destinationTelecomNumberId", required=false) String destinationTelecomNumberId, @RequestParam(value="estimatedShipCost", required=false) BigDecimal estimatedShipCost, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="estimatedShipWorkEffId", required=false) String estimatedShipWorkEffId, @RequestParam(value="destinationFacilityId", required=false) String destinationFacilityId, @RequestParam(value="addtlShippingChargeDesc", required=false) String addtlShippingChargeDesc, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="originContactMechId", required=false) String originContactMechId, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="destinationContactMechId", required=false) String destinationContactMechId, @RequestParam(value="originTelecomNumberId", required=false) String originTelecomNumberId, @RequestParam(value="primaryOrderId", required=false) String primaryOrderId, @RequestParam(value="estimatedShipDate", required=false) Timestamp estimatedShipDate, @RequestParam(value="partyIdTo", required=false) String partyIdTo, @RequestParam(value="shipmentTypeId", required=false) String shipmentTypeId, @RequestParam(value="estimatedArrivalDate", required=false) Timestamp estimatedArrivalDate, @RequestParam(value="picklistBinId", required=false) String picklistBinId, @RequestParam(value="primaryShipGroupSeqId", required=false) String primaryShipGroupSeqId, @RequestParam(value="handlingInstructions", required=false) String handlingInstructions) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("primaryReturnId",primaryReturnId);
@@ -320,23 +322,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteCarrierShipmentMethod")
-	public ResponseEntity<Object> deleteCarrierShipmentMethod(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="shipmentMethodTypeId") String shipmentMethodTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteCarrierShipmentMethod(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="shipmentMethodTypeId") String shipmentMethodTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("roleTypeId",roleTypeId);
@@ -351,23 +353,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/calcShipmentCostEstimate")
-	public ResponseEntity<Object> calcShipmentCostEstimate(HttpSession session, @RequestParam(value="carrierPartyId") String carrierPartyId, @RequestParam(value="carrierRoleTypeId") String carrierRoleTypeId, @RequestParam(value="shippableItemInfo") List shippableItemInfo, @RequestParam(value="shippableWeight") BigDecimal shippableWeight, @RequestParam(value="productStoreId") String productStoreId, @RequestParam(value="shipmentMethodTypeId") String shipmentMethodTypeId, @RequestParam(value="shippableQuantity") BigDecimal shippableQuantity, @RequestParam(value="shippableTotal") BigDecimal shippableTotal, @RequestParam(value="productStoreShipMethId", required=false) String productStoreShipMethId, @RequestParam(value="shippingContactMechId", required=false) String shippingContactMechId, @RequestParam(value="shippingCountryCode", required=false) String shippingCountryCode, @RequestParam(value="shipmentCustomMethodId", required=false) String shipmentCustomMethodId, @RequestParam(value="serviceConfigProps", required=false) String serviceConfigProps, @RequestParam(value="shipmentGatewayConfigId", required=false) String shipmentGatewayConfigId, @RequestParam(value="shippingOriginContactMechId", required=false) String shippingOriginContactMechId, @RequestParam(value="shippingPostalCode", required=false) String shippingPostalCode, @RequestParam(value="initialEstimateAmt", required=false) BigDecimal initialEstimateAmt, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Map<String, Object>> calcShipmentCostEstimate(HttpSession session, @RequestParam(value="carrierPartyId") String carrierPartyId, @RequestParam(value="carrierRoleTypeId") String carrierRoleTypeId, @RequestParam(value="shippableItemInfo") List shippableItemInfo, @RequestParam(value="shippableWeight") BigDecimal shippableWeight, @RequestParam(value="productStoreId") String productStoreId, @RequestParam(value="shipmentMethodTypeId") String shipmentMethodTypeId, @RequestParam(value="shippableQuantity") BigDecimal shippableQuantity, @RequestParam(value="shippableTotal") BigDecimal shippableTotal, @RequestParam(value="productStoreShipMethId", required=false) String productStoreShipMethId, @RequestParam(value="shippingContactMechId", required=false) String shippingContactMechId, @RequestParam(value="shippingCountryCode", required=false) String shippingCountryCode, @RequestParam(value="shipmentCustomMethodId", required=false) String shipmentCustomMethodId, @RequestParam(value="serviceConfigProps", required=false) String serviceConfigProps, @RequestParam(value="shipmentGatewayConfigId", required=false) String shipmentGatewayConfigId, @RequestParam(value="shippingOriginContactMechId", required=false) String shippingOriginContactMechId, @RequestParam(value="shippingPostalCode", required=false) String shippingPostalCode, @RequestParam(value="initialEstimateAmt", required=false) BigDecimal initialEstimateAmt, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("carrierPartyId",carrierPartyId);
@@ -397,23 +399,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deletePackedLine")
-	public ResponseEntity<Object> deletePackedLine(HttpSession session, @RequestParam(value="weightPackageSession") org.apache.ofbiz.shipment.weightPackage.WeightPackageSession weightPackageSession, @RequestParam(value="weightPackageSeqId") Integer weightPackageSeqId) {
+	public ResponseEntity<Map<String, Object>> deletePackedLine(HttpSession session, @RequestParam(value="weightPackageSession") org.apache.ofbiz.shipment.weightPackage.WeightPackageSession weightPackageSession, @RequestParam(value="weightPackageSeqId") Integer weightPackageSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("weightPackageSession",weightPackageSession);
@@ -427,23 +429,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/issueInventoryItemToFixedAssetMaint")
-	public ResponseEntity<Object> issueInventoryItemToFixedAssetMaint(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="maintHistSeqId") String maintHistSeqId) {
+	public ResponseEntity<Map<String, Object>> issueInventoryItemToFixedAssetMaint(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="fixedAssetId") String fixedAssetId, @RequestParam(value="maintHistSeqId") String maintHistSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("inventoryItemId",inventoryItemId);
@@ -459,23 +461,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipmentReceiptRole")
-	public ResponseEntity<Object> createShipmentReceiptRole(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="receiptId") String receiptId) {
+	public ResponseEntity<Map<String, Object>> createShipmentReceiptRole(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="receiptId") String receiptId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("roleTypeId",roleTypeId);
@@ -490,23 +492,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipmentCostEstimate")
-	public ResponseEntity<Object> createShipmentCostEstimate(HttpSession session, @RequestParam(value="productStoreShipMethId", required=false) String productStoreShipMethId, @RequestParam(value="quantityUnitPrice", required=false) BigDecimal quantityUnitPrice, @RequestParam(value="quantityUomId", required=false) String quantityUomId, @RequestParam(value="featurePercent", required=false) BigDecimal featurePercent, @RequestParam(value="featurePrice", required=false) BigDecimal featurePrice, @RequestParam(value="weightUnitPrice", required=false) BigDecimal weightUnitPrice, @RequestParam(value="oversizeUnit", required=false) BigDecimal oversizeUnit, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="productFeatureGroupId", required=false) String productFeatureGroupId, @RequestParam(value="oversizePrice", required=false) BigDecimal oversizePrice, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId, @RequestParam(value="geoIdTo", required=false) String geoIdTo, @RequestParam(value="orderPricePercent", required=false) BigDecimal orderPricePercent, @RequestParam(value="orderItemFlatPrice", required=false) BigDecimal orderItemFlatPrice, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="shippingPricePercent", required=false) BigDecimal shippingPricePercent, @RequestParam(value="weightBreakId", required=false) String weightBreakId, @RequestParam(value="quantityBreakId", required=false) String quantityBreakId, @RequestParam(value="priceBreakId", required=false) String priceBreakId, @RequestParam(value="carrierPartyId", required=false) String carrierPartyId, @RequestParam(value="geoIdFrom", required=false) String geoIdFrom, @RequestParam(value="orderFlatPrice", required=false) BigDecimal orderFlatPrice, @RequestParam(value="carrierRoleTypeId", required=false) String carrierRoleTypeId, @RequestParam(value="weightUomId", required=false) String weightUomId, @RequestParam(value="priceUnitPrice", required=false) BigDecimal priceUnitPrice, @RequestParam(value="shipmentCostEstimateId", required=false) String shipmentCostEstimateId, @RequestParam(value="priceUomId", required=false) String priceUomId) {
+	public ResponseEntity<Map<String, Object>> createShipmentCostEstimate(HttpSession session, @RequestParam(value="productStoreShipMethId", required=false) String productStoreShipMethId, @RequestParam(value="quantityUnitPrice", required=false) BigDecimal quantityUnitPrice, @RequestParam(value="quantityUomId", required=false) String quantityUomId, @RequestParam(value="featurePercent", required=false) BigDecimal featurePercent, @RequestParam(value="featurePrice", required=false) BigDecimal featurePrice, @RequestParam(value="weightUnitPrice", required=false) BigDecimal weightUnitPrice, @RequestParam(value="oversizeUnit", required=false) BigDecimal oversizeUnit, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="productFeatureGroupId", required=false) String productFeatureGroupId, @RequestParam(value="oversizePrice", required=false) BigDecimal oversizePrice, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId, @RequestParam(value="geoIdTo", required=false) String geoIdTo, @RequestParam(value="orderPricePercent", required=false) BigDecimal orderPricePercent, @RequestParam(value="orderItemFlatPrice", required=false) BigDecimal orderItemFlatPrice, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="shippingPricePercent", required=false) BigDecimal shippingPricePercent, @RequestParam(value="weightBreakId", required=false) String weightBreakId, @RequestParam(value="quantityBreakId", required=false) String quantityBreakId, @RequestParam(value="priceBreakId", required=false) String priceBreakId, @RequestParam(value="carrierPartyId", required=false) String carrierPartyId, @RequestParam(value="geoIdFrom", required=false) String geoIdFrom, @RequestParam(value="orderFlatPrice", required=false) BigDecimal orderFlatPrice, @RequestParam(value="carrierRoleTypeId", required=false) String carrierRoleTypeId, @RequestParam(value="weightUomId", required=false) String weightUomId, @RequestParam(value="priceUnitPrice", required=false) BigDecimal priceUnitPrice, @RequestParam(value="shipmentCostEstimateId", required=false) String shipmentCostEstimateId, @RequestParam(value="priceUomId", required=false) String priceUomId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productStoreShipMethId",productStoreShipMethId);
@@ -546,23 +548,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/quickShipOrderByItem")
-	public ResponseEntity<Object> quickShipOrderByItem(HttpSession session, @RequestParam(value="itemShipList") List itemShipList, @RequestParam(value="orderId") String orderId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="setPackedOnly", required=false) String setPackedOnly) {
+	public ResponseEntity<Map<String, Object>> quickShipOrderByItem(HttpSession session, @RequestParam(value="itemShipList") List itemShipList, @RequestParam(value="orderId") String orderId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="setPackedOnly", required=false) String setPackedOnly) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("itemShipList",itemShipList);
@@ -579,23 +581,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipmentTypeAttr")
-	public ResponseEntity<Object> createShipmentTypeAttr(HttpSession session, @RequestParam(value="shipmentTypeId") String shipmentTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createShipmentTypeAttr(HttpSession session, @RequestParam(value="shipmentTypeId") String shipmentTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentTypeId",shipmentTypeId);
@@ -610,23 +612,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCarrierShipmentMethod")
-	public ResponseEntity<Object> createCarrierShipmentMethod(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="shipmentMethodTypeId") String shipmentMethodTypeId, @RequestParam(value="sequenceNumber", required=false) Long sequenceNumber, @RequestParam(value="carrierServiceCode", required=false) String carrierServiceCode) {
+	public ResponseEntity<Map<String, Object>> createCarrierShipmentMethod(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="shipmentMethodTypeId") String shipmentMethodTypeId, @RequestParam(value="sequenceNumber", required=false) Long sequenceNumber, @RequestParam(value="carrierServiceCode", required=false) String carrierServiceCode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("roleTypeId",roleTypeId);
@@ -643,23 +645,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/completeShipment")
-	public ResponseEntity<Object> completeShipment(HttpSession session, @RequestParam(value="weightPackageSession") org.apache.ofbiz.shipment.weightPackage.WeightPackageSession weightPackageSession, @RequestParam(value="orderId") String orderId, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="shipmentId", required=false) String shipmentId) {
+	public ResponseEntity<Map<String, Object>> completeShipment(HttpSession session, @RequestParam(value="weightPackageSession") org.apache.ofbiz.shipment.weightPackage.WeightPackageSession weightPackageSession, @RequestParam(value="orderId") String orderId, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="shipmentId", required=false) String shipmentId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("weightPackageSession",weightPackageSession);
@@ -675,23 +677,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createOrderShipmentPlan")
-	public ResponseEntity<Object> createOrderShipmentPlan(HttpSession session, @RequestParam(value="orderId") String orderId) {
+	public ResponseEntity<Map<String, Object>> createOrderShipmentPlan(HttpSession session, @RequestParam(value="orderId") String orderId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderId",orderId);
@@ -704,23 +706,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/splitShipmentItemByQuantity")
-	public ResponseEntity<Object> splitShipmentItemByQuantity(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="newItemQuantity") BigDecimal newItemQuantity, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId) {
+	public ResponseEntity<Map<String, Object>> splitShipmentItemByQuantity(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="newItemQuantity") BigDecimal newItemQuantity, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -735,23 +737,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/issueOrderItemToShipment")
-	public ResponseEntity<Object> issueOrderItemToShipment(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="orderId") String orderId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId) {
+	public ResponseEntity<Map<String, Object>> issueOrderItemToShipment(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="orderId") String orderId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderItemSeqId",orderItemSeqId);
@@ -768,23 +770,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateShipmentPackageRouteSeg")
-	public ResponseEntity<Object> updateShipmentPackageRouteSeg(HttpSession session, @RequestParam(value="shipmentRouteSegmentId") String shipmentRouteSegmentId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentPackageSeqId") String shipmentPackageSeqId, @RequestParam(value="labelIntlSignImage", required=false) byte[] labelIntlSignImage, @RequestParam(value="trackingCode", required=false) String trackingCode, @RequestParam(value="boxNumber", required=false) String boxNumber, @RequestParam(value="packageServiceCost", required=false) BigDecimal packageServiceCost, @RequestParam(value="packageOtherCost", required=false) BigDecimal packageOtherCost, @RequestParam(value="labelImage", required=false) byte[] labelImage, @RequestParam(value="labelPrinted", required=false) String labelPrinted, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="internationalInvoice", required=false) byte[] internationalInvoice, @RequestParam(value="packageTransportCost", required=false) BigDecimal packageTransportCost, @RequestParam(value="codAmount", required=false) BigDecimal codAmount, @RequestParam(value="insuredAmount", required=false) BigDecimal insuredAmount, @RequestParam(value="labelHtml", required=false) String labelHtml) {
+	public ResponseEntity<Map<String, Object>> updateShipmentPackageRouteSeg(HttpSession session, @RequestParam(value="shipmentRouteSegmentId") String shipmentRouteSegmentId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentPackageSeqId") String shipmentPackageSeqId, @RequestParam(value="labelIntlSignImage", required=false) byte[] labelIntlSignImage, @RequestParam(value="trackingCode", required=false) String trackingCode, @RequestParam(value="boxNumber", required=false) String boxNumber, @RequestParam(value="packageServiceCost", required=false) BigDecimal packageServiceCost, @RequestParam(value="packageOtherCost", required=false) BigDecimal packageOtherCost, @RequestParam(value="labelImage", required=false) byte[] labelImage, @RequestParam(value="labelPrinted", required=false) String labelPrinted, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="internationalInvoice", required=false) byte[] internationalInvoice, @RequestParam(value="packageTransportCost", required=false) BigDecimal packageTransportCost, @RequestParam(value="codAmount", required=false) BigDecimal codAmount, @RequestParam(value="insuredAmount", required=false) BigDecimal insuredAmount, @RequestParam(value="labelHtml", required=false) String labelHtml) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentRouteSegmentId",shipmentRouteSegmentId);
@@ -812,23 +814,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateDelivery")
-	public ResponseEntity<Object> updateDelivery(HttpSession session, @RequestParam(value="deliveryId") String deliveryId, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="destFacilityId", required=false) String destFacilityId, @RequestParam(value="actualArrivalDate", required=false) Timestamp actualArrivalDate, @RequestParam(value="estimatedStartDate", required=false) Timestamp estimatedStartDate, @RequestParam(value="fuelUsed", required=false) BigDecimal fuelUsed, @RequestParam(value="actualStartDate", required=false) Timestamp actualStartDate, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="startMileage", required=false) BigDecimal startMileage, @RequestParam(value="estimatedArrivalDate", required=false) Timestamp estimatedArrivalDate, @RequestParam(value="endMileage", required=false) BigDecimal endMileage) {
+	public ResponseEntity<Map<String, Object>> updateDelivery(HttpSession session, @RequestParam(value="deliveryId") String deliveryId, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="destFacilityId", required=false) String destFacilityId, @RequestParam(value="actualArrivalDate", required=false) Timestamp actualArrivalDate, @RequestParam(value="estimatedStartDate", required=false) Timestamp estimatedStartDate, @RequestParam(value="fuelUsed", required=false) BigDecimal fuelUsed, @RequestParam(value="actualStartDate", required=false) Timestamp actualStartDate, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="startMileage", required=false) BigDecimal startMileage, @RequestParam(value="estimatedArrivalDate", required=false) Timestamp estimatedArrivalDate, @RequestParam(value="endMileage", required=false) BigDecimal endMileage) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("deliveryId",deliveryId);
@@ -851,23 +853,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/sendShipmentScheduledNotification")
-	public ResponseEntity<Object> sendShipmentScheduledNotification(HttpSession session, @RequestParam(value="shipmentId") String shipmentId) {
+	public ResponseEntity<Map<String, Object>> sendShipmentScheduledNotification(HttpSession session, @RequestParam(value="shipmentId") String shipmentId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -880,23 +882,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteRejectionReason")
-	public ResponseEntity<Object> deleteRejectionReason(HttpSession session, @RequestParam(value="rejectionId") String rejectionId) {
+	public ResponseEntity<Map<String, Object>> deleteRejectionReason(HttpSession session, @RequestParam(value="rejectionId") String rejectionId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("rejectionId",rejectionId);
@@ -909,23 +911,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/quickDropShipOrder")
-	public ResponseEntity<Object> quickDropShipOrder(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId) {
+	public ResponseEntity<Map<String, Object>> quickDropShipOrder(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderId",orderId);
@@ -939,23 +941,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/setPackageInfo")
-	public ResponseEntity<Object> setPackageInfo(HttpSession session, @RequestParam(value="weightPackageSession") org.apache.ofbiz.shipment.weightPackage.WeightPackageSession weightPackageSession, @RequestParam(value="orderId") String orderId, @RequestParam(value="packageHeight", required=false) BigDecimal packageHeight, @RequestParam(value="packageWeight", required=false) BigDecimal packageWeight, @RequestParam(value="packageLength", required=false) BigDecimal packageLength, @RequestParam(value="packageWidth", required=false) BigDecimal packageWidth, @RequestParam(value="shipmentBoxTypeId", required=false) String shipmentBoxTypeId) {
+	public ResponseEntity<Map<String, Object>> setPackageInfo(HttpSession session, @RequestParam(value="weightPackageSession") org.apache.ofbiz.shipment.weightPackage.WeightPackageSession weightPackageSession, @RequestParam(value="orderId") String orderId, @RequestParam(value="packageHeight", required=false) BigDecimal packageHeight, @RequestParam(value="packageWeight", required=false) BigDecimal packageWeight, @RequestParam(value="packageLength", required=false) BigDecimal packageLength, @RequestParam(value="packageWidth", required=false) BigDecimal packageWidth, @RequestParam(value="shipmentBoxTypeId", required=false) String shipmentBoxTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("weightPackageSession",weightPackageSession);
@@ -974,23 +976,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/setShipmentSettingsFromPrimaryOrder")
-	public ResponseEntity<Object> setShipmentSettingsFromPrimaryOrder(HttpSession session, @RequestParam(value="shipmentId") String shipmentId) {
+	public ResponseEntity<Map<String, Object>> setShipmentSettingsFromPrimaryOrder(HttpSession session, @RequestParam(value="shipmentId") String shipmentId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -1003,23 +1005,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/calcShipmentEstimateInterface")
-	public ResponseEntity<Object> calcShipmentEstimateInterface(HttpSession session, @RequestParam(value="carrierPartyId") String carrierPartyId, @RequestParam(value="carrierRoleTypeId") String carrierRoleTypeId, @RequestParam(value="shippableItemInfo") List shippableItemInfo, @RequestParam(value="shippableWeight") BigDecimal shippableWeight, @RequestParam(value="productStoreId") String productStoreId, @RequestParam(value="shipmentMethodTypeId") String shipmentMethodTypeId, @RequestParam(value="shippableQuantity") BigDecimal shippableQuantity, @RequestParam(value="shippableTotal") BigDecimal shippableTotal, @RequestParam(value="productStoreShipMethId", required=false) String productStoreShipMethId, @RequestParam(value="shippingContactMechId", required=false) String shippingContactMechId, @RequestParam(value="shippingCountryCode", required=false) String shippingCountryCode, @RequestParam(value="shipmentCustomMethodId", required=false) String shipmentCustomMethodId, @RequestParam(value="serviceConfigProps", required=false) String serviceConfigProps, @RequestParam(value="shipmentGatewayConfigId", required=false) String shipmentGatewayConfigId, @RequestParam(value="shippingOriginContactMechId", required=false) String shippingOriginContactMechId, @RequestParam(value="shippingPostalCode", required=false) String shippingPostalCode, @RequestParam(value="initialEstimateAmt", required=false) BigDecimal initialEstimateAmt, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Map<String, Object>> calcShipmentEstimateInterface(HttpSession session, @RequestParam(value="carrierPartyId") String carrierPartyId, @RequestParam(value="carrierRoleTypeId") String carrierRoleTypeId, @RequestParam(value="shippableItemInfo") List shippableItemInfo, @RequestParam(value="shippableWeight") BigDecimal shippableWeight, @RequestParam(value="productStoreId") String productStoreId, @RequestParam(value="shipmentMethodTypeId") String shipmentMethodTypeId, @RequestParam(value="shippableQuantity") BigDecimal shippableQuantity, @RequestParam(value="shippableTotal") BigDecimal shippableTotal, @RequestParam(value="productStoreShipMethId", required=false) String productStoreShipMethId, @RequestParam(value="shippingContactMechId", required=false) String shippingContactMechId, @RequestParam(value="shippingCountryCode", required=false) String shippingCountryCode, @RequestParam(value="shipmentCustomMethodId", required=false) String shipmentCustomMethodId, @RequestParam(value="serviceConfigProps", required=false) String serviceConfigProps, @RequestParam(value="shipmentGatewayConfigId", required=false) String shipmentGatewayConfigId, @RequestParam(value="shippingOriginContactMechId", required=false) String shippingOriginContactMechId, @RequestParam(value="shippingPostalCode", required=false) String shippingPostalCode, @RequestParam(value="initialEstimateAmt", required=false) BigDecimal initialEstimateAmt, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("carrierPartyId",carrierPartyId);
@@ -1049,23 +1051,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateShipmentContactMech")
-	public ResponseEntity<Object> updateShipmentContactMech(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentContactMechTypeId") String shipmentContactMechTypeId, @RequestParam(value="contactMechId", required=false) String contactMechId) {
+	public ResponseEntity<Map<String, Object>> updateShipmentContactMech(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentContactMechTypeId") String shipmentContactMechTypeId, @RequestParam(value="contactMechId", required=false) String contactMechId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -1080,23 +1082,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/sendShipmentCompleteNotification")
-	public ResponseEntity<Object> sendShipmentCompleteNotification(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="sendTo", required=false) String sendTo, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="screenUri", required=false) String screenUri) {
+	public ResponseEntity<Map<String, Object>> sendShipmentCompleteNotification(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="sendTo", required=false) String sendTo, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="screenUri", required=false) String screenUri) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -1112,23 +1114,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/cancelAllRows")
-	public ResponseEntity<Object> cancelAllRows(HttpSession session, @RequestParam(value="verifyPickSession") org.apache.ofbiz.shipment.verify.VerifyPickSession verifyPickSession) {
+	public ResponseEntity<Map<String, Object>> cancelAllRows(HttpSession session, @RequestParam(value="verifyPickSession") org.apache.ofbiz.shipment.verify.VerifyPickSession verifyPickSession) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("verifyPickSession",verifyPickSession);
@@ -1141,23 +1143,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/completePackage")
-	public ResponseEntity<Object> completePackage(HttpSession session, @RequestParam(value="weightPackageSession") org.apache.ofbiz.shipment.weightPackage.WeightPackageSession weightPackageSession, @RequestParam(value="orderId") String orderId, @RequestParam(value="invoiceId") String invoiceId, @RequestParam(value="newEstimatedShippingCost", required=false) BigDecimal newEstimatedShippingCost, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="dimensionUomId", required=false) String dimensionUomId, @RequestParam(value="weightUomId", required=false) String weightUomId, @RequestParam(value="estimatedShippingCost", required=false) BigDecimal estimatedShippingCost) {
+	public ResponseEntity<Map<String, Object>> completePackage(HttpSession session, @RequestParam(value="weightPackageSession") org.apache.ofbiz.shipment.weightPackage.WeightPackageSession weightPackageSession, @RequestParam(value="orderId") String orderId, @RequestParam(value="invoiceId") String invoiceId, @RequestParam(value="newEstimatedShippingCost", required=false) BigDecimal newEstimatedShippingCost, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="dimensionUomId", required=false) String dimensionUomId, @RequestParam(value="weightUomId", required=false) String weightUomId, @RequestParam(value="estimatedShippingCost", required=false) BigDecimal estimatedShippingCost) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("weightPackageSession",weightPackageSession);
@@ -1178,23 +1180,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/quickReceiveReturn")
-	public ResponseEntity<Object> quickReceiveReturn(HttpSession session, @RequestParam(value="returnId") String returnId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="inventoryItemTypeId", required=false) String inventoryItemTypeId) {
+	public ResponseEntity<Map<String, Object>> quickReceiveReturn(HttpSession session, @RequestParam(value="returnId") String returnId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="inventoryItemTypeId", required=false) String inventoryItemTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -1209,23 +1211,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateIssuanceShipmentAndPoOnReceiveInventory")
-	public ResponseEntity<Object> updateIssuanceShipmentAndPoOnReceiveInventory(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="orderId") String orderId, @RequestParam(value="quantityAccepted") BigDecimal quantityAccepted, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="unitCost", required=false) String unitCost, @RequestParam(value="orderCurrencyUnitPrice", required=false) String orderCurrencyUnitPrice, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId) {
+	public ResponseEntity<Map<String, Object>> updateIssuanceShipmentAndPoOnReceiveInventory(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="orderId") String orderId, @RequestParam(value="quantityAccepted") BigDecimal quantityAccepted, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="unitCost", required=false) String unitCost, @RequestParam(value="orderCurrencyUnitPrice", required=false) String orderCurrencyUnitPrice, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderItemSeqId",orderItemSeqId);
@@ -1244,23 +1246,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipmentContactMechType")
-	public ResponseEntity<Object> createShipmentContactMechType(HttpSession session, @RequestParam(value="description", required=false) String description, @RequestParam(value="shipmentContactMechTypeId", required=false) String shipmentContactMechTypeId) {
+	public ResponseEntity<Map<String, Object>> createShipmentContactMechType(HttpSession session, @RequestParam(value="description", required=false) String description, @RequestParam(value="shipmentContactMechTypeId", required=false) String shipmentContactMechTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("description",description);
@@ -1274,23 +1276,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addOrderShipmentToShipment")
-	public ResponseEntity<Object> addOrderShipmentToShipment(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="orderId") String orderId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId) {
+	public ResponseEntity<Map<String, Object>> addOrderShipmentToShipment(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="orderId") String orderId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderItemSeqId",orderItemSeqId);
@@ -1308,23 +1310,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/interfaceShipmentReceiptRole")
-	public ResponseEntity<Object> interfaceShipmentReceiptRole(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="receiptId") String receiptId) {
+	public ResponseEntity<Map<String, Object>> interfaceShipmentReceiptRole(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="receiptId") String receiptId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("roleTypeId",roleTypeId);
@@ -1339,23 +1341,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/packSingleItem")
-	public ResponseEntity<Object> packSingleItem(HttpSession session, @RequestParam(value="packageSeq") Integer packageSeq, @RequestParam(value="packingSession") org.apache.ofbiz.shipment.packing.PackingSession packingSession, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId, @RequestParam(value="pickerPartyId", required=false) String pickerPartyId, @RequestParam(value="handlingInstructions", required=false) String handlingInstructions) {
+	public ResponseEntity<Map<String, Object>> packSingleItem(HttpSession session, @RequestParam(value="packageSeq") Integer packageSeq, @RequestParam(value="packingSession") org.apache.ofbiz.shipment.packing.PackingSession packingSession, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId, @RequestParam(value="pickerPartyId", required=false) String pickerPartyId, @RequestParam(value="handlingInstructions", required=false) String handlingInstructions) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("packageSeq",packageSeq);
@@ -1375,23 +1377,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipmentBoxType")
-	public ResponseEntity<Object> createShipmentBoxType(HttpSession session, @RequestParam(value="boxLength", required=false) BigDecimal boxLength, @RequestParam(value="boxWeight", required=false) BigDecimal boxWeight, @RequestParam(value="dimensionUomId", required=false) String dimensionUomId, @RequestParam(value="description", required=false) String description, @RequestParam(value="weightUomId", required=false) String weightUomId, @RequestParam(value="boxWidth", required=false) BigDecimal boxWidth, @RequestParam(value="boxHeight", required=false) BigDecimal boxHeight, @RequestParam(value="shipmentBoxTypeId", required=false) String shipmentBoxTypeId) {
+	public ResponseEntity<Map<String, Object>> createShipmentBoxType(HttpSession session, @RequestParam(value="boxLength", required=false) BigDecimal boxLength, @RequestParam(value="boxWeight", required=false) BigDecimal boxWeight, @RequestParam(value="dimensionUomId", required=false) String dimensionUomId, @RequestParam(value="description", required=false) String description, @RequestParam(value="weightUomId", required=false) String weightUomId, @RequestParam(value="boxWidth", required=false) BigDecimal boxWidth, @RequestParam(value="boxHeight", required=false) BigDecimal boxHeight, @RequestParam(value="shipmentBoxTypeId", required=false) String shipmentBoxTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("boxLength",boxLength);
@@ -1411,23 +1413,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/interfaceShipmentReceipt")
-	public ResponseEntity<Object> interfaceShipmentReceipt(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="productId") String productId, @RequestParam(value="quantityAccepted") BigDecimal quantityAccepted, @RequestParam(value="quantityRejected") BigDecimal quantityRejected, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="rejectionId", required=false) String rejectionId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="receivedByUserLoginId", required=false) String receivedByUserLoginId, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId, @RequestParam(value="shipmentPackageSeqId", required=false) String shipmentPackageSeqId, @RequestParam(value="datetimeReceived", required=false) Timestamp datetimeReceived, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId, @RequestParam(value="itemDescription", required=false) String itemDescription, @RequestParam(value="inventoryItemDetailSeqId", required=false) String inventoryItemDetailSeqId) {
+	public ResponseEntity<Map<String, Object>> interfaceShipmentReceipt(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="productId") String productId, @RequestParam(value="quantityAccepted") BigDecimal quantityAccepted, @RequestParam(value="quantityRejected") BigDecimal quantityRejected, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="rejectionId", required=false) String rejectionId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="receivedByUserLoginId", required=false) String receivedByUserLoginId, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId, @RequestParam(value="shipmentPackageSeqId", required=false) String shipmentPackageSeqId, @RequestParam(value="datetimeReceived", required=false) Timestamp datetimeReceived, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId, @RequestParam(value="itemDescription", required=false) String itemDescription, @RequestParam(value="inventoryItemDetailSeqId", required=false) String inventoryItemDetailSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("inventoryItemId",inventoryItemId);
@@ -1455,23 +1457,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/balanceItemIssuancesForShipment")
-	public ResponseEntity<Object> balanceItemIssuancesForShipment(HttpSession session, @RequestParam(value="shipmentId") String shipmentId) {
+	public ResponseEntity<Map<String, Object>> balanceItemIssuancesForShipment(HttpSession session, @RequestParam(value="shipmentId") String shipmentId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -1484,23 +1486,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteQuantityBreak")
-	public ResponseEntity<Object> deleteQuantityBreak(HttpSession session, @RequestParam(value="quantityBreakId") String quantityBreakId) {
+	public ResponseEntity<Map<String, Object>> deleteQuantityBreak(HttpSession session, @RequestParam(value="quantityBreakId") String quantityBreakId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quantityBreakId",quantityBreakId);
@@ -1513,23 +1515,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCarrierShipmentBoxType")
-	public ResponseEntity<Object> createCarrierShipmentBoxType(HttpSession session, @RequestParam(value="partyId") String partyId, @RequestParam(value="shipmentBoxTypeId") String shipmentBoxTypeId, @RequestParam(value="packagingTypeCode", required=false) String packagingTypeCode, @RequestParam(value="oversizeCode", required=false) String oversizeCode) {
+	public ResponseEntity<Map<String, Object>> createCarrierShipmentBoxType(HttpSession session, @RequestParam(value="partyId") String partyId, @RequestParam(value="shipmentBoxTypeId") String shipmentBoxTypeId, @RequestParam(value="packagingTypeCode", required=false) String packagingTypeCode, @RequestParam(value="oversizeCode", required=false) String oversizeCode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("partyId",partyId);
@@ -1545,23 +1547,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/setShipmentSettingsFromFacilities")
-	public ResponseEntity<Object> setShipmentSettingsFromFacilities(HttpSession session, @RequestParam(value="shipmentId") String shipmentId) {
+	public ResponseEntity<Map<String, Object>> setShipmentSettingsFromFacilities(HttpSession session, @RequestParam(value="shipmentId") String shipmentId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -1574,23 +1576,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeShipmentReceiptRole")
-	public ResponseEntity<Object> removeShipmentReceiptRole(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="receiptId") String receiptId) {
+	public ResponseEntity<Map<String, Object>> removeShipmentReceiptRole(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="receiptId") String receiptId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("roleTypeId",roleTypeId);
@@ -1605,23 +1607,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateShipmentAttribute")
-	public ResponseEntity<Object> updateShipmentAttribute(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
+	public ResponseEntity<Map<String, Object>> updateShipmentAttribute(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -1637,23 +1639,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeOrderShipmentFromShipment")
-	public ResponseEntity<Object> removeOrderShipmentFromShipment(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="orderId") String orderId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId) {
+	public ResponseEntity<Map<String, Object>> removeOrderShipmentFromShipment(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="orderId") String orderId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderItemSeqId",orderItemSeqId);
@@ -1670,23 +1672,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateShipmentContactMechType")
-	public ResponseEntity<Object> updateShipmentContactMechType(HttpSession session, @RequestParam(value="shipmentContactMechTypeId") String shipmentContactMechTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateShipmentContactMechType(HttpSession session, @RequestParam(value="shipmentContactMechTypeId") String shipmentContactMechTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentContactMechTypeId",shipmentContactMechTypeId);
@@ -1700,23 +1702,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipmentPackage")
-	public ResponseEntity<Object> createShipmentPackage(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="boxLength", required=false) BigDecimal boxLength, @RequestParam(value="dimensionUomId", required=false) String dimensionUomId, @RequestParam(value="insuredValue", required=false) BigDecimal insuredValue, @RequestParam(value="weight", required=false) BigDecimal weight, @RequestParam(value="weightUomId", required=false) String weightUomId, @RequestParam(value="shipmentPackageSeqId", required=false) String shipmentPackageSeqId, @RequestParam(value="boxHeight", required=false) BigDecimal boxHeight, @RequestParam(value="boxWidth", required=false) BigDecimal boxWidth, @RequestParam(value="shipmentBoxTypeId", required=false) String shipmentBoxTypeId) {
+	public ResponseEntity<Map<String, Object>> createShipmentPackage(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="boxLength", required=false) BigDecimal boxLength, @RequestParam(value="dimensionUomId", required=false) String dimensionUomId, @RequestParam(value="insuredValue", required=false) BigDecimal insuredValue, @RequestParam(value="weight", required=false) BigDecimal weight, @RequestParam(value="weightUomId", required=false) String weightUomId, @RequestParam(value="shipmentPackageSeqId", required=false) String shipmentPackageSeqId, @RequestParam(value="boxHeight", required=false) BigDecimal boxHeight, @RequestParam(value="boxWidth", required=false) BigDecimal boxWidth, @RequestParam(value="shipmentBoxTypeId", required=false) String shipmentBoxTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -1738,23 +1740,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCarrierShipmentMethod")
-	public ResponseEntity<Object> updateCarrierShipmentMethod(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="shipmentMethodTypeId") String shipmentMethodTypeId, @RequestParam(value="sequenceNumber", required=false) Long sequenceNumber, @RequestParam(value="carrierServiceCode", required=false) String carrierServiceCode) {
+	public ResponseEntity<Map<String, Object>> updateCarrierShipmentMethod(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="shipmentMethodTypeId") String shipmentMethodTypeId, @RequestParam(value="sequenceNumber", required=false) Long sequenceNumber, @RequestParam(value="carrierServiceCode", required=false) String carrierServiceCode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("roleTypeId",roleTypeId);
@@ -1771,23 +1773,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteShipmentMethodType")
-	public ResponseEntity<Object> deleteShipmentMethodType(HttpSession session, @RequestParam(value="shipmentMethodTypeId") String shipmentMethodTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteShipmentMethodType(HttpSession session, @RequestParam(value="shipmentMethodTypeId") String shipmentMethodTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentMethodTypeId",shipmentMethodTypeId);
@@ -1800,23 +1802,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipmentEstimate")
-	public ResponseEntity<Object> createShipmentEstimate(HttpSession session, @RequestParam(value="productStoreShipMethId") String productStoreShipMethId, @RequestParam(value="flatPercent") BigDecimal flatPercent, @RequestParam(value="toGeo", required=false) String toGeo, @RequestParam(value="pmax", required=false) BigDecimal pmax, @RequestParam(value="wprice", required=false) BigDecimal wprice, @RequestParam(value="wuom", required=false) String wuom, @RequestParam(value="qprice", required=false) BigDecimal qprice, @RequestParam(value="wmin", required=false) BigDecimal wmin, @RequestParam(value="featurePercent", required=false) BigDecimal featurePercent, @RequestParam(value="featurePrice", required=false) BigDecimal featurePrice, @RequestParam(value="fromGeo", required=false) String fromGeo, @RequestParam(value="pmin", required=false) BigDecimal pmin, @RequestParam(value="puom", required=false) String puom, @RequestParam(value="oversizeUnit", required=false) BigDecimal oversizeUnit, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="productFeatureGroupId", required=false) String productFeatureGroupId, @RequestParam(value="oversizePrice", required=false) BigDecimal oversizePrice, @RequestParam(value="flatPrice", required=false) BigDecimal flatPrice, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="shippingPricePercent", required=false) BigDecimal shippingPricePercent, @RequestParam(value="qmax", required=false) BigDecimal qmax, @RequestParam(value="pprice", required=false) BigDecimal pprice, @RequestParam(value="weightBreakId", required=false) String weightBreakId, @RequestParam(value="quantityBreakId", required=false) String quantityBreakId, @RequestParam(value="priceBreakId", required=false) String priceBreakId, @RequestParam(value="flatItemPrice", required=false) BigDecimal flatItemPrice, @RequestParam(value="qmin", required=false) BigDecimal qmin, @RequestParam(value="quom", required=false) String quom, @RequestParam(value="wmax", required=false) BigDecimal wmax) {
+	public ResponseEntity<Map<String, Object>> createShipmentEstimate(HttpSession session, @RequestParam(value="productStoreShipMethId") String productStoreShipMethId, @RequestParam(value="flatPercent") BigDecimal flatPercent, @RequestParam(value="toGeo", required=false) String toGeo, @RequestParam(value="pmax", required=false) BigDecimal pmax, @RequestParam(value="wprice", required=false) BigDecimal wprice, @RequestParam(value="wuom", required=false) String wuom, @RequestParam(value="qprice", required=false) BigDecimal qprice, @RequestParam(value="wmin", required=false) BigDecimal wmin, @RequestParam(value="featurePercent", required=false) BigDecimal featurePercent, @RequestParam(value="featurePrice", required=false) BigDecimal featurePrice, @RequestParam(value="fromGeo", required=false) String fromGeo, @RequestParam(value="pmin", required=false) BigDecimal pmin, @RequestParam(value="puom", required=false) String puom, @RequestParam(value="oversizeUnit", required=false) BigDecimal oversizeUnit, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="productFeatureGroupId", required=false) String productFeatureGroupId, @RequestParam(value="oversizePrice", required=false) BigDecimal oversizePrice, @RequestParam(value="flatPrice", required=false) BigDecimal flatPrice, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="shippingPricePercent", required=false) BigDecimal shippingPricePercent, @RequestParam(value="qmax", required=false) BigDecimal qmax, @RequestParam(value="pprice", required=false) BigDecimal pprice, @RequestParam(value="weightBreakId", required=false) String weightBreakId, @RequestParam(value="quantityBreakId", required=false) String quantityBreakId, @RequestParam(value="priceBreakId", required=false) String priceBreakId, @RequestParam(value="flatItemPrice", required=false) BigDecimal flatItemPrice, @RequestParam(value="qmin", required=false) BigDecimal qmin, @RequestParam(value="quom", required=false) String quom, @RequestParam(value="wmax", required=false) BigDecimal wmax) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productStoreShipMethId",productStoreShipMethId);
@@ -1857,23 +1859,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createRejectionReason")
-	public ResponseEntity<Object> createRejectionReason(HttpSession session, @RequestParam(value="rejectionId", required=false) String rejectionId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createRejectionReason(HttpSession session, @RequestParam(value="rejectionId", required=false) String rejectionId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("rejectionId",rejectionId);
@@ -1887,23 +1889,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteShippingDocument")
-	public ResponseEntity<Object> deleteShippingDocument(HttpSession session, @RequestParam(value="documentId") String documentId) {
+	public ResponseEntity<Map<String, Object>> deleteShippingDocument(HttpSession session, @RequestParam(value="documentId") String documentId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("documentId",documentId);
@@ -1916,23 +1918,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createQuantityBreak")
-	public ResponseEntity<Object> createQuantityBreak(HttpSession session, @RequestParam(value="thruQuantity", required=false) BigDecimal thruQuantity, @RequestParam(value="quantityBreakTypeId", required=false) String quantityBreakTypeId, @RequestParam(value="fromQuantity", required=false) BigDecimal fromQuantity) {
+	public ResponseEntity<Map<String, Object>> createQuantityBreak(HttpSession session, @RequestParam(value="thruQuantity", required=false) BigDecimal thruQuantity, @RequestParam(value="quantityBreakTypeId", required=false) String quantityBreakTypeId, @RequestParam(value="fromQuantity", required=false) BigDecimal fromQuantity) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("thruQuantity",thruQuantity);
@@ -1947,23 +1949,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateShipmentTypeAttr")
-	public ResponseEntity<Object> updateShipmentTypeAttr(HttpSession session, @RequestParam(value="shipmentTypeId") String shipmentTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateShipmentTypeAttr(HttpSession session, @RequestParam(value="shipmentTypeId") String shipmentTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentTypeId",shipmentTypeId);
@@ -1978,23 +1980,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipmentItemFeature")
-	public ResponseEntity<Object> createShipmentItemFeature(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId) {
+	public ResponseEntity<Map<String, Object>> createShipmentItemFeature(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -2009,23 +2011,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteShipmentContactMech")
-	public ResponseEntity<Object> deleteShipmentContactMech(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentContactMechTypeId") String shipmentContactMechTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteShipmentContactMech(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentContactMechTypeId") String shipmentContactMechTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -2039,23 +2041,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createItemIssuanceRole")
-	public ResponseEntity<Object> createItemIssuanceRole(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="itemIssuanceId") String itemIssuanceId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="partyId") String partyId) {
+	public ResponseEntity<Map<String, Object>> createItemIssuanceRole(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="itemIssuanceId") String itemIssuanceId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="partyId") String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("roleTypeId",roleTypeId);
@@ -2071,23 +2073,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateShipmentReceipt")
-	public ResponseEntity<Object> updateShipmentReceipt(HttpSession session, @RequestParam(value="receiptId") String receiptId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="quantityAccepted", required=false) BigDecimal quantityAccepted, @RequestParam(value="shipmentPackageSeqId", required=false) String shipmentPackageSeqId, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId, @RequestParam(value="quantityRejected", required=false) BigDecimal quantityRejected, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="rejectionId", required=false) String rejectionId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="receivedByUserLoginId", required=false) String receivedByUserLoginId, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId, @RequestParam(value="datetimeReceived", required=false) Timestamp datetimeReceived, @RequestParam(value="itemDescription", required=false) String itemDescription) {
+	public ResponseEntity<Map<String, Object>> updateShipmentReceipt(HttpSession session, @RequestParam(value="receiptId") String receiptId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="quantityAccepted", required=false) BigDecimal quantityAccepted, @RequestParam(value="shipmentPackageSeqId", required=false) String shipmentPackageSeqId, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId, @RequestParam(value="quantityRejected", required=false) BigDecimal quantityRejected, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="rejectionId", required=false) String rejectionId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="receivedByUserLoginId", required=false) String receivedByUserLoginId, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId, @RequestParam(value="datetimeReceived", required=false) Timestamp datetimeReceived, @RequestParam(value="itemDescription", required=false) String itemDescription) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("receiptId",receiptId);
@@ -2115,23 +2117,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createItemIssuance")
-	public ResponseEntity<Object> createItemIssuance(HttpSession session, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="issuedDateTime", required=false) Timestamp issuedDateTime, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="maintHistSeqId", required=false) String maintHistSeqId, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId, @RequestParam(value="issuedByUserLoginId", required=false) String issuedByUserLoginId, @RequestParam(value="cancelQuantity", required=false) BigDecimal cancelQuantity) {
+	public ResponseEntity<Map<String, Object>> createItemIssuance(HttpSession session, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="issuedDateTime", required=false) Timestamp issuedDateTime, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="maintHistSeqId", required=false) String maintHistSeqId, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId, @RequestParam(value="issuedByUserLoginId", required=false) String issuedByUserLoginId, @RequestParam(value="cancelQuantity", required=false) BigDecimal cancelQuantity) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderItemSeqId",orderItemSeqId);
@@ -2155,23 +2157,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteCarrierShipmentBoxType")
-	public ResponseEntity<Object> deleteCarrierShipmentBoxType(HttpSession session, @RequestParam(value="partyId") String partyId, @RequestParam(value="shipmentBoxTypeId") String shipmentBoxTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteCarrierShipmentBoxType(HttpSession session, @RequestParam(value="partyId") String partyId, @RequestParam(value="shipmentBoxTypeId") String shipmentBoxTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("partyId",partyId);
@@ -2185,23 +2187,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/completePack")
-	public ResponseEntity<Object> completePack(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="packingSession") org.apache.ofbiz.shipment.packing.PackingSession packingSession, @RequestParam(value="additionalShippingCharge", required=false) BigDecimal additionalShippingCharge, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="dimensionUomId", required=false) String dimensionUomId, @RequestParam(value="weightUomId", required=false) String weightUomId, @RequestParam(value="invoiceId", required=false) String invoiceId, @RequestParam(value="boxTypes", required=false) Map boxTypes, @RequestParam(value="pickerPartyId", required=false) String pickerPartyId, @RequestParam(value="forceComplete", required=false) Boolean forceComplete, @RequestParam(value="handlingInstructions", required=false) String handlingInstructions, @RequestParam(value="packageWeights", required=false) Map packageWeights) {
+	public ResponseEntity<Map<String, Object>> completePack(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="packingSession") org.apache.ofbiz.shipment.packing.PackingSession packingSession, @RequestParam(value="additionalShippingCharge", required=false) BigDecimal additionalShippingCharge, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="dimensionUomId", required=false) String dimensionUomId, @RequestParam(value="weightUomId", required=false) String weightUomId, @RequestParam(value="invoiceId", required=false) String invoiceId, @RequestParam(value="boxTypes", required=false) Map boxTypes, @RequestParam(value="pickerPartyId", required=false) String pickerPartyId, @RequestParam(value="forceComplete", required=false) Boolean forceComplete, @RequestParam(value="handlingInstructions", required=false) String handlingInstructions, @RequestParam(value="packageWeights", required=false) Map packageWeights) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderId",orderId);
@@ -2225,23 +2227,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipment")
-	public ResponseEntity<Object> createShipment(HttpSession session, @RequestParam(value="partyIdFrom", required=false) String partyIdFrom, @RequestParam(value="latestCancelDate", required=false) Timestamp latestCancelDate, @RequestParam(value="estimatedReadyDate", required=false) Timestamp estimatedReadyDate, @RequestParam(value="estimatedArrivalWorkEffId", required=false) String estimatedArrivalWorkEffId, @RequestParam(value="additionalShippingCharge", required=false) BigDecimal additionalShippingCharge, @RequestParam(value="destinationTelecomNumberId", required=false) String destinationTelecomNumberId, @RequestParam(value="estimatedShipCost", required=false) BigDecimal estimatedShipCost, @RequestParam(value="estimatedShipWorkEffId", required=false) String estimatedShipWorkEffId, @RequestParam(value="destinationFacilityId", required=false) String destinationFacilityId, @RequestParam(value="addtlShippingChargeDesc", required=false) String addtlShippingChargeDesc, @RequestParam(value="originContactMechId", required=false) String originContactMechId, @RequestParam(value="primaryReturnId", required=false) String primaryReturnId, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="destinationContactMechId", required=false) String destinationContactMechId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="originTelecomNumberId", required=false) String originTelecomNumberId, @RequestParam(value="primaryOrderId", required=false) String primaryOrderId, @RequestParam(value="estimatedShipDate", required=false) Timestamp estimatedShipDate, @RequestParam(value="partyIdTo", required=false) String partyIdTo, @RequestParam(value="shipmentTypeId", required=false) String shipmentTypeId, @RequestParam(value="estimatedArrivalDate", required=false) Timestamp estimatedArrivalDate, @RequestParam(value="picklistBinId", required=false) String picklistBinId, @RequestParam(value="primaryShipGroupSeqId", required=false) String primaryShipGroupSeqId, @RequestParam(value="handlingInstructions", required=false) String handlingInstructions) {
+	public ResponseEntity<Map<String, Object>> createShipment(HttpSession session, @RequestParam(value="partyIdFrom", required=false) String partyIdFrom, @RequestParam(value="latestCancelDate", required=false) Timestamp latestCancelDate, @RequestParam(value="estimatedReadyDate", required=false) Timestamp estimatedReadyDate, @RequestParam(value="estimatedArrivalWorkEffId", required=false) String estimatedArrivalWorkEffId, @RequestParam(value="additionalShippingCharge", required=false) BigDecimal additionalShippingCharge, @RequestParam(value="destinationTelecomNumberId", required=false) String destinationTelecomNumberId, @RequestParam(value="estimatedShipCost", required=false) BigDecimal estimatedShipCost, @RequestParam(value="estimatedShipWorkEffId", required=false) String estimatedShipWorkEffId, @RequestParam(value="destinationFacilityId", required=false) String destinationFacilityId, @RequestParam(value="addtlShippingChargeDesc", required=false) String addtlShippingChargeDesc, @RequestParam(value="originContactMechId", required=false) String originContactMechId, @RequestParam(value="primaryReturnId", required=false) String primaryReturnId, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="destinationContactMechId", required=false) String destinationContactMechId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="originTelecomNumberId", required=false) String originTelecomNumberId, @RequestParam(value="primaryOrderId", required=false) String primaryOrderId, @RequestParam(value="estimatedShipDate", required=false) Timestamp estimatedShipDate, @RequestParam(value="partyIdTo", required=false) String partyIdTo, @RequestParam(value="shipmentTypeId", required=false) String shipmentTypeId, @RequestParam(value="estimatedArrivalDate", required=false) Timestamp estimatedArrivalDate, @RequestParam(value="picklistBinId", required=false) String picklistBinId, @RequestParam(value="primaryShipGroupSeqId", required=false) String primaryShipGroupSeqId, @RequestParam(value="handlingInstructions", required=false) String handlingInstructions) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("partyIdFrom",partyIdFrom);
@@ -2279,23 +2281,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateShipmentMethodType")
-	public ResponseEntity<Object> updateShipmentMethodType(HttpSession session, @RequestParam(value="shipmentMethodTypeId") String shipmentMethodTypeId) {
+	public ResponseEntity<Map<String, Object>> updateShipmentMethodType(HttpSession session, @RequestParam(value="shipmentMethodTypeId") String shipmentMethodTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentMethodTypeId",shipmentMethodTypeId);
@@ -2308,23 +2310,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/issueOrderItemShipGrpInvResToShipment")
-	public ResponseEntity<Object> issueOrderItemShipGrpInvResToShipment(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="orderId") String orderId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="eventDate", required=false) Timestamp eventDate) {
+	public ResponseEntity<Map<String, Object>> issueOrderItemShipGrpInvResToShipment(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="orderId") String orderId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="eventDate", required=false) Timestamp eventDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderItemSeqId",orderItemSeqId);
@@ -2343,23 +2345,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/setNextPackageSeq")
-	public ResponseEntity<Object> setNextPackageSeq(HttpSession session, @RequestParam(value="packingSession") org.apache.ofbiz.shipment.packing.PackingSession packingSession) {
+	public ResponseEntity<Map<String, Object>> setNextPackageSeq(HttpSession session, @RequestParam(value="packingSession") org.apache.ofbiz.shipment.packing.PackingSession packingSession) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("packingSession",packingSession);
@@ -2372,23 +2374,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCarrierShipmentBoxType")
-	public ResponseEntity<Object> updateCarrierShipmentBoxType(HttpSession session, @RequestParam(value="partyId") String partyId, @RequestParam(value="shipmentBoxTypeId") String shipmentBoxTypeId, @RequestParam(value="packagingTypeCode", required=false) String packagingTypeCode, @RequestParam(value="oversizeCode", required=false) String oversizeCode) {
+	public ResponseEntity<Map<String, Object>> updateCarrierShipmentBoxType(HttpSession session, @RequestParam(value="partyId") String partyId, @RequestParam(value="shipmentBoxTypeId") String shipmentBoxTypeId, @RequestParam(value="packagingTypeCode", required=false) String packagingTypeCode, @RequestParam(value="oversizeCode", required=false) String oversizeCode) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("partyId",partyId);
@@ -2404,23 +2406,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateShipment")
-	public ResponseEntity<Object> updateShipment(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="partyIdFrom", required=false) String partyIdFrom, @RequestParam(value="latestCancelDate", required=false) Timestamp latestCancelDate, @RequestParam(value="estimatedReadyDate", required=false) Timestamp estimatedReadyDate, @RequestParam(value="estimatedArrivalWorkEffId", required=false) String estimatedArrivalWorkEffId, @RequestParam(value="additionalShippingCharge", required=false) BigDecimal additionalShippingCharge, @RequestParam(value="destinationTelecomNumberId", required=false) String destinationTelecomNumberId, @RequestParam(value="estimatedShipCost", required=false) BigDecimal estimatedShipCost, @RequestParam(value="estimatedShipWorkEffId", required=false) String estimatedShipWorkEffId, @RequestParam(value="destinationFacilityId", required=false) String destinationFacilityId, @RequestParam(value="addtlShippingChargeDesc", required=false) String addtlShippingChargeDesc, @RequestParam(value="originContactMechId", required=false) String originContactMechId, @RequestParam(value="primaryReturnId", required=false) String primaryReturnId, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="destinationContactMechId", required=false) String destinationContactMechId, @RequestParam(value="originTelecomNumberId", required=false) String originTelecomNumberId, @RequestParam(value="primaryOrderId", required=false) String primaryOrderId, @RequestParam(value="estimatedShipDate", required=false) Timestamp estimatedShipDate, @RequestParam(value="partyIdTo", required=false) String partyIdTo, @RequestParam(value="estimatedArrivalDate", required=false) Timestamp estimatedArrivalDate, @RequestParam(value="shipmentTypeId", required=false) String shipmentTypeId, @RequestParam(value="picklistBinId", required=false) String picklistBinId, @RequestParam(value="primaryShipGroupSeqId", required=false) String primaryShipGroupSeqId, @RequestParam(value="handlingInstructions", required=false) String handlingInstructions, @RequestParam(value="eventDate", required=false) Timestamp eventDate) {
+	public ResponseEntity<Map<String, Object>> updateShipment(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="partyIdFrom", required=false) String partyIdFrom, @RequestParam(value="latestCancelDate", required=false) Timestamp latestCancelDate, @RequestParam(value="estimatedReadyDate", required=false) Timestamp estimatedReadyDate, @RequestParam(value="estimatedArrivalWorkEffId", required=false) String estimatedArrivalWorkEffId, @RequestParam(value="additionalShippingCharge", required=false) BigDecimal additionalShippingCharge, @RequestParam(value="destinationTelecomNumberId", required=false) String destinationTelecomNumberId, @RequestParam(value="estimatedShipCost", required=false) BigDecimal estimatedShipCost, @RequestParam(value="estimatedShipWorkEffId", required=false) String estimatedShipWorkEffId, @RequestParam(value="destinationFacilityId", required=false) String destinationFacilityId, @RequestParam(value="addtlShippingChargeDesc", required=false) String addtlShippingChargeDesc, @RequestParam(value="originContactMechId", required=false) String originContactMechId, @RequestParam(value="primaryReturnId", required=false) String primaryReturnId, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="destinationContactMechId", required=false) String destinationContactMechId, @RequestParam(value="originTelecomNumberId", required=false) String originTelecomNumberId, @RequestParam(value="primaryOrderId", required=false) String primaryOrderId, @RequestParam(value="estimatedShipDate", required=false) Timestamp estimatedShipDate, @RequestParam(value="partyIdTo", required=false) String partyIdTo, @RequestParam(value="estimatedArrivalDate", required=false) Timestamp estimatedArrivalDate, @RequestParam(value="shipmentTypeId", required=false) String shipmentTypeId, @RequestParam(value="picklistBinId", required=false) String picklistBinId, @RequestParam(value="primaryShipGroupSeqId", required=false) String primaryShipGroupSeqId, @RequestParam(value="handlingInstructions", required=false) String handlingInstructions, @RequestParam(value="eventDate", required=false) Timestamp eventDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -2459,23 +2461,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateShipmentCostEstimate")
-	public ResponseEntity<Object> updateShipmentCostEstimate(HttpSession session, @RequestParam(value="shipmentCostEstimateId") String shipmentCostEstimateId, @RequestParam(value="productStoreShipMethId", required=false) String productStoreShipMethId, @RequestParam(value="quantityUnitPrice", required=false) BigDecimal quantityUnitPrice, @RequestParam(value="quantityUomId", required=false) String quantityUomId, @RequestParam(value="featurePercent", required=false) BigDecimal featurePercent, @RequestParam(value="featurePrice", required=false) BigDecimal featurePrice, @RequestParam(value="weightUnitPrice", required=false) BigDecimal weightUnitPrice, @RequestParam(value="oversizeUnit", required=false) BigDecimal oversizeUnit, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="productFeatureGroupId", required=false) String productFeatureGroupId, @RequestParam(value="oversizePrice", required=false) BigDecimal oversizePrice, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId, @RequestParam(value="geoIdTo", required=false) String geoIdTo, @RequestParam(value="orderPricePercent", required=false) BigDecimal orderPricePercent, @RequestParam(value="orderItemFlatPrice", required=false) BigDecimal orderItemFlatPrice, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="shippingPricePercent", required=false) BigDecimal shippingPricePercent, @RequestParam(value="weightBreakId", required=false) String weightBreakId, @RequestParam(value="quantityBreakId", required=false) String quantityBreakId, @RequestParam(value="priceBreakId", required=false) String priceBreakId, @RequestParam(value="carrierPartyId", required=false) String carrierPartyId, @RequestParam(value="geoIdFrom", required=false) String geoIdFrom, @RequestParam(value="orderFlatPrice", required=false) BigDecimal orderFlatPrice, @RequestParam(value="carrierRoleTypeId", required=false) String carrierRoleTypeId, @RequestParam(value="weightUomId", required=false) String weightUomId, @RequestParam(value="priceUnitPrice", required=false) BigDecimal priceUnitPrice, @RequestParam(value="priceUomId", required=false) String priceUomId) {
+	public ResponseEntity<Map<String, Object>> updateShipmentCostEstimate(HttpSession session, @RequestParam(value="shipmentCostEstimateId") String shipmentCostEstimateId, @RequestParam(value="productStoreShipMethId", required=false) String productStoreShipMethId, @RequestParam(value="quantityUnitPrice", required=false) BigDecimal quantityUnitPrice, @RequestParam(value="quantityUomId", required=false) String quantityUomId, @RequestParam(value="featurePercent", required=false) BigDecimal featurePercent, @RequestParam(value="featurePrice", required=false) BigDecimal featurePrice, @RequestParam(value="weightUnitPrice", required=false) BigDecimal weightUnitPrice, @RequestParam(value="oversizeUnit", required=false) BigDecimal oversizeUnit, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="productFeatureGroupId", required=false) String productFeatureGroupId, @RequestParam(value="oversizePrice", required=false) BigDecimal oversizePrice, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId, @RequestParam(value="geoIdTo", required=false) String geoIdTo, @RequestParam(value="orderPricePercent", required=false) BigDecimal orderPricePercent, @RequestParam(value="orderItemFlatPrice", required=false) BigDecimal orderItemFlatPrice, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="shippingPricePercent", required=false) BigDecimal shippingPricePercent, @RequestParam(value="weightBreakId", required=false) String weightBreakId, @RequestParam(value="quantityBreakId", required=false) String quantityBreakId, @RequestParam(value="priceBreakId", required=false) String priceBreakId, @RequestParam(value="carrierPartyId", required=false) String carrierPartyId, @RequestParam(value="geoIdFrom", required=false) String geoIdFrom, @RequestParam(value="orderFlatPrice", required=false) BigDecimal orderFlatPrice, @RequestParam(value="carrierRoleTypeId", required=false) String carrierRoleTypeId, @RequestParam(value="weightUomId", required=false) String weightUomId, @RequestParam(value="priceUnitPrice", required=false) BigDecimal priceUnitPrice, @RequestParam(value="priceUomId", required=false) String priceUomId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentCostEstimateId",shipmentCostEstimateId);
@@ -2515,23 +2517,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateRejectionReason")
-	public ResponseEntity<Object> updateRejectionReason(HttpSession session, @RequestParam(value="rejectionId") String rejectionId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateRejectionReason(HttpSession session, @RequestParam(value="rejectionId") String rejectionId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("rejectionId",rejectionId);
@@ -2545,23 +2547,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipmentItem")
-	public ResponseEntity<Object> createShipmentItem(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="shipmentContentDescription", required=false) String shipmentContentDescription, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId) {
+	public ResponseEntity<Map<String, Object>> createShipmentItem(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="shipmentContentDescription", required=false) String shipmentContentDescription, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -2578,23 +2580,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/clearLastPackage")
-	public ResponseEntity<Object> clearLastPackage(HttpSession session, @RequestParam(value="packingSession") org.apache.ofbiz.shipment.packing.PackingSession packingSession) {
+	public ResponseEntity<Map<String, Object>> clearLastPackage(HttpSession session, @RequestParam(value="packingSession") org.apache.ofbiz.shipment.packing.PackingSession packingSession) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("packingSession",packingSession);
@@ -2607,23 +2609,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateShipmentRouteSegment")
-	public ResponseEntity<Object> updateShipmentRouteSegment(HttpSession session, @RequestParam(value="shipmentRouteSegmentId") String shipmentRouteSegmentId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="actualOtherCost", required=false) BigDecimal actualOtherCost, @RequestParam(value="carrierDeliveryZone", required=false) String carrierDeliveryZone, @RequestParam(value="thirdPartyPostalCode", required=false) String thirdPartyPostalCode, @RequestParam(value="destTelecomNumberId", required=false) String destTelecomNumberId, @RequestParam(value="carrierRestrictionCodes", required=false) String carrierRestrictionCodes, @RequestParam(value="trackingIdNumber", required=false) String trackingIdNumber, @RequestParam(value="deliveryId", required=false) String deliveryId, @RequestParam(value="carrierServiceStatusId", required=false) String carrierServiceStatusId, @RequestParam(value="actualStartDate", required=false) Timestamp actualStartDate, @RequestParam(value="trackingDigest", required=false) String trackingDigest, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId, @RequestParam(value="actualCost", required=false) BigDecimal actualCost, @RequestParam(value="upsHighValueReport", required=false) byte[] upsHighValueReport, @RequestParam(value="actualArrivalDate", required=false) Timestamp actualArrivalDate, @RequestParam(value="actualServiceCost", required=false) BigDecimal actualServiceCost, @RequestParam(value="originContactMechId", required=false) String originContactMechId, @RequestParam(value="estimatedStartDate", required=false) Timestamp estimatedStartDate, @RequestParam(value="carrierRestrictionDesc", required=false) String carrierRestrictionDesc, @RequestParam(value="actualTransportCost", required=false) BigDecimal actualTransportCost, @RequestParam(value="billingWeightUomId", required=false) String billingWeightUomId, @RequestParam(value="homeDeliveryDate", required=false) Timestamp homeDeliveryDate, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="destFacilityId", required=false) String destFacilityId, @RequestParam(value="carrierPartyId", required=false) String carrierPartyId, @RequestParam(value="lastUpdatedDate", required=false) Timestamp lastUpdatedDate, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="billingWeight", required=false) BigDecimal billingWeight, @RequestParam(value="originTelecomNumberId", required=false) String originTelecomNumberId, @RequestParam(value="thirdPartyCountryGeoCode", required=false) String thirdPartyCountryGeoCode, @RequestParam(value="destContactMechId", required=false) String destContactMechId, @RequestParam(value="estimatedArrivalDate", required=false) Timestamp estimatedArrivalDate, @RequestParam(value="homeDeliveryType", required=false) String homeDeliveryType, @RequestParam(value="thirdPartyAccountNumber", required=false) String thirdPartyAccountNumber, @RequestParam(value="updatedByUserLoginId", required=false) String updatedByUserLoginId) {
+	public ResponseEntity<Map<String, Object>> updateShipmentRouteSegment(HttpSession session, @RequestParam(value="shipmentRouteSegmentId") String shipmentRouteSegmentId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="actualOtherCost", required=false) BigDecimal actualOtherCost, @RequestParam(value="carrierDeliveryZone", required=false) String carrierDeliveryZone, @RequestParam(value="thirdPartyPostalCode", required=false) String thirdPartyPostalCode, @RequestParam(value="destTelecomNumberId", required=false) String destTelecomNumberId, @RequestParam(value="carrierRestrictionCodes", required=false) String carrierRestrictionCodes, @RequestParam(value="trackingIdNumber", required=false) String trackingIdNumber, @RequestParam(value="deliveryId", required=false) String deliveryId, @RequestParam(value="carrierServiceStatusId", required=false) String carrierServiceStatusId, @RequestParam(value="actualStartDate", required=false) Timestamp actualStartDate, @RequestParam(value="trackingDigest", required=false) String trackingDigest, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId, @RequestParam(value="actualCost", required=false) BigDecimal actualCost, @RequestParam(value="upsHighValueReport", required=false) byte[] upsHighValueReport, @RequestParam(value="actualArrivalDate", required=false) Timestamp actualArrivalDate, @RequestParam(value="actualServiceCost", required=false) BigDecimal actualServiceCost, @RequestParam(value="originContactMechId", required=false) String originContactMechId, @RequestParam(value="estimatedStartDate", required=false) Timestamp estimatedStartDate, @RequestParam(value="carrierRestrictionDesc", required=false) String carrierRestrictionDesc, @RequestParam(value="actualTransportCost", required=false) BigDecimal actualTransportCost, @RequestParam(value="billingWeightUomId", required=false) String billingWeightUomId, @RequestParam(value="homeDeliveryDate", required=false) Timestamp homeDeliveryDate, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="destFacilityId", required=false) String destFacilityId, @RequestParam(value="carrierPartyId", required=false) String carrierPartyId, @RequestParam(value="lastUpdatedDate", required=false) Timestamp lastUpdatedDate, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="billingWeight", required=false) BigDecimal billingWeight, @RequestParam(value="originTelecomNumberId", required=false) String originTelecomNumberId, @RequestParam(value="thirdPartyCountryGeoCode", required=false) String thirdPartyCountryGeoCode, @RequestParam(value="destContactMechId", required=false) String destContactMechId, @RequestParam(value="estimatedArrivalDate", required=false) Timestamp estimatedArrivalDate, @RequestParam(value="homeDeliveryType", required=false) String homeDeliveryType, @RequestParam(value="thirdPartyAccountNumber", required=false) String thirdPartyAccountNumber, @RequestParam(value="updatedByUserLoginId", required=false) String updatedByUserLoginId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentRouteSegmentId",shipmentRouteSegmentId);
@@ -2671,23 +2673,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/duplicateShipmentRouteSegment")
-	public ResponseEntity<Object> duplicateShipmentRouteSegment(HttpSession session, @RequestParam(value="shipmentRouteSegmentId") String shipmentRouteSegmentId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="actualOtherCost", required=false) BigDecimal actualOtherCost, @RequestParam(value="carrierDeliveryZone", required=false) String carrierDeliveryZone, @RequestParam(value="thirdPartyPostalCode", required=false) String thirdPartyPostalCode, @RequestParam(value="destTelecomNumberId", required=false) String destTelecomNumberId, @RequestParam(value="carrierRestrictionCodes", required=false) String carrierRestrictionCodes, @RequestParam(value="trackingIdNumber", required=false) String trackingIdNumber, @RequestParam(value="deliveryId", required=false) String deliveryId, @RequestParam(value="carrierServiceStatusId", required=false) String carrierServiceStatusId, @RequestParam(value="actualStartDate", required=false) Timestamp actualStartDate, @RequestParam(value="trackingDigest", required=false) String trackingDigest, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId, @RequestParam(value="actualCost", required=false) BigDecimal actualCost, @RequestParam(value="upsHighValueReport", required=false) byte[] upsHighValueReport, @RequestParam(value="actualArrivalDate", required=false) Timestamp actualArrivalDate, @RequestParam(value="actualServiceCost", required=false) BigDecimal actualServiceCost, @RequestParam(value="originContactMechId", required=false) String originContactMechId, @RequestParam(value="estimatedStartDate", required=false) Timestamp estimatedStartDate, @RequestParam(value="carrierRestrictionDesc", required=false) String carrierRestrictionDesc, @RequestParam(value="actualTransportCost", required=false) BigDecimal actualTransportCost, @RequestParam(value="billingWeightUomId", required=false) String billingWeightUomId, @RequestParam(value="homeDeliveryDate", required=false) Timestamp homeDeliveryDate, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="destFacilityId", required=false) String destFacilityId, @RequestParam(value="carrierPartyId", required=false) String carrierPartyId, @RequestParam(value="lastUpdatedDate", required=false) Timestamp lastUpdatedDate, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="billingWeight", required=false) BigDecimal billingWeight, @RequestParam(value="originTelecomNumberId", required=false) String originTelecomNumberId, @RequestParam(value="thirdPartyCountryGeoCode", required=false) String thirdPartyCountryGeoCode, @RequestParam(value="destContactMechId", required=false) String destContactMechId, @RequestParam(value="estimatedArrivalDate", required=false) Timestamp estimatedArrivalDate, @RequestParam(value="homeDeliveryType", required=false) String homeDeliveryType, @RequestParam(value="thirdPartyAccountNumber", required=false) String thirdPartyAccountNumber, @RequestParam(value="updatedByUserLoginId", required=false) String updatedByUserLoginId) {
+	public ResponseEntity<Map<String, Object>> duplicateShipmentRouteSegment(HttpSession session, @RequestParam(value="shipmentRouteSegmentId") String shipmentRouteSegmentId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="actualOtherCost", required=false) BigDecimal actualOtherCost, @RequestParam(value="carrierDeliveryZone", required=false) String carrierDeliveryZone, @RequestParam(value="thirdPartyPostalCode", required=false) String thirdPartyPostalCode, @RequestParam(value="destTelecomNumberId", required=false) String destTelecomNumberId, @RequestParam(value="carrierRestrictionCodes", required=false) String carrierRestrictionCodes, @RequestParam(value="trackingIdNumber", required=false) String trackingIdNumber, @RequestParam(value="deliveryId", required=false) String deliveryId, @RequestParam(value="carrierServiceStatusId", required=false) String carrierServiceStatusId, @RequestParam(value="actualStartDate", required=false) Timestamp actualStartDate, @RequestParam(value="trackingDigest", required=false) String trackingDigest, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId, @RequestParam(value="actualCost", required=false) BigDecimal actualCost, @RequestParam(value="upsHighValueReport", required=false) byte[] upsHighValueReport, @RequestParam(value="actualArrivalDate", required=false) Timestamp actualArrivalDate, @RequestParam(value="actualServiceCost", required=false) BigDecimal actualServiceCost, @RequestParam(value="originContactMechId", required=false) String originContactMechId, @RequestParam(value="estimatedStartDate", required=false) Timestamp estimatedStartDate, @RequestParam(value="carrierRestrictionDesc", required=false) String carrierRestrictionDesc, @RequestParam(value="actualTransportCost", required=false) BigDecimal actualTransportCost, @RequestParam(value="billingWeightUomId", required=false) String billingWeightUomId, @RequestParam(value="homeDeliveryDate", required=false) Timestamp homeDeliveryDate, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="destFacilityId", required=false) String destFacilityId, @RequestParam(value="carrierPartyId", required=false) String carrierPartyId, @RequestParam(value="lastUpdatedDate", required=false) Timestamp lastUpdatedDate, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="billingWeight", required=false) BigDecimal billingWeight, @RequestParam(value="originTelecomNumberId", required=false) String originTelecomNumberId, @RequestParam(value="thirdPartyCountryGeoCode", required=false) String thirdPartyCountryGeoCode, @RequestParam(value="destContactMechId", required=false) String destContactMechId, @RequestParam(value="estimatedArrivalDate", required=false) Timestamp estimatedArrivalDate, @RequestParam(value="homeDeliveryType", required=false) String homeDeliveryType, @RequestParam(value="thirdPartyAccountNumber", required=false) String thirdPartyAccountNumber, @RequestParam(value="updatedByUserLoginId", required=false) String updatedByUserLoginId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentRouteSegmentId",shipmentRouteSegmentId);
@@ -2735,23 +2737,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/setShipmentStatusPackedAndShipped")
-	public ResponseEntity<Object> setShipmentStatusPackedAndShipped(HttpSession session, @RequestParam(value="shipmentId") String shipmentId) {
+	public ResponseEntity<Map<String, Object>> setShipmentStatusPackedAndShipped(HttpSession session, @RequestParam(value="shipmentId") String shipmentId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -2764,23 +2766,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/verifySingleItem")
-	public ResponseEntity<Object> verifySingleItem(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="verifyPickSession") org.apache.ofbiz.shipment.verify.VerifyPickSession verifyPickSession, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId) {
+	public ResponseEntity<Map<String, Object>> verifySingleItem(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="verifyPickSession") org.apache.ofbiz.shipment.verify.VerifyPickSession verifyPickSession, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -2797,23 +2799,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteShipmentPackageRouteSeg")
-	public ResponseEntity<Object> deleteShipmentPackageRouteSeg(HttpSession session, @RequestParam(value="shipmentRouteSegmentId") String shipmentRouteSegmentId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentPackageSeqId") String shipmentPackageSeqId) {
+	public ResponseEntity<Map<String, Object>> deleteShipmentPackageRouteSeg(HttpSession session, @RequestParam(value="shipmentRouteSegmentId") String shipmentRouteSegmentId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentPackageSeqId") String shipmentPackageSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentRouteSegmentId",shipmentRouteSegmentId);
@@ -2828,23 +2830,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeShipmentEstimate")
-	public ResponseEntity<Object> removeShipmentEstimate(HttpSession session, @RequestParam(value="shipmentCostEstimateId") String shipmentCostEstimateId) {
+	public ResponseEntity<Map<String, Object>> removeShipmentEstimate(HttpSession session, @RequestParam(value="shipmentCostEstimateId") String shipmentCostEstimateId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentCostEstimateId",shipmentCostEstimateId);
@@ -2857,23 +2859,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipmentAndItemsForReturn")
-	public ResponseEntity<Object> createShipmentAndItemsForReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
+	public ResponseEntity<Map<String, Object>> createShipmentAndItemsForReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -2886,23 +2888,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipmentAttribute")
-	public ResponseEntity<Object> createShipmentAttribute(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
+	public ResponseEntity<Map<String, Object>> createShipmentAttribute(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -2918,23 +2920,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/clearPackLine")
-	public ResponseEntity<Object> clearPackLine(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="productId") String productId, @RequestParam(value="orderId") String orderId, @RequestParam(value="packageSeqId") Integer packageSeqId, @RequestParam(value="packingSession") org.apache.ofbiz.shipment.packing.PackingSession packingSession, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId) {
+	public ResponseEntity<Map<String, Object>> clearPackLine(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="productId") String productId, @RequestParam(value="orderId") String orderId, @RequestParam(value="packageSeqId") Integer packageSeqId, @RequestParam(value="packingSession") org.apache.ofbiz.shipment.packing.PackingSession packingSession, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderItemSeqId",orderItemSeqId);
@@ -2953,23 +2955,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateShippingDocument")
-	public ResponseEntity<Object> updateShippingDocument(HttpSession session, @RequestParam(value="documentId") String documentId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="shipmentPackageSeqId", required=false) String shipmentPackageSeqId, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId) {
+	public ResponseEntity<Map<String, Object>> updateShippingDocument(HttpSession session, @RequestParam(value="documentId") String documentId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="shipmentPackageSeqId", required=false) String shipmentPackageSeqId, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("documentId",documentId);
@@ -2986,23 +2988,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/receiveInventoryProduct")
-	public ResponseEntity<Object> receiveInventoryProduct(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="productId") String productId, @RequestParam(value="quantityAccepted") BigDecimal quantityAccepted, @RequestParam(value="quantityRejected") BigDecimal quantityRejected, @RequestParam(value="inventoryItemTypeId") String inventoryItemTypeId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="binNumber", required=false) String binNumber, @RequestParam(value="maintHistSeqId", required=false) String maintHistSeqId, @RequestParam(value="priorityOrderItemSeqId", required=false) String priorityOrderItemSeqId, @RequestParam(value="inventoryItemDetailSeqId", required=false) String inventoryItemDetailSeqId, @RequestParam(value="oldAvailableToPromise", required=false) BigDecimal oldAvailableToPromise, @RequestParam(value="physicalInventoryId", required=false) String physicalInventoryId, @RequestParam(value="reasonEnumId", required=false) String reasonEnumId, @RequestParam(value="itemDescription", required=false) String itemDescription, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="containerId", required=false) String containerId, @RequestParam(value="locationSeqId", required=false) String locationSeqId, @RequestParam(value="quantityOnHandDiff", required=false) BigDecimal quantityOnHandDiff, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="serialNumber", required=false) Long serialNumber, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="availableToPromiseDiff", required=false) BigDecimal availableToPromiseDiff, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="softIdentifier", required=false) Long softIdentifier, @RequestParam(value="description", required=false) String description, @RequestParam(value="shipmentPackageSeqId", required=false) String shipmentPackageSeqId, @RequestParam(value="currentInventoryItemId", required=false) String currentInventoryItemId, @RequestParam(value="accountingQuantityDiff", required=false) BigDecimal accountingQuantityDiff, @RequestParam(value="itemIssuanceId", required=false) String itemIssuanceId, @RequestParam(value="datetimeManufactured", required=false) Timestamp datetimeManufactured, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="orderCurrencyUnitPrice", required=false) String orderCurrencyUnitPrice, @RequestParam(value="expireDate", required=false) Timestamp expireDate, @RequestParam(value="oldQuantityOnHand", required=false) BigDecimal oldQuantityOnHand, @RequestParam(value="receiptId", required=false) String receiptId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="lotId", required=false) String lotId, @RequestParam(value="accountingQuantityTotal", required=false) BigDecimal accountingQuantityTotal, @RequestParam(value="rejectionId", required=false) String rejectionId, @RequestParam(value="ownerPartyId", required=false) String ownerPartyId, @RequestParam(value="activationValidThru", required=false) Timestamp activationValidThru, @RequestParam(value="activationNumber", required=false) Long activationNumber, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="receivedByUserLoginId", required=false) String receivedByUserLoginId, @RequestParam(value="priorityOrderId", required=false) String priorityOrderId, @RequestParam(value="unitCost", required=false) BigDecimal unitCost, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId, @RequestParam(value="datetimeReceived", required=false) Timestamp datetimeReceived, @RequestParam(value="effectiveDate", required=false) Timestamp effectiveDate) {
+	public ResponseEntity<Map<String, Object>> receiveInventoryProduct(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="productId") String productId, @RequestParam(value="quantityAccepted") BigDecimal quantityAccepted, @RequestParam(value="quantityRejected") BigDecimal quantityRejected, @RequestParam(value="inventoryItemTypeId") String inventoryItemTypeId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="binNumber", required=false) String binNumber, @RequestParam(value="maintHistSeqId", required=false) String maintHistSeqId, @RequestParam(value="priorityOrderItemSeqId", required=false) String priorityOrderItemSeqId, @RequestParam(value="inventoryItemDetailSeqId", required=false) String inventoryItemDetailSeqId, @RequestParam(value="oldAvailableToPromise", required=false) BigDecimal oldAvailableToPromise, @RequestParam(value="physicalInventoryId", required=false) String physicalInventoryId, @RequestParam(value="reasonEnumId", required=false) String reasonEnumId, @RequestParam(value="itemDescription", required=false) String itemDescription, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="containerId", required=false) String containerId, @RequestParam(value="locationSeqId", required=false) String locationSeqId, @RequestParam(value="quantityOnHandDiff", required=false) BigDecimal quantityOnHandDiff, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="serialNumber", required=false) Long serialNumber, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="availableToPromiseDiff", required=false) BigDecimal availableToPromiseDiff, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="softIdentifier", required=false) Long softIdentifier, @RequestParam(value="description", required=false) String description, @RequestParam(value="shipmentPackageSeqId", required=false) String shipmentPackageSeqId, @RequestParam(value="currentInventoryItemId", required=false) String currentInventoryItemId, @RequestParam(value="accountingQuantityDiff", required=false) BigDecimal accountingQuantityDiff, @RequestParam(value="itemIssuanceId", required=false) String itemIssuanceId, @RequestParam(value="datetimeManufactured", required=false) Timestamp datetimeManufactured, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="orderCurrencyUnitPrice", required=false) String orderCurrencyUnitPrice, @RequestParam(value="expireDate", required=false) Timestamp expireDate, @RequestParam(value="oldQuantityOnHand", required=false) BigDecimal oldQuantityOnHand, @RequestParam(value="receiptId", required=false) String receiptId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="lotId", required=false) String lotId, @RequestParam(value="accountingQuantityTotal", required=false) BigDecimal accountingQuantityTotal, @RequestParam(value="rejectionId", required=false) String rejectionId, @RequestParam(value="ownerPartyId", required=false) String ownerPartyId, @RequestParam(value="activationValidThru", required=false) Timestamp activationValidThru, @RequestParam(value="activationNumber", required=false) Long activationNumber, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="receivedByUserLoginId", required=false) String receivedByUserLoginId, @RequestParam(value="priorityOrderId", required=false) String priorityOrderId, @RequestParam(value="unitCost", required=false) BigDecimal unitCost, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId, @RequestParam(value="datetimeReceived", required=false) Timestamp datetimeReceived, @RequestParam(value="effectiveDate", required=false) Timestamp effectiveDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("facilityId",facilityId);
@@ -3069,23 +3071,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteShipmentPackageContent")
-	public ResponseEntity<Object> deleteShipmentPackageContent(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentPackageSeqId") String shipmentPackageSeqId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId) {
+	public ResponseEntity<Map<String, Object>> deleteShipmentPackageContent(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentPackageSeqId") String shipmentPackageSeqId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -3100,23 +3102,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/cancelOrderItemIssuanceFromSalesShipment")
-	public ResponseEntity<Object> cancelOrderItemIssuanceFromSalesShipment(HttpSession session, @RequestParam(value="itemIssuanceId") String itemIssuanceId, @RequestParam(value="cancelQuantity", required=false) BigDecimal cancelQuantity) {
+	public ResponseEntity<Map<String, Object>> cancelOrderItemIssuanceFromSalesShipment(HttpSession session, @RequestParam(value="itemIssuanceId") String itemIssuanceId, @RequestParam(value="cancelQuantity", required=false) BigDecimal cancelQuantity) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("itemIssuanceId",itemIssuanceId);
@@ -3130,23 +3132,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateShipmentBoxType")
-	public ResponseEntity<Object> updateShipmentBoxType(HttpSession session, @RequestParam(value="shipmentBoxTypeId") String shipmentBoxTypeId, @RequestParam(value="boxLength", required=false) BigDecimal boxLength, @RequestParam(value="boxWeight", required=false) BigDecimal boxWeight, @RequestParam(value="dimensionUomId", required=false) String dimensionUomId, @RequestParam(value="description", required=false) String description, @RequestParam(value="weightUomId", required=false) String weightUomId, @RequestParam(value="boxWidth", required=false) BigDecimal boxWidth, @RequestParam(value="boxHeight", required=false) BigDecimal boxHeight) {
+	public ResponseEntity<Map<String, Object>> updateShipmentBoxType(HttpSession session, @RequestParam(value="shipmentBoxTypeId") String shipmentBoxTypeId, @RequestParam(value="boxLength", required=false) BigDecimal boxLength, @RequestParam(value="boxWeight", required=false) BigDecimal boxWeight, @RequestParam(value="dimensionUomId", required=false) String dimensionUomId, @RequestParam(value="description", required=false) String description, @RequestParam(value="weightUomId", required=false) String weightUomId, @RequestParam(value="boxWidth", required=false) BigDecimal boxWidth, @RequestParam(value="boxHeight", required=false) BigDecimal boxHeight) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentBoxTypeId",shipmentBoxTypeId);
@@ -3166,23 +3168,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/cancelReceivedItems")
-	public ResponseEntity<Object> cancelReceivedItems(HttpSession session, @RequestParam(value="receiptId") String receiptId, @RequestParam(value="facilityId", required=false) String facilityId) {
+	public ResponseEntity<Map<String, Object>> cancelReceivedItems(HttpSession session, @RequestParam(value="receiptId") String receiptId, @RequestParam(value="facilityId", required=false) String facilityId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("receiptId",receiptId);
@@ -3196,23 +3198,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteShipment")
-	public ResponseEntity<Object> deleteShipment(HttpSession session, @RequestParam(value="shipmentId") String shipmentId) {
+	public ResponseEntity<Map<String, Object>> deleteShipment(HttpSession session, @RequestParam(value="shipmentId") String shipmentId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -3225,23 +3227,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipmentForReturn")
-	public ResponseEntity<Object> createShipmentForReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
+	public ResponseEntity<Map<String, Object>> createShipmentForReturn(HttpSession session, @RequestParam(value="returnId") String returnId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("returnId",returnId);
@@ -3254,23 +3256,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/returnInventoryItemIssuedToFixedAssetMaint")
-	public ResponseEntity<Object> returnInventoryItemIssuedToFixedAssetMaint(HttpSession session, @RequestParam(value="itemIssuanceId") String itemIssuanceId) {
+	public ResponseEntity<Map<String, Object>> returnInventoryItemIssuedToFixedAssetMaint(HttpSession session, @RequestParam(value="itemIssuanceId") String itemIssuanceId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("itemIssuanceId",itemIssuanceId);
@@ -3283,23 +3285,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/clearPackAll")
-	public ResponseEntity<Object> clearPackAll(HttpSession session, @RequestParam(value="packingSession") org.apache.ofbiz.shipment.packing.PackingSession packingSession) {
+	public ResponseEntity<Map<String, Object>> clearPackAll(HttpSession session, @RequestParam(value="packingSession") org.apache.ofbiz.shipment.packing.PackingSession packingSession) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("packingSession",packingSession);
@@ -3312,23 +3314,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipmentPackageRouteSeg")
-	public ResponseEntity<Object> createShipmentPackageRouteSeg(HttpSession session, @RequestParam(value="shipmentRouteSegmentId") String shipmentRouteSegmentId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentPackageSeqId") String shipmentPackageSeqId, @RequestParam(value="labelIntlSignImage", required=false) byte[] labelIntlSignImage, @RequestParam(value="trackingCode", required=false) String trackingCode, @RequestParam(value="boxNumber", required=false) String boxNumber, @RequestParam(value="packageServiceCost", required=false) BigDecimal packageServiceCost, @RequestParam(value="packageOtherCost", required=false) BigDecimal packageOtherCost, @RequestParam(value="labelImage", required=false) byte[] labelImage, @RequestParam(value="labelPrinted", required=false) String labelPrinted, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="internationalInvoice", required=false) byte[] internationalInvoice, @RequestParam(value="packageTransportCost", required=false) BigDecimal packageTransportCost, @RequestParam(value="codAmount", required=false) BigDecimal codAmount, @RequestParam(value="insuredAmount", required=false) BigDecimal insuredAmount, @RequestParam(value="labelHtml", required=false) String labelHtml) {
+	public ResponseEntity<Map<String, Object>> createShipmentPackageRouteSeg(HttpSession session, @RequestParam(value="shipmentRouteSegmentId") String shipmentRouteSegmentId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentPackageSeqId") String shipmentPackageSeqId, @RequestParam(value="labelIntlSignImage", required=false) byte[] labelIntlSignImage, @RequestParam(value="trackingCode", required=false) String trackingCode, @RequestParam(value="boxNumber", required=false) String boxNumber, @RequestParam(value="packageServiceCost", required=false) BigDecimal packageServiceCost, @RequestParam(value="packageOtherCost", required=false) BigDecimal packageOtherCost, @RequestParam(value="labelImage", required=false) byte[] labelImage, @RequestParam(value="labelPrinted", required=false) String labelPrinted, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="internationalInvoice", required=false) byte[] internationalInvoice, @RequestParam(value="packageTransportCost", required=false) BigDecimal packageTransportCost, @RequestParam(value="codAmount", required=false) BigDecimal codAmount, @RequestParam(value="insuredAmount", required=false) BigDecimal insuredAmount, @RequestParam(value="labelHtml", required=false) String labelHtml) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentRouteSegmentId",shipmentRouteSegmentId);
@@ -3356,23 +3358,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateItemIssuance")
-	public ResponseEntity<Object> updateItemIssuance(HttpSession session, @RequestParam(value="itemIssuanceId") String itemIssuanceId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="issuedDateTime", required=false) Timestamp issuedDateTime, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="maintHistSeqId", required=false) String maintHistSeqId, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId, @RequestParam(value="issuedByUserLoginId", required=false) String issuedByUserLoginId, @RequestParam(value="cancelQuantity", required=false) BigDecimal cancelQuantity) {
+	public ResponseEntity<Map<String, Object>> updateItemIssuance(HttpSession session, @RequestParam(value="itemIssuanceId") String itemIssuanceId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="issuedDateTime", required=false) Timestamp issuedDateTime, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="maintHistSeqId", required=false) String maintHistSeqId, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId, @RequestParam(value="issuedByUserLoginId", required=false) String issuedByUserLoginId, @RequestParam(value="cancelQuantity", required=false) BigDecimal cancelQuantity) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("itemIssuanceId",itemIssuanceId);
@@ -3397,23 +3399,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateShipmentPackageContent")
-	public ResponseEntity<Object> updateShipmentPackageContent(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentPackageSeqId") String shipmentPackageSeqId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="subProductQuantity", required=false) BigDecimal subProductQuantity, @RequestParam(value="subProductId", required=false) String subProductId) {
+	public ResponseEntity<Map<String, Object>> updateShipmentPackageContent(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentPackageSeqId") String shipmentPackageSeqId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="subProductQuantity", required=false) BigDecimal subProductQuantity, @RequestParam(value="subProductId", required=false) String subProductId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -3431,23 +3433,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/quickShipEntireOrder")
-	public ResponseEntity<Object> quickShipEntireOrder(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="setPackedOnly", required=false) String setPackedOnly, @RequestParam(value="eventDate", required=false) Timestamp eventDate) {
+	public ResponseEntity<Map<String, Object>> quickShipEntireOrder(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="setPackedOnly", required=false) String setPackedOnly, @RequestParam(value="eventDate", required=false) Timestamp eventDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderId",orderId);
@@ -3463,23 +3465,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addShipmentContentToPackage")
-	public ResponseEntity<Object> addShipmentContentToPackage(HttpSession session, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentPackageSeqId") String shipmentPackageSeqId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId, @RequestParam(value="subProductQuantity", required=false) BigDecimal subProductQuantity, @RequestParam(value="subProductId", required=false) String subProductId) {
+	public ResponseEntity<Map<String, Object>> addShipmentContentToPackage(HttpSession session, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentPackageSeqId") String shipmentPackageSeqId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId, @RequestParam(value="subProductQuantity", required=false) BigDecimal subProductQuantity, @RequestParam(value="subProductId", required=false) String subProductId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quantity",quantity);
@@ -3497,23 +3499,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/checkCancelItemIssuanceAndOrderShipmentFromShipment")
-	public ResponseEntity<Object> checkCancelItemIssuanceAndOrderShipmentFromShipment(HttpSession session, @RequestParam(value="shipmentId") String shipmentId) {
+	public ResponseEntity<Map<String, Object>> checkCancelItemIssuanceAndOrderShipmentFromShipment(HttpSession session, @RequestParam(value="shipmentId") String shipmentId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -3526,23 +3528,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteShipmentItem")
-	public ResponseEntity<Object> deleteShipmentItem(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId) {
+	public ResponseEntity<Map<String, Object>> deleteShipmentItem(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -3556,23 +3558,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteShipmentReceipt")
-	public ResponseEntity<Object> deleteShipmentReceipt(HttpSession session, @RequestParam(value="receiptId") String receiptId) {
+	public ResponseEntity<Map<String, Object>> deleteShipmentReceipt(HttpSession session, @RequestParam(value="receiptId") String receiptId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("receiptId",receiptId);
@@ -3585,23 +3587,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipmentReceipt")
-	public ResponseEntity<Object> createShipmentReceipt(HttpSession session, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="quantityAccepted", required=false) BigDecimal quantityAccepted, @RequestParam(value="shipmentPackageSeqId", required=false) String shipmentPackageSeqId, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId, @RequestParam(value="quantityRejected", required=false) BigDecimal quantityRejected, @RequestParam(value="inventoryItemDetailSeqId", required=false) String inventoryItemDetailSeqId, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="rejectionId", required=false) String rejectionId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="receivedByUserLoginId", required=false) String receivedByUserLoginId, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId, @RequestParam(value="datetimeReceived", required=false) Timestamp datetimeReceived, @RequestParam(value="itemDescription", required=false) String itemDescription) {
+	public ResponseEntity<Map<String, Object>> createShipmentReceipt(HttpSession session, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="quantityAccepted", required=false) BigDecimal quantityAccepted, @RequestParam(value="shipmentPackageSeqId", required=false) String shipmentPackageSeqId, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId, @RequestParam(value="quantityRejected", required=false) BigDecimal quantityRejected, @RequestParam(value="inventoryItemDetailSeqId", required=false) String inventoryItemDetailSeqId, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="rejectionId", required=false) String rejectionId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="receivedByUserLoginId", required=false) String receivedByUserLoginId, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId, @RequestParam(value="datetimeReceived", required=false) Timestamp datetimeReceived, @RequestParam(value="itemDescription", required=false) String itemDescription) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderItemSeqId",orderItemSeqId);
@@ -3629,23 +3631,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/issueSerializedInvToShipmentPackageAndSetTracking")
-	public ResponseEntity<Object> issueSerializedInvToShipmentPackageAndSetTracking(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="orderId") String orderId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="promisedDatetime") Timestamp promisedDatetime, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="trackingNum", required=false) String trackingNum, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="serialNumber", required=false) String serialNumber, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="quantityNotReserved", required=false) BigDecimal quantityNotReserved, @RequestParam(value="requireInventory", required=false) String requireInventory, @RequestParam(value="shipmentPackageSeqId", required=false) String shipmentPackageSeqId, @RequestParam(value="reservedDatetime", required=false) Timestamp reservedDatetime, @RequestParam(value="reserveOrderEnumId", required=false) String reserveOrderEnumId, @RequestParam(value="sequenceId", required=false) Long sequenceId) {
+	public ResponseEntity<Map<String, Object>> issueSerializedInvToShipmentPackageAndSetTracking(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="orderId") String orderId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="promisedDatetime") Timestamp promisedDatetime, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="trackingNum", required=false) String trackingNum, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="serialNumber", required=false) String serialNumber, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="quantityNotReserved", required=false) BigDecimal quantityNotReserved, @RequestParam(value="requireInventory", required=false) String requireInventory, @RequestParam(value="shipmentPackageSeqId", required=false) String shipmentPackageSeqId, @RequestParam(value="reservedDatetime", required=false) Timestamp reservedDatetime, @RequestParam(value="reserveOrderEnumId", required=false) String reserveOrderEnumId, @RequestParam(value="sequenceId", required=false) Long sequenceId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("inventoryItemId",inventoryItemId);
@@ -3674,23 +3676,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/verifyBulkItem")
-	public ResponseEntity<Object> verifyBulkItem(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="verifyPickSession") org.apache.ofbiz.shipment.verify.VerifyPickSession verifyPickSession, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="productMap", required=false) Map productMap, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="selectedMap", required=false) Map selectedMap, @RequestParam(value="originGeoIdMap", required=false) Map originGeoIdMap, @RequestParam(value="itemMap", required=false) Map itemMap, @RequestParam(value="quantityMap", required=false) Map quantityMap, @RequestParam(value="pickerPartyId", required=false) String pickerPartyId) {
+	public ResponseEntity<Map<String, Object>> verifyBulkItem(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="verifyPickSession") org.apache.ofbiz.shipment.verify.VerifyPickSession verifyPickSession, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="productMap", required=false) Map productMap, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="selectedMap", required=false) Map selectedMap, @RequestParam(value="originGeoIdMap", required=false) Map originGeoIdMap, @RequestParam(value="itemMap", required=false) Map itemMap, @RequestParam(value="quantityMap", required=false) Map quantityMap, @RequestParam(value="pickerPartyId", required=false) String pickerPartyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderId",orderId);
@@ -3712,23 +3714,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/quickShipPurchaseOrder")
-	public ResponseEntity<Object> quickShipPurchaseOrder(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="orderId") String orderId) {
+	public ResponseEntity<Map<String, Object>> quickShipPurchaseOrder(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="orderId") String orderId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("facilityId",facilityId);
@@ -3742,23 +3744,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/quickScheduleShipmentRouteSegment")
-	public ResponseEntity<Object> quickScheduleShipmentRouteSegment(HttpSession session, @RequestParam(value="shipmentRouteSegmentId") String shipmentRouteSegmentId, @RequestParam(value="shipmentId") String shipmentId) {
+	public ResponseEntity<Map<String, Object>> quickScheduleShipmentRouteSegment(HttpSession session, @RequestParam(value="shipmentRouteSegmentId") String shipmentRouteSegmentId, @RequestParam(value="shipmentId") String shipmentId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentRouteSegmentId",shipmentRouteSegmentId);
@@ -3772,23 +3774,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getShipmentPackageValueFromOrders")
-	public ResponseEntity<Object> getShipmentPackageValueFromOrders(HttpSession session, @RequestParam(value="currencyUomId") String currencyUomId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentPackageSeqId") String shipmentPackageSeqId) {
+	public ResponseEntity<Map<String, Object>> getShipmentPackageValueFromOrders(HttpSession session, @RequestParam(value="currencyUomId") String currencyUomId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentPackageSeqId") String shipmentPackageSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("currencyUomId",currencyUomId);
@@ -3803,23 +3805,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/savePackagesInfo")
-	public ResponseEntity<Object> savePackagesInfo(HttpSession session, @RequestParam(value="weightPackageSession") org.apache.ofbiz.shipment.weightPackage.WeightPackageSession weightPackageSession, @RequestParam(value="orderId") String orderId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="facilityId", required=false) String facilityId) {
+	public ResponseEntity<Map<String, Object>> savePackagesInfo(HttpSession session, @RequestParam(value="weightPackageSession") org.apache.ofbiz.shipment.weightPackage.WeightPackageSession weightPackageSession, @RequestParam(value="orderId") String orderId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="facilityId", required=false) String facilityId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("weightPackageSession",weightPackageSession);
@@ -3835,23 +3837,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/issueOrderItemToShipmentAndReceiveAgainstPO")
-	public ResponseEntity<Object> issueOrderItemToShipmentAndReceiveAgainstPO(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="orderId") String orderId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="quantityAccepted", required=false) BigDecimal quantityAccepted, @RequestParam(value="binNumber", required=false) String binNumber, @RequestParam(value="maintHistSeqId", required=false) String maintHistSeqId, @RequestParam(value="priorityOrderItemSeqId", required=false) String priorityOrderItemSeqId, @RequestParam(value="inventoryItemDetailSeqId", required=false) String inventoryItemDetailSeqId, @RequestParam(value="oldAvailableToPromise", required=false) BigDecimal oldAvailableToPromise, @RequestParam(value="physicalInventoryId", required=false) String physicalInventoryId, @RequestParam(value="reasonEnumId", required=false) String reasonEnumId, @RequestParam(value="itemDescription", required=false) String itemDescription, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="containerId", required=false) String containerId, @RequestParam(value="locationSeqId", required=false) String locationSeqId, @RequestParam(value="quantityOnHandDiff", required=false) BigDecimal quantityOnHandDiff, @RequestParam(value="serialNumber", required=false) Long serialNumber, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId, @RequestParam(value="quantityRejected", required=false) BigDecimal quantityRejected, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="availableToPromiseDiff", required=false) BigDecimal availableToPromiseDiff, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="softIdentifier", required=false) Long softIdentifier, @RequestParam(value="description", required=false) String description, @RequestParam(value="shipmentPackageSeqId", required=false) String shipmentPackageSeqId, @RequestParam(value="currentInventoryItemId", required=false) String currentInventoryItemId, @RequestParam(value="accountingQuantityDiff", required=false) BigDecimal accountingQuantityDiff, @RequestParam(value="itemIssuanceId", required=false) String itemIssuanceId, @RequestParam(value="datetimeManufactured", required=false) Timestamp datetimeManufactured, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="orderCurrencyUnitPrice", required=false) String orderCurrencyUnitPrice, @RequestParam(value="expireDate", required=false) Timestamp expireDate, @RequestParam(value="oldQuantityOnHand", required=false) BigDecimal oldQuantityOnHand, @RequestParam(value="receiptId", required=false) String receiptId, @RequestParam(value="inventoryItemTypeId", required=false) String inventoryItemTypeId, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="lotId", required=false) String lotId, @RequestParam(value="accountingQuantityTotal", required=false) BigDecimal accountingQuantityTotal, @RequestParam(value="rejectionId", required=false) String rejectionId, @RequestParam(value="ownerPartyId", required=false) String ownerPartyId, @RequestParam(value="activationValidThru", required=false) Timestamp activationValidThru, @RequestParam(value="activationNumber", required=false) Long activationNumber, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="receivedByUserLoginId", required=false) String receivedByUserLoginId, @RequestParam(value="priorityOrderId", required=false) String priorityOrderId, @RequestParam(value="unitCost", required=false) BigDecimal unitCost, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId, @RequestParam(value="datetimeReceived", required=false) Timestamp datetimeReceived, @RequestParam(value="effectiveDate", required=false) Timestamp effectiveDate) {
+	public ResponseEntity<Map<String, Object>> issueOrderItemToShipmentAndReceiveAgainstPO(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="orderId") String orderId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="quantityAccepted", required=false) BigDecimal quantityAccepted, @RequestParam(value="binNumber", required=false) String binNumber, @RequestParam(value="maintHistSeqId", required=false) String maintHistSeqId, @RequestParam(value="priorityOrderItemSeqId", required=false) String priorityOrderItemSeqId, @RequestParam(value="inventoryItemDetailSeqId", required=false) String inventoryItemDetailSeqId, @RequestParam(value="oldAvailableToPromise", required=false) BigDecimal oldAvailableToPromise, @RequestParam(value="physicalInventoryId", required=false) String physicalInventoryId, @RequestParam(value="reasonEnumId", required=false) String reasonEnumId, @RequestParam(value="itemDescription", required=false) String itemDescription, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="containerId", required=false) String containerId, @RequestParam(value="locationSeqId", required=false) String locationSeqId, @RequestParam(value="quantityOnHandDiff", required=false) BigDecimal quantityOnHandDiff, @RequestParam(value="serialNumber", required=false) Long serialNumber, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId, @RequestParam(value="quantityRejected", required=false) BigDecimal quantityRejected, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="availableToPromiseDiff", required=false) BigDecimal availableToPromiseDiff, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="softIdentifier", required=false) Long softIdentifier, @RequestParam(value="description", required=false) String description, @RequestParam(value="shipmentPackageSeqId", required=false) String shipmentPackageSeqId, @RequestParam(value="currentInventoryItemId", required=false) String currentInventoryItemId, @RequestParam(value="accountingQuantityDiff", required=false) BigDecimal accountingQuantityDiff, @RequestParam(value="itemIssuanceId", required=false) String itemIssuanceId, @RequestParam(value="datetimeManufactured", required=false) Timestamp datetimeManufactured, @RequestParam(value="returnId", required=false) String returnId, @RequestParam(value="orderCurrencyUnitPrice", required=false) String orderCurrencyUnitPrice, @RequestParam(value="expireDate", required=false) Timestamp expireDate, @RequestParam(value="oldQuantityOnHand", required=false) BigDecimal oldQuantityOnHand, @RequestParam(value="receiptId", required=false) String receiptId, @RequestParam(value="inventoryItemTypeId", required=false) String inventoryItemTypeId, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="lotId", required=false) String lotId, @RequestParam(value="accountingQuantityTotal", required=false) BigDecimal accountingQuantityTotal, @RequestParam(value="rejectionId", required=false) String rejectionId, @RequestParam(value="ownerPartyId", required=false) String ownerPartyId, @RequestParam(value="activationValidThru", required=false) Timestamp activationValidThru, @RequestParam(value="activationNumber", required=false) Long activationNumber, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="receivedByUserLoginId", required=false) String receivedByUserLoginId, @RequestParam(value="priorityOrderId", required=false) String priorityOrderId, @RequestParam(value="unitCost", required=false) BigDecimal unitCost, @RequestParam(value="returnItemSeqId", required=false) String returnItemSeqId, @RequestParam(value="datetimeReceived", required=false) Timestamp datetimeReceived, @RequestParam(value="effectiveDate", required=false) Timestamp effectiveDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderItemSeqId",orderItemSeqId);
@@ -3919,23 +3921,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteShipmentCostEstimate")
-	public ResponseEntity<Object> deleteShipmentCostEstimate(HttpSession session, @RequestParam(value="shipmentCostEstimateId") String shipmentCostEstimateId) {
+	public ResponseEntity<Map<String, Object>> deleteShipmentCostEstimate(HttpSession session, @RequestParam(value="shipmentCostEstimateId") String shipmentCostEstimateId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentCostEstimateId",shipmentCostEstimateId);
@@ -3948,23 +3950,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/completeVerifiedPick")
-	public ResponseEntity<Object> completeVerifiedPick(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="verifyPickSession") org.apache.ofbiz.shipment.verify.VerifyPickSession verifyPickSession, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="pickerPartyId", required=false) String pickerPartyId) {
+	public ResponseEntity<Map<String, Object>> completeVerifiedPick(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="verifyPickSession") org.apache.ofbiz.shipment.verify.VerifyPickSession verifyPickSession, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="pickerPartyId", required=false) String pickerPartyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderId",orderId);
@@ -3982,23 +3984,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteShipmentContactMechType")
-	public ResponseEntity<Object> deleteShipmentContactMechType(HttpSession session, @RequestParam(value="shipmentContactMechTypeId") String shipmentContactMechTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteShipmentContactMechType(HttpSession session, @RequestParam(value="shipmentContactMechTypeId") String shipmentContactMechTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentContactMechTypeId",shipmentContactMechTypeId);
@@ -4011,23 +4013,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateShipmentPackage")
-	public ResponseEntity<Object> updateShipmentPackage(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentPackageSeqId") String shipmentPackageSeqId, @RequestParam(value="boxLength", required=false) BigDecimal boxLength, @RequestParam(value="dateCreated", required=false) Timestamp dateCreated, @RequestParam(value="dimensionUomId", required=false) String dimensionUomId, @RequestParam(value="insuredValue", required=false) BigDecimal insuredValue, @RequestParam(value="weight", required=false) BigDecimal weight, @RequestParam(value="weightUomId", required=false) String weightUomId, @RequestParam(value="boxHeight", required=false) BigDecimal boxHeight, @RequestParam(value="boxWidth", required=false) BigDecimal boxWidth, @RequestParam(value="shipmentBoxTypeId", required=false) String shipmentBoxTypeId) {
+	public ResponseEntity<Map<String, Object>> updateShipmentPackage(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentPackageSeqId") String shipmentPackageSeqId, @RequestParam(value="boxLength", required=false) BigDecimal boxLength, @RequestParam(value="dateCreated", required=false) Timestamp dateCreated, @RequestParam(value="dimensionUomId", required=false) String dimensionUomId, @RequestParam(value="insuredValue", required=false) BigDecimal insuredValue, @RequestParam(value="weight", required=false) BigDecimal weight, @RequestParam(value="weightUomId", required=false) String weightUomId, @RequestParam(value="boxHeight", required=false) BigDecimal boxHeight, @RequestParam(value="boxWidth", required=false) BigDecimal boxWidth, @RequestParam(value="shipmentBoxTypeId", required=false) String shipmentBoxTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -4050,23 +4052,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteItemIssuance")
-	public ResponseEntity<Object> deleteItemIssuance(HttpSession session, @RequestParam(value="itemIssuanceId") String itemIssuanceId) {
+	public ResponseEntity<Map<String, Object>> deleteItemIssuance(HttpSession session, @RequestParam(value="itemIssuanceId") String itemIssuanceId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("itemIssuanceId",itemIssuanceId);
@@ -4079,23 +4081,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipmentStatus")
-	public ResponseEntity<Object> createShipmentStatus(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="statusDate", required=false) Timestamp statusDate, @RequestParam(value="changeByUserLoginId", required=false) String changeByUserLoginId) {
+	public ResponseEntity<Map<String, Object>> createShipmentStatus(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="statusDate", required=false) Timestamp statusDate, @RequestParam(value="changeByUserLoginId", required=false) String changeByUserLoginId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("statusId",statusId);
@@ -4111,23 +4113,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updatePackedLine")
-	public ResponseEntity<Object> updatePackedLine(HttpSession session, @RequestParam(value="weightPackageSession") org.apache.ofbiz.shipment.weightPackage.WeightPackageSession weightPackageSession, @RequestParam(value="weightPackageSeqId") Integer weightPackageSeqId, @RequestParam(value="packageHeight", required=false) BigDecimal packageHeight, @RequestParam(value="packageWeight", required=false) BigDecimal packageWeight, @RequestParam(value="packageLength", required=false) BigDecimal packageLength, @RequestParam(value="packageWidth", required=false) BigDecimal packageWidth, @RequestParam(value="shipmentBoxTypeId", required=false) String shipmentBoxTypeId) {
+	public ResponseEntity<Map<String, Object>> updatePackedLine(HttpSession session, @RequestParam(value="weightPackageSession") org.apache.ofbiz.shipment.weightPackage.WeightPackageSession weightPackageSession, @RequestParam(value="weightPackageSeqId") Integer weightPackageSeqId, @RequestParam(value="packageHeight", required=false) BigDecimal packageHeight, @RequestParam(value="packageWeight", required=false) BigDecimal packageWeight, @RequestParam(value="packageLength", required=false) BigDecimal packageLength, @RequestParam(value="packageWidth", required=false) BigDecimal packageWidth, @RequestParam(value="shipmentBoxTypeId", required=false) String shipmentBoxTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("weightPackageSession",weightPackageSession);
@@ -4146,23 +4148,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipmentRouteSegment")
-	public ResponseEntity<Object> createShipmentRouteSegment(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="actualOtherCost", required=false) BigDecimal actualOtherCost, @RequestParam(value="carrierDeliveryZone", required=false) String carrierDeliveryZone, @RequestParam(value="thirdPartyPostalCode", required=false) String thirdPartyPostalCode, @RequestParam(value="destTelecomNumberId", required=false) String destTelecomNumberId, @RequestParam(value="carrierRestrictionCodes", required=false) String carrierRestrictionCodes, @RequestParam(value="trackingIdNumber", required=false) String trackingIdNumber, @RequestParam(value="deliveryId", required=false) String deliveryId, @RequestParam(value="carrierServiceStatusId", required=false) String carrierServiceStatusId, @RequestParam(value="actualStartDate", required=false) Timestamp actualStartDate, @RequestParam(value="trackingDigest", required=false) String trackingDigest, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId, @RequestParam(value="actualCost", required=false) BigDecimal actualCost, @RequestParam(value="upsHighValueReport", required=false) byte[] upsHighValueReport, @RequestParam(value="actualArrivalDate", required=false) Timestamp actualArrivalDate, @RequestParam(value="actualServiceCost", required=false) BigDecimal actualServiceCost, @RequestParam(value="originContactMechId", required=false) String originContactMechId, @RequestParam(value="estimatedStartDate", required=false) Timestamp estimatedStartDate, @RequestParam(value="carrierRestrictionDesc", required=false) String carrierRestrictionDesc, @RequestParam(value="actualTransportCost", required=false) BigDecimal actualTransportCost, @RequestParam(value="billingWeightUomId", required=false) String billingWeightUomId, @RequestParam(value="homeDeliveryDate", required=false) Timestamp homeDeliveryDate, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="shipmentRouteSegmentId", required=false) String shipmentRouteSegmentId, @RequestParam(value="destFacilityId", required=false) String destFacilityId, @RequestParam(value="carrierPartyId", required=false) String carrierPartyId, @RequestParam(value="lastUpdatedDate", required=false) Timestamp lastUpdatedDate, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="billingWeight", required=false) BigDecimal billingWeight, @RequestParam(value="originTelecomNumberId", required=false) String originTelecomNumberId, @RequestParam(value="thirdPartyCountryGeoCode", required=false) String thirdPartyCountryGeoCode, @RequestParam(value="destContactMechId", required=false) String destContactMechId, @RequestParam(value="estimatedArrivalDate", required=false) Timestamp estimatedArrivalDate, @RequestParam(value="homeDeliveryType", required=false) String homeDeliveryType, @RequestParam(value="thirdPartyAccountNumber", required=false) String thirdPartyAccountNumber, @RequestParam(value="updatedByUserLoginId", required=false) String updatedByUserLoginId) {
+	public ResponseEntity<Map<String, Object>> createShipmentRouteSegment(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="actualOtherCost", required=false) BigDecimal actualOtherCost, @RequestParam(value="carrierDeliveryZone", required=false) String carrierDeliveryZone, @RequestParam(value="thirdPartyPostalCode", required=false) String thirdPartyPostalCode, @RequestParam(value="destTelecomNumberId", required=false) String destTelecomNumberId, @RequestParam(value="carrierRestrictionCodes", required=false) String carrierRestrictionCodes, @RequestParam(value="trackingIdNumber", required=false) String trackingIdNumber, @RequestParam(value="deliveryId", required=false) String deliveryId, @RequestParam(value="carrierServiceStatusId", required=false) String carrierServiceStatusId, @RequestParam(value="actualStartDate", required=false) Timestamp actualStartDate, @RequestParam(value="trackingDigest", required=false) String trackingDigest, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId, @RequestParam(value="actualCost", required=false) BigDecimal actualCost, @RequestParam(value="upsHighValueReport", required=false) byte[] upsHighValueReport, @RequestParam(value="actualArrivalDate", required=false) Timestamp actualArrivalDate, @RequestParam(value="actualServiceCost", required=false) BigDecimal actualServiceCost, @RequestParam(value="originContactMechId", required=false) String originContactMechId, @RequestParam(value="estimatedStartDate", required=false) Timestamp estimatedStartDate, @RequestParam(value="carrierRestrictionDesc", required=false) String carrierRestrictionDesc, @RequestParam(value="actualTransportCost", required=false) BigDecimal actualTransportCost, @RequestParam(value="billingWeightUomId", required=false) String billingWeightUomId, @RequestParam(value="homeDeliveryDate", required=false) Timestamp homeDeliveryDate, @RequestParam(value="originFacilityId", required=false) String originFacilityId, @RequestParam(value="shipmentRouteSegmentId", required=false) String shipmentRouteSegmentId, @RequestParam(value="destFacilityId", required=false) String destFacilityId, @RequestParam(value="carrierPartyId", required=false) String carrierPartyId, @RequestParam(value="lastUpdatedDate", required=false) Timestamp lastUpdatedDate, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="billingWeight", required=false) BigDecimal billingWeight, @RequestParam(value="originTelecomNumberId", required=false) String originTelecomNumberId, @RequestParam(value="thirdPartyCountryGeoCode", required=false) String thirdPartyCountryGeoCode, @RequestParam(value="destContactMechId", required=false) String destContactMechId, @RequestParam(value="estimatedArrivalDate", required=false) Timestamp estimatedArrivalDate, @RequestParam(value="homeDeliveryType", required=false) String homeDeliveryType, @RequestParam(value="thirdPartyAccountNumber", required=false) String thirdPartyAccountNumber, @RequestParam(value="updatedByUserLoginId", required=false) String updatedByUserLoginId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -4210,23 +4212,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShippingDocument")
-	public ResponseEntity<Object> createShippingDocument(HttpSession session, @RequestParam(value="documentId") String documentId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="shipmentPackageSeqId", required=false) String shipmentPackageSeqId, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId) {
+	public ResponseEntity<Map<String, Object>> createShippingDocument(HttpSession session, @RequestParam(value="documentId") String documentId, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="shipmentPackageSeqId", required=false) String shipmentPackageSeqId, @RequestParam(value="shipmentItemSeqId", required=false) String shipmentItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("documentId",documentId);
@@ -4243,23 +4245,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipmentPackageContent")
-	public ResponseEntity<Object> createShipmentPackageContent(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentPackageSeqId") String shipmentPackageSeqId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="subProductQuantity", required=false) BigDecimal subProductQuantity, @RequestParam(value="subProductId", required=false) String subProductId) {
+	public ResponseEntity<Map<String, Object>> createShipmentPackageContent(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentPackageSeqId") String shipmentPackageSeqId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="subProductQuantity", required=false) BigDecimal subProductQuantity, @RequestParam(value="subProductId", required=false) String subProductId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -4277,23 +4279,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/issueInventoryItemToShipment")
-	public ResponseEntity<Object> issueInventoryItemToShipment(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="totalIssuedQty") BigDecimal totalIssuedQty, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId) {
+	public ResponseEntity<Map<String, Object>> issueInventoryItemToShipment(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="totalIssuedQty") BigDecimal totalIssuedQty, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("inventoryItemId",inventoryItemId);
@@ -4310,23 +4312,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteShipmentAttribute")
-	public ResponseEntity<Object> deleteShipmentAttribute(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="attrName") String attrName) {
+	public ResponseEntity<Map<String, Object>> deleteShipmentAttribute(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="attrName") String attrName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -4340,23 +4342,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/packBulkItems")
-	public ResponseEntity<Object> packBulkItems(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="packingSession") org.apache.ofbiz.shipment.packing.PackingSession packingSession, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="updateQuantity", required=false) Boolean updateQuantity, @RequestParam(value="selInfo", required=false) Map selInfo, @RequestParam(value="pkgInfo", required=false) Map pkgInfo, @RequestParam(value="prdInfo", required=false) Map prdInfo, @RequestParam(value="nextPackageSeq", required=false) Integer nextPackageSeq, @RequestParam(value="qtyInfo", required=false) Map qtyInfo, @RequestParam(value="iteInfo", required=false) Map iteInfo, @RequestParam(value="wgtInfo", required=false) Map wgtInfo, @RequestParam(value="pickerPartyId", required=false) String pickerPartyId, @RequestParam(value="handlingInstructions", required=false) String handlingInstructions, @RequestParam(value="numPackagesInfo", required=false) Map numPackagesInfo) {
+	public ResponseEntity<Map<String, Object>> packBulkItems(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="packingSession") org.apache.ofbiz.shipment.packing.PackingSession packingSession, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="updateQuantity", required=false) Boolean updateQuantity, @RequestParam(value="selInfo", required=false) Map selInfo, @RequestParam(value="pkgInfo", required=false) Map pkgInfo, @RequestParam(value="prdInfo", required=false) Map prdInfo, @RequestParam(value="nextPackageSeq", required=false) Integer nextPackageSeq, @RequestParam(value="qtyInfo", required=false) Map qtyInfo, @RequestParam(value="iteInfo", required=false) Map iteInfo, @RequestParam(value="wgtInfo", required=false) Map wgtInfo, @RequestParam(value="pickerPartyId", required=false) String pickerPartyId, @RequestParam(value="handlingInstructions", required=false) String handlingInstructions, @RequestParam(value="numPackagesInfo", required=false) Map numPackagesInfo) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderId",orderId);
@@ -4382,23 +4384,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipmentContactMech")
-	public ResponseEntity<Object> createShipmentContactMech(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentContactMechTypeId") String shipmentContactMechTypeId, @RequestParam(value="contactMechId", required=false) String contactMechId) {
+	public ResponseEntity<Map<String, Object>> createShipmentContactMech(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentContactMechTypeId") String shipmentContactMechTypeId, @RequestParam(value="contactMechId", required=false) String contactMechId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -4413,23 +4415,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createShipmentMethodType")
-	public ResponseEntity<Object> createShipmentMethodType(HttpSession session, @RequestParam(value="shipmentMethodTypeId") String shipmentMethodTypeId) {
+	public ResponseEntity<Map<String, Object>> createShipmentMethodType(HttpSession session, @RequestParam(value="shipmentMethodTypeId") String shipmentMethodTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentMethodTypeId",shipmentMethodTypeId);
@@ -4442,23 +4444,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updatePurchaseShipmentFromReceipt")
-	public ResponseEntity<Object> updatePurchaseShipmentFromReceipt(HttpSession session, @RequestParam(value="shipmentId") String shipmentId) {
+	public ResponseEntity<Map<String, Object>> updatePurchaseShipmentFromReceipt(HttpSession session, @RequestParam(value="shipmentId") String shipmentId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -4471,23 +4473,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateQuantityBreak")
-	public ResponseEntity<Object> updateQuantityBreak(HttpSession session, @RequestParam(value="quantityBreakId") String quantityBreakId, @RequestParam(value="thruQuantity", required=false) BigDecimal thruQuantity, @RequestParam(value="quantityBreakTypeId", required=false) String quantityBreakTypeId, @RequestParam(value="fromQuantity", required=false) BigDecimal fromQuantity) {
+	public ResponseEntity<Map<String, Object>> updateQuantityBreak(HttpSession session, @RequestParam(value="quantityBreakId") String quantityBreakId, @RequestParam(value="thruQuantity", required=false) BigDecimal thruQuantity, @RequestParam(value="quantityBreakTypeId", required=false) String quantityBreakTypeId, @RequestParam(value="fromQuantity", required=false) BigDecimal fromQuantity) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quantityBreakId",quantityBreakId);
@@ -4503,23 +4505,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateShipmentItem")
-	public ResponseEntity<Object> updateShipmentItem(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="shipmentContentDescription", required=false) String shipmentContentDescription) {
+	public ResponseEntity<Map<String, Object>> updateShipmentItem(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="shipmentContentDescription", required=false) String shipmentContentDescription) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -4536,23 +4538,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteShipmentItemFeature")
-	public ResponseEntity<Object> deleteShipmentItemFeature(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId) {
+	public ResponseEntity<Map<String, Object>> deleteShipmentItemFeature(HttpSession session, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="shipmentItemSeqId") String shipmentItemSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentId",shipmentId);
@@ -4567,23 +4569,23 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteItemIssuanceRole")
-	public ResponseEntity<Object> deleteItemIssuanceRole(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="itemIssuanceId") String itemIssuanceId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="partyId") String partyId) {
+	public ResponseEntity<Map<String, Object>> deleteItemIssuanceRole(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="itemIssuanceId") String itemIssuanceId, @RequestParam(value="shipmentId") String shipmentId, @RequestParam(value="partyId") String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("roleTypeId",roleTypeId);
@@ -4599,19 +4601,19 @@ public class ProductShipmentServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

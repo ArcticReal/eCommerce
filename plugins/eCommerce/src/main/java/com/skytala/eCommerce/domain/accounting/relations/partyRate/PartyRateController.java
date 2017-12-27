@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.partyRate.query.FindPar
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/partyRates")
 public class PartyRateController {
@@ -52,7 +54,7 @@ public class PartyRateController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPartyRatesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PartyRate>> findPartyRatesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyRatesBy query = new FindPartyRatesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PartyRateController {
 		}
 
 		List<PartyRate> partyRates =((PartyRateFound) Scheduler.execute(query).data()).getPartyRates();
-
-		if (partyRates.size() == 1) {
-			return ResponseEntity.ok().body(partyRates.get(0));
-		}
 
 		return ResponseEntity.ok().body(partyRates);
 
@@ -78,7 +76,7 @@ public class PartyRateController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPartyRate(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PartyRate> createPartyRate(HttpServletRequest request) throws Exception {
 
 		PartyRate partyRateToBeAdded = new PartyRate();
 		try {
@@ -86,7 +84,7 @@ public class PartyRateController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPartyRate(partyRateToBeAdded);
@@ -101,63 +99,15 @@ public class PartyRateController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPartyRate(@RequestBody PartyRate partyRateToBeAdded) throws Exception {
+	public ResponseEntity<PartyRate> createPartyRate(@RequestBody PartyRate partyRateToBeAdded) throws Exception {
 
 		AddPartyRate command = new AddPartyRate(partyRateToBeAdded);
 		PartyRate partyRate = ((PartyRateAdded) Scheduler.execute(command).data()).getAddedPartyRate();
 		
 		if (partyRate != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(partyRate);
+			return successful(partyRate);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PartyRate could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePartyRate(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PartyRate partyRateToBeUpdated = new PartyRate();
-
-		try {
-			partyRateToBeUpdated = PartyRateMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePartyRate(partyRateToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PartyRateController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePartyRate(@RequestBody PartyRate partyRateToBeUpdated,
+	public ResponseEntity<String> updatePartyRate(@RequestBody PartyRate partyRateToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		partyRateToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class PartyRateController {
 
 		try {
 			if(((PartyRateUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{partyRateId}")
-	public ResponseEntity<Object> findById(@PathVariable String partyRateId) throws Exception {
+	public ResponseEntity<PartyRate> findById(@PathVariable String partyRateId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyRateId", partyRateId);
 		try {
 
-			Object foundPartyRate = findPartyRatesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPartyRate);
+			List<PartyRate> foundPartyRate = findPartyRatesBy(requestParams).getBody();
+			if(foundPartyRate.size()==1){				return successful(foundPartyRate.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{partyRateId}")
-	public ResponseEntity<Object> deletePartyRateByIdUpdated(@PathVariable String partyRateId) throws Exception {
+	public ResponseEntity<String> deletePartyRateByIdUpdated(@PathVariable String partyRateId) throws Exception {
 		DeletePartyRate command = new DeletePartyRate(partyRateId);
 
 		try {
 			if (((PartyRateDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PartyRate could not be deleted");
+		return conflict();
 
 	}
 

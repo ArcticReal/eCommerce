@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.requirement.query.attribute.
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/requirement/requirementAttributes")
 public class RequirementAttributeController {
@@ -52,7 +54,7 @@ public class RequirementAttributeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findRequirementAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<RequirementAttribute>> findRequirementAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindRequirementAttributesBy query = new FindRequirementAttributesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class RequirementAttributeController {
 		}
 
 		List<RequirementAttribute> requirementAttributes =((RequirementAttributeFound) Scheduler.execute(query).data()).getRequirementAttributes();
-
-		if (requirementAttributes.size() == 1) {
-			return ResponseEntity.ok().body(requirementAttributes.get(0));
-		}
 
 		return ResponseEntity.ok().body(requirementAttributes);
 
@@ -78,7 +76,7 @@ public class RequirementAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createRequirementAttribute(HttpServletRequest request) throws Exception {
+	public ResponseEntity<RequirementAttribute> createRequirementAttribute(HttpServletRequest request) throws Exception {
 
 		RequirementAttribute requirementAttributeToBeAdded = new RequirementAttribute();
 		try {
@@ -86,7 +84,7 @@ public class RequirementAttributeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createRequirementAttribute(requirementAttributeToBeAdded);
@@ -101,63 +99,15 @@ public class RequirementAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createRequirementAttribute(@RequestBody RequirementAttribute requirementAttributeToBeAdded) throws Exception {
+	public ResponseEntity<RequirementAttribute> createRequirementAttribute(@RequestBody RequirementAttribute requirementAttributeToBeAdded) throws Exception {
 
 		AddRequirementAttribute command = new AddRequirementAttribute(requirementAttributeToBeAdded);
 		RequirementAttribute requirementAttribute = ((RequirementAttributeAdded) Scheduler.execute(command).data()).getAddedRequirementAttribute();
 		
 		if (requirementAttribute != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(requirementAttribute);
+			return successful(requirementAttribute);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("RequirementAttribute could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateRequirementAttribute(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		RequirementAttribute requirementAttributeToBeUpdated = new RequirementAttribute();
-
-		try {
-			requirementAttributeToBeUpdated = RequirementAttributeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateRequirementAttribute(requirementAttributeToBeUpdated, requirementAttributeToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class RequirementAttributeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateRequirementAttribute(@RequestBody RequirementAttribute requirementAttributeToBeUpdated,
+	public ResponseEntity<String> updateRequirementAttribute(@RequestBody RequirementAttribute requirementAttributeToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		requirementAttributeToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class RequirementAttributeController {
 
 		try {
 			if(((RequirementAttributeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{requirementAttributeId}")
-	public ResponseEntity<Object> findById(@PathVariable String requirementAttributeId) throws Exception {
+	public ResponseEntity<RequirementAttribute> findById(@PathVariable String requirementAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("requirementAttributeId", requirementAttributeId);
 		try {
 
-			Object foundRequirementAttribute = findRequirementAttributesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundRequirementAttribute);
+			List<RequirementAttribute> foundRequirementAttribute = findRequirementAttributesBy(requestParams).getBody();
+			if(foundRequirementAttribute.size()==1){				return successful(foundRequirementAttribute.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{requirementAttributeId}")
-	public ResponseEntity<Object> deleteRequirementAttributeByIdUpdated(@PathVariable String requirementAttributeId) throws Exception {
+	public ResponseEntity<String> deleteRequirementAttributeByIdUpdated(@PathVariable String requirementAttributeId) throws Exception {
 		DeleteRequirementAttribute command = new DeleteRequirementAttribute(requirementAttributeId);
 
 		try {
 			if (((RequirementAttributeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("RequirementAttribute could not be deleted");
+		return conflict();
 
 	}
 

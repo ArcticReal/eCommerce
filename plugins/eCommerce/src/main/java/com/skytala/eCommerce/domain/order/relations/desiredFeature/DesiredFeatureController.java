@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.desiredFeature.query.FindDes
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/desiredFeatures")
 public class DesiredFeatureController {
@@ -52,7 +54,7 @@ public class DesiredFeatureController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findDesiredFeaturesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<DesiredFeature>> findDesiredFeaturesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDesiredFeaturesBy query = new FindDesiredFeaturesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class DesiredFeatureController {
 		}
 
 		List<DesiredFeature> desiredFeatures =((DesiredFeatureFound) Scheduler.execute(query).data()).getDesiredFeatures();
-
-		if (desiredFeatures.size() == 1) {
-			return ResponseEntity.ok().body(desiredFeatures.get(0));
-		}
 
 		return ResponseEntity.ok().body(desiredFeatures);
 
@@ -78,7 +76,7 @@ public class DesiredFeatureController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createDesiredFeature(HttpServletRequest request) throws Exception {
+	public ResponseEntity<DesiredFeature> createDesiredFeature(HttpServletRequest request) throws Exception {
 
 		DesiredFeature desiredFeatureToBeAdded = new DesiredFeature();
 		try {
@@ -86,7 +84,7 @@ public class DesiredFeatureController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createDesiredFeature(desiredFeatureToBeAdded);
@@ -101,63 +99,15 @@ public class DesiredFeatureController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createDesiredFeature(@RequestBody DesiredFeature desiredFeatureToBeAdded) throws Exception {
+	public ResponseEntity<DesiredFeature> createDesiredFeature(@RequestBody DesiredFeature desiredFeatureToBeAdded) throws Exception {
 
 		AddDesiredFeature command = new AddDesiredFeature(desiredFeatureToBeAdded);
 		DesiredFeature desiredFeature = ((DesiredFeatureAdded) Scheduler.execute(command).data()).getAddedDesiredFeature();
 		
 		if (desiredFeature != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(desiredFeature);
+			return successful(desiredFeature);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("DesiredFeature could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateDesiredFeature(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		DesiredFeature desiredFeatureToBeUpdated = new DesiredFeature();
-
-		try {
-			desiredFeatureToBeUpdated = DesiredFeatureMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateDesiredFeature(desiredFeatureToBeUpdated, desiredFeatureToBeUpdated.getDesiredFeatureId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class DesiredFeatureController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{desiredFeatureId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateDesiredFeature(@RequestBody DesiredFeature desiredFeatureToBeUpdated,
+	public ResponseEntity<String> updateDesiredFeature(@RequestBody DesiredFeature desiredFeatureToBeUpdated,
 			@PathVariable String desiredFeatureId) throws Exception {
 
 		desiredFeatureToBeUpdated.setDesiredFeatureId(desiredFeatureId);
@@ -178,41 +128,44 @@ public class DesiredFeatureController {
 
 		try {
 			if(((DesiredFeatureUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{desiredFeatureId}")
-	public ResponseEntity<Object> findById(@PathVariable String desiredFeatureId) throws Exception {
+	public ResponseEntity<DesiredFeature> findById(@PathVariable String desiredFeatureId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("desiredFeatureId", desiredFeatureId);
 		try {
 
-			Object foundDesiredFeature = findDesiredFeaturesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundDesiredFeature);
+			List<DesiredFeature> foundDesiredFeature = findDesiredFeaturesBy(requestParams).getBody();
+			if(foundDesiredFeature.size()==1){				return successful(foundDesiredFeature.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{desiredFeatureId}")
-	public ResponseEntity<Object> deleteDesiredFeatureByIdUpdated(@PathVariable String desiredFeatureId) throws Exception {
+	public ResponseEntity<String> deleteDesiredFeatureByIdUpdated(@PathVariable String desiredFeatureId) throws Exception {
 		DeleteDesiredFeature command = new DeleteDesiredFeature(desiredFeatureId);
 
 		try {
 			if (((DesiredFeatureDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("DesiredFeature could not be deleted");
+		return conflict();
 
 	}
 

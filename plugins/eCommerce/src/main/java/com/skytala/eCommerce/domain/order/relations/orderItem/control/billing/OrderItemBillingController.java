@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.orderItem.query.billing.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/orderItem/orderItemBillings")
 public class OrderItemBillingController {
@@ -52,7 +54,7 @@ public class OrderItemBillingController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findOrderItemBillingsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OrderItemBilling>> findOrderItemBillingsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderItemBillingsBy query = new FindOrderItemBillingsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class OrderItemBillingController {
 		}
 
 		List<OrderItemBilling> orderItemBillings =((OrderItemBillingFound) Scheduler.execute(query).data()).getOrderItemBillings();
-
-		if (orderItemBillings.size() == 1) {
-			return ResponseEntity.ok().body(orderItemBillings.get(0));
-		}
 
 		return ResponseEntity.ok().body(orderItemBillings);
 
@@ -78,7 +76,7 @@ public class OrderItemBillingController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOrderItemBilling(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OrderItemBilling> createOrderItemBilling(HttpServletRequest request) throws Exception {
 
 		OrderItemBilling orderItemBillingToBeAdded = new OrderItemBilling();
 		try {
@@ -86,7 +84,7 @@ public class OrderItemBillingController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createOrderItemBilling(orderItemBillingToBeAdded);
@@ -101,63 +99,15 @@ public class OrderItemBillingController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOrderItemBilling(@RequestBody OrderItemBilling orderItemBillingToBeAdded) throws Exception {
+	public ResponseEntity<OrderItemBilling> createOrderItemBilling(@RequestBody OrderItemBilling orderItemBillingToBeAdded) throws Exception {
 
 		AddOrderItemBilling command = new AddOrderItemBilling(orderItemBillingToBeAdded);
 		OrderItemBilling orderItemBilling = ((OrderItemBillingAdded) Scheduler.execute(command).data()).getAddedOrderItemBilling();
 		
 		if (orderItemBilling != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(orderItemBilling);
+			return successful(orderItemBilling);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OrderItemBilling could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateOrderItemBilling(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OrderItemBilling orderItemBillingToBeUpdated = new OrderItemBilling();
-
-		try {
-			orderItemBillingToBeUpdated = OrderItemBillingMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOrderItemBilling(orderItemBillingToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class OrderItemBillingController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOrderItemBilling(@RequestBody OrderItemBilling orderItemBillingToBeUpdated,
+	public ResponseEntity<String> updateOrderItemBilling(@RequestBody OrderItemBilling orderItemBillingToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		orderItemBillingToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class OrderItemBillingController {
 
 		try {
 			if(((OrderItemBillingUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{orderItemBillingId}")
-	public ResponseEntity<Object> findById(@PathVariable String orderItemBillingId) throws Exception {
+	public ResponseEntity<OrderItemBilling> findById(@PathVariable String orderItemBillingId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderItemBillingId", orderItemBillingId);
 		try {
 
-			Object foundOrderItemBilling = findOrderItemBillingsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOrderItemBilling);
+			List<OrderItemBilling> foundOrderItemBilling = findOrderItemBillingsBy(requestParams).getBody();
+			if(foundOrderItemBilling.size()==1){				return successful(foundOrderItemBilling.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{orderItemBillingId}")
-	public ResponseEntity<Object> deleteOrderItemBillingByIdUpdated(@PathVariable String orderItemBillingId) throws Exception {
+	public ResponseEntity<String> deleteOrderItemBillingByIdUpdated(@PathVariable String orderItemBillingId) throws Exception {
 		DeleteOrderItemBilling command = new DeleteOrderItemBilling(orderItemBillingId);
 
 		try {
 			if (((OrderItemBillingDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("OrderItemBilling could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.survey.query.question.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/survey/surveyQuestions")
 public class SurveyQuestionController {
@@ -52,7 +54,7 @@ public class SurveyQuestionController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findSurveyQuestionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<SurveyQuestion>> findSurveyQuestionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSurveyQuestionsBy query = new FindSurveyQuestionsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class SurveyQuestionController {
 		}
 
 		List<SurveyQuestion> surveyQuestions =((SurveyQuestionFound) Scheduler.execute(query).data()).getSurveyQuestions();
-
-		if (surveyQuestions.size() == 1) {
-			return ResponseEntity.ok().body(surveyQuestions.get(0));
-		}
 
 		return ResponseEntity.ok().body(surveyQuestions);
 
@@ -78,7 +76,7 @@ public class SurveyQuestionController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createSurveyQuestion(HttpServletRequest request) throws Exception {
+	public ResponseEntity<SurveyQuestion> createSurveyQuestion(HttpServletRequest request) throws Exception {
 
 		SurveyQuestion surveyQuestionToBeAdded = new SurveyQuestion();
 		try {
@@ -86,7 +84,7 @@ public class SurveyQuestionController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createSurveyQuestion(surveyQuestionToBeAdded);
@@ -101,63 +99,15 @@ public class SurveyQuestionController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createSurveyQuestion(@RequestBody SurveyQuestion surveyQuestionToBeAdded) throws Exception {
+	public ResponseEntity<SurveyQuestion> createSurveyQuestion(@RequestBody SurveyQuestion surveyQuestionToBeAdded) throws Exception {
 
 		AddSurveyQuestion command = new AddSurveyQuestion(surveyQuestionToBeAdded);
 		SurveyQuestion surveyQuestion = ((SurveyQuestionAdded) Scheduler.execute(command).data()).getAddedSurveyQuestion();
 		
 		if (surveyQuestion != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(surveyQuestion);
+			return successful(surveyQuestion);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("SurveyQuestion could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateSurveyQuestion(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		SurveyQuestion surveyQuestionToBeUpdated = new SurveyQuestion();
-
-		try {
-			surveyQuestionToBeUpdated = SurveyQuestionMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateSurveyQuestion(surveyQuestionToBeUpdated, surveyQuestionToBeUpdated.getSurveyQuestionId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class SurveyQuestionController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{surveyQuestionId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateSurveyQuestion(@RequestBody SurveyQuestion surveyQuestionToBeUpdated,
+	public ResponseEntity<String> updateSurveyQuestion(@RequestBody SurveyQuestion surveyQuestionToBeUpdated,
 			@PathVariable String surveyQuestionId) throws Exception {
 
 		surveyQuestionToBeUpdated.setSurveyQuestionId(surveyQuestionId);
@@ -178,41 +128,44 @@ public class SurveyQuestionController {
 
 		try {
 			if(((SurveyQuestionUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{surveyQuestionId}")
-	public ResponseEntity<Object> findById(@PathVariable String surveyQuestionId) throws Exception {
+	public ResponseEntity<SurveyQuestion> findById(@PathVariable String surveyQuestionId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("surveyQuestionId", surveyQuestionId);
 		try {
 
-			Object foundSurveyQuestion = findSurveyQuestionsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundSurveyQuestion);
+			List<SurveyQuestion> foundSurveyQuestion = findSurveyQuestionsBy(requestParams).getBody();
+			if(foundSurveyQuestion.size()==1){				return successful(foundSurveyQuestion.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{surveyQuestionId}")
-	public ResponseEntity<Object> deleteSurveyQuestionByIdUpdated(@PathVariable String surveyQuestionId) throws Exception {
+	public ResponseEntity<String> deleteSurveyQuestionByIdUpdated(@PathVariable String surveyQuestionId) throws Exception {
 		DeleteSurveyQuestion command = new DeleteSurveyQuestion(surveyQuestionId);
 
 		try {
 			if (((SurveyQuestionDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("SurveyQuestion could not be deleted");
+		return conflict();
 
 	}
 

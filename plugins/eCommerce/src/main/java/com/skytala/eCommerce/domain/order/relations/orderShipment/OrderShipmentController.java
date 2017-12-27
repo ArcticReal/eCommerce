@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.orderShipment.query.FindOrde
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/orderShipments")
 public class OrderShipmentController {
@@ -52,7 +54,7 @@ public class OrderShipmentController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findOrderShipmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OrderShipment>> findOrderShipmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderShipmentsBy query = new FindOrderShipmentsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class OrderShipmentController {
 		}
 
 		List<OrderShipment> orderShipments =((OrderShipmentFound) Scheduler.execute(query).data()).getOrderShipments();
-
-		if (orderShipments.size() == 1) {
-			return ResponseEntity.ok().body(orderShipments.get(0));
-		}
 
 		return ResponseEntity.ok().body(orderShipments);
 
@@ -78,7 +76,7 @@ public class OrderShipmentController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOrderShipment(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OrderShipment> createOrderShipment(HttpServletRequest request) throws Exception {
 
 		OrderShipment orderShipmentToBeAdded = new OrderShipment();
 		try {
@@ -86,7 +84,7 @@ public class OrderShipmentController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createOrderShipment(orderShipmentToBeAdded);
@@ -101,63 +99,15 @@ public class OrderShipmentController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOrderShipment(@RequestBody OrderShipment orderShipmentToBeAdded) throws Exception {
+	public ResponseEntity<OrderShipment> createOrderShipment(@RequestBody OrderShipment orderShipmentToBeAdded) throws Exception {
 
 		AddOrderShipment command = new AddOrderShipment(orderShipmentToBeAdded);
 		OrderShipment orderShipment = ((OrderShipmentAdded) Scheduler.execute(command).data()).getAddedOrderShipment();
 		
 		if (orderShipment != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(orderShipment);
+			return successful(orderShipment);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OrderShipment could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateOrderShipment(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OrderShipment orderShipmentToBeUpdated = new OrderShipment();
-
-		try {
-			orderShipmentToBeUpdated = OrderShipmentMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOrderShipment(orderShipmentToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class OrderShipmentController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOrderShipment(@RequestBody OrderShipment orderShipmentToBeUpdated,
+	public ResponseEntity<String> updateOrderShipment(@RequestBody OrderShipment orderShipmentToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		orderShipmentToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class OrderShipmentController {
 
 		try {
 			if(((OrderShipmentUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{orderShipmentId}")
-	public ResponseEntity<Object> findById(@PathVariable String orderShipmentId) throws Exception {
+	public ResponseEntity<OrderShipment> findById(@PathVariable String orderShipmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderShipmentId", orderShipmentId);
 		try {
 
-			Object foundOrderShipment = findOrderShipmentsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOrderShipment);
+			List<OrderShipment> foundOrderShipment = findOrderShipmentsBy(requestParams).getBody();
+			if(foundOrderShipment.size()==1){				return successful(foundOrderShipment.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{orderShipmentId}")
-	public ResponseEntity<Object> deleteOrderShipmentByIdUpdated(@PathVariable String orderShipmentId) throws Exception {
+	public ResponseEntity<String> deleteOrderShipmentByIdUpdated(@PathVariable String orderShipmentId) throws Exception {
 		DeleteOrderShipment command = new DeleteOrderShipment(orderShipmentId);
 
 		try {
 			if (((OrderShipmentDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("OrderShipment could not be deleted");
+		return conflict();
 
 	}
 

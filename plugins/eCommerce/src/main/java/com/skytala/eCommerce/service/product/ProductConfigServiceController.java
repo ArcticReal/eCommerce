@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/productConfig")
 public class ProductConfigServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProdConfItemContentType")
-	public ResponseEntity<Object> createProdConfItemContentType(HttpSession session, @RequestParam(value="confItemContentTypeId", required=false) String confItemContentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createProdConfItemContentType(HttpSession session, @RequestParam(value="confItemContentTypeId", required=false) String confItemContentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("confItemContentTypeId",confItemContentTypeId);
@@ -42,23 +44,23 @@ public class ProductConfigServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createConfigOptionProductOption")
-	public ResponseEntity<Object> createConfigOptionProductOption(HttpSession session, @RequestParam(value="configItemId") String configItemId, @RequestParam(value="sequenceNum") Long sequenceNum, @RequestParam(value="productId") String productId, @RequestParam(value="configId") String configId, @RequestParam(value="configOptionId") String configOptionId, @RequestParam(value="productOptionId", required=false) String productOptionId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createConfigOptionProductOption(HttpSession session, @RequestParam(value="configItemId") String configItemId, @RequestParam(value="sequenceNum") Long sequenceNum, @RequestParam(value="productId") String productId, @RequestParam(value="configId") String configId, @RequestParam(value="configOptionId") String configOptionId, @RequestParam(value="productOptionId", required=false) String productOptionId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("configItemId",configItemId);
@@ -77,23 +79,23 @@ public class ProductConfigServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateConfigOptionProductOption")
-	public ResponseEntity<Object> updateConfigOptionProductOption(HttpSession session, @RequestParam(value="configItemId") String configItemId, @RequestParam(value="sequenceNum") Long sequenceNum, @RequestParam(value="productId") String productId, @RequestParam(value="configId") String configId, @RequestParam(value="configOptionId") String configOptionId, @RequestParam(value="productOptionId", required=false) String productOptionId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateConfigOptionProductOption(HttpSession session, @RequestParam(value="configItemId") String configItemId, @RequestParam(value="sequenceNum") Long sequenceNum, @RequestParam(value="productId") String productId, @RequestParam(value="configId") String configId, @RequestParam(value="configOptionId") String configOptionId, @RequestParam(value="productOptionId", required=false) String productOptionId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("configItemId",configItemId);
@@ -112,23 +114,23 @@ public class ProductConfigServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteConfigOptionProductOption")
-	public ResponseEntity<Object> deleteConfigOptionProductOption(HttpSession session, @RequestParam(value="configItemId") String configItemId, @RequestParam(value="sequenceNum") Long sequenceNum, @RequestParam(value="productId") String productId, @RequestParam(value="configId") String configId, @RequestParam(value="configOptionId") String configOptionId) {
+	public ResponseEntity<Map<String, Object>> deleteConfigOptionProductOption(HttpSession session, @RequestParam(value="configItemId") String configItemId, @RequestParam(value="sequenceNum") Long sequenceNum, @RequestParam(value="productId") String productId, @RequestParam(value="configId") String configId, @RequestParam(value="configOptionId") String configOptionId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("configItemId",configItemId);
@@ -145,23 +147,23 @@ public class ProductConfigServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteProdConfItemContentType")
-	public ResponseEntity<Object> deleteProdConfItemContentType(HttpSession session, @RequestParam(value="confItemContentTypeId") String confItemContentTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteProdConfItemContentType(HttpSession session, @RequestParam(value="confItemContentTypeId") String confItemContentTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("confItemContentTypeId",confItemContentTypeId);
@@ -174,23 +176,23 @@ public class ProductConfigServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProdConfItemContentType")
-	public ResponseEntity<Object> updateProdConfItemContentType(HttpSession session, @RequestParam(value="confItemContentTypeId") String confItemContentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateProdConfItemContentType(HttpSession session, @RequestParam(value="confItemContentTypeId") String confItemContentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("confItemContentTypeId",confItemContentTypeId);
@@ -206,19 +208,19 @@ public class ProductConfigServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

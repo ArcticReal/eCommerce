@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.workeffort.relations.workEffort.query.costCa
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/workeffort/workEffort/workEffortCostCalcs")
 public class WorkEffortCostCalcController {
@@ -52,7 +54,7 @@ public class WorkEffortCostCalcController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWorkEffortCostCalcsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WorkEffortCostCalc>> findWorkEffortCostCalcsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortCostCalcsBy query = new FindWorkEffortCostCalcsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WorkEffortCostCalcController {
 		}
 
 		List<WorkEffortCostCalc> workEffortCostCalcs =((WorkEffortCostCalcFound) Scheduler.execute(query).data()).getWorkEffortCostCalcs();
-
-		if (workEffortCostCalcs.size() == 1) {
-			return ResponseEntity.ok().body(workEffortCostCalcs.get(0));
-		}
 
 		return ResponseEntity.ok().body(workEffortCostCalcs);
 
@@ -78,7 +76,7 @@ public class WorkEffortCostCalcController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWorkEffortCostCalc(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WorkEffortCostCalc> createWorkEffortCostCalc(HttpServletRequest request) throws Exception {
 
 		WorkEffortCostCalc workEffortCostCalcToBeAdded = new WorkEffortCostCalc();
 		try {
@@ -86,7 +84,7 @@ public class WorkEffortCostCalcController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWorkEffortCostCalc(workEffortCostCalcToBeAdded);
@@ -101,63 +99,15 @@ public class WorkEffortCostCalcController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWorkEffortCostCalc(@RequestBody WorkEffortCostCalc workEffortCostCalcToBeAdded) throws Exception {
+	public ResponseEntity<WorkEffortCostCalc> createWorkEffortCostCalc(@RequestBody WorkEffortCostCalc workEffortCostCalcToBeAdded) throws Exception {
 
 		AddWorkEffortCostCalc command = new AddWorkEffortCostCalc(workEffortCostCalcToBeAdded);
 		WorkEffortCostCalc workEffortCostCalc = ((WorkEffortCostCalcAdded) Scheduler.execute(command).data()).getAddedWorkEffortCostCalc();
 		
 		if (workEffortCostCalc != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(workEffortCostCalc);
+			return successful(workEffortCostCalc);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WorkEffortCostCalc could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWorkEffortCostCalc(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WorkEffortCostCalc workEffortCostCalcToBeUpdated = new WorkEffortCostCalc();
-
-		try {
-			workEffortCostCalcToBeUpdated = WorkEffortCostCalcMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWorkEffortCostCalc(workEffortCostCalcToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WorkEffortCostCalcController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWorkEffortCostCalc(@RequestBody WorkEffortCostCalc workEffortCostCalcToBeUpdated,
+	public ResponseEntity<String> updateWorkEffortCostCalc(@RequestBody WorkEffortCostCalc workEffortCostCalcToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		workEffortCostCalcToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class WorkEffortCostCalcController {
 
 		try {
 			if(((WorkEffortCostCalcUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{workEffortCostCalcId}")
-	public ResponseEntity<Object> findById(@PathVariable String workEffortCostCalcId) throws Exception {
+	public ResponseEntity<WorkEffortCostCalc> findById(@PathVariable String workEffortCostCalcId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortCostCalcId", workEffortCostCalcId);
 		try {
 
-			Object foundWorkEffortCostCalc = findWorkEffortCostCalcsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWorkEffortCostCalc);
+			List<WorkEffortCostCalc> foundWorkEffortCostCalc = findWorkEffortCostCalcsBy(requestParams).getBody();
+			if(foundWorkEffortCostCalc.size()==1){				return successful(foundWorkEffortCostCalc.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{workEffortCostCalcId}")
-	public ResponseEntity<Object> deleteWorkEffortCostCalcByIdUpdated(@PathVariable String workEffortCostCalcId) throws Exception {
+	public ResponseEntity<String> deleteWorkEffortCostCalcByIdUpdated(@PathVariable String workEffortCostCalcId) throws Exception {
 		DeleteWorkEffortCostCalc command = new DeleteWorkEffortCostCalc(workEffortCostCalcId);
 
 		try {
 			if (((WorkEffortCostCalcDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WorkEffortCostCalc could not be deleted");
+		return conflict();
 
 	}
 

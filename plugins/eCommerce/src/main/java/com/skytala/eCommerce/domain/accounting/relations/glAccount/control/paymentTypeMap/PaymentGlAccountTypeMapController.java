@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.glAccount.query.payment
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/glAccount/paymentGlAccountTypeMaps")
 public class PaymentGlAccountTypeMapController {
@@ -52,7 +54,7 @@ public class PaymentGlAccountTypeMapController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPaymentGlAccountTypeMapsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PaymentGlAccountTypeMap>> findPaymentGlAccountTypeMapsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentGlAccountTypeMapsBy query = new FindPaymentGlAccountTypeMapsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PaymentGlAccountTypeMapController {
 		}
 
 		List<PaymentGlAccountTypeMap> paymentGlAccountTypeMaps =((PaymentGlAccountTypeMapFound) Scheduler.execute(query).data()).getPaymentGlAccountTypeMaps();
-
-		if (paymentGlAccountTypeMaps.size() == 1) {
-			return ResponseEntity.ok().body(paymentGlAccountTypeMaps.get(0));
-		}
 
 		return ResponseEntity.ok().body(paymentGlAccountTypeMaps);
 
@@ -78,7 +76,7 @@ public class PaymentGlAccountTypeMapController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPaymentGlAccountTypeMap(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PaymentGlAccountTypeMap> createPaymentGlAccountTypeMap(HttpServletRequest request) throws Exception {
 
 		PaymentGlAccountTypeMap paymentGlAccountTypeMapToBeAdded = new PaymentGlAccountTypeMap();
 		try {
@@ -86,7 +84,7 @@ public class PaymentGlAccountTypeMapController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPaymentGlAccountTypeMap(paymentGlAccountTypeMapToBeAdded);
@@ -101,63 +99,15 @@ public class PaymentGlAccountTypeMapController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPaymentGlAccountTypeMap(@RequestBody PaymentGlAccountTypeMap paymentGlAccountTypeMapToBeAdded) throws Exception {
+	public ResponseEntity<PaymentGlAccountTypeMap> createPaymentGlAccountTypeMap(@RequestBody PaymentGlAccountTypeMap paymentGlAccountTypeMapToBeAdded) throws Exception {
 
 		AddPaymentGlAccountTypeMap command = new AddPaymentGlAccountTypeMap(paymentGlAccountTypeMapToBeAdded);
 		PaymentGlAccountTypeMap paymentGlAccountTypeMap = ((PaymentGlAccountTypeMapAdded) Scheduler.execute(command).data()).getAddedPaymentGlAccountTypeMap();
 		
 		if (paymentGlAccountTypeMap != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(paymentGlAccountTypeMap);
+			return successful(paymentGlAccountTypeMap);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PaymentGlAccountTypeMap could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePaymentGlAccountTypeMap(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PaymentGlAccountTypeMap paymentGlAccountTypeMapToBeUpdated = new PaymentGlAccountTypeMap();
-
-		try {
-			paymentGlAccountTypeMapToBeUpdated = PaymentGlAccountTypeMapMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePaymentGlAccountTypeMap(paymentGlAccountTypeMapToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PaymentGlAccountTypeMapController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePaymentGlAccountTypeMap(@RequestBody PaymentGlAccountTypeMap paymentGlAccountTypeMapToBeUpdated,
+	public ResponseEntity<String> updatePaymentGlAccountTypeMap(@RequestBody PaymentGlAccountTypeMap paymentGlAccountTypeMapToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		paymentGlAccountTypeMapToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class PaymentGlAccountTypeMapController {
 
 		try {
 			if(((PaymentGlAccountTypeMapUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{paymentGlAccountTypeMapId}")
-	public ResponseEntity<Object> findById(@PathVariable String paymentGlAccountTypeMapId) throws Exception {
+	public ResponseEntity<PaymentGlAccountTypeMap> findById(@PathVariable String paymentGlAccountTypeMapId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentGlAccountTypeMapId", paymentGlAccountTypeMapId);
 		try {
 
-			Object foundPaymentGlAccountTypeMap = findPaymentGlAccountTypeMapsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPaymentGlAccountTypeMap);
+			List<PaymentGlAccountTypeMap> foundPaymentGlAccountTypeMap = findPaymentGlAccountTypeMapsBy(requestParams).getBody();
+			if(foundPaymentGlAccountTypeMap.size()==1){				return successful(foundPaymentGlAccountTypeMap.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{paymentGlAccountTypeMapId}")
-	public ResponseEntity<Object> deletePaymentGlAccountTypeMapByIdUpdated(@PathVariable String paymentGlAccountTypeMapId) throws Exception {
+	public ResponseEntity<String> deletePaymentGlAccountTypeMapByIdUpdated(@PathVariable String paymentGlAccountTypeMapId) throws Exception {
 		DeletePaymentGlAccountTypeMap command = new DeletePaymentGlAccountTypeMap(paymentGlAccountTypeMapId);
 
 		try {
 			if (((PaymentGlAccountTypeMapDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PaymentGlAccountTypeMap could not be deleted");
+		return conflict();
 
 	}
 

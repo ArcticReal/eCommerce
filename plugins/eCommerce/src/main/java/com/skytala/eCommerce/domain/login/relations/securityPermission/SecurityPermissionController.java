@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.login.relations.securityPermission.query.Fin
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/login/securityPermissions")
 public class SecurityPermissionController {
@@ -52,7 +54,7 @@ public class SecurityPermissionController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findSecurityPermissionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<SecurityPermission>> findSecurityPermissionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSecurityPermissionsBy query = new FindSecurityPermissionsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class SecurityPermissionController {
 		}
 
 		List<SecurityPermission> securityPermissions =((SecurityPermissionFound) Scheduler.execute(query).data()).getSecurityPermissions();
-
-		if (securityPermissions.size() == 1) {
-			return ResponseEntity.ok().body(securityPermissions.get(0));
-		}
 
 		return ResponseEntity.ok().body(securityPermissions);
 
@@ -78,7 +76,7 @@ public class SecurityPermissionController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createSecurityPermission(HttpServletRequest request) throws Exception {
+	public ResponseEntity<SecurityPermission> createSecurityPermission(HttpServletRequest request) throws Exception {
 
 		SecurityPermission securityPermissionToBeAdded = new SecurityPermission();
 		try {
@@ -86,7 +84,7 @@ public class SecurityPermissionController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createSecurityPermission(securityPermissionToBeAdded);
@@ -101,63 +99,15 @@ public class SecurityPermissionController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createSecurityPermission(@RequestBody SecurityPermission securityPermissionToBeAdded) throws Exception {
+	public ResponseEntity<SecurityPermission> createSecurityPermission(@RequestBody SecurityPermission securityPermissionToBeAdded) throws Exception {
 
 		AddSecurityPermission command = new AddSecurityPermission(securityPermissionToBeAdded);
 		SecurityPermission securityPermission = ((SecurityPermissionAdded) Scheduler.execute(command).data()).getAddedSecurityPermission();
 		
 		if (securityPermission != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(securityPermission);
+			return successful(securityPermission);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("SecurityPermission could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateSecurityPermission(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		SecurityPermission securityPermissionToBeUpdated = new SecurityPermission();
-
-		try {
-			securityPermissionToBeUpdated = SecurityPermissionMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateSecurityPermission(securityPermissionToBeUpdated, securityPermissionToBeUpdated.getPermissionId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class SecurityPermissionController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{permissionId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateSecurityPermission(@RequestBody SecurityPermission securityPermissionToBeUpdated,
+	public ResponseEntity<String> updateSecurityPermission(@RequestBody SecurityPermission securityPermissionToBeUpdated,
 			@PathVariable String permissionId) throws Exception {
 
 		securityPermissionToBeUpdated.setPermissionId(permissionId);
@@ -178,41 +128,44 @@ public class SecurityPermissionController {
 
 		try {
 			if(((SecurityPermissionUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{securityPermissionId}")
-	public ResponseEntity<Object> findById(@PathVariable String securityPermissionId) throws Exception {
+	public ResponseEntity<SecurityPermission> findById(@PathVariable String securityPermissionId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("securityPermissionId", securityPermissionId);
 		try {
 
-			Object foundSecurityPermission = findSecurityPermissionsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundSecurityPermission);
+			List<SecurityPermission> foundSecurityPermission = findSecurityPermissionsBy(requestParams).getBody();
+			if(foundSecurityPermission.size()==1){				return successful(foundSecurityPermission.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{securityPermissionId}")
-	public ResponseEntity<Object> deleteSecurityPermissionByIdUpdated(@PathVariable String securityPermissionId) throws Exception {
+	public ResponseEntity<String> deleteSecurityPermissionByIdUpdated(@PathVariable String securityPermissionId) throws Exception {
 		DeleteSecurityPermission command = new DeleteSecurityPermission(securityPermissionId);
 
 		try {
 			if (((SecurityPermissionDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("SecurityPermission could not be deleted");
+		return conflict();
 
 	}
 

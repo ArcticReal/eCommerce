@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.requirement.query.type.FindR
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/requirement/requirementTypes")
 public class RequirementTypeController {
@@ -52,7 +54,7 @@ public class RequirementTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findRequirementTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<RequirementType>> findRequirementTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindRequirementTypesBy query = new FindRequirementTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class RequirementTypeController {
 		}
 
 		List<RequirementType> requirementTypes =((RequirementTypeFound) Scheduler.execute(query).data()).getRequirementTypes();
-
-		if (requirementTypes.size() == 1) {
-			return ResponseEntity.ok().body(requirementTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(requirementTypes);
 
@@ -78,7 +76,7 @@ public class RequirementTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createRequirementType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<RequirementType> createRequirementType(HttpServletRequest request) throws Exception {
 
 		RequirementType requirementTypeToBeAdded = new RequirementType();
 		try {
@@ -86,7 +84,7 @@ public class RequirementTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createRequirementType(requirementTypeToBeAdded);
@@ -101,63 +99,15 @@ public class RequirementTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createRequirementType(@RequestBody RequirementType requirementTypeToBeAdded) throws Exception {
+	public ResponseEntity<RequirementType> createRequirementType(@RequestBody RequirementType requirementTypeToBeAdded) throws Exception {
 
 		AddRequirementType command = new AddRequirementType(requirementTypeToBeAdded);
 		RequirementType requirementType = ((RequirementTypeAdded) Scheduler.execute(command).data()).getAddedRequirementType();
 		
 		if (requirementType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(requirementType);
+			return successful(requirementType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("RequirementType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateRequirementType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		RequirementType requirementTypeToBeUpdated = new RequirementType();
-
-		try {
-			requirementTypeToBeUpdated = RequirementTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateRequirementType(requirementTypeToBeUpdated, requirementTypeToBeUpdated.getRequirementTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class RequirementTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{requirementTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateRequirementType(@RequestBody RequirementType requirementTypeToBeUpdated,
+	public ResponseEntity<String> updateRequirementType(@RequestBody RequirementType requirementTypeToBeUpdated,
 			@PathVariable String requirementTypeId) throws Exception {
 
 		requirementTypeToBeUpdated.setRequirementTypeId(requirementTypeId);
@@ -178,41 +128,44 @@ public class RequirementTypeController {
 
 		try {
 			if(((RequirementTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{requirementTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String requirementTypeId) throws Exception {
+	public ResponseEntity<RequirementType> findById(@PathVariable String requirementTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("requirementTypeId", requirementTypeId);
 		try {
 
-			Object foundRequirementType = findRequirementTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundRequirementType);
+			List<RequirementType> foundRequirementType = findRequirementTypesBy(requestParams).getBody();
+			if(foundRequirementType.size()==1){				return successful(foundRequirementType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{requirementTypeId}")
-	public ResponseEntity<Object> deleteRequirementTypeByIdUpdated(@PathVariable String requirementTypeId) throws Exception {
+	public ResponseEntity<String> deleteRequirementTypeByIdUpdated(@PathVariable String requirementTypeId) throws Exception {
 		DeleteRequirementType command = new DeleteRequirementType(requirementTypeId);
 
 		try {
 			if (((RequirementTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("RequirementType could not be deleted");
+		return conflict();
 
 	}
 

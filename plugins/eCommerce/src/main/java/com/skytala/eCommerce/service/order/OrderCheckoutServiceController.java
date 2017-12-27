@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/orderCheckout")
 public class OrderCheckoutServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createUpdateBillingAddressAndPaymentMethod")
-	public ResponseEntity<Object> createUpdateBillingAddressAndPaymentMethod(HttpSession session, @RequestParam(value="expMonth") String expMonth, @RequestParam(value="expYear") String expYear, @RequestParam(value="lastNameOnCard") String lastNameOnCard, @RequestParam(value="firstNameOnCard") String firstNameOnCard, @RequestParam(value="cardType") String cardType, @RequestParam(value="shoppingCart") org.apache.ofbiz.order.shoppingcart.ShoppingCart shoppingCart, @RequestParam(value="cardNumber") String cardNumber, @RequestParam(value="billToCountryCode", required=false) String billToCountryCode, @RequestParam(value="billToAreaCode", required=false) String billToAreaCode, @RequestParam(value="billToPostalCode", required=false) String billToPostalCode, @RequestParam(value="setDefaultBilling", required=false) String setDefaultBilling, @RequestParam(value="billToAddress2", required=false) String billToAddress2, @RequestParam(value="contactMechId", required=false) String contactMechId, @RequestParam(value="billToCity", required=false) String billToCity, @RequestParam(value="keepAddressBook", required=false) String keepAddressBook, @RequestParam(value="titleOnCard", required=false) String titleOnCard, @RequestParam(value="paymentMethodId", required=false) String paymentMethodId, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="billToContactNumber", required=false) String billToContactNumber, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="suffixOnCard", required=false) String suffixOnCard, @RequestParam(value="billToStateProvinceGeoId", required=false) String billToStateProvinceGeoId, @RequestParam(value="billToAttnName", required=false) String billToAttnName, @RequestParam(value="shipToContactMechId", required=false) String shipToContactMechId, @RequestParam(value="billToName", required=false) String billToName, @RequestParam(value="billToCountryGeoId", required=false) String billToCountryGeoId, @RequestParam(value="companyNameOnCard", required=false) String companyNameOnCard, @RequestParam(value="userLogin", required=false) org.apache.ofbiz.entity.GenericValue userLogin, @RequestParam(value="billToCardSecurityCode", required=false) String billToCardSecurityCode, @RequestParam(value="billToAddress1", required=false) String billToAddress1, @RequestParam(value="billToContactMechId", required=false) String billToContactMechId, @RequestParam(value="middleNameOnCard", required=false) String middleNameOnCard, @RequestParam(value="useShippingAddressForBilling", required=false) String useShippingAddressForBilling, @RequestParam(value="billToExtension", required=false) String billToExtension, @RequestParam(value="billToPhoneContactMechId", required=false) String billToPhoneContactMechId) {
+	public ResponseEntity<Map<String, Object>> createUpdateBillingAddressAndPaymentMethod(HttpSession session, @RequestParam(value="expMonth") String expMonth, @RequestParam(value="expYear") String expYear, @RequestParam(value="lastNameOnCard") String lastNameOnCard, @RequestParam(value="firstNameOnCard") String firstNameOnCard, @RequestParam(value="cardType") String cardType, @RequestParam(value="shoppingCart") org.apache.ofbiz.order.shoppingcart.ShoppingCart shoppingCart, @RequestParam(value="cardNumber") String cardNumber, @RequestParam(value="billToCountryCode", required=false) String billToCountryCode, @RequestParam(value="billToAreaCode", required=false) String billToAreaCode, @RequestParam(value="billToPostalCode", required=false) String billToPostalCode, @RequestParam(value="setDefaultBilling", required=false) String setDefaultBilling, @RequestParam(value="billToAddress2", required=false) String billToAddress2, @RequestParam(value="contactMechId", required=false) String contactMechId, @RequestParam(value="billToCity", required=false) String billToCity, @RequestParam(value="keepAddressBook", required=false) String keepAddressBook, @RequestParam(value="titleOnCard", required=false) String titleOnCard, @RequestParam(value="paymentMethodId", required=false) String paymentMethodId, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="billToContactNumber", required=false) String billToContactNumber, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="suffixOnCard", required=false) String suffixOnCard, @RequestParam(value="billToStateProvinceGeoId", required=false) String billToStateProvinceGeoId, @RequestParam(value="billToAttnName", required=false) String billToAttnName, @RequestParam(value="shipToContactMechId", required=false) String shipToContactMechId, @RequestParam(value="billToName", required=false) String billToName, @RequestParam(value="billToCountryGeoId", required=false) String billToCountryGeoId, @RequestParam(value="companyNameOnCard", required=false) String companyNameOnCard, @RequestParam(value="userLogin", required=false) org.apache.ofbiz.entity.GenericValue userLogin, @RequestParam(value="billToCardSecurityCode", required=false) String billToCardSecurityCode, @RequestParam(value="billToAddress1", required=false) String billToAddress1, @RequestParam(value="billToContactMechId", required=false) String billToContactMechId, @RequestParam(value="middleNameOnCard", required=false) String middleNameOnCard, @RequestParam(value="useShippingAddressForBilling", required=false) String useShippingAddressForBilling, @RequestParam(value="billToExtension", required=false) String billToExtension, @RequestParam(value="billToPhoneContactMechId", required=false) String billToPhoneContactMechId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("expMonth",expMonth);
@@ -72,23 +74,23 @@ public class OrderCheckoutServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createUpdateCustomerAndShippingAddress")
-	public ResponseEntity<Object> createUpdateCustomerAndShippingAddress(HttpSession session, @RequestParam(value="shipToCity") String shipToCity, @RequestParam(value="emailAddress") String emailAddress, @RequestParam(value="shipToAddress1") String shipToAddress1, @RequestParam(value="shipToPostalCode") String shipToPostalCode, @RequestParam(value="shoppingCart") org.apache.ofbiz.order.shoppingcart.ShoppingCart shoppingCart, @RequestParam(value="shipToCountryGeoId") String shipToCountryGeoId, @RequestParam(value="shipToStateProvinceGeoId") String shipToStateProvinceGeoId, @RequestParam(value="lastName", required=false) String lastName, @RequestParam(value="setDefaultShipping", required=false) String setDefaultShipping, @RequestParam(value="shipToContactMechId", required=false) String shipToContactMechId, @RequestParam(value="shipToPhoneContactMechId", required=false) String shipToPhoneContactMechId, @RequestParam(value="userLogin", required=false) org.apache.ofbiz.entity.GenericValue userLogin, @RequestParam(value="emailContactMechId", required=false) String emailContactMechId, @RequestParam(value="keepAddressBook", required=false) String keepAddressBook, @RequestParam(value="firstName", required=false) String firstName, @RequestParam(value="shipToContactNumber", required=false) String shipToContactNumber, @RequestParam(value="shipToAddress2", required=false) String shipToAddress2, @RequestParam(value="billToContactMechId", required=false) String billToContactMechId, @RequestParam(value="shipToCountryCode", required=false) String shipToCountryCode, @RequestParam(value="shipToName", required=false) String shipToName, @RequestParam(value="shipToExtension", required=false) String shipToExtension, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="shipToAreaCode", required=false) String shipToAreaCode, @RequestParam(value="shipToAttnName", required=false) String shipToAttnName) {
+	public ResponseEntity<Map<String, Object>> createUpdateCustomerAndShippingAddress(HttpSession session, @RequestParam(value="shipToCity") String shipToCity, @RequestParam(value="emailAddress") String emailAddress, @RequestParam(value="shipToAddress1") String shipToAddress1, @RequestParam(value="shipToPostalCode") String shipToPostalCode, @RequestParam(value="shoppingCart") org.apache.ofbiz.order.shoppingcart.ShoppingCart shoppingCart, @RequestParam(value="shipToCountryGeoId") String shipToCountryGeoId, @RequestParam(value="shipToStateProvinceGeoId") String shipToStateProvinceGeoId, @RequestParam(value="lastName", required=false) String lastName, @RequestParam(value="setDefaultShipping", required=false) String setDefaultShipping, @RequestParam(value="shipToContactMechId", required=false) String shipToContactMechId, @RequestParam(value="shipToPhoneContactMechId", required=false) String shipToPhoneContactMechId, @RequestParam(value="userLogin", required=false) org.apache.ofbiz.entity.GenericValue userLogin, @RequestParam(value="emailContactMechId", required=false) String emailContactMechId, @RequestParam(value="keepAddressBook", required=false) String keepAddressBook, @RequestParam(value="firstName", required=false) String firstName, @RequestParam(value="shipToContactNumber", required=false) String shipToContactNumber, @RequestParam(value="shipToAddress2", required=false) String shipToAddress2, @RequestParam(value="billToContactMechId", required=false) String billToContactMechId, @RequestParam(value="shipToCountryCode", required=false) String shipToCountryCode, @RequestParam(value="shipToName", required=false) String shipToName, @RequestParam(value="shipToExtension", required=false) String shipToExtension, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="shipToAreaCode", required=false) String shipToAreaCode, @RequestParam(value="shipToAttnName", required=false) String shipToAttnName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipToCity",shipToCity);
@@ -124,23 +126,23 @@ public class OrderCheckoutServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/setAnonUserLogin")
-	public ResponseEntity<Object> setAnonUserLogin(HttpSession session, @RequestParam(value="shoppingCart") org.apache.ofbiz.order.shoppingcart.ShoppingCart shoppingCart, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Map<String, Object>> setAnonUserLogin(HttpSession session, @RequestParam(value="shoppingCart") org.apache.ofbiz.order.shoppingcart.ShoppingCart shoppingCart, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shoppingCart",shoppingCart);
@@ -154,19 +156,19 @@ public class OrderCheckoutServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

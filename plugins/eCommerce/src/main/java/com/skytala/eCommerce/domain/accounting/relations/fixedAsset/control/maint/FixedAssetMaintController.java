@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.fixedAsset.query.maint.
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/fixedAsset/fixedAssetMaints")
 public class FixedAssetMaintController {
@@ -52,7 +54,7 @@ public class FixedAssetMaintController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findFixedAssetMaintsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<FixedAssetMaint>> findFixedAssetMaintsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFixedAssetMaintsBy query = new FindFixedAssetMaintsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class FixedAssetMaintController {
 		}
 
 		List<FixedAssetMaint> fixedAssetMaints =((FixedAssetMaintFound) Scheduler.execute(query).data()).getFixedAssetMaints();
-
-		if (fixedAssetMaints.size() == 1) {
-			return ResponseEntity.ok().body(fixedAssetMaints.get(0));
-		}
 
 		return ResponseEntity.ok().body(fixedAssetMaints);
 
@@ -78,7 +76,7 @@ public class FixedAssetMaintController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createFixedAssetMaint(HttpServletRequest request) throws Exception {
+	public ResponseEntity<FixedAssetMaint> createFixedAssetMaint(HttpServletRequest request) throws Exception {
 
 		FixedAssetMaint fixedAssetMaintToBeAdded = new FixedAssetMaint();
 		try {
@@ -86,7 +84,7 @@ public class FixedAssetMaintController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createFixedAssetMaint(fixedAssetMaintToBeAdded);
@@ -101,63 +99,15 @@ public class FixedAssetMaintController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createFixedAssetMaint(@RequestBody FixedAssetMaint fixedAssetMaintToBeAdded) throws Exception {
+	public ResponseEntity<FixedAssetMaint> createFixedAssetMaint(@RequestBody FixedAssetMaint fixedAssetMaintToBeAdded) throws Exception {
 
 		AddFixedAssetMaint command = new AddFixedAssetMaint(fixedAssetMaintToBeAdded);
 		FixedAssetMaint fixedAssetMaint = ((FixedAssetMaintAdded) Scheduler.execute(command).data()).getAddedFixedAssetMaint();
 		
 		if (fixedAssetMaint != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(fixedAssetMaint);
+			return successful(fixedAssetMaint);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("FixedAssetMaint could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateFixedAssetMaint(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		FixedAssetMaint fixedAssetMaintToBeUpdated = new FixedAssetMaint();
-
-		try {
-			fixedAssetMaintToBeUpdated = FixedAssetMaintMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateFixedAssetMaint(fixedAssetMaintToBeUpdated, fixedAssetMaintToBeUpdated.getMaintHistSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class FixedAssetMaintController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{maintHistSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateFixedAssetMaint(@RequestBody FixedAssetMaint fixedAssetMaintToBeUpdated,
+	public ResponseEntity<String> updateFixedAssetMaint(@RequestBody FixedAssetMaint fixedAssetMaintToBeUpdated,
 			@PathVariable String maintHistSeqId) throws Exception {
 
 		fixedAssetMaintToBeUpdated.setMaintHistSeqId(maintHistSeqId);
@@ -178,41 +128,44 @@ public class FixedAssetMaintController {
 
 		try {
 			if(((FixedAssetMaintUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{fixedAssetMaintId}")
-	public ResponseEntity<Object> findById(@PathVariable String fixedAssetMaintId) throws Exception {
+	public ResponseEntity<FixedAssetMaint> findById(@PathVariable String fixedAssetMaintId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("fixedAssetMaintId", fixedAssetMaintId);
 		try {
 
-			Object foundFixedAssetMaint = findFixedAssetMaintsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundFixedAssetMaint);
+			List<FixedAssetMaint> foundFixedAssetMaint = findFixedAssetMaintsBy(requestParams).getBody();
+			if(foundFixedAssetMaint.size()==1){				return successful(foundFixedAssetMaint.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{fixedAssetMaintId}")
-	public ResponseEntity<Object> deleteFixedAssetMaintByIdUpdated(@PathVariable String fixedAssetMaintId) throws Exception {
+	public ResponseEntity<String> deleteFixedAssetMaintByIdUpdated(@PathVariable String fixedAssetMaintId) throws Exception {
 		DeleteFixedAssetMaint command = new DeleteFixedAssetMaint(fixedAssetMaintId);
 
 		try {
 			if (((FixedAssetMaintDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("FixedAssetMaint could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.categoryGlAc
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productCategoryGlAccounts")
 public class ProductCategoryGlAccountController {
@@ -52,7 +54,7 @@ public class ProductCategoryGlAccountController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductCategoryGlAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductCategoryGlAccount>> findProductCategoryGlAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductCategoryGlAccountsBy query = new FindProductCategoryGlAccountsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductCategoryGlAccountController {
 		}
 
 		List<ProductCategoryGlAccount> productCategoryGlAccounts =((ProductCategoryGlAccountFound) Scheduler.execute(query).data()).getProductCategoryGlAccounts();
-
-		if (productCategoryGlAccounts.size() == 1) {
-			return ResponseEntity.ok().body(productCategoryGlAccounts.get(0));
-		}
 
 		return ResponseEntity.ok().body(productCategoryGlAccounts);
 
@@ -78,7 +76,7 @@ public class ProductCategoryGlAccountController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductCategoryGlAccount(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductCategoryGlAccount> createProductCategoryGlAccount(HttpServletRequest request) throws Exception {
 
 		ProductCategoryGlAccount productCategoryGlAccountToBeAdded = new ProductCategoryGlAccount();
 		try {
@@ -86,7 +84,7 @@ public class ProductCategoryGlAccountController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductCategoryGlAccount(productCategoryGlAccountToBeAdded);
@@ -101,63 +99,15 @@ public class ProductCategoryGlAccountController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductCategoryGlAccount(@RequestBody ProductCategoryGlAccount productCategoryGlAccountToBeAdded) throws Exception {
+	public ResponseEntity<ProductCategoryGlAccount> createProductCategoryGlAccount(@RequestBody ProductCategoryGlAccount productCategoryGlAccountToBeAdded) throws Exception {
 
 		AddProductCategoryGlAccount command = new AddProductCategoryGlAccount(productCategoryGlAccountToBeAdded);
 		ProductCategoryGlAccount productCategoryGlAccount = ((ProductCategoryGlAccountAdded) Scheduler.execute(command).data()).getAddedProductCategoryGlAccount();
 		
 		if (productCategoryGlAccount != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productCategoryGlAccount);
+			return successful(productCategoryGlAccount);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductCategoryGlAccount could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductCategoryGlAccount(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductCategoryGlAccount productCategoryGlAccountToBeUpdated = new ProductCategoryGlAccount();
-
-		try {
-			productCategoryGlAccountToBeUpdated = ProductCategoryGlAccountMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductCategoryGlAccount(productCategoryGlAccountToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductCategoryGlAccountController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductCategoryGlAccount(@RequestBody ProductCategoryGlAccount productCategoryGlAccountToBeUpdated,
+	public ResponseEntity<String> updateProductCategoryGlAccount(@RequestBody ProductCategoryGlAccount productCategoryGlAccountToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		productCategoryGlAccountToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ProductCategoryGlAccountController {
 
 		try {
 			if(((ProductCategoryGlAccountUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productCategoryGlAccountId}")
-	public ResponseEntity<Object> findById(@PathVariable String productCategoryGlAccountId) throws Exception {
+	public ResponseEntity<ProductCategoryGlAccount> findById(@PathVariable String productCategoryGlAccountId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productCategoryGlAccountId", productCategoryGlAccountId);
 		try {
 
-			Object foundProductCategoryGlAccount = findProductCategoryGlAccountsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductCategoryGlAccount);
+			List<ProductCategoryGlAccount> foundProductCategoryGlAccount = findProductCategoryGlAccountsBy(requestParams).getBody();
+			if(foundProductCategoryGlAccount.size()==1){				return successful(foundProductCategoryGlAccount.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productCategoryGlAccountId}")
-	public ResponseEntity<Object> deleteProductCategoryGlAccountByIdUpdated(@PathVariable String productCategoryGlAccountId) throws Exception {
+	public ResponseEntity<String> deleteProductCategoryGlAccountByIdUpdated(@PathVariable String productCategoryGlAccountId) throws Exception {
 		DeleteProductCategoryGlAccount command = new DeleteProductCategoryGlAccount(productCategoryGlAccountId);
 
 		try {
 			if (((ProductCategoryGlAccountDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductCategoryGlAccount could not be deleted");
+		return conflict();
 
 	}
 

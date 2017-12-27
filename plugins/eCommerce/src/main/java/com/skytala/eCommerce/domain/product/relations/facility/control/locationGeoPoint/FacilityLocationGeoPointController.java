@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.facility.query.locationGeo
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/facility/facilityLocationGeoPoints")
 public class FacilityLocationGeoPointController {
@@ -52,7 +54,7 @@ public class FacilityLocationGeoPointController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findFacilityLocationGeoPointsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<FacilityLocationGeoPoint>> findFacilityLocationGeoPointsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFacilityLocationGeoPointsBy query = new FindFacilityLocationGeoPointsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class FacilityLocationGeoPointController {
 		}
 
 		List<FacilityLocationGeoPoint> facilityLocationGeoPoints =((FacilityLocationGeoPointFound) Scheduler.execute(query).data()).getFacilityLocationGeoPoints();
-
-		if (facilityLocationGeoPoints.size() == 1) {
-			return ResponseEntity.ok().body(facilityLocationGeoPoints.get(0));
-		}
 
 		return ResponseEntity.ok().body(facilityLocationGeoPoints);
 
@@ -78,7 +76,7 @@ public class FacilityLocationGeoPointController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createFacilityLocationGeoPoint(HttpServletRequest request) throws Exception {
+	public ResponseEntity<FacilityLocationGeoPoint> createFacilityLocationGeoPoint(HttpServletRequest request) throws Exception {
 
 		FacilityLocationGeoPoint facilityLocationGeoPointToBeAdded = new FacilityLocationGeoPoint();
 		try {
@@ -86,7 +84,7 @@ public class FacilityLocationGeoPointController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createFacilityLocationGeoPoint(facilityLocationGeoPointToBeAdded);
@@ -101,63 +99,15 @@ public class FacilityLocationGeoPointController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createFacilityLocationGeoPoint(@RequestBody FacilityLocationGeoPoint facilityLocationGeoPointToBeAdded) throws Exception {
+	public ResponseEntity<FacilityLocationGeoPoint> createFacilityLocationGeoPoint(@RequestBody FacilityLocationGeoPoint facilityLocationGeoPointToBeAdded) throws Exception {
 
 		AddFacilityLocationGeoPoint command = new AddFacilityLocationGeoPoint(facilityLocationGeoPointToBeAdded);
 		FacilityLocationGeoPoint facilityLocationGeoPoint = ((FacilityLocationGeoPointAdded) Scheduler.execute(command).data()).getAddedFacilityLocationGeoPoint();
 		
 		if (facilityLocationGeoPoint != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(facilityLocationGeoPoint);
+			return successful(facilityLocationGeoPoint);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("FacilityLocationGeoPoint could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateFacilityLocationGeoPoint(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		FacilityLocationGeoPoint facilityLocationGeoPointToBeUpdated = new FacilityLocationGeoPoint();
-
-		try {
-			facilityLocationGeoPointToBeUpdated = FacilityLocationGeoPointMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateFacilityLocationGeoPoint(facilityLocationGeoPointToBeUpdated, facilityLocationGeoPointToBeUpdated.getLocationSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class FacilityLocationGeoPointController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{locationSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateFacilityLocationGeoPoint(@RequestBody FacilityLocationGeoPoint facilityLocationGeoPointToBeUpdated,
+	public ResponseEntity<String> updateFacilityLocationGeoPoint(@RequestBody FacilityLocationGeoPoint facilityLocationGeoPointToBeUpdated,
 			@PathVariable String locationSeqId) throws Exception {
 
 		facilityLocationGeoPointToBeUpdated.setLocationSeqId(locationSeqId);
@@ -178,41 +128,44 @@ public class FacilityLocationGeoPointController {
 
 		try {
 			if(((FacilityLocationGeoPointUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{facilityLocationGeoPointId}")
-	public ResponseEntity<Object> findById(@PathVariable String facilityLocationGeoPointId) throws Exception {
+	public ResponseEntity<FacilityLocationGeoPoint> findById(@PathVariable String facilityLocationGeoPointId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("facilityLocationGeoPointId", facilityLocationGeoPointId);
 		try {
 
-			Object foundFacilityLocationGeoPoint = findFacilityLocationGeoPointsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundFacilityLocationGeoPoint);
+			List<FacilityLocationGeoPoint> foundFacilityLocationGeoPoint = findFacilityLocationGeoPointsBy(requestParams).getBody();
+			if(foundFacilityLocationGeoPoint.size()==1){				return successful(foundFacilityLocationGeoPoint.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{facilityLocationGeoPointId}")
-	public ResponseEntity<Object> deleteFacilityLocationGeoPointByIdUpdated(@PathVariable String facilityLocationGeoPointId) throws Exception {
+	public ResponseEntity<String> deleteFacilityLocationGeoPointByIdUpdated(@PathVariable String facilityLocationGeoPointId) throws Exception {
 		DeleteFacilityLocationGeoPoint command = new DeleteFacilityLocationGeoPoint(facilityLocationGeoPointId);
 
 		try {
 			if (((FacilityLocationGeoPointDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("FacilityLocationGeoPoint could not be deleted");
+		return conflict();
 
 	}
 

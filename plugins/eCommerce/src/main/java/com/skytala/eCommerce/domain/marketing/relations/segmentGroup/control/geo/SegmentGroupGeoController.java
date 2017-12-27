@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.marketing.relations.segmentGroup.query.geo.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/marketing/segmentGroup/segmentGroupGeos")
 public class SegmentGroupGeoController {
@@ -52,7 +54,7 @@ public class SegmentGroupGeoController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findSegmentGroupGeosBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<SegmentGroupGeo>> findSegmentGroupGeosBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSegmentGroupGeosBy query = new FindSegmentGroupGeosBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class SegmentGroupGeoController {
 		}
 
 		List<SegmentGroupGeo> segmentGroupGeos =((SegmentGroupGeoFound) Scheduler.execute(query).data()).getSegmentGroupGeos();
-
-		if (segmentGroupGeos.size() == 1) {
-			return ResponseEntity.ok().body(segmentGroupGeos.get(0));
-		}
 
 		return ResponseEntity.ok().body(segmentGroupGeos);
 
@@ -78,7 +76,7 @@ public class SegmentGroupGeoController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createSegmentGroupGeo(HttpServletRequest request) throws Exception {
+	public ResponseEntity<SegmentGroupGeo> createSegmentGroupGeo(HttpServletRequest request) throws Exception {
 
 		SegmentGroupGeo segmentGroupGeoToBeAdded = new SegmentGroupGeo();
 		try {
@@ -86,7 +84,7 @@ public class SegmentGroupGeoController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createSegmentGroupGeo(segmentGroupGeoToBeAdded);
@@ -101,63 +99,15 @@ public class SegmentGroupGeoController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createSegmentGroupGeo(@RequestBody SegmentGroupGeo segmentGroupGeoToBeAdded) throws Exception {
+	public ResponseEntity<SegmentGroupGeo> createSegmentGroupGeo(@RequestBody SegmentGroupGeo segmentGroupGeoToBeAdded) throws Exception {
 
 		AddSegmentGroupGeo command = new AddSegmentGroupGeo(segmentGroupGeoToBeAdded);
 		SegmentGroupGeo segmentGroupGeo = ((SegmentGroupGeoAdded) Scheduler.execute(command).data()).getAddedSegmentGroupGeo();
 		
 		if (segmentGroupGeo != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(segmentGroupGeo);
+			return successful(segmentGroupGeo);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("SegmentGroupGeo could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateSegmentGroupGeo(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		SegmentGroupGeo segmentGroupGeoToBeUpdated = new SegmentGroupGeo();
-
-		try {
-			segmentGroupGeoToBeUpdated = SegmentGroupGeoMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateSegmentGroupGeo(segmentGroupGeoToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class SegmentGroupGeoController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateSegmentGroupGeo(@RequestBody SegmentGroupGeo segmentGroupGeoToBeUpdated,
+	public ResponseEntity<String> updateSegmentGroupGeo(@RequestBody SegmentGroupGeo segmentGroupGeoToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		segmentGroupGeoToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class SegmentGroupGeoController {
 
 		try {
 			if(((SegmentGroupGeoUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{segmentGroupGeoId}")
-	public ResponseEntity<Object> findById(@PathVariable String segmentGroupGeoId) throws Exception {
+	public ResponseEntity<SegmentGroupGeo> findById(@PathVariable String segmentGroupGeoId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("segmentGroupGeoId", segmentGroupGeoId);
 		try {
 
-			Object foundSegmentGroupGeo = findSegmentGroupGeosBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundSegmentGroupGeo);
+			List<SegmentGroupGeo> foundSegmentGroupGeo = findSegmentGroupGeosBy(requestParams).getBody();
+			if(foundSegmentGroupGeo.size()==1){				return successful(foundSegmentGroupGeo.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{segmentGroupGeoId}")
-	public ResponseEntity<Object> deleteSegmentGroupGeoByIdUpdated(@PathVariable String segmentGroupGeoId) throws Exception {
+	public ResponseEntity<String> deleteSegmentGroupGeoByIdUpdated(@PathVariable String segmentGroupGeoId) throws Exception {
 		DeleteSegmentGroupGeo command = new DeleteSegmentGroupGeo(segmentGroupGeoId);
 
 		try {
 			if (((SegmentGroupGeoDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("SegmentGroupGeo could not be deleted");
+		return conflict();
 
 	}
 

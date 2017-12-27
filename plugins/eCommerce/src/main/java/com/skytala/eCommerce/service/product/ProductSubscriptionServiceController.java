@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/productSubscription")
 public class ProductSubscriptionServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteSubscriptionTypeAttr")
-	public ResponseEntity<Object> deleteSubscriptionTypeAttr(HttpSession session, @RequestParam(value="subscriptionTypeId") String subscriptionTypeId, @RequestParam(value="attrName") String attrName) {
+	public ResponseEntity<Map<String, Object>> deleteSubscriptionTypeAttr(HttpSession session, @RequestParam(value="subscriptionTypeId") String subscriptionTypeId, @RequestParam(value="attrName") String attrName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("subscriptionTypeId",subscriptionTypeId);
@@ -40,23 +42,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createSubscriptionResource")
-	public ResponseEntity<Object> createSubscriptionResource(HttpSession session, @RequestParam(value="serviceNameOnExpiry", required=false) String serviceNameOnExpiry, @RequestParam(value="contentId", required=false) String contentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="parentResourceId", required=false) String parentResourceId, @RequestParam(value="webSiteId", required=false) String webSiteId) {
+	public ResponseEntity<Map<String, Object>> createSubscriptionResource(HttpSession session, @RequestParam(value="serviceNameOnExpiry", required=false) String serviceNameOnExpiry, @RequestParam(value="contentId", required=false) String contentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="parentResourceId", required=false) String parentResourceId, @RequestParam(value="webSiteId", required=false) String webSiteId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("serviceNameOnExpiry",serviceNameOnExpiry);
@@ -73,23 +75,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateSubscriptionAttribute")
-	public ResponseEntity<Object> updateSubscriptionAttribute(HttpSession session, @RequestParam(value="subscriptionId") String subscriptionId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrValue", required=false) String attrValue) {
+	public ResponseEntity<Map<String, Object>> updateSubscriptionAttribute(HttpSession session, @RequestParam(value="subscriptionId") String subscriptionId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrValue", required=false) String attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("subscriptionId",subscriptionId);
@@ -104,23 +106,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductSubscriptionResource")
-	public ResponseEntity<Object> deleteProductSubscriptionResource(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="subscriptionResourceId") String subscriptionResourceId) {
+	public ResponseEntity<Map<String, Object>> deleteProductSubscriptionResource(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="subscriptionResourceId") String subscriptionResourceId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -135,23 +137,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createSubscriptionAttribute")
-	public ResponseEntity<Object> createSubscriptionAttribute(HttpSession session, @RequestParam(value="subscriptionId") String subscriptionId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
+	public ResponseEntity<Map<String, Object>> createSubscriptionAttribute(HttpSession session, @RequestParam(value="subscriptionId") String subscriptionId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("subscriptionId",subscriptionId);
@@ -167,23 +169,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/isSubscribed")
-	public ResponseEntity<Object> isSubscribed(HttpSession session, @RequestParam(value="partyId") String partyId, @RequestParam(value="maxLifeTimeUomId", required=false) String maxLifeTimeUomId, @RequestParam(value="useTimeUomId", required=false) String useTimeUomId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="subscriptionResourceId", required=false) String subscriptionResourceId, @RequestParam(value="description", required=false) String description, @RequestParam(value="subscriptionTypeId", required=false) String subscriptionTypeId, @RequestParam(value="canclAutmExtTimeUomId", required=false) String canclAutmExtTimeUomId, @RequestParam(value="contactMechId", required=false) String contactMechId, @RequestParam(value="gracePeriodOnExpiryUomId", required=false) String gracePeriodOnExpiryUomId, @RequestParam(value="availableTime", required=false) Long availableTime, @RequestParam(value="productCategoryId", required=false) String productCategoryId, @RequestParam(value="partyNeedId", required=false) String partyNeedId, @RequestParam(value="useTime", required=false) Long useTime, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="purchaseFromDate", required=false) Timestamp purchaseFromDate, @RequestParam(value="needTypeId", required=false) String needTypeId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="filterByDate", required=false) String filterByDate, @RequestParam(value="useCountLimit", required=false) Long useCountLimit, @RequestParam(value="expirationCompletedDate", required=false) Timestamp expirationCompletedDate, @RequestParam(value="availableTimeUomId", required=false) String availableTimeUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="canclAutmExtTime", required=false) Long canclAutmExtTime, @RequestParam(value="originatedFromRoleTypeId", required=false) String originatedFromRoleTypeId, @RequestParam(value="automaticExtend", required=false) String automaticExtend, @RequestParam(value="originatedFromPartyId", required=false) String originatedFromPartyId, @RequestParam(value="communicationEventId", required=false) String communicationEventId, @RequestParam(value="maxLifeTime", required=false) Long maxLifeTime, @RequestParam(value="purchaseThruDate", required=false) Timestamp purchaseThruDate, @RequestParam(value="externalSubscriptionId", required=false) String externalSubscriptionId, @RequestParam(value="gracePeriodOnExpiry", required=false) Long gracePeriodOnExpiry, @RequestParam(value="subscriptionId", required=false) String subscriptionId) {
+	public ResponseEntity<Map<String, Object>> isSubscribed(HttpSession session, @RequestParam(value="partyId") String partyId, @RequestParam(value="maxLifeTimeUomId", required=false) String maxLifeTimeUomId, @RequestParam(value="useTimeUomId", required=false) String useTimeUomId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="subscriptionResourceId", required=false) String subscriptionResourceId, @RequestParam(value="description", required=false) String description, @RequestParam(value="subscriptionTypeId", required=false) String subscriptionTypeId, @RequestParam(value="canclAutmExtTimeUomId", required=false) String canclAutmExtTimeUomId, @RequestParam(value="contactMechId", required=false) String contactMechId, @RequestParam(value="gracePeriodOnExpiryUomId", required=false) String gracePeriodOnExpiryUomId, @RequestParam(value="availableTime", required=false) Long availableTime, @RequestParam(value="productCategoryId", required=false) String productCategoryId, @RequestParam(value="partyNeedId", required=false) String partyNeedId, @RequestParam(value="useTime", required=false) Long useTime, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="purchaseFromDate", required=false) Timestamp purchaseFromDate, @RequestParam(value="needTypeId", required=false) String needTypeId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="filterByDate", required=false) String filterByDate, @RequestParam(value="useCountLimit", required=false) Long useCountLimit, @RequestParam(value="expirationCompletedDate", required=false) Timestamp expirationCompletedDate, @RequestParam(value="availableTimeUomId", required=false) String availableTimeUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="canclAutmExtTime", required=false) Long canclAutmExtTime, @RequestParam(value="originatedFromRoleTypeId", required=false) String originatedFromRoleTypeId, @RequestParam(value="automaticExtend", required=false) String automaticExtend, @RequestParam(value="originatedFromPartyId", required=false) String originatedFromPartyId, @RequestParam(value="communicationEventId", required=false) String communicationEventId, @RequestParam(value="maxLifeTime", required=false) Long maxLifeTime, @RequestParam(value="purchaseThruDate", required=false) Timestamp purchaseThruDate, @RequestParam(value="externalSubscriptionId", required=false) String externalSubscriptionId, @RequestParam(value="gracePeriodOnExpiry", required=false) Long gracePeriodOnExpiry, @RequestParam(value="subscriptionId", required=false) String subscriptionId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("partyId",partyId);
@@ -231,23 +233,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductSubscriptionResource")
-	public ResponseEntity<Object> createProductSubscriptionResource(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="subscriptionResourceId") String subscriptionResourceId, @RequestParam(value="purchaseFromDate", required=false) Timestamp purchaseFromDate, @RequestParam(value="maxLifeTimeUomId", required=false) String maxLifeTimeUomId, @RequestParam(value="useTimeUomId", required=false) String useTimeUomId, @RequestParam(value="canclAutmExtTimeUomId", required=false) String canclAutmExtTimeUomId, @RequestParam(value="useCountLimit", required=false) Long useCountLimit, @RequestParam(value="availableTimeUomId", required=false) String availableTimeUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="canclAutmExtTime", required=false) Long canclAutmExtTime, @RequestParam(value="gracePeriodOnExpiryUomId", required=false) String gracePeriodOnExpiryUomId, @RequestParam(value="availableTime", required=false) Long availableTime, @RequestParam(value="automaticExtend", required=false) String automaticExtend, @RequestParam(value="useRoleTypeId", required=false) String useRoleTypeId, @RequestParam(value="maxLifeTime", required=false) Long maxLifeTime, @RequestParam(value="useTime", required=false) Long useTime, @RequestParam(value="purchaseThruDate", required=false) Timestamp purchaseThruDate, @RequestParam(value="gracePeriodOnExpiry", required=false) Long gracePeriodOnExpiry) {
+	public ResponseEntity<Map<String, Object>> createProductSubscriptionResource(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="subscriptionResourceId") String subscriptionResourceId, @RequestParam(value="purchaseFromDate", required=false) Timestamp purchaseFromDate, @RequestParam(value="maxLifeTimeUomId", required=false) String maxLifeTimeUomId, @RequestParam(value="useTimeUomId", required=false) String useTimeUomId, @RequestParam(value="canclAutmExtTimeUomId", required=false) String canclAutmExtTimeUomId, @RequestParam(value="useCountLimit", required=false) Long useCountLimit, @RequestParam(value="availableTimeUomId", required=false) String availableTimeUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="canclAutmExtTime", required=false) Long canclAutmExtTime, @RequestParam(value="gracePeriodOnExpiryUomId", required=false) String gracePeriodOnExpiryUomId, @RequestParam(value="availableTime", required=false) Long availableTime, @RequestParam(value="automaticExtend", required=false) String automaticExtend, @RequestParam(value="useRoleTypeId", required=false) String useRoleTypeId, @RequestParam(value="maxLifeTime", required=false) Long maxLifeTime, @RequestParam(value="useTime", required=false) Long useTime, @RequestParam(value="purchaseThruDate", required=false) Timestamp purchaseThruDate, @RequestParam(value="gracePeriodOnExpiry", required=false) Long gracePeriodOnExpiry) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -278,23 +280,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateSubscriptionActivity")
-	public ResponseEntity<Object> updateSubscriptionActivity(HttpSession session, @RequestParam(value="subscriptionActivityId") String subscriptionActivityId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="dateSent", required=false) Timestamp dateSent) {
+	public ResponseEntity<Map<String, Object>> updateSubscriptionActivity(HttpSession session, @RequestParam(value="subscriptionActivityId") String subscriptionActivityId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="dateSent", required=false) Timestamp dateSent) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("subscriptionActivityId",subscriptionActivityId);
@@ -309,23 +311,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/runSubscriptionExpired")
-	public ResponseEntity<Object> runSubscriptionExpired(HttpSession session, @RequestParam(value="subscriptionId") String subscriptionId) {
+	public ResponseEntity<Map<String, Object>> runSubscriptionExpired(HttpSession session, @RequestParam(value="subscriptionId") String subscriptionId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("subscriptionId",subscriptionId);
@@ -338,23 +340,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeSubscriptionCommEvent")
-	public ResponseEntity<Object> removeSubscriptionCommEvent(HttpSession session, @RequestParam(value="communicationEventId") String communicationEventId, @RequestParam(value="subscriptionId") String subscriptionId) {
+	public ResponseEntity<Map<String, Object>> removeSubscriptionCommEvent(HttpSession session, @RequestParam(value="communicationEventId") String communicationEventId, @RequestParam(value="subscriptionId") String subscriptionId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("communicationEventId",communicationEventId);
@@ -368,23 +370,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateSubscriptionType")
-	public ResponseEntity<Object> updateSubscriptionType(HttpSession session, @RequestParam(value="subscriptionTypeId") String subscriptionTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateSubscriptionType(HttpSession session, @RequestParam(value="subscriptionTypeId") String subscriptionTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("subscriptionTypeId",subscriptionTypeId);
@@ -400,23 +402,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getSubscriptionEnt")
-	public ResponseEntity<Object> getSubscriptionEnt(HttpSession session, @RequestParam(value="subscriptionId") String subscriptionId) {
+	public ResponseEntity<Map<String, Object>> getSubscriptionEnt(HttpSession session, @RequestParam(value="subscriptionId") String subscriptionId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("subscriptionId",subscriptionId);
@@ -429,23 +431,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteSubscriptionAttribute")
-	public ResponseEntity<Object> deleteSubscriptionAttribute(HttpSession session, @RequestParam(value="subscriptionId") String subscriptionId, @RequestParam(value="attrName") String attrName) {
+	public ResponseEntity<Map<String, Object>> deleteSubscriptionAttribute(HttpSession session, @RequestParam(value="subscriptionId") String subscriptionId, @RequestParam(value="attrName") String attrName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("subscriptionId",subscriptionId);
@@ -459,23 +461,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductSubscriptionResource")
-	public ResponseEntity<Object> updateProductSubscriptionResource(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="subscriptionResourceId") String subscriptionResourceId, @RequestParam(value="purchaseFromDate", required=false) Timestamp purchaseFromDate, @RequestParam(value="maxLifeTimeUomId", required=false) String maxLifeTimeUomId, @RequestParam(value="useTimeUomId", required=false) String useTimeUomId, @RequestParam(value="canclAutmExtTimeUomId", required=false) String canclAutmExtTimeUomId, @RequestParam(value="useCountLimit", required=false) Long useCountLimit, @RequestParam(value="availableTimeUomId", required=false) String availableTimeUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="canclAutmExtTime", required=false) Long canclAutmExtTime, @RequestParam(value="gracePeriodOnExpiryUomId", required=false) String gracePeriodOnExpiryUomId, @RequestParam(value="availableTime", required=false) Long availableTime, @RequestParam(value="automaticExtend", required=false) String automaticExtend, @RequestParam(value="useRoleTypeId", required=false) String useRoleTypeId, @RequestParam(value="maxLifeTime", required=false) Long maxLifeTime, @RequestParam(value="useTime", required=false) Long useTime, @RequestParam(value="purchaseThruDate", required=false) Timestamp purchaseThruDate, @RequestParam(value="gracePeriodOnExpiry", required=false) Long gracePeriodOnExpiry) {
+	public ResponseEntity<Map<String, Object>> updateProductSubscriptionResource(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="subscriptionResourceId") String subscriptionResourceId, @RequestParam(value="purchaseFromDate", required=false) Timestamp purchaseFromDate, @RequestParam(value="maxLifeTimeUomId", required=false) String maxLifeTimeUomId, @RequestParam(value="useTimeUomId", required=false) String useTimeUomId, @RequestParam(value="canclAutmExtTimeUomId", required=false) String canclAutmExtTimeUomId, @RequestParam(value="useCountLimit", required=false) Long useCountLimit, @RequestParam(value="availableTimeUomId", required=false) String availableTimeUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="canclAutmExtTime", required=false) Long canclAutmExtTime, @RequestParam(value="gracePeriodOnExpiryUomId", required=false) String gracePeriodOnExpiryUomId, @RequestParam(value="availableTime", required=false) Long availableTime, @RequestParam(value="automaticExtend", required=false) String automaticExtend, @RequestParam(value="useRoleTypeId", required=false) String useRoleTypeId, @RequestParam(value="maxLifeTime", required=false) Long maxLifeTime, @RequestParam(value="useTime", required=false) Long useTime, @RequestParam(value="purchaseThruDate", required=false) Timestamp purchaseThruDate, @RequestParam(value="gracePeriodOnExpiry", required=false) Long gracePeriodOnExpiry) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -506,23 +508,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteSubscriptionActivity")
-	public ResponseEntity<Object> deleteSubscriptionActivity(HttpSession session, @RequestParam(value="subscriptionActivityId") String subscriptionActivityId) {
+	public ResponseEntity<Map<String, Object>> deleteSubscriptionActivity(HttpSession session, @RequestParam(value="subscriptionActivityId") String subscriptionActivityId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("subscriptionActivityId",subscriptionActivityId);
@@ -535,23 +537,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/processExtendSubscriptionByOrder")
-	public ResponseEntity<Object> processExtendSubscriptionByOrder(HttpSession session, @RequestParam(value="orderId") String orderId) {
+	public ResponseEntity<Map<String, Object>> processExtendSubscriptionByOrder(HttpSession session, @RequestParam(value="orderId") String orderId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderId",orderId);
@@ -564,23 +566,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/runServiceOnSubscriptionExpiry")
-	public ResponseEntity<Object> runServiceOnSubscriptionExpiry(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> runServiceOnSubscriptionExpiry(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -592,23 +594,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createSubscription")
-	public ResponseEntity<Object> createSubscription(HttpSession session, @RequestParam(value="maxLifeTimeUomId", required=false) String maxLifeTimeUomId, @RequestParam(value="useTimeUomId", required=false) String useTimeUomId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="subscriptionResourceId", required=false) String subscriptionResourceId, @RequestParam(value="description", required=false) String description, @RequestParam(value="subscriptionTypeId", required=false) String subscriptionTypeId, @RequestParam(value="canclAutmExtTimeUomId", required=false) String canclAutmExtTimeUomId, @RequestParam(value="contactMechId", required=false) String contactMechId, @RequestParam(value="gracePeriodOnExpiryUomId", required=false) String gracePeriodOnExpiryUomId, @RequestParam(value="availableTime", required=false) Long availableTime, @RequestParam(value="productCategoryId", required=false) String productCategoryId, @RequestParam(value="partyNeedId", required=false) String partyNeedId, @RequestParam(value="useTime", required=false) Long useTime, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="purchaseFromDate", required=false) Timestamp purchaseFromDate, @RequestParam(value="needTypeId", required=false) String needTypeId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="useCountLimit", required=false) Long useCountLimit, @RequestParam(value="expirationCompletedDate", required=false) Timestamp expirationCompletedDate, @RequestParam(value="availableTimeUomId", required=false) String availableTimeUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="canclAutmExtTime", required=false) Long canclAutmExtTime, @RequestParam(value="originatedFromRoleTypeId", required=false) String originatedFromRoleTypeId, @RequestParam(value="automaticExtend", required=false) String automaticExtend, @RequestParam(value="originatedFromPartyId", required=false) String originatedFromPartyId, @RequestParam(value="communicationEventId", required=false) String communicationEventId, @RequestParam(value="maxLifeTime", required=false) Long maxLifeTime, @RequestParam(value="purchaseThruDate", required=false) Timestamp purchaseThruDate, @RequestParam(value="externalSubscriptionId", required=false) String externalSubscriptionId, @RequestParam(value="gracePeriodOnExpiry", required=false) Long gracePeriodOnExpiry, @RequestParam(value="subscriptionId", required=false) String subscriptionId) {
+	public ResponseEntity<Map<String, Object>> createSubscription(HttpSession session, @RequestParam(value="maxLifeTimeUomId", required=false) String maxLifeTimeUomId, @RequestParam(value="useTimeUomId", required=false) String useTimeUomId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="subscriptionResourceId", required=false) String subscriptionResourceId, @RequestParam(value="description", required=false) String description, @RequestParam(value="subscriptionTypeId", required=false) String subscriptionTypeId, @RequestParam(value="canclAutmExtTimeUomId", required=false) String canclAutmExtTimeUomId, @RequestParam(value="contactMechId", required=false) String contactMechId, @RequestParam(value="gracePeriodOnExpiryUomId", required=false) String gracePeriodOnExpiryUomId, @RequestParam(value="availableTime", required=false) Long availableTime, @RequestParam(value="productCategoryId", required=false) String productCategoryId, @RequestParam(value="partyNeedId", required=false) String partyNeedId, @RequestParam(value="useTime", required=false) Long useTime, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="purchaseFromDate", required=false) Timestamp purchaseFromDate, @RequestParam(value="needTypeId", required=false) String needTypeId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="useCountLimit", required=false) Long useCountLimit, @RequestParam(value="expirationCompletedDate", required=false) Timestamp expirationCompletedDate, @RequestParam(value="availableTimeUomId", required=false) String availableTimeUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="canclAutmExtTime", required=false) Long canclAutmExtTime, @RequestParam(value="originatedFromRoleTypeId", required=false) String originatedFromRoleTypeId, @RequestParam(value="automaticExtend", required=false) String automaticExtend, @RequestParam(value="originatedFromPartyId", required=false) String originatedFromPartyId, @RequestParam(value="communicationEventId", required=false) String communicationEventId, @RequestParam(value="maxLifeTime", required=false) Long maxLifeTime, @RequestParam(value="purchaseThruDate", required=false) Timestamp purchaseThruDate, @RequestParam(value="externalSubscriptionId", required=false) String externalSubscriptionId, @RequestParam(value="gracePeriodOnExpiry", required=false) Long gracePeriodOnExpiry, @RequestParam(value="subscriptionId", required=false) String subscriptionId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("maxLifeTimeUomId",maxLifeTimeUomId);
@@ -655,23 +657,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateSubscription")
-	public ResponseEntity<Object> updateSubscription(HttpSession session, @RequestParam(value="subscriptionId") String subscriptionId, @RequestParam(value="maxLifeTimeUomId", required=false) String maxLifeTimeUomId, @RequestParam(value="useTimeUomId", required=false) String useTimeUomId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="subscriptionResourceId", required=false) String subscriptionResourceId, @RequestParam(value="description", required=false) String description, @RequestParam(value="subscriptionTypeId", required=false) String subscriptionTypeId, @RequestParam(value="canclAutmExtTimeUomId", required=false) String canclAutmExtTimeUomId, @RequestParam(value="contactMechId", required=false) String contactMechId, @RequestParam(value="gracePeriodOnExpiryUomId", required=false) String gracePeriodOnExpiryUomId, @RequestParam(value="availableTime", required=false) Long availableTime, @RequestParam(value="productCategoryId", required=false) String productCategoryId, @RequestParam(value="partyNeedId", required=false) String partyNeedId, @RequestParam(value="useTime", required=false) Long useTime, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="purchaseFromDate", required=false) Timestamp purchaseFromDate, @RequestParam(value="needTypeId", required=false) String needTypeId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="useCountLimit", required=false) Long useCountLimit, @RequestParam(value="expirationCompletedDate", required=false) Timestamp expirationCompletedDate, @RequestParam(value="availableTimeUomId", required=false) String availableTimeUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="canclAutmExtTime", required=false) Long canclAutmExtTime, @RequestParam(value="originatedFromRoleTypeId", required=false) String originatedFromRoleTypeId, @RequestParam(value="automaticExtend", required=false) String automaticExtend, @RequestParam(value="originatedFromPartyId", required=false) String originatedFromPartyId, @RequestParam(value="communicationEventId", required=false) String communicationEventId, @RequestParam(value="maxLifeTime", required=false) Long maxLifeTime, @RequestParam(value="purchaseThruDate", required=false) Timestamp purchaseThruDate, @RequestParam(value="externalSubscriptionId", required=false) String externalSubscriptionId, @RequestParam(value="gracePeriodOnExpiry", required=false) Long gracePeriodOnExpiry) {
+	public ResponseEntity<Map<String, Object>> updateSubscription(HttpSession session, @RequestParam(value="subscriptionId") String subscriptionId, @RequestParam(value="maxLifeTimeUomId", required=false) String maxLifeTimeUomId, @RequestParam(value="useTimeUomId", required=false) String useTimeUomId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="subscriptionResourceId", required=false) String subscriptionResourceId, @RequestParam(value="description", required=false) String description, @RequestParam(value="subscriptionTypeId", required=false) String subscriptionTypeId, @RequestParam(value="canclAutmExtTimeUomId", required=false) String canclAutmExtTimeUomId, @RequestParam(value="contactMechId", required=false) String contactMechId, @RequestParam(value="gracePeriodOnExpiryUomId", required=false) String gracePeriodOnExpiryUomId, @RequestParam(value="availableTime", required=false) Long availableTime, @RequestParam(value="productCategoryId", required=false) String productCategoryId, @RequestParam(value="partyNeedId", required=false) String partyNeedId, @RequestParam(value="useTime", required=false) Long useTime, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="purchaseFromDate", required=false) Timestamp purchaseFromDate, @RequestParam(value="needTypeId", required=false) String needTypeId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="useCountLimit", required=false) Long useCountLimit, @RequestParam(value="expirationCompletedDate", required=false) Timestamp expirationCompletedDate, @RequestParam(value="availableTimeUomId", required=false) String availableTimeUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="canclAutmExtTime", required=false) Long canclAutmExtTime, @RequestParam(value="originatedFromRoleTypeId", required=false) String originatedFromRoleTypeId, @RequestParam(value="automaticExtend", required=false) String automaticExtend, @RequestParam(value="originatedFromPartyId", required=false) String originatedFromPartyId, @RequestParam(value="communicationEventId", required=false) String communicationEventId, @RequestParam(value="maxLifeTime", required=false) Long maxLifeTime, @RequestParam(value="purchaseThruDate", required=false) Timestamp purchaseThruDate, @RequestParam(value="externalSubscriptionId", required=false) String externalSubscriptionId, @RequestParam(value="gracePeriodOnExpiry", required=false) Long gracePeriodOnExpiry) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("subscriptionId",subscriptionId);
@@ -718,23 +720,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createSubscriptionActivity")
-	public ResponseEntity<Object> createSubscriptionActivity(HttpSession session, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="subscriptionActivityId", required=false) String subscriptionActivityId, @RequestParam(value="dateSent", required=false) Timestamp dateSent) {
+	public ResponseEntity<Map<String, Object>> createSubscriptionActivity(HttpSession session, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="subscriptionActivityId", required=false) String subscriptionActivityId, @RequestParam(value="dateSent", required=false) Timestamp dateSent) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("comments",comments);
@@ -749,23 +751,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createSubscriptionType")
-	public ResponseEntity<Object> createSubscriptionType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description, @RequestParam(value="subscriptionTypeId", required=false) String subscriptionTypeId) {
+	public ResponseEntity<Map<String, Object>> createSubscriptionType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description, @RequestParam(value="subscriptionTypeId", required=false) String subscriptionTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("parentTypeId",parentTypeId);
@@ -781,23 +783,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateSubscriptionResource")
-	public ResponseEntity<Object> updateSubscriptionResource(HttpSession session, @RequestParam(value="subscriptionResourceId") String subscriptionResourceId, @RequestParam(value="serviceNameOnExpiry", required=false) String serviceNameOnExpiry, @RequestParam(value="contentId", required=false) String contentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="parentResourceId", required=false) String parentResourceId, @RequestParam(value="webSiteId", required=false) String webSiteId) {
+	public ResponseEntity<Map<String, Object>> updateSubscriptionResource(HttpSession session, @RequestParam(value="subscriptionResourceId") String subscriptionResourceId, @RequestParam(value="serviceNameOnExpiry", required=false) String serviceNameOnExpiry, @RequestParam(value="contentId", required=false) String contentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="parentResourceId", required=false) String parentResourceId, @RequestParam(value="webSiteId", required=false) String webSiteId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("subscriptionResourceId",subscriptionResourceId);
@@ -815,23 +817,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/subscriptionPermissionCheck")
-	public ResponseEntity<Object> subscriptionPermissionCheck(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="mainAction", required=false) String mainAction) {
+	public ResponseEntity<Map<String, Object>> subscriptionPermissionCheck(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="mainAction", required=false) String mainAction) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("primaryPermission",primaryPermission);
@@ -847,23 +849,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/processExtendSubscriptionByProduct")
-	public ResponseEntity<Object> processExtendSubscriptionByProduct(HttpSession session, @RequestParam(value="quantity") Integer quantity, @RequestParam(value="productId") String productId, @RequestParam(value="partyId") String partyId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="orderCreatedDate", required=false) Timestamp orderCreatedDate) {
+	public ResponseEntity<Map<String, Object>> processExtendSubscriptionByProduct(HttpSession session, @RequestParam(value="quantity") Integer quantity, @RequestParam(value="productId") String productId, @RequestParam(value="partyId") String partyId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="orderCreatedDate", required=false) Timestamp orderCreatedDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quantity",quantity);
@@ -882,23 +884,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateSubscriptionTypeAttr")
-	public ResponseEntity<Object> updateSubscriptionTypeAttr(HttpSession session, @RequestParam(value="subscriptionTypeId") String subscriptionTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateSubscriptionTypeAttr(HttpSession session, @RequestParam(value="subscriptionTypeId") String subscriptionTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("subscriptionTypeId",subscriptionTypeId);
@@ -913,23 +915,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteSubscriptionType")
-	public ResponseEntity<Object> deleteSubscriptionType(HttpSession session, @RequestParam(value="subscriptionTypeId") String subscriptionTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteSubscriptionType(HttpSession session, @RequestParam(value="subscriptionTypeId") String subscriptionTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("subscriptionTypeId",subscriptionTypeId);
@@ -942,23 +944,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createSubscriptionTypeAttr")
-	public ResponseEntity<Object> createSubscriptionTypeAttr(HttpSession session, @RequestParam(value="subscriptionTypeId") String subscriptionTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createSubscriptionTypeAttr(HttpSession session, @RequestParam(value="subscriptionTypeId") String subscriptionTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("subscriptionTypeId",subscriptionTypeId);
@@ -973,23 +975,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/processExtendSubscription")
-	public ResponseEntity<Object> processExtendSubscription(HttpSession session, @RequestParam(value="useTimeUomId") String useTimeUomId, @RequestParam(value="subscriptionResourceId") String subscriptionResourceId, @RequestParam(value="useTime") Integer useTime, @RequestParam(value="partyId") String partyId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="canclAutmExtTime", required=false) Integer canclAutmExtTime, @RequestParam(value="gracePeriodOnExpiryUomId", required=false) String gracePeriodOnExpiryUomId, @RequestParam(value="alwaysCreateNewRecord", required=false) String alwaysCreateNewRecord, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="automaticExtend", required=false) String automaticExtend, @RequestParam(value="useRoleTypeId", required=false) String useRoleTypeId, @RequestParam(value="canclAutmExtTimeUomId", required=false) String canclAutmExtTimeUomId, @RequestParam(value="gracePeriodOnExpiry", required=false) Integer gracePeriodOnExpiry) {
+	public ResponseEntity<Map<String, Object>> processExtendSubscription(HttpSession session, @RequestParam(value="useTimeUomId") String useTimeUomId, @RequestParam(value="subscriptionResourceId") String subscriptionResourceId, @RequestParam(value="useTime") Integer useTime, @RequestParam(value="partyId") String partyId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="canclAutmExtTime", required=false) Integer canclAutmExtTime, @RequestParam(value="gracePeriodOnExpiryUomId", required=false) String gracePeriodOnExpiryUomId, @RequestParam(value="alwaysCreateNewRecord", required=false) String alwaysCreateNewRecord, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="automaticExtend", required=false) String automaticExtend, @RequestParam(value="useRoleTypeId", required=false) String useRoleTypeId, @RequestParam(value="canclAutmExtTimeUomId", required=false) String canclAutmExtTimeUomId, @RequestParam(value="gracePeriodOnExpiry", required=false) Integer gracePeriodOnExpiry) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("useTimeUomId",useTimeUomId);
@@ -1016,23 +1018,23 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createSubscriptionCommEvent")
-	public ResponseEntity<Object> createSubscriptionCommEvent(HttpSession session, @RequestParam(value="communicationEventId") String communicationEventId, @RequestParam(value="subscriptionId") String subscriptionId) {
+	public ResponseEntity<Map<String, Object>> createSubscriptionCommEvent(HttpSession session, @RequestParam(value="communicationEventId") String communicationEventId, @RequestParam(value="subscriptionId") String subscriptionId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("communicationEventId",communicationEventId);
@@ -1046,19 +1048,19 @@ public class ProductSubscriptionServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

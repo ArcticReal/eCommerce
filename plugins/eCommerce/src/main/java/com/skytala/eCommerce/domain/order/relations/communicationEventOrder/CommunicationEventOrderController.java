@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.communicationEventOrder.quer
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/communicationEventOrders")
 public class CommunicationEventOrderController {
@@ -52,7 +54,7 @@ public class CommunicationEventOrderController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findCommunicationEventOrdersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<CommunicationEventOrder>> findCommunicationEventOrdersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCommunicationEventOrdersBy query = new FindCommunicationEventOrdersBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class CommunicationEventOrderController {
 		}
 
 		List<CommunicationEventOrder> communicationEventOrders =((CommunicationEventOrderFound) Scheduler.execute(query).data()).getCommunicationEventOrders();
-
-		if (communicationEventOrders.size() == 1) {
-			return ResponseEntity.ok().body(communicationEventOrders.get(0));
-		}
 
 		return ResponseEntity.ok().body(communicationEventOrders);
 
@@ -78,7 +76,7 @@ public class CommunicationEventOrderController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createCommunicationEventOrder(HttpServletRequest request) throws Exception {
+	public ResponseEntity<CommunicationEventOrder> createCommunicationEventOrder(HttpServletRequest request) throws Exception {
 
 		CommunicationEventOrder communicationEventOrderToBeAdded = new CommunicationEventOrder();
 		try {
@@ -86,7 +84,7 @@ public class CommunicationEventOrderController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createCommunicationEventOrder(communicationEventOrderToBeAdded);
@@ -101,63 +99,15 @@ public class CommunicationEventOrderController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createCommunicationEventOrder(@RequestBody CommunicationEventOrder communicationEventOrderToBeAdded) throws Exception {
+	public ResponseEntity<CommunicationEventOrder> createCommunicationEventOrder(@RequestBody CommunicationEventOrder communicationEventOrderToBeAdded) throws Exception {
 
 		AddCommunicationEventOrder command = new AddCommunicationEventOrder(communicationEventOrderToBeAdded);
 		CommunicationEventOrder communicationEventOrder = ((CommunicationEventOrderAdded) Scheduler.execute(command).data()).getAddedCommunicationEventOrder();
 		
 		if (communicationEventOrder != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(communicationEventOrder);
+			return successful(communicationEventOrder);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("CommunicationEventOrder could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateCommunicationEventOrder(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		CommunicationEventOrder communicationEventOrderToBeUpdated = new CommunicationEventOrder();
-
-		try {
-			communicationEventOrderToBeUpdated = CommunicationEventOrderMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateCommunicationEventOrder(communicationEventOrderToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class CommunicationEventOrderController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateCommunicationEventOrder(@RequestBody CommunicationEventOrder communicationEventOrderToBeUpdated,
+	public ResponseEntity<String> updateCommunicationEventOrder(@RequestBody CommunicationEventOrder communicationEventOrderToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		communicationEventOrderToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class CommunicationEventOrderController {
 
 		try {
 			if(((CommunicationEventOrderUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{communicationEventOrderId}")
-	public ResponseEntity<Object> findById(@PathVariable String communicationEventOrderId) throws Exception {
+	public ResponseEntity<CommunicationEventOrder> findById(@PathVariable String communicationEventOrderId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("communicationEventOrderId", communicationEventOrderId);
 		try {
 
-			Object foundCommunicationEventOrder = findCommunicationEventOrdersBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundCommunicationEventOrder);
+			List<CommunicationEventOrder> foundCommunicationEventOrder = findCommunicationEventOrdersBy(requestParams).getBody();
+			if(foundCommunicationEventOrder.size()==1){				return successful(foundCommunicationEventOrder.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{communicationEventOrderId}")
-	public ResponseEntity<Object> deleteCommunicationEventOrderByIdUpdated(@PathVariable String communicationEventOrderId) throws Exception {
+	public ResponseEntity<String> deleteCommunicationEventOrderByIdUpdated(@PathVariable String communicationEventOrderId) throws Exception {
 		DeleteCommunicationEventOrder command = new DeleteCommunicationEventOrder(communicationEventOrderId);
 
 		try {
 			if (((CommunicationEventOrderDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("CommunicationEventOrder could not be deleted");
+		return conflict();
 
 	}
 

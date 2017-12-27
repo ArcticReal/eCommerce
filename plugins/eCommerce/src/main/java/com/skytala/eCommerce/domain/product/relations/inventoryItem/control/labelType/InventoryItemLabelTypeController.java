@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.inventoryItem.query.labelT
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/inventoryItem/inventoryItemLabelTypes")
 public class InventoryItemLabelTypeController {
@@ -52,7 +54,7 @@ public class InventoryItemLabelTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findInventoryItemLabelTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<InventoryItemLabelType>> findInventoryItemLabelTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInventoryItemLabelTypesBy query = new FindInventoryItemLabelTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class InventoryItemLabelTypeController {
 		}
 
 		List<InventoryItemLabelType> inventoryItemLabelTypes =((InventoryItemLabelTypeFound) Scheduler.execute(query).data()).getInventoryItemLabelTypes();
-
-		if (inventoryItemLabelTypes.size() == 1) {
-			return ResponseEntity.ok().body(inventoryItemLabelTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(inventoryItemLabelTypes);
 
@@ -78,7 +76,7 @@ public class InventoryItemLabelTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createInventoryItemLabelType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<InventoryItemLabelType> createInventoryItemLabelType(HttpServletRequest request) throws Exception {
 
 		InventoryItemLabelType inventoryItemLabelTypeToBeAdded = new InventoryItemLabelType();
 		try {
@@ -86,7 +84,7 @@ public class InventoryItemLabelTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createInventoryItemLabelType(inventoryItemLabelTypeToBeAdded);
@@ -101,63 +99,15 @@ public class InventoryItemLabelTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createInventoryItemLabelType(@RequestBody InventoryItemLabelType inventoryItemLabelTypeToBeAdded) throws Exception {
+	public ResponseEntity<InventoryItemLabelType> createInventoryItemLabelType(@RequestBody InventoryItemLabelType inventoryItemLabelTypeToBeAdded) throws Exception {
 
 		AddInventoryItemLabelType command = new AddInventoryItemLabelType(inventoryItemLabelTypeToBeAdded);
 		InventoryItemLabelType inventoryItemLabelType = ((InventoryItemLabelTypeAdded) Scheduler.execute(command).data()).getAddedInventoryItemLabelType();
 		
 		if (inventoryItemLabelType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(inventoryItemLabelType);
+			return successful(inventoryItemLabelType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("InventoryItemLabelType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateInventoryItemLabelType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		InventoryItemLabelType inventoryItemLabelTypeToBeUpdated = new InventoryItemLabelType();
-
-		try {
-			inventoryItemLabelTypeToBeUpdated = InventoryItemLabelTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateInventoryItemLabelType(inventoryItemLabelTypeToBeUpdated, inventoryItemLabelTypeToBeUpdated.getInventoryItemLabelTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class InventoryItemLabelTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{inventoryItemLabelTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateInventoryItemLabelType(@RequestBody InventoryItemLabelType inventoryItemLabelTypeToBeUpdated,
+	public ResponseEntity<String> updateInventoryItemLabelType(@RequestBody InventoryItemLabelType inventoryItemLabelTypeToBeUpdated,
 			@PathVariable String inventoryItemLabelTypeId) throws Exception {
 
 		inventoryItemLabelTypeToBeUpdated.setInventoryItemLabelTypeId(inventoryItemLabelTypeId);
@@ -178,41 +128,44 @@ public class InventoryItemLabelTypeController {
 
 		try {
 			if(((InventoryItemLabelTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{inventoryItemLabelTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String inventoryItemLabelTypeId) throws Exception {
+	public ResponseEntity<InventoryItemLabelType> findById(@PathVariable String inventoryItemLabelTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("inventoryItemLabelTypeId", inventoryItemLabelTypeId);
 		try {
 
-			Object foundInventoryItemLabelType = findInventoryItemLabelTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundInventoryItemLabelType);
+			List<InventoryItemLabelType> foundInventoryItemLabelType = findInventoryItemLabelTypesBy(requestParams).getBody();
+			if(foundInventoryItemLabelType.size()==1){				return successful(foundInventoryItemLabelType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{inventoryItemLabelTypeId}")
-	public ResponseEntity<Object> deleteInventoryItemLabelTypeByIdUpdated(@PathVariable String inventoryItemLabelTypeId) throws Exception {
+	public ResponseEntity<String> deleteInventoryItemLabelTypeByIdUpdated(@PathVariable String inventoryItemLabelTypeId) throws Exception {
 		DeleteInventoryItemLabelType command = new DeleteInventoryItemLabelType(inventoryItemLabelTypeId);
 
 		try {
 			if (((InventoryItemLabelTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("InventoryItemLabelType could not be deleted");
+		return conflict();
 
 	}
 

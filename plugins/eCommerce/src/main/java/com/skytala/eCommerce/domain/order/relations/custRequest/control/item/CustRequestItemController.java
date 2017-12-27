@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.custRequest.query.item.FindC
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/custRequest/custRequestItems")
 public class CustRequestItemController {
@@ -52,7 +54,7 @@ public class CustRequestItemController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findCustRequestItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<CustRequestItem>> findCustRequestItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCustRequestItemsBy query = new FindCustRequestItemsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class CustRequestItemController {
 		}
 
 		List<CustRequestItem> custRequestItems =((CustRequestItemFound) Scheduler.execute(query).data()).getCustRequestItems();
-
-		if (custRequestItems.size() == 1) {
-			return ResponseEntity.ok().body(custRequestItems.get(0));
-		}
 
 		return ResponseEntity.ok().body(custRequestItems);
 
@@ -78,7 +76,7 @@ public class CustRequestItemController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createCustRequestItem(HttpServletRequest request) throws Exception {
+	public ResponseEntity<CustRequestItem> createCustRequestItem(HttpServletRequest request) throws Exception {
 
 		CustRequestItem custRequestItemToBeAdded = new CustRequestItem();
 		try {
@@ -86,7 +84,7 @@ public class CustRequestItemController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createCustRequestItem(custRequestItemToBeAdded);
@@ -101,63 +99,15 @@ public class CustRequestItemController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createCustRequestItem(@RequestBody CustRequestItem custRequestItemToBeAdded) throws Exception {
+	public ResponseEntity<CustRequestItem> createCustRequestItem(@RequestBody CustRequestItem custRequestItemToBeAdded) throws Exception {
 
 		AddCustRequestItem command = new AddCustRequestItem(custRequestItemToBeAdded);
 		CustRequestItem custRequestItem = ((CustRequestItemAdded) Scheduler.execute(command).data()).getAddedCustRequestItem();
 		
 		if (custRequestItem != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(custRequestItem);
+			return successful(custRequestItem);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("CustRequestItem could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateCustRequestItem(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		CustRequestItem custRequestItemToBeUpdated = new CustRequestItem();
-
-		try {
-			custRequestItemToBeUpdated = CustRequestItemMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateCustRequestItem(custRequestItemToBeUpdated, custRequestItemToBeUpdated.getCustRequestItemSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class CustRequestItemController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{custRequestItemSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateCustRequestItem(@RequestBody CustRequestItem custRequestItemToBeUpdated,
+	public ResponseEntity<String> updateCustRequestItem(@RequestBody CustRequestItem custRequestItemToBeUpdated,
 			@PathVariable String custRequestItemSeqId) throws Exception {
 
 		custRequestItemToBeUpdated.setCustRequestItemSeqId(custRequestItemSeqId);
@@ -178,41 +128,44 @@ public class CustRequestItemController {
 
 		try {
 			if(((CustRequestItemUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{custRequestItemId}")
-	public ResponseEntity<Object> findById(@PathVariable String custRequestItemId) throws Exception {
+	public ResponseEntity<CustRequestItem> findById(@PathVariable String custRequestItemId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("custRequestItemId", custRequestItemId);
 		try {
 
-			Object foundCustRequestItem = findCustRequestItemsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundCustRequestItem);
+			List<CustRequestItem> foundCustRequestItem = findCustRequestItemsBy(requestParams).getBody();
+			if(foundCustRequestItem.size()==1){				return successful(foundCustRequestItem.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{custRequestItemId}")
-	public ResponseEntity<Object> deleteCustRequestItemByIdUpdated(@PathVariable String custRequestItemId) throws Exception {
+	public ResponseEntity<String> deleteCustRequestItemByIdUpdated(@PathVariable String custRequestItemId) throws Exception {
 		DeleteCustRequestItem command = new DeleteCustRequestItem(custRequestItemId);
 
 		try {
 			if (((CustRequestItemDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("CustRequestItem could not be deleted");
+		return conflict();
 
 	}
 

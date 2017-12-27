@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/accountingTax")
 public class AccountingTaxServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateTaxAuthorityCategory")
-	public ResponseEntity<Object> updateTaxAuthorityCategory(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId) {
+	public ResponseEntity<Map<String, Object>> updateTaxAuthorityCategory(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthPartyId",taxAuthPartyId);
@@ -41,23 +43,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteTaxAuthorityRateProduct")
-	public ResponseEntity<Object> deleteTaxAuthorityRateProduct(HttpSession session, @RequestParam(value="taxAuthorityRateSeqId") String taxAuthorityRateSeqId) {
+	public ResponseEntity<Map<String, Object>> deleteTaxAuthorityRateProduct(HttpSession session, @RequestParam(value="taxAuthorityRateSeqId") String taxAuthorityRateSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthorityRateSeqId",taxAuthorityRateSeqId);
@@ -70,23 +72,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createTaxAuthority")
-	public ResponseEntity<Object> createTaxAuthority(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="requireTaxIdForExemption", required=false) String requireTaxIdForExemption, @RequestParam(value="includeTaxInPrice", required=false) String includeTaxInPrice, @RequestParam(value="taxIdFormatPattern", required=false) String taxIdFormatPattern) {
+	public ResponseEntity<Map<String, Object>> createTaxAuthority(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="requireTaxIdForExemption", required=false) String requireTaxIdForExemption, @RequestParam(value="includeTaxInPrice", required=false) String includeTaxInPrice, @RequestParam(value="taxIdFormatPattern", required=false) String taxIdFormatPattern) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthPartyId",taxAuthPartyId);
@@ -103,23 +105,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createPartyTaxAuthInfo")
-	public ResponseEntity<Object> createPartyTaxAuthInfo(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="partyId") String partyId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="partyTaxId", required=false) String partyTaxId, @RequestParam(value="isNexus", required=false) String isNexus, @RequestParam(value="isExempt", required=false) String isExempt, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createPartyTaxAuthInfo(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="partyId") String partyId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="partyTaxId", required=false) String partyTaxId, @RequestParam(value="isNexus", required=false) String isNexus, @RequestParam(value="isExempt", required=false) String isExempt, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthPartyId",taxAuthPartyId);
@@ -139,23 +141,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/calcTaxTotalForDisplayInterface")
-	public ResponseEntity<Object> calcTaxTotalForDisplayInterface(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productStoreId") String productStoreId, @RequestParam(value="basePrice") BigDecimal basePrice, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="shippingPrice", required=false) BigDecimal shippingPrice, @RequestParam(value="billToPartyId", required=false) String billToPartyId) {
+	public ResponseEntity<Map<String, Object>> calcTaxTotalForDisplayInterface(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productStoreId") String productStoreId, @RequestParam(value="basePrice") BigDecimal basePrice, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="shippingPrice", required=false) BigDecimal shippingPrice, @RequestParam(value="billToPartyId", required=false) String billToPartyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -173,23 +175,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateTaxAuthorityRateProduct")
-	public ResponseEntity<Object> updateTaxAuthorityRateProduct(HttpSession session, @RequestParam(value="taxAuthorityRateSeqId") String taxAuthorityRateSeqId, @RequestParam(value="taxShipping", required=false) String taxShipping, @RequestParam(value="taxPercentage", required=false) BigDecimal taxPercentage, @RequestParam(value="description", required=false) String description, @RequestParam(value="titleTransferEnumId", required=false) String titleTransferEnumId, @RequestParam(value="taxPromotions", required=false) String taxPromotions, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="productCategoryId", required=false) String productCategoryId, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="minItemPrice", required=false) BigDecimal minItemPrice, @RequestParam(value="minPurchase", required=false) BigDecimal minPurchase, @RequestParam(value="taxAuthorityRateTypeId", required=false) String taxAuthorityRateTypeId, @RequestParam(value="productStoreId", required=false) String productStoreId) {
+	public ResponseEntity<Map<String, Object>> updateTaxAuthorityRateProduct(HttpSession session, @RequestParam(value="taxAuthorityRateSeqId") String taxAuthorityRateSeqId, @RequestParam(value="taxShipping", required=false) String taxShipping, @RequestParam(value="taxPercentage", required=false) BigDecimal taxPercentage, @RequestParam(value="description", required=false) String description, @RequestParam(value="titleTransferEnumId", required=false) String titleTransferEnumId, @RequestParam(value="taxPromotions", required=false) String taxPromotions, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="productCategoryId", required=false) String productCategoryId, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="minItemPrice", required=false) BigDecimal minItemPrice, @RequestParam(value="minPurchase", required=false) BigDecimal minPurchase, @RequestParam(value="taxAuthorityRateTypeId", required=false) String taxAuthorityRateTypeId, @RequestParam(value="productStoreId", required=false) String productStoreId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthorityRateSeqId",taxAuthorityRateSeqId);
@@ -216,23 +218,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/calcTaxInterface")
-	public ResponseEntity<Object> calcTaxInterface(HttpSession session, @RequestParam(value="itemPriceList") java.util.List itemPriceList, @RequestParam(value="itemAmountList") java.util.List itemAmountList, @RequestParam(value="itemProductList") java.util.List itemProductList, @RequestParam(value="orderPromotionsAmount", required=false) BigDecimal orderPromotionsAmount, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="orderShippingAmount", required=false) BigDecimal orderShippingAmount, @RequestParam(value="billToPartyId", required=false) String billToPartyId, @RequestParam(value="shippingAddress", required=false) org.apache.ofbiz.entity.GenericValue shippingAddress, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="itemQuantityList", required=false) java.util.List itemQuantityList, @RequestParam(value="payToPartyId", required=false) String payToPartyId, @RequestParam(value="itemShippingList", required=false) java.util.List itemShippingList) {
+	public ResponseEntity<Map<String, Object>> calcTaxInterface(HttpSession session, @RequestParam(value="itemPriceList") java.util.List itemPriceList, @RequestParam(value="itemAmountList") java.util.List itemAmountList, @RequestParam(value="itemProductList") java.util.List itemProductList, @RequestParam(value="orderPromotionsAmount", required=false) BigDecimal orderPromotionsAmount, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="orderShippingAmount", required=false) BigDecimal orderShippingAmount, @RequestParam(value="billToPartyId", required=false) String billToPartyId, @RequestParam(value="shippingAddress", required=false) org.apache.ofbiz.entity.GenericValue shippingAddress, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="itemQuantityList", required=false) java.util.List itemQuantityList, @RequestParam(value="payToPartyId", required=false) String payToPartyId, @RequestParam(value="itemShippingList", required=false) java.util.List itemShippingList) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("itemPriceList",itemPriceList);
@@ -256,23 +258,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updatePartyTaxAuthInfo")
-	public ResponseEntity<Object> updatePartyTaxAuthInfo(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="partyId") String partyId, @RequestParam(value="partyTaxId", required=false) String partyTaxId, @RequestParam(value="isNexus", required=false) String isNexus, @RequestParam(value="isExempt", required=false) String isExempt, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updatePartyTaxAuthInfo(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="partyId") String partyId, @RequestParam(value="partyTaxId", required=false) String partyTaxId, @RequestParam(value="isNexus", required=false) String isNexus, @RequestParam(value="isExempt", required=false) String isExempt, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthPartyId",taxAuthPartyId);
@@ -292,23 +294,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteTaxAuthorityAssoc")
-	public ResponseEntity<Object> deleteTaxAuthorityAssoc(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="toTaxAuthPartyId") String toTaxAuthPartyId, @RequestParam(value="toTaxAuthGeoId") String toTaxAuthGeoId) {
+	public ResponseEntity<Map<String, Object>> deleteTaxAuthorityAssoc(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="toTaxAuthPartyId") String toTaxAuthPartyId, @RequestParam(value="toTaxAuthGeoId") String toTaxAuthGeoId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthPartyId",taxAuthPartyId);
@@ -325,23 +327,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteTaxAuthorityGlAccount")
-	public ResponseEntity<Object> deleteTaxAuthorityGlAccount(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="organizationPartyId") String organizationPartyId) {
+	public ResponseEntity<Map<String, Object>> deleteTaxAuthorityGlAccount(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="organizationPartyId") String organizationPartyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthPartyId",taxAuthPartyId);
@@ -356,23 +358,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateTaxAuthority")
-	public ResponseEntity<Object> updateTaxAuthority(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="requireTaxIdForExemption", required=false) String requireTaxIdForExemption, @RequestParam(value="includeTaxInPrice", required=false) String includeTaxInPrice, @RequestParam(value="taxIdFormatPattern", required=false) String taxIdFormatPattern) {
+	public ResponseEntity<Map<String, Object>> updateTaxAuthority(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="requireTaxIdForExemption", required=false) String requireTaxIdForExemption, @RequestParam(value="includeTaxInPrice", required=false) String includeTaxInPrice, @RequestParam(value="taxIdFormatPattern", required=false) String taxIdFormatPattern) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthPartyId",taxAuthPartyId);
@@ -389,23 +391,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteTaxAuthorityAssocType")
-	public ResponseEntity<Object> deleteTaxAuthorityAssocType(HttpSession session, @RequestParam(value="taxAuthorityAssocTypeId") String taxAuthorityAssocTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteTaxAuthorityAssocType(HttpSession session, @RequestParam(value="taxAuthorityAssocTypeId") String taxAuthorityAssocTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthorityAssocTypeId",taxAuthorityAssocTypeId);
@@ -418,23 +420,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCustomerTaxAuthInfo")
-	public ResponseEntity<Object> createCustomerTaxAuthInfo(HttpSession session, @RequestParam(value="taxAuthPartyGeoIds") String taxAuthPartyGeoIds, @RequestParam(value="partyId") String partyId, @RequestParam(value="partyTaxId", required=false) String partyTaxId, @RequestParam(value="fromDate", required=false) String fromDate, @RequestParam(value="isNexus", required=false) String isNexus, @RequestParam(value="isExempt", required=false) String isExempt, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createCustomerTaxAuthInfo(HttpSession session, @RequestParam(value="taxAuthPartyGeoIds") String taxAuthPartyGeoIds, @RequestParam(value="partyId") String partyId, @RequestParam(value="partyTaxId", required=false) String partyTaxId, @RequestParam(value="fromDate", required=false) String fromDate, @RequestParam(value="isNexus", required=false) String isNexus, @RequestParam(value="isExempt", required=false) String isExempt, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthPartyGeoIds",taxAuthPartyGeoIds);
@@ -453,23 +455,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateTaxAuthorityRateType")
-	public ResponseEntity<Object> updateTaxAuthorityRateType(HttpSession session, @RequestParam(value="taxAuthorityRateTypeId") String taxAuthorityRateTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateTaxAuthorityRateType(HttpSession session, @RequestParam(value="taxAuthorityRateTypeId") String taxAuthorityRateTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthorityRateTypeId",taxAuthorityRateTypeId);
@@ -483,23 +485,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/calcTaxForDisplay")
-	public ResponseEntity<Object> calcTaxForDisplay(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productStoreId") String productStoreId, @RequestParam(value="basePrice") BigDecimal basePrice, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="shippingPrice", required=false) BigDecimal shippingPrice, @RequestParam(value="billToPartyId", required=false) String billToPartyId) {
+	public ResponseEntity<Map<String, Object>> calcTaxForDisplay(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productStoreId") String productStoreId, @RequestParam(value="basePrice") BigDecimal basePrice, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="shippingPrice", required=false) BigDecimal shippingPrice, @RequestParam(value="billToPartyId", required=false) String billToPartyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -517,23 +519,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateTaxAuthorityGlAccount")
-	public ResponseEntity<Object> updateTaxAuthorityGlAccount(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="organizationPartyId") String organizationPartyId, @RequestParam(value="glAccountId", required=false) String glAccountId) {
+	public ResponseEntity<Map<String, Object>> updateTaxAuthorityGlAccount(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="organizationPartyId") String organizationPartyId, @RequestParam(value="glAccountId", required=false) String glAccountId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthPartyId",taxAuthPartyId);
@@ -549,23 +551,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createTaxAuthorityAssocType")
-	public ResponseEntity<Object> createTaxAuthorityAssocType(HttpSession session, @RequestParam(value="taxAuthorityAssocTypeId", required=false) String taxAuthorityAssocTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createTaxAuthorityAssocType(HttpSession session, @RequestParam(value="taxAuthorityAssocTypeId", required=false) String taxAuthorityAssocTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthorityAssocTypeId",taxAuthorityAssocTypeId);
@@ -579,23 +581,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateTaxAuthorityAssocType")
-	public ResponseEntity<Object> updateTaxAuthorityAssocType(HttpSession session, @RequestParam(value="taxAuthorityAssocTypeId") String taxAuthorityAssocTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateTaxAuthorityAssocType(HttpSession session, @RequestParam(value="taxAuthorityAssocTypeId") String taxAuthorityAssocTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthorityAssocTypeId",taxAuthorityAssocTypeId);
@@ -609,23 +611,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createTaxAuthorityAssoc")
-	public ResponseEntity<Object> createTaxAuthorityAssoc(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="toTaxAuthPartyId") String toTaxAuthPartyId, @RequestParam(value="toTaxAuthGeoId") String toTaxAuthGeoId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="taxAuthorityAssocTypeId", required=false) String taxAuthorityAssocTypeId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createTaxAuthorityAssoc(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="toTaxAuthPartyId") String toTaxAuthPartyId, @RequestParam(value="toTaxAuthGeoId") String toTaxAuthGeoId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="taxAuthorityAssocTypeId", required=false) String taxAuthorityAssocTypeId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthPartyId",taxAuthPartyId);
@@ -644,23 +646,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteTaxAuthorityRateType")
-	public ResponseEntity<Object> deleteTaxAuthorityRateType(HttpSession session, @RequestParam(value="taxAuthorityRateTypeId") String taxAuthorityRateTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteTaxAuthorityRateType(HttpSession session, @RequestParam(value="taxAuthorityRateTypeId") String taxAuthorityRateTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthorityRateTypeId",taxAuthorityRateTypeId);
@@ -673,23 +675,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createTaxAuthorityRateProduct")
-	public ResponseEntity<Object> createTaxAuthorityRateProduct(HttpSession session, @RequestParam(value="taxShipping", required=false) String taxShipping, @RequestParam(value="taxPercentage", required=false) BigDecimal taxPercentage, @RequestParam(value="description", required=false) String description, @RequestParam(value="titleTransferEnumId", required=false) String titleTransferEnumId, @RequestParam(value="taxPromotions", required=false) String taxPromotions, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="productCategoryId", required=false) String productCategoryId, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="minItemPrice", required=false) BigDecimal minItemPrice, @RequestParam(value="minPurchase", required=false) BigDecimal minPurchase, @RequestParam(value="taxAuthorityRateTypeId", required=false) String taxAuthorityRateTypeId, @RequestParam(value="productStoreId", required=false) String productStoreId) {
+	public ResponseEntity<Map<String, Object>> createTaxAuthorityRateProduct(HttpSession session, @RequestParam(value="taxShipping", required=false) String taxShipping, @RequestParam(value="taxPercentage", required=false) BigDecimal taxPercentage, @RequestParam(value="description", required=false) String description, @RequestParam(value="titleTransferEnumId", required=false) String titleTransferEnumId, @RequestParam(value="taxPromotions", required=false) String taxPromotions, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="productCategoryId", required=false) String productCategoryId, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="minItemPrice", required=false) BigDecimal minItemPrice, @RequestParam(value="minPurchase", required=false) BigDecimal minPurchase, @RequestParam(value="taxAuthorityRateTypeId", required=false) String taxAuthorityRateTypeId, @RequestParam(value="productStoreId", required=false) String productStoreId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxShipping",taxShipping);
@@ -715,23 +717,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createTaxAuthorityCategory")
-	public ResponseEntity<Object> createTaxAuthorityCategory(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId) {
+	public ResponseEntity<Map<String, Object>> createTaxAuthorityCategory(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthPartyId",taxAuthPartyId);
@@ -746,23 +748,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/importZipSalesTaxData")
-	public ResponseEntity<Object> importZipSalesTaxData(HttpSession session, @RequestParam(value="ruleFileLocation") String ruleFileLocation, @RequestParam(value="taxFileLocation") String taxFileLocation) {
+	public ResponseEntity<Map<String, Object>> importZipSalesTaxData(HttpSession session, @RequestParam(value="ruleFileLocation") String ruleFileLocation, @RequestParam(value="taxFileLocation") String taxFileLocation) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("ruleFileLocation",ruleFileLocation);
@@ -776,23 +778,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deletePartyTaxAuthInfo")
-	public ResponseEntity<Object> deletePartyTaxAuthInfo(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="partyId") String partyId) {
+	public ResponseEntity<Map<String, Object>> deletePartyTaxAuthInfo(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="partyId") String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthPartyId",taxAuthPartyId);
@@ -808,23 +810,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createTaxAuthorityRateType")
-	public ResponseEntity<Object> createTaxAuthorityRateType(HttpSession session, @RequestParam(value="description", required=false) String description, @RequestParam(value="taxAuthorityRateTypeId", required=false) String taxAuthorityRateTypeId) {
+	public ResponseEntity<Map<String, Object>> createTaxAuthorityRateType(HttpSession session, @RequestParam(value="description", required=false) String description, @RequestParam(value="taxAuthorityRateTypeId", required=false) String taxAuthorityRateTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("description",description);
@@ -838,23 +840,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateTaxAuthorityAssoc")
-	public ResponseEntity<Object> updateTaxAuthorityAssoc(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="toTaxAuthPartyId") String toTaxAuthPartyId, @RequestParam(value="toTaxAuthGeoId") String toTaxAuthGeoId, @RequestParam(value="taxAuthorityAssocTypeId", required=false) String taxAuthorityAssocTypeId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateTaxAuthorityAssoc(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="toTaxAuthPartyId") String toTaxAuthPartyId, @RequestParam(value="toTaxAuthGeoId") String toTaxAuthGeoId, @RequestParam(value="taxAuthorityAssocTypeId", required=false) String taxAuthorityAssocTypeId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthPartyId",taxAuthPartyId);
@@ -873,23 +875,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteTaxAuthorityCategory")
-	public ResponseEntity<Object> deleteTaxAuthorityCategory(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId) {
+	public ResponseEntity<Map<String, Object>> deleteTaxAuthorityCategory(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthPartyId",taxAuthPartyId);
@@ -904,23 +906,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteTaxAuthority")
-	public ResponseEntity<Object> deleteTaxAuthority(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId) {
+	public ResponseEntity<Map<String, Object>> deleteTaxAuthority(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthPartyId",taxAuthPartyId);
@@ -934,23 +936,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/calcTax")
-	public ResponseEntity<Object> calcTax(HttpSession session, @RequestParam(value="itemPriceList") java.util.List itemPriceList, @RequestParam(value="itemAmountList") java.util.List itemAmountList, @RequestParam(value="itemProductList") java.util.List itemProductList, @RequestParam(value="orderPromotionsAmount", required=false) BigDecimal orderPromotionsAmount, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="orderShippingAmount", required=false) BigDecimal orderShippingAmount, @RequestParam(value="billToPartyId", required=false) String billToPartyId, @RequestParam(value="shippingAddress", required=false) org.apache.ofbiz.entity.GenericValue shippingAddress, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="itemQuantityList", required=false) java.util.List itemQuantityList, @RequestParam(value="payToPartyId", required=false) String payToPartyId, @RequestParam(value="itemShippingList", required=false) java.util.List itemShippingList) {
+	public ResponseEntity<Map<String, Object>> calcTax(HttpSession session, @RequestParam(value="itemPriceList") java.util.List itemPriceList, @RequestParam(value="itemAmountList") java.util.List itemAmountList, @RequestParam(value="itemProductList") java.util.List itemProductList, @RequestParam(value="orderPromotionsAmount", required=false) BigDecimal orderPromotionsAmount, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="orderShippingAmount", required=false) BigDecimal orderShippingAmount, @RequestParam(value="billToPartyId", required=false) String billToPartyId, @RequestParam(value="shippingAddress", required=false) org.apache.ofbiz.entity.GenericValue shippingAddress, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="itemQuantityList", required=false) java.util.List itemQuantityList, @RequestParam(value="payToPartyId", required=false) String payToPartyId, @RequestParam(value="itemShippingList", required=false) java.util.List itemShippingList) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("itemPriceList",itemPriceList);
@@ -974,23 +976,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createTaxAuthorityGlAccount")
-	public ResponseEntity<Object> createTaxAuthorityGlAccount(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="organizationPartyId") String organizationPartyId, @RequestParam(value="glAccountId", required=false) String glAccountId) {
+	public ResponseEntity<Map<String, Object>> createTaxAuthorityGlAccount(HttpSession session, @RequestParam(value="taxAuthPartyId") String taxAuthPartyId, @RequestParam(value="taxAuthGeoId") String taxAuthGeoId, @RequestParam(value="organizationPartyId") String organizationPartyId, @RequestParam(value="glAccountId", required=false) String glAccountId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("taxAuthPartyId",taxAuthPartyId);
@@ -1006,23 +1008,23 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/flatZipSalesTaxCalc")
-	public ResponseEntity<Object> flatZipSalesTaxCalc(HttpSession session, @RequestParam(value="itemPriceList") java.util.List itemPriceList, @RequestParam(value="itemAmountList") java.util.List itemAmountList, @RequestParam(value="itemProductList") java.util.List itemProductList, @RequestParam(value="orderPromotionsAmount", required=false) BigDecimal orderPromotionsAmount, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="orderShippingAmount", required=false) BigDecimal orderShippingAmount, @RequestParam(value="billToPartyId", required=false) String billToPartyId, @RequestParam(value="shippingAddress", required=false) org.apache.ofbiz.entity.GenericValue shippingAddress, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="itemQuantityList", required=false) java.util.List itemQuantityList, @RequestParam(value="payToPartyId", required=false) String payToPartyId, @RequestParam(value="itemShippingList", required=false) java.util.List itemShippingList) {
+	public ResponseEntity<Map<String, Object>> flatZipSalesTaxCalc(HttpSession session, @RequestParam(value="itemPriceList") java.util.List itemPriceList, @RequestParam(value="itemAmountList") java.util.List itemAmountList, @RequestParam(value="itemProductList") java.util.List itemProductList, @RequestParam(value="orderPromotionsAmount", required=false) BigDecimal orderPromotionsAmount, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="orderShippingAmount", required=false) BigDecimal orderShippingAmount, @RequestParam(value="billToPartyId", required=false) String billToPartyId, @RequestParam(value="shippingAddress", required=false) org.apache.ofbiz.entity.GenericValue shippingAddress, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="itemQuantityList", required=false) java.util.List itemQuantityList, @RequestParam(value="payToPartyId", required=false) String payToPartyId, @RequestParam(value="itemShippingList", required=false) java.util.List itemShippingList) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("itemPriceList",itemPriceList);
@@ -1046,19 +1048,19 @@ public class AccountingTaxServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

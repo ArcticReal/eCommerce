@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.subscription.query.type.Fi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/subscription/subscriptionTypes")
 public class SubscriptionTypeController {
@@ -52,7 +54,7 @@ public class SubscriptionTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findSubscriptionTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<SubscriptionType>> findSubscriptionTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSubscriptionTypesBy query = new FindSubscriptionTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class SubscriptionTypeController {
 		}
 
 		List<SubscriptionType> subscriptionTypes =((SubscriptionTypeFound) Scheduler.execute(query).data()).getSubscriptionTypes();
-
-		if (subscriptionTypes.size() == 1) {
-			return ResponseEntity.ok().body(subscriptionTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(subscriptionTypes);
 
@@ -78,7 +76,7 @@ public class SubscriptionTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createSubscriptionType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<SubscriptionType> createSubscriptionType(HttpServletRequest request) throws Exception {
 
 		SubscriptionType subscriptionTypeToBeAdded = new SubscriptionType();
 		try {
@@ -86,7 +84,7 @@ public class SubscriptionTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createSubscriptionType(subscriptionTypeToBeAdded);
@@ -101,63 +99,15 @@ public class SubscriptionTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createSubscriptionType(@RequestBody SubscriptionType subscriptionTypeToBeAdded) throws Exception {
+	public ResponseEntity<SubscriptionType> createSubscriptionType(@RequestBody SubscriptionType subscriptionTypeToBeAdded) throws Exception {
 
 		AddSubscriptionType command = new AddSubscriptionType(subscriptionTypeToBeAdded);
 		SubscriptionType subscriptionType = ((SubscriptionTypeAdded) Scheduler.execute(command).data()).getAddedSubscriptionType();
 		
 		if (subscriptionType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(subscriptionType);
+			return successful(subscriptionType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("SubscriptionType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateSubscriptionType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		SubscriptionType subscriptionTypeToBeUpdated = new SubscriptionType();
-
-		try {
-			subscriptionTypeToBeUpdated = SubscriptionTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateSubscriptionType(subscriptionTypeToBeUpdated, subscriptionTypeToBeUpdated.getSubscriptionTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class SubscriptionTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{subscriptionTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateSubscriptionType(@RequestBody SubscriptionType subscriptionTypeToBeUpdated,
+	public ResponseEntity<String> updateSubscriptionType(@RequestBody SubscriptionType subscriptionTypeToBeUpdated,
 			@PathVariable String subscriptionTypeId) throws Exception {
 
 		subscriptionTypeToBeUpdated.setSubscriptionTypeId(subscriptionTypeId);
@@ -178,41 +128,44 @@ public class SubscriptionTypeController {
 
 		try {
 			if(((SubscriptionTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{subscriptionTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String subscriptionTypeId) throws Exception {
+	public ResponseEntity<SubscriptionType> findById(@PathVariable String subscriptionTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("subscriptionTypeId", subscriptionTypeId);
 		try {
 
-			Object foundSubscriptionType = findSubscriptionTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundSubscriptionType);
+			List<SubscriptionType> foundSubscriptionType = findSubscriptionTypesBy(requestParams).getBody();
+			if(foundSubscriptionType.size()==1){				return successful(foundSubscriptionType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{subscriptionTypeId}")
-	public ResponseEntity<Object> deleteSubscriptionTypeByIdUpdated(@PathVariable String subscriptionTypeId) throws Exception {
+	public ResponseEntity<String> deleteSubscriptionTypeByIdUpdated(@PathVariable String subscriptionTypeId) throws Exception {
 		DeleteSubscriptionType command = new DeleteSubscriptionType(subscriptionTypeId);
 
 		try {
 			if (((SubscriptionTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("SubscriptionType could not be deleted");
+		return conflict();
 
 	}
 

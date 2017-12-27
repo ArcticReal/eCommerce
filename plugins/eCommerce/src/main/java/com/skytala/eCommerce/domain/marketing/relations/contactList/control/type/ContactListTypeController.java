@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.marketing.relations.contactList.query.type.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/marketing/contactList/contactListTypes")
 public class ContactListTypeController {
@@ -52,7 +54,7 @@ public class ContactListTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findContactListTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ContactListType>> findContactListTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContactListTypesBy query = new FindContactListTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ContactListTypeController {
 		}
 
 		List<ContactListType> contactListTypes =((ContactListTypeFound) Scheduler.execute(query).data()).getContactListTypes();
-
-		if (contactListTypes.size() == 1) {
-			return ResponseEntity.ok().body(contactListTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(contactListTypes);
 
@@ -78,7 +76,7 @@ public class ContactListTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createContactListType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ContactListType> createContactListType(HttpServletRequest request) throws Exception {
 
 		ContactListType contactListTypeToBeAdded = new ContactListType();
 		try {
@@ -86,7 +84,7 @@ public class ContactListTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createContactListType(contactListTypeToBeAdded);
@@ -101,63 +99,15 @@ public class ContactListTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createContactListType(@RequestBody ContactListType contactListTypeToBeAdded) throws Exception {
+	public ResponseEntity<ContactListType> createContactListType(@RequestBody ContactListType contactListTypeToBeAdded) throws Exception {
 
 		AddContactListType command = new AddContactListType(contactListTypeToBeAdded);
 		ContactListType contactListType = ((ContactListTypeAdded) Scheduler.execute(command).data()).getAddedContactListType();
 		
 		if (contactListType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(contactListType);
+			return successful(contactListType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ContactListType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateContactListType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ContactListType contactListTypeToBeUpdated = new ContactListType();
-
-		try {
-			contactListTypeToBeUpdated = ContactListTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateContactListType(contactListTypeToBeUpdated, contactListTypeToBeUpdated.getContactListTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ContactListTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{contactListTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateContactListType(@RequestBody ContactListType contactListTypeToBeUpdated,
+	public ResponseEntity<String> updateContactListType(@RequestBody ContactListType contactListTypeToBeUpdated,
 			@PathVariable String contactListTypeId) throws Exception {
 
 		contactListTypeToBeUpdated.setContactListTypeId(contactListTypeId);
@@ -178,41 +128,44 @@ public class ContactListTypeController {
 
 		try {
 			if(((ContactListTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{contactListTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String contactListTypeId) throws Exception {
+	public ResponseEntity<ContactListType> findById(@PathVariable String contactListTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contactListTypeId", contactListTypeId);
 		try {
 
-			Object foundContactListType = findContactListTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundContactListType);
+			List<ContactListType> foundContactListType = findContactListTypesBy(requestParams).getBody();
+			if(foundContactListType.size()==1){				return successful(foundContactListType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{contactListTypeId}")
-	public ResponseEntity<Object> deleteContactListTypeByIdUpdated(@PathVariable String contactListTypeId) throws Exception {
+	public ResponseEntity<String> deleteContactListTypeByIdUpdated(@PathVariable String contactListTypeId) throws Exception {
 		DeleteContactListType command = new DeleteContactListType(contactListTypeId);
 
 		try {
 			if (((ContactListTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ContactListType could not be deleted");
+		return conflict();
 
 	}
 

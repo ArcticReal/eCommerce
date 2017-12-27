@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.maint.FindPr
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productMaints")
 public class ProductMaintController {
@@ -52,7 +54,7 @@ public class ProductMaintController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductMaintsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductMaint>> findProductMaintsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductMaintsBy query = new FindProductMaintsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductMaintController {
 		}
 
 		List<ProductMaint> productMaints =((ProductMaintFound) Scheduler.execute(query).data()).getProductMaints();
-
-		if (productMaints.size() == 1) {
-			return ResponseEntity.ok().body(productMaints.get(0));
-		}
 
 		return ResponseEntity.ok().body(productMaints);
 
@@ -78,7 +76,7 @@ public class ProductMaintController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductMaint(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductMaint> createProductMaint(HttpServletRequest request) throws Exception {
 
 		ProductMaint productMaintToBeAdded = new ProductMaint();
 		try {
@@ -86,7 +84,7 @@ public class ProductMaintController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductMaint(productMaintToBeAdded);
@@ -101,63 +99,15 @@ public class ProductMaintController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductMaint(@RequestBody ProductMaint productMaintToBeAdded) throws Exception {
+	public ResponseEntity<ProductMaint> createProductMaint(@RequestBody ProductMaint productMaintToBeAdded) throws Exception {
 
 		AddProductMaint command = new AddProductMaint(productMaintToBeAdded);
 		ProductMaint productMaint = ((ProductMaintAdded) Scheduler.execute(command).data()).getAddedProductMaint();
 		
 		if (productMaint != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productMaint);
+			return successful(productMaint);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductMaint could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductMaint(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductMaint productMaintToBeUpdated = new ProductMaint();
-
-		try {
-			productMaintToBeUpdated = ProductMaintMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductMaint(productMaintToBeUpdated, productMaintToBeUpdated.getProductMaintSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductMaintController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{productMaintSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductMaint(@RequestBody ProductMaint productMaintToBeUpdated,
+	public ResponseEntity<String> updateProductMaint(@RequestBody ProductMaint productMaintToBeUpdated,
 			@PathVariable String productMaintSeqId) throws Exception {
 
 		productMaintToBeUpdated.setProductMaintSeqId(productMaintSeqId);
@@ -178,41 +128,44 @@ public class ProductMaintController {
 
 		try {
 			if(((ProductMaintUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productMaintId}")
-	public ResponseEntity<Object> findById(@PathVariable String productMaintId) throws Exception {
+	public ResponseEntity<ProductMaint> findById(@PathVariable String productMaintId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productMaintId", productMaintId);
 		try {
 
-			Object foundProductMaint = findProductMaintsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductMaint);
+			List<ProductMaint> foundProductMaint = findProductMaintsBy(requestParams).getBody();
+			if(foundProductMaint.size()==1){				return successful(foundProductMaint.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productMaintId}")
-	public ResponseEntity<Object> deleteProductMaintByIdUpdated(@PathVariable String productMaintId) throws Exception {
+	public ResponseEntity<String> deleteProductMaintByIdUpdated(@PathVariable String productMaintId) throws Exception {
 		DeleteProductMaint command = new DeleteProductMaint(productMaintId);
 
 		try {
 			if (((ProductMaintDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductMaint could not be deleted");
+		return conflict();
 
 	}
 

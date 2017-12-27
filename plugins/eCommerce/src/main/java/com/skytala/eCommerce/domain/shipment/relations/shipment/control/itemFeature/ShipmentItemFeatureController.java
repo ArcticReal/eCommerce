@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.shipment.relations.shipment.query.itemFeatur
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/shipment/shipment/shipmentItemFeatures")
 public class ShipmentItemFeatureController {
@@ -52,7 +54,7 @@ public class ShipmentItemFeatureController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findShipmentItemFeaturesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ShipmentItemFeature>> findShipmentItemFeaturesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentItemFeaturesBy query = new FindShipmentItemFeaturesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ShipmentItemFeatureController {
 		}
 
 		List<ShipmentItemFeature> shipmentItemFeatures =((ShipmentItemFeatureFound) Scheduler.execute(query).data()).getShipmentItemFeatures();
-
-		if (shipmentItemFeatures.size() == 1) {
-			return ResponseEntity.ok().body(shipmentItemFeatures.get(0));
-		}
 
 		return ResponseEntity.ok().body(shipmentItemFeatures);
 
@@ -78,7 +76,7 @@ public class ShipmentItemFeatureController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createShipmentItemFeature(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ShipmentItemFeature> createShipmentItemFeature(HttpServletRequest request) throws Exception {
 
 		ShipmentItemFeature shipmentItemFeatureToBeAdded = new ShipmentItemFeature();
 		try {
@@ -86,7 +84,7 @@ public class ShipmentItemFeatureController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createShipmentItemFeature(shipmentItemFeatureToBeAdded);
@@ -101,63 +99,15 @@ public class ShipmentItemFeatureController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createShipmentItemFeature(@RequestBody ShipmentItemFeature shipmentItemFeatureToBeAdded) throws Exception {
+	public ResponseEntity<ShipmentItemFeature> createShipmentItemFeature(@RequestBody ShipmentItemFeature shipmentItemFeatureToBeAdded) throws Exception {
 
 		AddShipmentItemFeature command = new AddShipmentItemFeature(shipmentItemFeatureToBeAdded);
 		ShipmentItemFeature shipmentItemFeature = ((ShipmentItemFeatureAdded) Scheduler.execute(command).data()).getAddedShipmentItemFeature();
 		
 		if (shipmentItemFeature != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(shipmentItemFeature);
+			return successful(shipmentItemFeature);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ShipmentItemFeature could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateShipmentItemFeature(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ShipmentItemFeature shipmentItemFeatureToBeUpdated = new ShipmentItemFeature();
-
-		try {
-			shipmentItemFeatureToBeUpdated = ShipmentItemFeatureMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateShipmentItemFeature(shipmentItemFeatureToBeUpdated, shipmentItemFeatureToBeUpdated.getShipmentItemSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ShipmentItemFeatureController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{shipmentItemSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateShipmentItemFeature(@RequestBody ShipmentItemFeature shipmentItemFeatureToBeUpdated,
+	public ResponseEntity<String> updateShipmentItemFeature(@RequestBody ShipmentItemFeature shipmentItemFeatureToBeUpdated,
 			@PathVariable String shipmentItemSeqId) throws Exception {
 
 		shipmentItemFeatureToBeUpdated.setShipmentItemSeqId(shipmentItemSeqId);
@@ -178,41 +128,44 @@ public class ShipmentItemFeatureController {
 
 		try {
 			if(((ShipmentItemFeatureUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{shipmentItemFeatureId}")
-	public ResponseEntity<Object> findById(@PathVariable String shipmentItemFeatureId) throws Exception {
+	public ResponseEntity<ShipmentItemFeature> findById(@PathVariable String shipmentItemFeatureId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentItemFeatureId", shipmentItemFeatureId);
 		try {
 
-			Object foundShipmentItemFeature = findShipmentItemFeaturesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundShipmentItemFeature);
+			List<ShipmentItemFeature> foundShipmentItemFeature = findShipmentItemFeaturesBy(requestParams).getBody();
+			if(foundShipmentItemFeature.size()==1){				return successful(foundShipmentItemFeature.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{shipmentItemFeatureId}")
-	public ResponseEntity<Object> deleteShipmentItemFeatureByIdUpdated(@PathVariable String shipmentItemFeatureId) throws Exception {
+	public ResponseEntity<String> deleteShipmentItemFeatureByIdUpdated(@PathVariable String shipmentItemFeatureId) throws Exception {
 		DeleteShipmentItemFeature command = new DeleteShipmentItemFeature(shipmentItemFeatureId);
 
 		try {
 			if (((ShipmentItemFeatureDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ShipmentItemFeature could not be deleted");
+		return conflict();
 
 	}
 

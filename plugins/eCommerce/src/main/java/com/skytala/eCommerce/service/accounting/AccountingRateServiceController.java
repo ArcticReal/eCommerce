@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/accountingRate")
 public class AccountingRateServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deletePartyRate")
-	public ResponseEntity<Object> deletePartyRate(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="rateTypeId") String rateTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="rateAmountFromDate", required=false) Timestamp rateAmountFromDate) {
+	public ResponseEntity<Map<String, Object>> deletePartyRate(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="rateTypeId") String rateTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="rateAmountFromDate", required=false) Timestamp rateAmountFromDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -42,23 +44,23 @@ public class AccountingRateServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/filterRateAmountList")
-	public ResponseEntity<Object> filterRateAmountList(HttpSession session, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="rateTypeId", required=false) String rateTypeId, @RequestParam(value="ratesList", required=false) List ratesList, @RequestParam(value="rateAmount", required=false) BigDecimal rateAmount, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="emplPositionTypeId", required=false) String emplPositionTypeId, @RequestParam(value="rateCurrencyUomId", required=false) String rateCurrencyUomId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> filterRateAmountList(HttpSession session, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="rateTypeId", required=false) String rateTypeId, @RequestParam(value="ratesList", required=false) List ratesList, @RequestParam(value="rateAmount", required=false) BigDecimal rateAmount, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="emplPositionTypeId", required=false) String emplPositionTypeId, @RequestParam(value="rateCurrencyUomId", required=false) String rateCurrencyUomId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -80,23 +82,23 @@ public class AccountingRateServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getRatesAmountsFromWorkEffortId")
-	public ResponseEntity<Object> getRatesAmountsFromWorkEffortId(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="rateTypeId", required=false) String rateTypeId, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="emplPositionTypeId", required=false) String emplPositionTypeId, @RequestParam(value="rateCurrencyUomId", required=false) String rateCurrencyUomId, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Map<String, Object>> getRatesAmountsFromWorkEffortId(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="rateTypeId", required=false) String rateTypeId, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="emplPositionTypeId", required=false) String emplPositionTypeId, @RequestParam(value="rateCurrencyUomId", required=false) String rateCurrencyUomId, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -115,23 +117,23 @@ public class AccountingRateServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getRatesAmountsFromPartyId")
-	public ResponseEntity<Object> getRatesAmountsFromPartyId(HttpSession session, @RequestParam(value="partyId") String partyId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="rateTypeId", required=false) String rateTypeId, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="emplPositionTypeId", required=false) String emplPositionTypeId, @RequestParam(value="rateCurrencyUomId", required=false) String rateCurrencyUomId) {
+	public ResponseEntity<Map<String, Object>> getRatesAmountsFromPartyId(HttpSession session, @RequestParam(value="partyId") String partyId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="rateTypeId", required=false) String rateTypeId, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="emplPositionTypeId", required=false) String emplPositionTypeId, @RequestParam(value="rateCurrencyUomId", required=false) String rateCurrencyUomId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("partyId",partyId);
@@ -150,23 +152,23 @@ public class AccountingRateServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getRatesAmountsFromEmplPositionTypeId")
-	public ResponseEntity<Object> getRatesAmountsFromEmplPositionTypeId(HttpSession session, @RequestParam(value="emplPositionTypeId") String emplPositionTypeId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="rateTypeId", required=false) String rateTypeId, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="rateCurrencyUomId", required=false) String rateCurrencyUomId, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Map<String, Object>> getRatesAmountsFromEmplPositionTypeId(HttpSession session, @RequestParam(value="emplPositionTypeId") String emplPositionTypeId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="rateTypeId", required=false) String rateTypeId, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="rateCurrencyUomId", required=false) String rateCurrencyUomId, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("emplPositionTypeId",emplPositionTypeId);
@@ -185,23 +187,23 @@ public class AccountingRateServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updatePartyRate")
-	public ResponseEntity<Object> updatePartyRate(HttpSession session, @RequestParam(value="rateTypeId") String rateTypeId, @RequestParam(value="periodTypeId") String periodTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="percentageUsed", required=false) BigDecimal percentageUsed, @RequestParam(value="defaultRate", required=false) String defaultRate, @RequestParam(value="rateAmount", required=false) BigDecimal rateAmount, @RequestParam(value="organizationPartyId", required=false) String organizationPartyId, @RequestParam(value="rateCurrencyUomId", required=false) String rateCurrencyUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updatePartyRate(HttpSession session, @RequestParam(value="rateTypeId") String rateTypeId, @RequestParam(value="periodTypeId") String periodTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="percentageUsed", required=false) BigDecimal percentageUsed, @RequestParam(value="defaultRate", required=false) String defaultRate, @RequestParam(value="rateAmount", required=false) BigDecimal rateAmount, @RequestParam(value="organizationPartyId", required=false) String organizationPartyId, @RequestParam(value="rateCurrencyUomId", required=false) String rateCurrencyUomId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("rateTypeId",rateTypeId);
@@ -223,23 +225,23 @@ public class AccountingRateServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteRateType")
-	public ResponseEntity<Object> deleteRateType(HttpSession session, @RequestParam(value="rateTypeId") String rateTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteRateType(HttpSession session, @RequestParam(value="rateTypeId") String rateTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("rateTypeId",rateTypeId);
@@ -252,23 +254,23 @@ public class AccountingRateServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateRateAmount")
-	public ResponseEntity<Object> updateRateAmount(HttpSession session, @RequestParam(value="rateTypeId") String rateTypeId, @RequestParam(value="rateAmount") BigDecimal rateAmount, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="emplPositionTypeId", required=false) String emplPositionTypeId, @RequestParam(value="rateCurrencyUomId", required=false) String rateCurrencyUomId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateRateAmount(HttpSession session, @RequestParam(value="rateTypeId") String rateTypeId, @RequestParam(value="rateAmount") BigDecimal rateAmount, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="emplPositionTypeId", required=false) String emplPositionTypeId, @RequestParam(value="rateCurrencyUomId", required=false) String rateCurrencyUomId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("rateTypeId",rateTypeId);
@@ -289,23 +291,23 @@ public class AccountingRateServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateRateType")
-	public ResponseEntity<Object> updateRateType(HttpSession session, @RequestParam(value="rateTypeId") String rateTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateRateType(HttpSession session, @RequestParam(value="rateTypeId") String rateTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("rateTypeId",rateTypeId);
@@ -319,23 +321,23 @@ public class AccountingRateServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteRateAmount")
-	public ResponseEntity<Object> deleteRateAmount(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="rateTypeId") String rateTypeId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="emplPositionTypeId", required=false) String emplPositionTypeId, @RequestParam(value="rateCurrencyUomId", required=false) String rateCurrencyUomId, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Map<String, Object>> deleteRateAmount(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="rateTypeId") String rateTypeId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="emplPositionTypeId", required=false) String emplPositionTypeId, @RequestParam(value="rateCurrencyUomId", required=false) String rateCurrencyUomId, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -354,23 +356,23 @@ public class AccountingRateServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getRateAmount")
-	public ResponseEntity<Object> getRateAmount(HttpSession session, @RequestParam(value="rateTypeId") String rateTypeId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="emplPositionTypeId", required=false) String emplPositionTypeId, @RequestParam(value="rateCurrencyUomId", required=false) String rateCurrencyUomId, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Map<String, Object>> getRateAmount(HttpSession session, @RequestParam(value="rateTypeId") String rateTypeId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="periodTypeId", required=false) String periodTypeId, @RequestParam(value="emplPositionTypeId", required=false) String emplPositionTypeId, @RequestParam(value="rateCurrencyUomId", required=false) String rateCurrencyUomId, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("rateTypeId",rateTypeId);
@@ -389,23 +391,23 @@ public class AccountingRateServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createRateType")
-	public ResponseEntity<Object> createRateType(HttpSession session, @RequestParam(value="rateTypeId", required=false) String rateTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createRateType(HttpSession session, @RequestParam(value="rateTypeId", required=false) String rateTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("rateTypeId",rateTypeId);
@@ -419,19 +421,19 @@ public class AccountingRateServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

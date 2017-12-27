@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.content.query.approval.Fin
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/content/contentApprovals")
 public class ContentApprovalController {
@@ -52,7 +54,7 @@ public class ContentApprovalController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findContentApprovalsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ContentApproval>> findContentApprovalsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContentApprovalsBy query = new FindContentApprovalsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ContentApprovalController {
 		}
 
 		List<ContentApproval> contentApprovals =((ContentApprovalFound) Scheduler.execute(query).data()).getContentApprovals();
-
-		if (contentApprovals.size() == 1) {
-			return ResponseEntity.ok().body(contentApprovals.get(0));
-		}
 
 		return ResponseEntity.ok().body(contentApprovals);
 
@@ -78,7 +76,7 @@ public class ContentApprovalController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createContentApproval(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ContentApproval> createContentApproval(HttpServletRequest request) throws Exception {
 
 		ContentApproval contentApprovalToBeAdded = new ContentApproval();
 		try {
@@ -86,7 +84,7 @@ public class ContentApprovalController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createContentApproval(contentApprovalToBeAdded);
@@ -101,63 +99,15 @@ public class ContentApprovalController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createContentApproval(@RequestBody ContentApproval contentApprovalToBeAdded) throws Exception {
+	public ResponseEntity<ContentApproval> createContentApproval(@RequestBody ContentApproval contentApprovalToBeAdded) throws Exception {
 
 		AddContentApproval command = new AddContentApproval(contentApprovalToBeAdded);
 		ContentApproval contentApproval = ((ContentApprovalAdded) Scheduler.execute(command).data()).getAddedContentApproval();
 		
 		if (contentApproval != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(contentApproval);
+			return successful(contentApproval);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ContentApproval could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateContentApproval(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ContentApproval contentApprovalToBeUpdated = new ContentApproval();
-
-		try {
-			contentApprovalToBeUpdated = ContentApprovalMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateContentApproval(contentApprovalToBeUpdated, contentApprovalToBeUpdated.getContentApprovalId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ContentApprovalController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{contentApprovalId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateContentApproval(@RequestBody ContentApproval contentApprovalToBeUpdated,
+	public ResponseEntity<String> updateContentApproval(@RequestBody ContentApproval contentApprovalToBeUpdated,
 			@PathVariable String contentApprovalId) throws Exception {
 
 		contentApprovalToBeUpdated.setContentApprovalId(contentApprovalId);
@@ -178,41 +128,44 @@ public class ContentApprovalController {
 
 		try {
 			if(((ContentApprovalUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{contentApprovalId}")
-	public ResponseEntity<Object> findById(@PathVariable String contentApprovalId) throws Exception {
+	public ResponseEntity<ContentApproval> findById(@PathVariable String contentApprovalId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contentApprovalId", contentApprovalId);
 		try {
 
-			Object foundContentApproval = findContentApprovalsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundContentApproval);
+			List<ContentApproval> foundContentApproval = findContentApprovalsBy(requestParams).getBody();
+			if(foundContentApproval.size()==1){				return successful(foundContentApproval.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{contentApprovalId}")
-	public ResponseEntity<Object> deleteContentApprovalByIdUpdated(@PathVariable String contentApprovalId) throws Exception {
+	public ResponseEntity<String> deleteContentApprovalByIdUpdated(@PathVariable String contentApprovalId) throws Exception {
 		DeleteContentApproval command = new DeleteContentApproval(contentApprovalId);
 
 		try {
 			if (((ContentApprovalDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ContentApproval could not be deleted");
+		return conflict();
 
 	}
 

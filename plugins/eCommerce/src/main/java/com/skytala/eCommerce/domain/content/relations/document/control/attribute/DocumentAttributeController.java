@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.document.query.attribute.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/document/documentAttributes")
 public class DocumentAttributeController {
@@ -52,7 +54,7 @@ public class DocumentAttributeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findDocumentAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<DocumentAttribute>> findDocumentAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDocumentAttributesBy query = new FindDocumentAttributesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class DocumentAttributeController {
 		}
 
 		List<DocumentAttribute> documentAttributes =((DocumentAttributeFound) Scheduler.execute(query).data()).getDocumentAttributes();
-
-		if (documentAttributes.size() == 1) {
-			return ResponseEntity.ok().body(documentAttributes.get(0));
-		}
 
 		return ResponseEntity.ok().body(documentAttributes);
 
@@ -78,7 +76,7 @@ public class DocumentAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createDocumentAttribute(HttpServletRequest request) throws Exception {
+	public ResponseEntity<DocumentAttribute> createDocumentAttribute(HttpServletRequest request) throws Exception {
 
 		DocumentAttribute documentAttributeToBeAdded = new DocumentAttribute();
 		try {
@@ -86,7 +84,7 @@ public class DocumentAttributeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createDocumentAttribute(documentAttributeToBeAdded);
@@ -101,63 +99,15 @@ public class DocumentAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createDocumentAttribute(@RequestBody DocumentAttribute documentAttributeToBeAdded) throws Exception {
+	public ResponseEntity<DocumentAttribute> createDocumentAttribute(@RequestBody DocumentAttribute documentAttributeToBeAdded) throws Exception {
 
 		AddDocumentAttribute command = new AddDocumentAttribute(documentAttributeToBeAdded);
 		DocumentAttribute documentAttribute = ((DocumentAttributeAdded) Scheduler.execute(command).data()).getAddedDocumentAttribute();
 		
 		if (documentAttribute != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(documentAttribute);
+			return successful(documentAttribute);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("DocumentAttribute could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateDocumentAttribute(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		DocumentAttribute documentAttributeToBeUpdated = new DocumentAttribute();
-
-		try {
-			documentAttributeToBeUpdated = DocumentAttributeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateDocumentAttribute(documentAttributeToBeUpdated, documentAttributeToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class DocumentAttributeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateDocumentAttribute(@RequestBody DocumentAttribute documentAttributeToBeUpdated,
+	public ResponseEntity<String> updateDocumentAttribute(@RequestBody DocumentAttribute documentAttributeToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		documentAttributeToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class DocumentAttributeController {
 
 		try {
 			if(((DocumentAttributeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{documentAttributeId}")
-	public ResponseEntity<Object> findById(@PathVariable String documentAttributeId) throws Exception {
+	public ResponseEntity<DocumentAttribute> findById(@PathVariable String documentAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("documentAttributeId", documentAttributeId);
 		try {
 
-			Object foundDocumentAttribute = findDocumentAttributesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundDocumentAttribute);
+			List<DocumentAttribute> foundDocumentAttribute = findDocumentAttributesBy(requestParams).getBody();
+			if(foundDocumentAttribute.size()==1){				return successful(foundDocumentAttribute.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{documentAttributeId}")
-	public ResponseEntity<Object> deleteDocumentAttributeByIdUpdated(@PathVariable String documentAttributeId) throws Exception {
+	public ResponseEntity<String> deleteDocumentAttributeByIdUpdated(@PathVariable String documentAttributeId) throws Exception {
 		DeleteDocumentAttribute command = new DeleteDocumentAttribute(documentAttributeId);
 
 		try {
 			if (((DocumentAttributeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("DocumentAttribute could not be deleted");
+		return conflict();
 
 	}
 

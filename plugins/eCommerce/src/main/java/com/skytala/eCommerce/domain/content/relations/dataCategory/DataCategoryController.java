@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.dataCategory.query.FindDat
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/dataCategorys")
 public class DataCategoryController {
@@ -52,7 +54,7 @@ public class DataCategoryController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findDataCategorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<DataCategory>> findDataCategorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDataCategorysBy query = new FindDataCategorysBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class DataCategoryController {
 		}
 
 		List<DataCategory> dataCategorys =((DataCategoryFound) Scheduler.execute(query).data()).getDataCategorys();
-
-		if (dataCategorys.size() == 1) {
-			return ResponseEntity.ok().body(dataCategorys.get(0));
-		}
 
 		return ResponseEntity.ok().body(dataCategorys);
 
@@ -78,7 +76,7 @@ public class DataCategoryController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createDataCategory(HttpServletRequest request) throws Exception {
+	public ResponseEntity<DataCategory> createDataCategory(HttpServletRequest request) throws Exception {
 
 		DataCategory dataCategoryToBeAdded = new DataCategory();
 		try {
@@ -86,7 +84,7 @@ public class DataCategoryController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createDataCategory(dataCategoryToBeAdded);
@@ -101,63 +99,15 @@ public class DataCategoryController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createDataCategory(@RequestBody DataCategory dataCategoryToBeAdded) throws Exception {
+	public ResponseEntity<DataCategory> createDataCategory(@RequestBody DataCategory dataCategoryToBeAdded) throws Exception {
 
 		AddDataCategory command = new AddDataCategory(dataCategoryToBeAdded);
 		DataCategory dataCategory = ((DataCategoryAdded) Scheduler.execute(command).data()).getAddedDataCategory();
 		
 		if (dataCategory != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(dataCategory);
+			return successful(dataCategory);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("DataCategory could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateDataCategory(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		DataCategory dataCategoryToBeUpdated = new DataCategory();
-
-		try {
-			dataCategoryToBeUpdated = DataCategoryMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateDataCategory(dataCategoryToBeUpdated, dataCategoryToBeUpdated.getDataCategoryId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class DataCategoryController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{dataCategoryId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateDataCategory(@RequestBody DataCategory dataCategoryToBeUpdated,
+	public ResponseEntity<String> updateDataCategory(@RequestBody DataCategory dataCategoryToBeUpdated,
 			@PathVariable String dataCategoryId) throws Exception {
 
 		dataCategoryToBeUpdated.setDataCategoryId(dataCategoryId);
@@ -178,41 +128,44 @@ public class DataCategoryController {
 
 		try {
 			if(((DataCategoryUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{dataCategoryId}")
-	public ResponseEntity<Object> findById(@PathVariable String dataCategoryId) throws Exception {
+	public ResponseEntity<DataCategory> findById(@PathVariable String dataCategoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("dataCategoryId", dataCategoryId);
 		try {
 
-			Object foundDataCategory = findDataCategorysBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundDataCategory);
+			List<DataCategory> foundDataCategory = findDataCategorysBy(requestParams).getBody();
+			if(foundDataCategory.size()==1){				return successful(foundDataCategory.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{dataCategoryId}")
-	public ResponseEntity<Object> deleteDataCategoryByIdUpdated(@PathVariable String dataCategoryId) throws Exception {
+	public ResponseEntity<String> deleteDataCategoryByIdUpdated(@PathVariable String dataCategoryId) throws Exception {
 		DeleteDataCategory command = new DeleteDataCategory(dataCategoryId);
 
 		try {
 			if (((DataCategoryDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("DataCategory could not be deleted");
+		return conflict();
 
 	}
 

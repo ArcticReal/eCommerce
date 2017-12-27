@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.quote.query.adjustment.FindQ
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/quote/quoteAdjustments")
 public class QuoteAdjustmentController {
@@ -52,7 +54,7 @@ public class QuoteAdjustmentController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findQuoteAdjustmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<QuoteAdjustment>> findQuoteAdjustmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindQuoteAdjustmentsBy query = new FindQuoteAdjustmentsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class QuoteAdjustmentController {
 		}
 
 		List<QuoteAdjustment> quoteAdjustments =((QuoteAdjustmentFound) Scheduler.execute(query).data()).getQuoteAdjustments();
-
-		if (quoteAdjustments.size() == 1) {
-			return ResponseEntity.ok().body(quoteAdjustments.get(0));
-		}
 
 		return ResponseEntity.ok().body(quoteAdjustments);
 
@@ -78,7 +76,7 @@ public class QuoteAdjustmentController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createQuoteAdjustment(HttpServletRequest request) throws Exception {
+	public ResponseEntity<QuoteAdjustment> createQuoteAdjustment(HttpServletRequest request) throws Exception {
 
 		QuoteAdjustment quoteAdjustmentToBeAdded = new QuoteAdjustment();
 		try {
@@ -86,7 +84,7 @@ public class QuoteAdjustmentController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createQuoteAdjustment(quoteAdjustmentToBeAdded);
@@ -101,63 +99,15 @@ public class QuoteAdjustmentController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createQuoteAdjustment(@RequestBody QuoteAdjustment quoteAdjustmentToBeAdded) throws Exception {
+	public ResponseEntity<QuoteAdjustment> createQuoteAdjustment(@RequestBody QuoteAdjustment quoteAdjustmentToBeAdded) throws Exception {
 
 		AddQuoteAdjustment command = new AddQuoteAdjustment(quoteAdjustmentToBeAdded);
 		QuoteAdjustment quoteAdjustment = ((QuoteAdjustmentAdded) Scheduler.execute(command).data()).getAddedQuoteAdjustment();
 		
 		if (quoteAdjustment != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(quoteAdjustment);
+			return successful(quoteAdjustment);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("QuoteAdjustment could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateQuoteAdjustment(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		QuoteAdjustment quoteAdjustmentToBeUpdated = new QuoteAdjustment();
-
-		try {
-			quoteAdjustmentToBeUpdated = QuoteAdjustmentMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateQuoteAdjustment(quoteAdjustmentToBeUpdated, quoteAdjustmentToBeUpdated.getQuoteAdjustmentId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class QuoteAdjustmentController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{quoteAdjustmentId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateQuoteAdjustment(@RequestBody QuoteAdjustment quoteAdjustmentToBeUpdated,
+	public ResponseEntity<String> updateQuoteAdjustment(@RequestBody QuoteAdjustment quoteAdjustmentToBeUpdated,
 			@PathVariable String quoteAdjustmentId) throws Exception {
 
 		quoteAdjustmentToBeUpdated.setQuoteAdjustmentId(quoteAdjustmentId);
@@ -178,41 +128,44 @@ public class QuoteAdjustmentController {
 
 		try {
 			if(((QuoteAdjustmentUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{quoteAdjustmentId}")
-	public ResponseEntity<Object> findById(@PathVariable String quoteAdjustmentId) throws Exception {
+	public ResponseEntity<QuoteAdjustment> findById(@PathVariable String quoteAdjustmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("quoteAdjustmentId", quoteAdjustmentId);
 		try {
 
-			Object foundQuoteAdjustment = findQuoteAdjustmentsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundQuoteAdjustment);
+			List<QuoteAdjustment> foundQuoteAdjustment = findQuoteAdjustmentsBy(requestParams).getBody();
+			if(foundQuoteAdjustment.size()==1){				return successful(foundQuoteAdjustment.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{quoteAdjustmentId}")
-	public ResponseEntity<Object> deleteQuoteAdjustmentByIdUpdated(@PathVariable String quoteAdjustmentId) throws Exception {
+	public ResponseEntity<String> deleteQuoteAdjustmentByIdUpdated(@PathVariable String quoteAdjustmentId) throws Exception {
 		DeleteQuoteAdjustment command = new DeleteQuoteAdjustment(quoteAdjustmentId);
 
 		try {
 			if (((QuoteAdjustmentDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("QuoteAdjustment could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.workeffort.relations.workEffort.query.icalDa
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/workeffort/workEffort/workEffortIcalDatas")
 public class WorkEffortIcalDataController {
@@ -52,7 +54,7 @@ public class WorkEffortIcalDataController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWorkEffortIcalDatasBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WorkEffortIcalData>> findWorkEffortIcalDatasBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortIcalDatasBy query = new FindWorkEffortIcalDatasBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WorkEffortIcalDataController {
 		}
 
 		List<WorkEffortIcalData> workEffortIcalDatas =((WorkEffortIcalDataFound) Scheduler.execute(query).data()).getWorkEffortIcalDatas();
-
-		if (workEffortIcalDatas.size() == 1) {
-			return ResponseEntity.ok().body(workEffortIcalDatas.get(0));
-		}
 
 		return ResponseEntity.ok().body(workEffortIcalDatas);
 
@@ -78,7 +76,7 @@ public class WorkEffortIcalDataController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWorkEffortIcalData(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WorkEffortIcalData> createWorkEffortIcalData(HttpServletRequest request) throws Exception {
 
 		WorkEffortIcalData workEffortIcalDataToBeAdded = new WorkEffortIcalData();
 		try {
@@ -86,7 +84,7 @@ public class WorkEffortIcalDataController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWorkEffortIcalData(workEffortIcalDataToBeAdded);
@@ -101,63 +99,15 @@ public class WorkEffortIcalDataController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWorkEffortIcalData(@RequestBody WorkEffortIcalData workEffortIcalDataToBeAdded) throws Exception {
+	public ResponseEntity<WorkEffortIcalData> createWorkEffortIcalData(@RequestBody WorkEffortIcalData workEffortIcalDataToBeAdded) throws Exception {
 
 		AddWorkEffortIcalData command = new AddWorkEffortIcalData(workEffortIcalDataToBeAdded);
 		WorkEffortIcalData workEffortIcalData = ((WorkEffortIcalDataAdded) Scheduler.execute(command).data()).getAddedWorkEffortIcalData();
 		
 		if (workEffortIcalData != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(workEffortIcalData);
+			return successful(workEffortIcalData);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WorkEffortIcalData could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWorkEffortIcalData(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WorkEffortIcalData workEffortIcalDataToBeUpdated = new WorkEffortIcalData();
-
-		try {
-			workEffortIcalDataToBeUpdated = WorkEffortIcalDataMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWorkEffortIcalData(workEffortIcalDataToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WorkEffortIcalDataController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWorkEffortIcalData(@RequestBody WorkEffortIcalData workEffortIcalDataToBeUpdated,
+	public ResponseEntity<String> updateWorkEffortIcalData(@RequestBody WorkEffortIcalData workEffortIcalDataToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		workEffortIcalDataToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class WorkEffortIcalDataController {
 
 		try {
 			if(((WorkEffortIcalDataUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{workEffortIcalDataId}")
-	public ResponseEntity<Object> findById(@PathVariable String workEffortIcalDataId) throws Exception {
+	public ResponseEntity<WorkEffortIcalData> findById(@PathVariable String workEffortIcalDataId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortIcalDataId", workEffortIcalDataId);
 		try {
 
-			Object foundWorkEffortIcalData = findWorkEffortIcalDatasBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWorkEffortIcalData);
+			List<WorkEffortIcalData> foundWorkEffortIcalData = findWorkEffortIcalDatasBy(requestParams).getBody();
+			if(foundWorkEffortIcalData.size()==1){				return successful(foundWorkEffortIcalData.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{workEffortIcalDataId}")
-	public ResponseEntity<Object> deleteWorkEffortIcalDataByIdUpdated(@PathVariable String workEffortIcalDataId) throws Exception {
+	public ResponseEntity<String> deleteWorkEffortIcalDataByIdUpdated(@PathVariable String workEffortIcalDataId) throws Exception {
 		DeleteWorkEffortIcalData command = new DeleteWorkEffortIcalData(workEffortIcalDataId);
 
 		try {
 			if (((WorkEffortIcalDataDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WorkEffortIcalData could not be deleted");
+		return conflict();
 
 	}
 

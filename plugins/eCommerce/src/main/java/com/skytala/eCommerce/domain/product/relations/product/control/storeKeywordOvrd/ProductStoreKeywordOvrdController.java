@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.storeKeyword
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productStoreKeywordOvrds")
 public class ProductStoreKeywordOvrdController {
@@ -52,7 +54,7 @@ public class ProductStoreKeywordOvrdController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductStoreKeywordOvrdsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductStoreKeywordOvrd>> findProductStoreKeywordOvrdsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductStoreKeywordOvrdsBy query = new FindProductStoreKeywordOvrdsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductStoreKeywordOvrdController {
 		}
 
 		List<ProductStoreKeywordOvrd> productStoreKeywordOvrds =((ProductStoreKeywordOvrdFound) Scheduler.execute(query).data()).getProductStoreKeywordOvrds();
-
-		if (productStoreKeywordOvrds.size() == 1) {
-			return ResponseEntity.ok().body(productStoreKeywordOvrds.get(0));
-		}
 
 		return ResponseEntity.ok().body(productStoreKeywordOvrds);
 
@@ -78,7 +76,7 @@ public class ProductStoreKeywordOvrdController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductStoreKeywordOvrd(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductStoreKeywordOvrd> createProductStoreKeywordOvrd(HttpServletRequest request) throws Exception {
 
 		ProductStoreKeywordOvrd productStoreKeywordOvrdToBeAdded = new ProductStoreKeywordOvrd();
 		try {
@@ -86,7 +84,7 @@ public class ProductStoreKeywordOvrdController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductStoreKeywordOvrd(productStoreKeywordOvrdToBeAdded);
@@ -101,63 +99,15 @@ public class ProductStoreKeywordOvrdController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductStoreKeywordOvrd(@RequestBody ProductStoreKeywordOvrd productStoreKeywordOvrdToBeAdded) throws Exception {
+	public ResponseEntity<ProductStoreKeywordOvrd> createProductStoreKeywordOvrd(@RequestBody ProductStoreKeywordOvrd productStoreKeywordOvrdToBeAdded) throws Exception {
 
 		AddProductStoreKeywordOvrd command = new AddProductStoreKeywordOvrd(productStoreKeywordOvrdToBeAdded);
 		ProductStoreKeywordOvrd productStoreKeywordOvrd = ((ProductStoreKeywordOvrdAdded) Scheduler.execute(command).data()).getAddedProductStoreKeywordOvrd();
 		
 		if (productStoreKeywordOvrd != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productStoreKeywordOvrd);
+			return successful(productStoreKeywordOvrd);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductStoreKeywordOvrd could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductStoreKeywordOvrd(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductStoreKeywordOvrd productStoreKeywordOvrdToBeUpdated = new ProductStoreKeywordOvrd();
-
-		try {
-			productStoreKeywordOvrdToBeUpdated = ProductStoreKeywordOvrdMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductStoreKeywordOvrd(productStoreKeywordOvrdToBeUpdated, productStoreKeywordOvrdToBeUpdated.getKeyword()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductStoreKeywordOvrdController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{keyword}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductStoreKeywordOvrd(@RequestBody ProductStoreKeywordOvrd productStoreKeywordOvrdToBeUpdated,
+	public ResponseEntity<String> updateProductStoreKeywordOvrd(@RequestBody ProductStoreKeywordOvrd productStoreKeywordOvrdToBeUpdated,
 			@PathVariable String keyword) throws Exception {
 
 		productStoreKeywordOvrdToBeUpdated.setKeyword(keyword);
@@ -178,41 +128,44 @@ public class ProductStoreKeywordOvrdController {
 
 		try {
 			if(((ProductStoreKeywordOvrdUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productStoreKeywordOvrdId}")
-	public ResponseEntity<Object> findById(@PathVariable String productStoreKeywordOvrdId) throws Exception {
+	public ResponseEntity<ProductStoreKeywordOvrd> findById(@PathVariable String productStoreKeywordOvrdId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productStoreKeywordOvrdId", productStoreKeywordOvrdId);
 		try {
 
-			Object foundProductStoreKeywordOvrd = findProductStoreKeywordOvrdsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductStoreKeywordOvrd);
+			List<ProductStoreKeywordOvrd> foundProductStoreKeywordOvrd = findProductStoreKeywordOvrdsBy(requestParams).getBody();
+			if(foundProductStoreKeywordOvrd.size()==1){				return successful(foundProductStoreKeywordOvrd.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productStoreKeywordOvrdId}")
-	public ResponseEntity<Object> deleteProductStoreKeywordOvrdByIdUpdated(@PathVariable String productStoreKeywordOvrdId) throws Exception {
+	public ResponseEntity<String> deleteProductStoreKeywordOvrdByIdUpdated(@PathVariable String productStoreKeywordOvrdId) throws Exception {
 		DeleteProductStoreKeywordOvrd command = new DeleteProductStoreKeywordOvrd(productStoreKeywordOvrdId);
 
 		try {
 			if (((ProductStoreKeywordOvrdDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductStoreKeywordOvrd could not be deleted");
+		return conflict();
 
 	}
 

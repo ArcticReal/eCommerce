@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.glResourceType.query.Fi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/glResourceTypes")
 public class GlResourceTypeController {
@@ -52,7 +54,7 @@ public class GlResourceTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findGlResourceTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<GlResourceType>> findGlResourceTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGlResourceTypesBy query = new FindGlResourceTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class GlResourceTypeController {
 		}
 
 		List<GlResourceType> glResourceTypes =((GlResourceTypeFound) Scheduler.execute(query).data()).getGlResourceTypes();
-
-		if (glResourceTypes.size() == 1) {
-			return ResponseEntity.ok().body(glResourceTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(glResourceTypes);
 
@@ -78,7 +76,7 @@ public class GlResourceTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createGlResourceType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<GlResourceType> createGlResourceType(HttpServletRequest request) throws Exception {
 
 		GlResourceType glResourceTypeToBeAdded = new GlResourceType();
 		try {
@@ -86,7 +84,7 @@ public class GlResourceTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createGlResourceType(glResourceTypeToBeAdded);
@@ -101,63 +99,15 @@ public class GlResourceTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createGlResourceType(@RequestBody GlResourceType glResourceTypeToBeAdded) throws Exception {
+	public ResponseEntity<GlResourceType> createGlResourceType(@RequestBody GlResourceType glResourceTypeToBeAdded) throws Exception {
 
 		AddGlResourceType command = new AddGlResourceType(glResourceTypeToBeAdded);
 		GlResourceType glResourceType = ((GlResourceTypeAdded) Scheduler.execute(command).data()).getAddedGlResourceType();
 		
 		if (glResourceType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(glResourceType);
+			return successful(glResourceType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("GlResourceType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateGlResourceType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		GlResourceType glResourceTypeToBeUpdated = new GlResourceType();
-
-		try {
-			glResourceTypeToBeUpdated = GlResourceTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateGlResourceType(glResourceTypeToBeUpdated, glResourceTypeToBeUpdated.getGlResourceTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class GlResourceTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{glResourceTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateGlResourceType(@RequestBody GlResourceType glResourceTypeToBeUpdated,
+	public ResponseEntity<String> updateGlResourceType(@RequestBody GlResourceType glResourceTypeToBeUpdated,
 			@PathVariable String glResourceTypeId) throws Exception {
 
 		glResourceTypeToBeUpdated.setGlResourceTypeId(glResourceTypeId);
@@ -178,41 +128,44 @@ public class GlResourceTypeController {
 
 		try {
 			if(((GlResourceTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{glResourceTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String glResourceTypeId) throws Exception {
+	public ResponseEntity<GlResourceType> findById(@PathVariable String glResourceTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("glResourceTypeId", glResourceTypeId);
 		try {
 
-			Object foundGlResourceType = findGlResourceTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundGlResourceType);
+			List<GlResourceType> foundGlResourceType = findGlResourceTypesBy(requestParams).getBody();
+			if(foundGlResourceType.size()==1){				return successful(foundGlResourceType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{glResourceTypeId}")
-	public ResponseEntity<Object> deleteGlResourceTypeByIdUpdated(@PathVariable String glResourceTypeId) throws Exception {
+	public ResponseEntity<String> deleteGlResourceTypeByIdUpdated(@PathVariable String glResourceTypeId) throws Exception {
 		DeleteGlResourceType command = new DeleteGlResourceType(glResourceTypeId);
 
 		try {
 			if (((GlResourceTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("GlResourceType could not be deleted");
+		return conflict();
 
 	}
 

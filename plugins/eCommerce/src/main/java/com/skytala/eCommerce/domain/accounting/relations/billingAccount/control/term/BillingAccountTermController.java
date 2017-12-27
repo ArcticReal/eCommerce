@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.billingAccount.query.te
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/billingAccount/billingAccountTerms")
 public class BillingAccountTermController {
@@ -52,7 +54,7 @@ public class BillingAccountTermController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findBillingAccountTermsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<BillingAccountTerm>> findBillingAccountTermsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindBillingAccountTermsBy query = new FindBillingAccountTermsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class BillingAccountTermController {
 		}
 
 		List<BillingAccountTerm> billingAccountTerms =((BillingAccountTermFound) Scheduler.execute(query).data()).getBillingAccountTerms();
-
-		if (billingAccountTerms.size() == 1) {
-			return ResponseEntity.ok().body(billingAccountTerms.get(0));
-		}
 
 		return ResponseEntity.ok().body(billingAccountTerms);
 
@@ -78,7 +76,7 @@ public class BillingAccountTermController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createBillingAccountTerm(HttpServletRequest request) throws Exception {
+	public ResponseEntity<BillingAccountTerm> createBillingAccountTerm(HttpServletRequest request) throws Exception {
 
 		BillingAccountTerm billingAccountTermToBeAdded = new BillingAccountTerm();
 		try {
@@ -86,7 +84,7 @@ public class BillingAccountTermController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createBillingAccountTerm(billingAccountTermToBeAdded);
@@ -101,63 +99,15 @@ public class BillingAccountTermController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createBillingAccountTerm(@RequestBody BillingAccountTerm billingAccountTermToBeAdded) throws Exception {
+	public ResponseEntity<BillingAccountTerm> createBillingAccountTerm(@RequestBody BillingAccountTerm billingAccountTermToBeAdded) throws Exception {
 
 		AddBillingAccountTerm command = new AddBillingAccountTerm(billingAccountTermToBeAdded);
 		BillingAccountTerm billingAccountTerm = ((BillingAccountTermAdded) Scheduler.execute(command).data()).getAddedBillingAccountTerm();
 		
 		if (billingAccountTerm != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(billingAccountTerm);
+			return successful(billingAccountTerm);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("BillingAccountTerm could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateBillingAccountTerm(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		BillingAccountTerm billingAccountTermToBeUpdated = new BillingAccountTerm();
-
-		try {
-			billingAccountTermToBeUpdated = BillingAccountTermMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateBillingAccountTerm(billingAccountTermToBeUpdated, billingAccountTermToBeUpdated.getBillingAccountTermId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class BillingAccountTermController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{billingAccountTermId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateBillingAccountTerm(@RequestBody BillingAccountTerm billingAccountTermToBeUpdated,
+	public ResponseEntity<String> updateBillingAccountTerm(@RequestBody BillingAccountTerm billingAccountTermToBeUpdated,
 			@PathVariable String billingAccountTermId) throws Exception {
 
 		billingAccountTermToBeUpdated.setBillingAccountTermId(billingAccountTermId);
@@ -178,41 +128,44 @@ public class BillingAccountTermController {
 
 		try {
 			if(((BillingAccountTermUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{billingAccountTermId}")
-	public ResponseEntity<Object> findById(@PathVariable String billingAccountTermId) throws Exception {
+	public ResponseEntity<BillingAccountTerm> findById(@PathVariable String billingAccountTermId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("billingAccountTermId", billingAccountTermId);
 		try {
 
-			Object foundBillingAccountTerm = findBillingAccountTermsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundBillingAccountTerm);
+			List<BillingAccountTerm> foundBillingAccountTerm = findBillingAccountTermsBy(requestParams).getBody();
+			if(foundBillingAccountTerm.size()==1){				return successful(foundBillingAccountTerm.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{billingAccountTermId}")
-	public ResponseEntity<Object> deleteBillingAccountTermByIdUpdated(@PathVariable String billingAccountTermId) throws Exception {
+	public ResponseEntity<String> deleteBillingAccountTermByIdUpdated(@PathVariable String billingAccountTermId) throws Exception {
 		DeleteBillingAccountTerm command = new DeleteBillingAccountTerm(billingAccountTermId);
 
 		try {
 			if (((BillingAccountTermDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("BillingAccountTerm could not be deleted");
+		return conflict();
 
 	}
 

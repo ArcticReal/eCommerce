@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.shipment.relations.shipment.query.receiptRol
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/shipment/shipment/shipmentReceiptRoles")
 public class ShipmentReceiptRoleController {
@@ -52,7 +54,7 @@ public class ShipmentReceiptRoleController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findShipmentReceiptRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ShipmentReceiptRole>> findShipmentReceiptRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentReceiptRolesBy query = new FindShipmentReceiptRolesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ShipmentReceiptRoleController {
 		}
 
 		List<ShipmentReceiptRole> shipmentReceiptRoles =((ShipmentReceiptRoleFound) Scheduler.execute(query).data()).getShipmentReceiptRoles();
-
-		if (shipmentReceiptRoles.size() == 1) {
-			return ResponseEntity.ok().body(shipmentReceiptRoles.get(0));
-		}
 
 		return ResponseEntity.ok().body(shipmentReceiptRoles);
 
@@ -78,7 +76,7 @@ public class ShipmentReceiptRoleController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createShipmentReceiptRole(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ShipmentReceiptRole> createShipmentReceiptRole(HttpServletRequest request) throws Exception {
 
 		ShipmentReceiptRole shipmentReceiptRoleToBeAdded = new ShipmentReceiptRole();
 		try {
@@ -86,7 +84,7 @@ public class ShipmentReceiptRoleController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createShipmentReceiptRole(shipmentReceiptRoleToBeAdded);
@@ -101,63 +99,15 @@ public class ShipmentReceiptRoleController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createShipmentReceiptRole(@RequestBody ShipmentReceiptRole shipmentReceiptRoleToBeAdded) throws Exception {
+	public ResponseEntity<ShipmentReceiptRole> createShipmentReceiptRole(@RequestBody ShipmentReceiptRole shipmentReceiptRoleToBeAdded) throws Exception {
 
 		AddShipmentReceiptRole command = new AddShipmentReceiptRole(shipmentReceiptRoleToBeAdded);
 		ShipmentReceiptRole shipmentReceiptRole = ((ShipmentReceiptRoleAdded) Scheduler.execute(command).data()).getAddedShipmentReceiptRole();
 		
 		if (shipmentReceiptRole != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(shipmentReceiptRole);
+			return successful(shipmentReceiptRole);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ShipmentReceiptRole could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateShipmentReceiptRole(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ShipmentReceiptRole shipmentReceiptRoleToBeUpdated = new ShipmentReceiptRole();
-
-		try {
-			shipmentReceiptRoleToBeUpdated = ShipmentReceiptRoleMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateShipmentReceiptRole(shipmentReceiptRoleToBeUpdated, shipmentReceiptRoleToBeUpdated.getRoleTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ShipmentReceiptRoleController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{roleTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateShipmentReceiptRole(@RequestBody ShipmentReceiptRole shipmentReceiptRoleToBeUpdated,
+	public ResponseEntity<String> updateShipmentReceiptRole(@RequestBody ShipmentReceiptRole shipmentReceiptRoleToBeUpdated,
 			@PathVariable String roleTypeId) throws Exception {
 
 		shipmentReceiptRoleToBeUpdated.setRoleTypeId(roleTypeId);
@@ -178,41 +128,44 @@ public class ShipmentReceiptRoleController {
 
 		try {
 			if(((ShipmentReceiptRoleUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{shipmentReceiptRoleId}")
-	public ResponseEntity<Object> findById(@PathVariable String shipmentReceiptRoleId) throws Exception {
+	public ResponseEntity<ShipmentReceiptRole> findById(@PathVariable String shipmentReceiptRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentReceiptRoleId", shipmentReceiptRoleId);
 		try {
 
-			Object foundShipmentReceiptRole = findShipmentReceiptRolesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundShipmentReceiptRole);
+			List<ShipmentReceiptRole> foundShipmentReceiptRole = findShipmentReceiptRolesBy(requestParams).getBody();
+			if(foundShipmentReceiptRole.size()==1){				return successful(foundShipmentReceiptRole.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{shipmentReceiptRoleId}")
-	public ResponseEntity<Object> deleteShipmentReceiptRoleByIdUpdated(@PathVariable String shipmentReceiptRoleId) throws Exception {
+	public ResponseEntity<String> deleteShipmentReceiptRoleByIdUpdated(@PathVariable String shipmentReceiptRoleId) throws Exception {
 		DeleteShipmentReceiptRole command = new DeleteShipmentReceiptRole(shipmentReceiptRoleId);
 
 		try {
 			if (((ShipmentReceiptRoleDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ShipmentReceiptRole could not be deleted");
+		return conflict();
 
 	}
 

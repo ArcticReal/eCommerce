@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/commonQrcode")
 public class CommonQrcodeServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/generateQRCodeImage")
-	public ResponseEntity<Object> generateQRCodeImage(HttpSession session, @RequestParam(value="message") String message, @RequestParam(value="logoImage", required=false) java.awt.image.BufferedImage logoImage, @RequestParam(value="logoImageMaxWidth", required=false) Integer logoImageMaxWidth, @RequestParam(value="logoImageMaxHeight", required=false) Integer logoImageMaxHeight, @RequestParam(value="format", required=false) String format, @RequestParam(value="width", required=false) Integer width, @RequestParam(value="verifyOutput", required=false) Boolean verifyOutput, @RequestParam(value="encoding", required=false) String encoding, @RequestParam(value="height", required=false) Integer height) {
+	public ResponseEntity<Map<String, Object>> generateQRCodeImage(HttpSession session, @RequestParam(value="message") String message, @RequestParam(value="logoImage", required=false) java.awt.image.BufferedImage logoImage, @RequestParam(value="logoImageMaxWidth", required=false) Integer logoImageMaxWidth, @RequestParam(value="logoImageMaxHeight", required=false) Integer logoImageMaxHeight, @RequestParam(value="format", required=false) String format, @RequestParam(value="width", required=false) Integer width, @RequestParam(value="verifyOutput", required=false) Boolean verifyOutput, @RequestParam(value="encoding", required=false) String encoding, @RequestParam(value="height", required=false) Integer height) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("message",message);
@@ -47,19 +49,19 @@ public class CommonQrcodeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

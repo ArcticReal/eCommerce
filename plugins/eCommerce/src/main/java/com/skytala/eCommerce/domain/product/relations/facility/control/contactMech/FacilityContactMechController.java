@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.facility.query.contactMech
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/facility/facilityContactMechs")
 public class FacilityContactMechController {
@@ -52,7 +54,7 @@ public class FacilityContactMechController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findFacilityContactMechsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<FacilityContactMech>> findFacilityContactMechsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFacilityContactMechsBy query = new FindFacilityContactMechsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class FacilityContactMechController {
 		}
 
 		List<FacilityContactMech> facilityContactMechs =((FacilityContactMechFound) Scheduler.execute(query).data()).getFacilityContactMechs();
-
-		if (facilityContactMechs.size() == 1) {
-			return ResponseEntity.ok().body(facilityContactMechs.get(0));
-		}
 
 		return ResponseEntity.ok().body(facilityContactMechs);
 
@@ -78,7 +76,7 @@ public class FacilityContactMechController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createFacilityContactMech(HttpServletRequest request) throws Exception {
+	public ResponseEntity<FacilityContactMech> createFacilityContactMech(HttpServletRequest request) throws Exception {
 
 		FacilityContactMech facilityContactMechToBeAdded = new FacilityContactMech();
 		try {
@@ -86,7 +84,7 @@ public class FacilityContactMechController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createFacilityContactMech(facilityContactMechToBeAdded);
@@ -101,63 +99,15 @@ public class FacilityContactMechController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createFacilityContactMech(@RequestBody FacilityContactMech facilityContactMechToBeAdded) throws Exception {
+	public ResponseEntity<FacilityContactMech> createFacilityContactMech(@RequestBody FacilityContactMech facilityContactMechToBeAdded) throws Exception {
 
 		AddFacilityContactMech command = new AddFacilityContactMech(facilityContactMechToBeAdded);
 		FacilityContactMech facilityContactMech = ((FacilityContactMechAdded) Scheduler.execute(command).data()).getAddedFacilityContactMech();
 		
 		if (facilityContactMech != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(facilityContactMech);
+			return successful(facilityContactMech);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("FacilityContactMech could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateFacilityContactMech(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		FacilityContactMech facilityContactMechToBeUpdated = new FacilityContactMech();
-
-		try {
-			facilityContactMechToBeUpdated = FacilityContactMechMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateFacilityContactMech(facilityContactMechToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class FacilityContactMechController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateFacilityContactMech(@RequestBody FacilityContactMech facilityContactMechToBeUpdated,
+	public ResponseEntity<String> updateFacilityContactMech(@RequestBody FacilityContactMech facilityContactMechToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		facilityContactMechToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class FacilityContactMechController {
 
 		try {
 			if(((FacilityContactMechUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{facilityContactMechId}")
-	public ResponseEntity<Object> findById(@PathVariable String facilityContactMechId) throws Exception {
+	public ResponseEntity<FacilityContactMech> findById(@PathVariable String facilityContactMechId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("facilityContactMechId", facilityContactMechId);
 		try {
 
-			Object foundFacilityContactMech = findFacilityContactMechsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundFacilityContactMech);
+			List<FacilityContactMech> foundFacilityContactMech = findFacilityContactMechsBy(requestParams).getBody();
+			if(foundFacilityContactMech.size()==1){				return successful(foundFacilityContactMech.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{facilityContactMechId}")
-	public ResponseEntity<Object> deleteFacilityContactMechByIdUpdated(@PathVariable String facilityContactMechId) throws Exception {
+	public ResponseEntity<String> deleteFacilityContactMechByIdUpdated(@PathVariable String facilityContactMechId) throws Exception {
 		DeleteFacilityContactMech command = new DeleteFacilityContactMech(facilityContactMechId);
 
 		try {
 			if (((FacilityContactMechDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("FacilityContactMech could not be deleted");
+		return conflict();
 
 	}
 

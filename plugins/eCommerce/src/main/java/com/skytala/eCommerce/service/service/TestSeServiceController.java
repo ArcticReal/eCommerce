@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/testSe")
 public class TestSeServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testEntityAutoUpdateTestingStatus")
-	public ResponseEntity<Object> testEntityAutoUpdateTestingStatus(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="testingStatusId") String testingStatusId) {
+	public ResponseEntity<Map<String, Object>> testEntityAutoUpdateTestingStatus(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="testingStatusId") String testingStatusId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("statusId",statusId);
@@ -40,23 +42,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testXmlRpcAdd")
-	public ResponseEntity<Object> testXmlRpcAdd(HttpSession session, @RequestParam(value="num1") Integer num1, @RequestParam(value="num2") Integer num2) {
+	public ResponseEntity<Map<String, Object>> testXmlRpcAdd(HttpSession session, @RequestParam(value="num1") Integer num1, @RequestParam(value="num2") Integer num2) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("num1",num1);
@@ -70,23 +72,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testServiceLockWaitTimeoutRetryCantRecoverWaiter")
-	public ResponseEntity<Object> testServiceLockWaitTimeoutRetryCantRecoverWaiter(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> testServiceLockWaitTimeoutRetryCantRecoverWaiter(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -98,23 +100,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testServiceEcaGlobalEventExec")
-	public ResponseEntity<Object> testServiceEcaGlobalEventExec(HttpSession session, @RequestParam(value="test") junit.framework.Test test, @RequestParam(value="testResult") junit.framework.TestResult testResult) {
+	public ResponseEntity<Map<String, Object>> testServiceEcaGlobalEventExec(HttpSession session, @RequestParam(value="test") junit.framework.Test test, @RequestParam(value="testResult") junit.framework.TestResult testResult) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("test",test);
@@ -128,23 +130,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testServiceEcaGlobalEventExecToRollback")
-	public ResponseEntity<Object> testServiceEcaGlobalEventExecToRollback(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> testServiceEcaGlobalEventExecToRollback(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -156,23 +158,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testEntityAutoCreateTestingItemPkMissing")
-	public ResponseEntity<Object> testEntityAutoCreateTestingItemPkMissing(HttpSession session, @RequestParam(value="testingId") String testingId, @RequestParam(value="testingHistory", required=false) String testingHistory) {
+	public ResponseEntity<Map<String, Object>> testEntityAutoCreateTestingItemPkMissing(HttpSession session, @RequestParam(value="testingId") String testingId, @RequestParam(value="testingHistory", required=false) String testingHistory) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("testingId",testingId);
@@ -186,23 +188,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testServiceLockWaitTimeoutRetryGrabber")
-	public ResponseEntity<Object> testServiceLockWaitTimeoutRetryGrabber(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> testServiceLockWaitTimeoutRetryGrabber(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -214,23 +216,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testEntityAutoCreateTestingPkPresent")
-	public ResponseEntity<Object> testEntityAutoCreateTestingPkPresent(HttpSession session, @RequestParam(value="testingId") String testingId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="testingTypeId", required=false) String testingTypeId, @RequestParam(value="testingSize", required=false) Long testingSize, @RequestParam(value="description", required=false) String description, @RequestParam(value="testingDate", required=false) Timestamp testingDate, @RequestParam(value="testingName", required=false) String testingName) {
+	public ResponseEntity<Map<String, Object>> testEntityAutoCreateTestingPkPresent(HttpSession session, @RequestParam(value="testingId") String testingId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="testingTypeId", required=false) String testingTypeId, @RequestParam(value="testingSize", required=false) Long testingSize, @RequestParam(value="description", required=false) String description, @RequestParam(value="testingDate", required=false) Timestamp testingDate, @RequestParam(value="testingName", required=false) String testingName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("testingId",testingId);
@@ -249,23 +251,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testServiceLockWaitTimeoutRetryCantRecover")
-	public ResponseEntity<Object> testServiceLockWaitTimeoutRetryCantRecover(HttpSession session, @RequestParam(value="test") junit.framework.Test test, @RequestParam(value="testResult") junit.framework.TestResult testResult) {
+	public ResponseEntity<Map<String, Object>> testServiceLockWaitTimeoutRetryCantRecover(HttpSession session, @RequestParam(value="test") junit.framework.Test test, @RequestParam(value="testResult") junit.framework.TestResult testResult) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("test",test);
@@ -279,23 +281,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testServiceOwnTxSubServiceAfterSetRollbackOnlyInParentErrorCatchWrapper")
-	public ResponseEntity<Object> testServiceOwnTxSubServiceAfterSetRollbackOnlyInParentErrorCatchWrapper(HttpSession session, @RequestParam(value="test") junit.framework.Test test, @RequestParam(value="testResult") junit.framework.TestResult testResult) {
+	public ResponseEntity<Map<String, Object>> testServiceOwnTxSubServiceAfterSetRollbackOnlyInParentErrorCatchWrapper(HttpSession session, @RequestParam(value="test") junit.framework.Test test, @RequestParam(value="testResult") junit.framework.TestResult testResult) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("test",test);
@@ -309,23 +311,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testEntityAutoCreateTestingNodeMemberPkMissing")
-	public ResponseEntity<Object> testEntityAutoCreateTestingNodeMemberPkMissing(HttpSession session, @RequestParam(value="testingId") String testingId, @RequestParam(value="testingNodeId") String testingNodeId, @RequestParam(value="extendFromDate", required=false) Timestamp extendFromDate, @RequestParam(value="extendThruDate", required=false) Timestamp extendThruDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> testEntityAutoCreateTestingNodeMemberPkMissing(HttpSession session, @RequestParam(value="testingId") String testingId, @RequestParam(value="testingNodeId") String testingNodeId, @RequestParam(value="extendFromDate", required=false) Timestamp extendFromDate, @RequestParam(value="extendThruDate", required=false) Timestamp extendThruDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("testingId",testingId);
@@ -342,23 +344,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testServiceEcaGlobalEventExecOnCommit")
-	public ResponseEntity<Object> testServiceEcaGlobalEventExecOnCommit(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> testServiceEcaGlobalEventExecOnCommit(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -370,23 +372,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testEntityAutoCreateTestingItemPkPresent")
-	public ResponseEntity<Object> testEntityAutoCreateTestingItemPkPresent(HttpSession session, @RequestParam(value="testingId") String testingId, @RequestParam(value="testingSeqId") String testingSeqId, @RequestParam(value="testingHistory", required=false) String testingHistory) {
+	public ResponseEntity<Map<String, Object>> testEntityAutoCreateTestingItemPkPresent(HttpSession session, @RequestParam(value="testingId") String testingId, @RequestParam(value="testingSeqId") String testingSeqId, @RequestParam(value="testingHistory", required=false) String testingHistory) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("testingId",testingId);
@@ -401,23 +403,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testEntityAutoExpireTestingNodeMember")
-	public ResponseEntity<Object> testEntityAutoExpireTestingNodeMember(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="testingId") String testingId, @RequestParam(value="testingNodeId") String testingNodeId) {
+	public ResponseEntity<Map<String, Object>> testEntityAutoExpireTestingNodeMember(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="testingId") String testingId, @RequestParam(value="testingNodeId") String testingNodeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -432,23 +434,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testServiceOwnTxSubServiceAfterSetRollbackOnlyInParentSubService")
-	public ResponseEntity<Object> testServiceOwnTxSubServiceAfterSetRollbackOnlyInParentSubService(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> testServiceOwnTxSubServiceAfterSetRollbackOnlyInParentSubService(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -460,23 +462,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testServiceDeadLockRetryThreadB")
-	public ResponseEntity<Object> testServiceDeadLockRetryThreadB(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> testServiceDeadLockRetryThreadB(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -488,23 +490,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testServiceDeadLockRetryThreadA")
-	public ResponseEntity<Object> testServiceDeadLockRetryThreadA(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> testServiceDeadLockRetryThreadA(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -516,23 +518,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testServiceLockWaitTimeoutRetry")
-	public ResponseEntity<Object> testServiceLockWaitTimeoutRetry(HttpSession session, @RequestParam(value="test") junit.framework.Test test, @RequestParam(value="testResult") junit.framework.TestResult testResult) {
+	public ResponseEntity<Map<String, Object>> testServiceLockWaitTimeoutRetry(HttpSession session, @RequestParam(value="test") junit.framework.Test test, @RequestParam(value="testResult") junit.framework.TestResult testResult) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("test",test);
@@ -546,23 +548,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testEntityAutoUpdateTesting")
-	public ResponseEntity<Object> testEntityAutoUpdateTesting(HttpSession session, @RequestParam(value="testingId") String testingId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="testingTypeId", required=false) String testingTypeId, @RequestParam(value="testingSize", required=false) Long testingSize, @RequestParam(value="description", required=false) String description, @RequestParam(value="testingDate", required=false) Timestamp testingDate, @RequestParam(value="testingName", required=false) String testingName) {
+	public ResponseEntity<Map<String, Object>> testEntityAutoUpdateTesting(HttpSession session, @RequestParam(value="testingId") String testingId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="testingTypeId", required=false) String testingTypeId, @RequestParam(value="testingSize", required=false) Long testingSize, @RequestParam(value="description", required=false) String description, @RequestParam(value="testingDate", required=false) Timestamp testingDate, @RequestParam(value="testingName", required=false) String testingName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("testingId",testingId);
@@ -581,23 +583,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testEntityAutoRemoveTesting")
-	public ResponseEntity<Object> testEntityAutoRemoveTesting(HttpSession session, @RequestParam(value="testingId") String testingId) {
+	public ResponseEntity<Map<String, Object>> testEntityAutoRemoveTesting(HttpSession session, @RequestParam(value="testingId") String testingId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("testingId",testingId);
@@ -610,23 +612,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testServiceLockWaitTimeoutRetryWaiter")
-	public ResponseEntity<Object> testServiceLockWaitTimeoutRetryWaiter(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> testServiceLockWaitTimeoutRetryWaiter(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -638,23 +640,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testEntityAutoCreateTestingStatus")
-	public ResponseEntity<Object> testEntityAutoCreateTestingStatus(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="testingId") String testingId) {
+	public ResponseEntity<Map<String, Object>> testEntityAutoCreateTestingStatus(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="testingId") String testingId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("statusId",statusId);
@@ -668,23 +670,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testEntityAutoDeleteTestingStatus")
-	public ResponseEntity<Object> testEntityAutoDeleteTestingStatus(HttpSession session, @RequestParam(value="testingStatusId") String testingStatusId) {
+	public ResponseEntity<Map<String, Object>> testEntityAutoDeleteTestingStatus(HttpSession session, @RequestParam(value="testingStatusId") String testingStatusId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("testingStatusId",testingStatusId);
@@ -697,23 +699,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testServiceEcaGlobalEventExecOnRollback")
-	public ResponseEntity<Object> testServiceEcaGlobalEventExecOnRollback(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> testServiceEcaGlobalEventExecOnRollback(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -725,23 +727,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testEntityAutoCreateTestingPkMissing")
-	public ResponseEntity<Object> testEntityAutoCreateTestingPkMissing(HttpSession session, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="testingTypeId", required=false) String testingTypeId, @RequestParam(value="testingSize", required=false) Long testingSize, @RequestParam(value="description", required=false) String description, @RequestParam(value="testingDate", required=false) Timestamp testingDate, @RequestParam(value="testingName", required=false) String testingName) {
+	public ResponseEntity<Map<String, Object>> testEntityAutoCreateTestingPkMissing(HttpSession session, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="testingTypeId", required=false) String testingTypeId, @RequestParam(value="testingSize", required=false) Long testingSize, @RequestParam(value="description", required=false) String description, @RequestParam(value="testingDate", required=false) Timestamp testingDate, @RequestParam(value="testingName", required=false) String testingName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("comments",comments);
@@ -759,23 +761,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testEntityAutoCreateTestingNodeMemberPkPresent")
-	public ResponseEntity<Object> testEntityAutoCreateTestingNodeMemberPkPresent(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="testingId") String testingId, @RequestParam(value="testingNodeId") String testingNodeId, @RequestParam(value="extendFromDate", required=false) Timestamp extendFromDate, @RequestParam(value="extendThruDate", required=false) Timestamp extendThruDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> testEntityAutoCreateTestingNodeMemberPkPresent(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="testingId") String testingId, @RequestParam(value="testingNodeId") String testingNodeId, @RequestParam(value="extendFromDate", required=false) Timestamp extendFromDate, @RequestParam(value="extendThruDate", required=false) Timestamp extendThruDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -793,23 +795,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testXmlRpcClientAdd")
-	public ResponseEntity<Object> testXmlRpcClientAdd(HttpSession session, @RequestParam(value="test") junit.framework.Test test, @RequestParam(value="testResult") junit.framework.TestResult testResult) {
+	public ResponseEntity<Map<String, Object>> testXmlRpcClientAdd(HttpSession session, @RequestParam(value="test") junit.framework.Test test, @RequestParam(value="testResult") junit.framework.TestResult testResult) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("test",test);
@@ -823,23 +825,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testServiceOwnTxSubServiceAfterSetRollbackOnlyInParent")
-	public ResponseEntity<Object> testServiceOwnTxSubServiceAfterSetRollbackOnlyInParent(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> testServiceOwnTxSubServiceAfterSetRollbackOnlyInParent(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -851,23 +853,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testServiceDeadLockRetry")
-	public ResponseEntity<Object> testServiceDeadLockRetry(HttpSession session, @RequestParam(value="test") junit.framework.Test test, @RequestParam(value="testResult") junit.framework.TestResult testResult) {
+	public ResponseEntity<Map<String, Object>> testServiceDeadLockRetry(HttpSession session, @RequestParam(value="test") junit.framework.Test test, @RequestParam(value="testResult") junit.framework.TestResult testResult) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("test",test);
@@ -881,23 +883,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testEntityAutoExpireTestFieldType")
-	public ResponseEntity<Object> testEntityAutoExpireTestFieldType(HttpSession session, @RequestParam(value="testFieldTypeId") String testFieldTypeId, @RequestParam(value="dateTimeField", required=false) Timestamp dateTimeField) {
+	public ResponseEntity<Map<String, Object>> testEntityAutoExpireTestFieldType(HttpSession session, @RequestParam(value="testFieldTypeId") String testFieldTypeId, @RequestParam(value="dateTimeField", required=false) Timestamp dateTimeField) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("testFieldTypeId",testFieldTypeId);
@@ -911,23 +913,23 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/testXmlRpcLocalEngine")
-	public ResponseEntity<Object> testXmlRpcLocalEngine(HttpSession session, @RequestParam(value="num1") Integer num1, @RequestParam(value="num2") Integer num2) {
+	public ResponseEntity<Map<String, Object>> testXmlRpcLocalEngine(HttpSession session, @RequestParam(value="num1") Integer num1, @RequestParam(value="num2") Integer num2) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("num1",num1);
@@ -941,19 +943,19 @@ public class TestSeServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

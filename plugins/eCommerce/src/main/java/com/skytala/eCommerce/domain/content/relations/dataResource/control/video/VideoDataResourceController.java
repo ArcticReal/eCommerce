@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.dataResource.query.video.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/dataResource/videoDataResources")
 public class VideoDataResourceController {
@@ -52,7 +54,7 @@ public class VideoDataResourceController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findVideoDataResourcesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<VideoDataResource>> findVideoDataResourcesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindVideoDataResourcesBy query = new FindVideoDataResourcesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class VideoDataResourceController {
 		}
 
 		List<VideoDataResource> videoDataResources =((VideoDataResourceFound) Scheduler.execute(query).data()).getVideoDataResources();
-
-		if (videoDataResources.size() == 1) {
-			return ResponseEntity.ok().body(videoDataResources.get(0));
-		}
 
 		return ResponseEntity.ok().body(videoDataResources);
 
@@ -78,7 +76,7 @@ public class VideoDataResourceController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createVideoDataResource(HttpServletRequest request) throws Exception {
+	public ResponseEntity<VideoDataResource> createVideoDataResource(HttpServletRequest request) throws Exception {
 
 		VideoDataResource videoDataResourceToBeAdded = new VideoDataResource();
 		try {
@@ -86,7 +84,7 @@ public class VideoDataResourceController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createVideoDataResource(videoDataResourceToBeAdded);
@@ -101,63 +99,15 @@ public class VideoDataResourceController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createVideoDataResource(@RequestBody VideoDataResource videoDataResourceToBeAdded) throws Exception {
+	public ResponseEntity<VideoDataResource> createVideoDataResource(@RequestBody VideoDataResource videoDataResourceToBeAdded) throws Exception {
 
 		AddVideoDataResource command = new AddVideoDataResource(videoDataResourceToBeAdded);
 		VideoDataResource videoDataResource = ((VideoDataResourceAdded) Scheduler.execute(command).data()).getAddedVideoDataResource();
 		
 		if (videoDataResource != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(videoDataResource);
+			return successful(videoDataResource);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("VideoDataResource could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateVideoDataResource(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		VideoDataResource videoDataResourceToBeUpdated = new VideoDataResource();
-
-		try {
-			videoDataResourceToBeUpdated = VideoDataResourceMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateVideoDataResource(videoDataResourceToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class VideoDataResourceController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateVideoDataResource(@RequestBody VideoDataResource videoDataResourceToBeUpdated,
+	public ResponseEntity<String> updateVideoDataResource(@RequestBody VideoDataResource videoDataResourceToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		videoDataResourceToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class VideoDataResourceController {
 
 		try {
 			if(((VideoDataResourceUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{videoDataResourceId}")
-	public ResponseEntity<Object> findById(@PathVariable String videoDataResourceId) throws Exception {
+	public ResponseEntity<VideoDataResource> findById(@PathVariable String videoDataResourceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("videoDataResourceId", videoDataResourceId);
 		try {
 
-			Object foundVideoDataResource = findVideoDataResourcesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundVideoDataResource);
+			List<VideoDataResource> foundVideoDataResource = findVideoDataResourcesBy(requestParams).getBody();
+			if(foundVideoDataResource.size()==1){				return successful(foundVideoDataResource.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{videoDataResourceId}")
-	public ResponseEntity<Object> deleteVideoDataResourceByIdUpdated(@PathVariable String videoDataResourceId) throws Exception {
+	public ResponseEntity<String> deleteVideoDataResourceByIdUpdated(@PathVariable String videoDataResourceId) throws Exception {
 		DeleteVideoDataResource command = new DeleteVideoDataResource(videoDataResourceId);
 
 		try {
 			if (((VideoDataResourceDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("VideoDataResource could not be deleted");
+		return conflict();
 
 	}
 

@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/productCost")
 public class ProductCostServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getProductCost")
-	public ResponseEntity<Object> getProductCost(HttpSession session, @RequestParam(value="costComponentTypePrefix") String costComponentTypePrefix, @RequestParam(value="currencyUomId") String currencyUomId, @RequestParam(value="productId") String productId) {
+	public ResponseEntity<Map<String, Object>> getProductCost(HttpSession session, @RequestParam(value="costComponentTypePrefix") String costComponentTypePrefix, @RequestParam(value="currencyUomId") String currencyUomId, @RequestParam(value="productId") String productId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentTypePrefix",costComponentTypePrefix);
@@ -41,23 +43,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/calculateAllProductsCosts")
-	public ResponseEntity<Object> calculateAllProductsCosts(HttpSession session, @RequestParam(value="costComponentTypePrefix") String costComponentTypePrefix, @RequestParam(value="currencyUomId") String currencyUomId) {
+	public ResponseEntity<Map<String, Object>> calculateAllProductsCosts(HttpSession session, @RequestParam(value="costComponentTypePrefix") String costComponentTypePrefix, @RequestParam(value="currencyUomId") String currencyUomId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentTypePrefix",costComponentTypePrefix);
@@ -71,23 +73,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductCostComponentCalc")
-	public ResponseEntity<Object> deleteProductCostComponentCalc(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="productId") String productId) {
+	public ResponseEntity<Map<String, Object>> deleteProductCostComponentCalc(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="productId") String productId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -102,23 +104,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/calculateProductCosts")
-	public ResponseEntity<Object> calculateProductCosts(HttpSession session, @RequestParam(value="costComponentTypePrefix") String costComponentTypePrefix, @RequestParam(value="currencyUomId") String currencyUomId, @RequestParam(value="productId") String productId) {
+	public ResponseEntity<Map<String, Object>> calculateProductCosts(HttpSession session, @RequestParam(value="costComponentTypePrefix") String costComponentTypePrefix, @RequestParam(value="currencyUomId") String currencyUomId, @RequestParam(value="productId") String productId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentTypePrefix",costComponentTypePrefix);
@@ -133,23 +135,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCostComponentAttribute")
-	public ResponseEntity<Object> updateCostComponentAttribute(HttpSession session, @RequestParam(value="attrName") String attrName, @RequestParam(value="costComponentId") String costComponentId, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
+	public ResponseEntity<Map<String, Object>> updateCostComponentAttribute(HttpSession session, @RequestParam(value="attrName") String attrName, @RequestParam(value="costComponentId") String costComponentId, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("attrName",attrName);
@@ -165,23 +167,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductCostComponentCalc")
-	public ResponseEntity<Object> updateProductCostComponentCalc(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="productId") String productId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateProductCostComponentCalc(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="productId") String productId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -199,23 +201,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteCostComponentTypeAttr")
-	public ResponseEntity<Object> deleteCostComponentTypeAttr(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="attrName") String attrName) {
+	public ResponseEntity<Map<String, Object>> deleteCostComponentTypeAttr(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="attrName") String attrName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentTypeId",costComponentTypeId);
@@ -229,23 +231,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getTaskCost")
-	public ResponseEntity<Object> getTaskCost(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="currencyUomId") String currencyUomId, @RequestParam(value="routingId", required=false) String routingId, @RequestParam(value="productId", required=false) String productId) {
+	public ResponseEntity<Map<String, Object>> getTaskCost(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="currencyUomId") String currencyUomId, @RequestParam(value="routingId", required=false) String routingId, @RequestParam(value="productId", required=false) String productId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -261,23 +263,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCostComponentTypeAttr")
-	public ResponseEntity<Object> createCostComponentTypeAttr(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createCostComponentTypeAttr(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentTypeId",costComponentTypeId);
@@ -292,23 +294,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCostComponentType")
-	public ResponseEntity<Object> createCostComponentType(HttpSession session, @RequestParam(value="costComponentTypeId", required=false) String costComponentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createCostComponentType(HttpSession session, @RequestParam(value="costComponentTypeId", required=false) String costComponentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentTypeId",costComponentTypeId);
@@ -324,23 +326,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/cancelCostComponents")
-	public ResponseEntity<Object> cancelCostComponents(HttpSession session, @RequestParam(value="costComponentTypeId", required=false) String costComponentTypeId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="costUomId", required=false) String costUomId, @RequestParam(value="costComponentId", required=false) String costComponentId) {
+	public ResponseEntity<Map<String, Object>> cancelCostComponents(HttpSession session, @RequestParam(value="costComponentTypeId", required=false) String costComponentTypeId, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="costUomId", required=false) String costUomId, @RequestParam(value="costComponentId", required=false) String costComponentId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentTypeId",costComponentTypeId);
@@ -356,23 +358,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteCostComponent")
-	public ResponseEntity<Object> deleteCostComponent(HttpSession session, @RequestParam(value="costComponentId") String costComponentId) {
+	public ResponseEntity<Map<String, Object>> deleteCostComponent(HttpSession session, @RequestParam(value="costComponentId") String costComponentId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentId",costComponentId);
@@ -385,23 +387,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCostComponent")
-	public ResponseEntity<Object> createCostComponent(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="cost", required=false) BigDecimal cost, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="geoId", required=false) String geoId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="costUomId", required=false) String costUomId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createCostComponent(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="cost", required=false) BigDecimal cost, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="geoId", required=false) String geoId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="costUomId", required=false) String costUomId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentTypeId",costComponentTypeId);
@@ -425,23 +427,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCostComponent")
-	public ResponseEntity<Object> updateCostComponent(HttpSession session, @RequestParam(value="costComponentId") String costComponentId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="costComponentTypeId", required=false) String costComponentTypeId, @RequestParam(value="cost", required=false) BigDecimal cost, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="geoId", required=false) String geoId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="costUomId", required=false) String costUomId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateCostComponent(HttpSession session, @RequestParam(value="costComponentId") String costComponentId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="costComponentTypeId", required=false) String costComponentTypeId, @RequestParam(value="cost", required=false) BigDecimal cost, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="geoId", required=false) String geoId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="costUomId", required=false) String costUomId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentId",costComponentId);
@@ -466,23 +468,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCostComponentTypeAttr")
-	public ResponseEntity<Object> updateCostComponentTypeAttr(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateCostComponentTypeAttr(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentTypeId",costComponentTypeId);
@@ -497,23 +499,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductCostComponentCalc")
-	public ResponseEntity<Object> createProductCostComponentCalc(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="productId") String productId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createProductCostComponentCalc(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="productId") String productId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -531,23 +533,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCostComponentAttribute")
-	public ResponseEntity<Object> createCostComponentAttribute(HttpSession session, @RequestParam(value="attrName") String attrName, @RequestParam(value="costComponentId") String costComponentId, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
+	public ResponseEntity<Map<String, Object>> createCostComponentAttribute(HttpSession session, @RequestParam(value="attrName") String attrName, @RequestParam(value="costComponentId") String costComponentId, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("attrName",attrName);
@@ -563,23 +565,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteCostComponentAttribute")
-	public ResponseEntity<Object> deleteCostComponentAttribute(HttpSession session, @RequestParam(value="attrName") String attrName, @RequestParam(value="costComponentId") String costComponentId) {
+	public ResponseEntity<Map<String, Object>> deleteCostComponentAttribute(HttpSession session, @RequestParam(value="attrName") String attrName, @RequestParam(value="costComponentId") String costComponentId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("attrName",attrName);
@@ -593,23 +595,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/productCostCalcInterface")
-	public ResponseEntity<Object> productCostCalcInterface(HttpSession session, @RequestParam(value="productCostComponentCalc") GenericValue productCostComponentCalc, @RequestParam(value="costComponentTypePrefix") String costComponentTypePrefix, @RequestParam(value="baseCost") BigDecimal baseCost, @RequestParam(value="currencyUomId") String currencyUomId, @RequestParam(value="costComponentCalc") GenericValue costComponentCalc) {
+	public ResponseEntity<Map<String, Object>> productCostCalcInterface(HttpSession session, @RequestParam(value="productCostComponentCalc") GenericValue productCostComponentCalc, @RequestParam(value="costComponentTypePrefix") String costComponentTypePrefix, @RequestParam(value="baseCost") BigDecimal baseCost, @RequestParam(value="currencyUomId") String currencyUomId, @RequestParam(value="costComponentCalc") GenericValue costComponentCalc) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productCostComponentCalc",productCostComponentCalc);
@@ -626,23 +628,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/productCostPercentageFormula")
-	public ResponseEntity<Object> productCostPercentageFormula(HttpSession session, @RequestParam(value="productCostComponentCalc") GenericValue productCostComponentCalc, @RequestParam(value="costComponentTypePrefix") String costComponentTypePrefix, @RequestParam(value="baseCost") BigDecimal baseCost, @RequestParam(value="currencyUomId") String currencyUomId, @RequestParam(value="costComponentCalc") GenericValue costComponentCalc) {
+	public ResponseEntity<Map<String, Object>> productCostPercentageFormula(HttpSession session, @RequestParam(value="productCostComponentCalc") GenericValue productCostComponentCalc, @RequestParam(value="costComponentTypePrefix") String costComponentTypePrefix, @RequestParam(value="baseCost") BigDecimal baseCost, @RequestParam(value="currencyUomId") String currencyUomId, @RequestParam(value="costComponentCalc") GenericValue costComponentCalc) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productCostComponentCalc",productCostComponentCalc);
@@ -659,23 +661,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCostComponentType")
-	public ResponseEntity<Object> updateCostComponentType(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateCostComponentType(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentTypeId",costComponentTypeId);
@@ -691,23 +693,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/recreateCostComponent")
-	public ResponseEntity<Object> recreateCostComponent(HttpSession session, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="costComponentTypeId", required=false) String costComponentTypeId, @RequestParam(value="cost", required=false) BigDecimal cost, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="geoId", required=false) String geoId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="costUomId", required=false) String costUomId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> recreateCostComponent(HttpSession session, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="costComponentTypeId", required=false) String costComponentTypeId, @RequestParam(value="cost", required=false) BigDecimal cost, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="geoId", required=false) String geoId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="costUomId", required=false) String costUomId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="costComponentCalcId", required=false) String costComponentCalcId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -731,23 +733,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/calculateProductAverageCost")
-	public ResponseEntity<Object> calculateProductAverageCost(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="ownerPartyId", required=false) String ownerPartyId, @RequestParam(value="facilityId", required=false) String facilityId) {
+	public ResponseEntity<Map<String, Object>> calculateProductAverageCost(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="ownerPartyId", required=false) String ownerPartyId, @RequestParam(value="facilityId", required=false) String facilityId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -762,23 +764,23 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteCostComponentType")
-	public ResponseEntity<Object> deleteCostComponentType(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteCostComponentType(HttpSession session, @RequestParam(value="costComponentTypeId") String costComponentTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("costComponentTypeId",costComponentTypeId);
@@ -791,19 +793,19 @@ public class ProductCostServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

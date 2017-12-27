@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.roleType.query.FindRoleTypes
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/roleTypes")
 public class RoleTypeController {
@@ -52,7 +54,7 @@ public class RoleTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findRoleTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<RoleType>> findRoleTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindRoleTypesBy query = new FindRoleTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class RoleTypeController {
 		}
 
 		List<RoleType> roleTypes =((RoleTypeFound) Scheduler.execute(query).data()).getRoleTypes();
-
-		if (roleTypes.size() == 1) {
-			return ResponseEntity.ok().body(roleTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(roleTypes);
 
@@ -78,7 +76,7 @@ public class RoleTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createRoleType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<RoleType> createRoleType(HttpServletRequest request) throws Exception {
 
 		RoleType roleTypeToBeAdded = new RoleType();
 		try {
@@ -86,7 +84,7 @@ public class RoleTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createRoleType(roleTypeToBeAdded);
@@ -101,63 +99,15 @@ public class RoleTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createRoleType(@RequestBody RoleType roleTypeToBeAdded) throws Exception {
+	public ResponseEntity<RoleType> createRoleType(@RequestBody RoleType roleTypeToBeAdded) throws Exception {
 
 		AddRoleType command = new AddRoleType(roleTypeToBeAdded);
 		RoleType roleType = ((RoleTypeAdded) Scheduler.execute(command).data()).getAddedRoleType();
 		
 		if (roleType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(roleType);
+			return successful(roleType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("RoleType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateRoleType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		RoleType roleTypeToBeUpdated = new RoleType();
-
-		try {
-			roleTypeToBeUpdated = RoleTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateRoleType(roleTypeToBeUpdated, roleTypeToBeUpdated.getRoleTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class RoleTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{roleTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateRoleType(@RequestBody RoleType roleTypeToBeUpdated,
+	public ResponseEntity<String> updateRoleType(@RequestBody RoleType roleTypeToBeUpdated,
 			@PathVariable String roleTypeId) throws Exception {
 
 		roleTypeToBeUpdated.setRoleTypeId(roleTypeId);
@@ -178,41 +128,44 @@ public class RoleTypeController {
 
 		try {
 			if(((RoleTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{roleTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String roleTypeId) throws Exception {
+	public ResponseEntity<RoleType> findById(@PathVariable String roleTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("roleTypeId", roleTypeId);
 		try {
 
-			Object foundRoleType = findRoleTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundRoleType);
+			List<RoleType> foundRoleType = findRoleTypesBy(requestParams).getBody();
+			if(foundRoleType.size()==1){				return successful(foundRoleType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{roleTypeId}")
-	public ResponseEntity<Object> deleteRoleTypeByIdUpdated(@PathVariable String roleTypeId) throws Exception {
+	public ResponseEntity<String> deleteRoleTypeByIdUpdated(@PathVariable String roleTypeId) throws Exception {
 		DeleteRoleType command = new DeleteRoleType(roleTypeId);
 
 		try {
 			if (((RoleTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("RoleType could not be deleted");
+		return conflict();
 
 	}
 

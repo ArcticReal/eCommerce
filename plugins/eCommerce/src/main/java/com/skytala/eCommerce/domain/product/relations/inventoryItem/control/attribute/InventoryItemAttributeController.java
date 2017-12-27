@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.inventoryItem.query.attrib
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/inventoryItem/inventoryItemAttributes")
 public class InventoryItemAttributeController {
@@ -52,7 +54,7 @@ public class InventoryItemAttributeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findInventoryItemAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<InventoryItemAttribute>> findInventoryItemAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInventoryItemAttributesBy query = new FindInventoryItemAttributesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class InventoryItemAttributeController {
 		}
 
 		List<InventoryItemAttribute> inventoryItemAttributes =((InventoryItemAttributeFound) Scheduler.execute(query).data()).getInventoryItemAttributes();
-
-		if (inventoryItemAttributes.size() == 1) {
-			return ResponseEntity.ok().body(inventoryItemAttributes.get(0));
-		}
 
 		return ResponseEntity.ok().body(inventoryItemAttributes);
 
@@ -78,7 +76,7 @@ public class InventoryItemAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createInventoryItemAttribute(HttpServletRequest request) throws Exception {
+	public ResponseEntity<InventoryItemAttribute> createInventoryItemAttribute(HttpServletRequest request) throws Exception {
 
 		InventoryItemAttribute inventoryItemAttributeToBeAdded = new InventoryItemAttribute();
 		try {
@@ -86,7 +84,7 @@ public class InventoryItemAttributeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createInventoryItemAttribute(inventoryItemAttributeToBeAdded);
@@ -101,63 +99,15 @@ public class InventoryItemAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createInventoryItemAttribute(@RequestBody InventoryItemAttribute inventoryItemAttributeToBeAdded) throws Exception {
+	public ResponseEntity<InventoryItemAttribute> createInventoryItemAttribute(@RequestBody InventoryItemAttribute inventoryItemAttributeToBeAdded) throws Exception {
 
 		AddInventoryItemAttribute command = new AddInventoryItemAttribute(inventoryItemAttributeToBeAdded);
 		InventoryItemAttribute inventoryItemAttribute = ((InventoryItemAttributeAdded) Scheduler.execute(command).data()).getAddedInventoryItemAttribute();
 		
 		if (inventoryItemAttribute != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(inventoryItemAttribute);
+			return successful(inventoryItemAttribute);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("InventoryItemAttribute could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateInventoryItemAttribute(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		InventoryItemAttribute inventoryItemAttributeToBeUpdated = new InventoryItemAttribute();
-
-		try {
-			inventoryItemAttributeToBeUpdated = InventoryItemAttributeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateInventoryItemAttribute(inventoryItemAttributeToBeUpdated, inventoryItemAttributeToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class InventoryItemAttributeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateInventoryItemAttribute(@RequestBody InventoryItemAttribute inventoryItemAttributeToBeUpdated,
+	public ResponseEntity<String> updateInventoryItemAttribute(@RequestBody InventoryItemAttribute inventoryItemAttributeToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		inventoryItemAttributeToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class InventoryItemAttributeController {
 
 		try {
 			if(((InventoryItemAttributeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{inventoryItemAttributeId}")
-	public ResponseEntity<Object> findById(@PathVariable String inventoryItemAttributeId) throws Exception {
+	public ResponseEntity<InventoryItemAttribute> findById(@PathVariable String inventoryItemAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("inventoryItemAttributeId", inventoryItemAttributeId);
 		try {
 
-			Object foundInventoryItemAttribute = findInventoryItemAttributesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundInventoryItemAttribute);
+			List<InventoryItemAttribute> foundInventoryItemAttribute = findInventoryItemAttributesBy(requestParams).getBody();
+			if(foundInventoryItemAttribute.size()==1){				return successful(foundInventoryItemAttribute.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{inventoryItemAttributeId}")
-	public ResponseEntity<Object> deleteInventoryItemAttributeByIdUpdated(@PathVariable String inventoryItemAttributeId) throws Exception {
+	public ResponseEntity<String> deleteInventoryItemAttributeByIdUpdated(@PathVariable String inventoryItemAttributeId) throws Exception {
 		DeleteInventoryItemAttribute command = new DeleteInventoryItemAttribute(inventoryItemAttributeId);
 
 		try {
 			if (((InventoryItemAttributeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("InventoryItemAttribute could not be deleted");
+		return conflict();
 
 	}
 

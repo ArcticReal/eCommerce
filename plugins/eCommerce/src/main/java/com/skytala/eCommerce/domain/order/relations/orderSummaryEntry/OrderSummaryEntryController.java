@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.orderSummaryEntry.query.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/orderSummaryEntrys")
 public class OrderSummaryEntryController {
@@ -52,7 +54,7 @@ public class OrderSummaryEntryController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findOrderSummaryEntrysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OrderSummaryEntry>> findOrderSummaryEntrysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderSummaryEntrysBy query = new FindOrderSummaryEntrysBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class OrderSummaryEntryController {
 		}
 
 		List<OrderSummaryEntry> orderSummaryEntrys =((OrderSummaryEntryFound) Scheduler.execute(query).data()).getOrderSummaryEntrys();
-
-		if (orderSummaryEntrys.size() == 1) {
-			return ResponseEntity.ok().body(orderSummaryEntrys.get(0));
-		}
 
 		return ResponseEntity.ok().body(orderSummaryEntrys);
 
@@ -78,7 +76,7 @@ public class OrderSummaryEntryController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOrderSummaryEntry(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OrderSummaryEntry> createOrderSummaryEntry(HttpServletRequest request) throws Exception {
 
 		OrderSummaryEntry orderSummaryEntryToBeAdded = new OrderSummaryEntry();
 		try {
@@ -86,7 +84,7 @@ public class OrderSummaryEntryController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createOrderSummaryEntry(orderSummaryEntryToBeAdded);
@@ -101,63 +99,15 @@ public class OrderSummaryEntryController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOrderSummaryEntry(@RequestBody OrderSummaryEntry orderSummaryEntryToBeAdded) throws Exception {
+	public ResponseEntity<OrderSummaryEntry> createOrderSummaryEntry(@RequestBody OrderSummaryEntry orderSummaryEntryToBeAdded) throws Exception {
 
 		AddOrderSummaryEntry command = new AddOrderSummaryEntry(orderSummaryEntryToBeAdded);
 		OrderSummaryEntry orderSummaryEntry = ((OrderSummaryEntryAdded) Scheduler.execute(command).data()).getAddedOrderSummaryEntry();
 		
 		if (orderSummaryEntry != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(orderSummaryEntry);
+			return successful(orderSummaryEntry);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OrderSummaryEntry could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateOrderSummaryEntry(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OrderSummaryEntry orderSummaryEntryToBeUpdated = new OrderSummaryEntry();
-
-		try {
-			orderSummaryEntryToBeUpdated = OrderSummaryEntryMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOrderSummaryEntry(orderSummaryEntryToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class OrderSummaryEntryController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOrderSummaryEntry(@RequestBody OrderSummaryEntry orderSummaryEntryToBeUpdated,
+	public ResponseEntity<String> updateOrderSummaryEntry(@RequestBody OrderSummaryEntry orderSummaryEntryToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		orderSummaryEntryToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class OrderSummaryEntryController {
 
 		try {
 			if(((OrderSummaryEntryUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{orderSummaryEntryId}")
-	public ResponseEntity<Object> findById(@PathVariable String orderSummaryEntryId) throws Exception {
+	public ResponseEntity<OrderSummaryEntry> findById(@PathVariable String orderSummaryEntryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderSummaryEntryId", orderSummaryEntryId);
 		try {
 
-			Object foundOrderSummaryEntry = findOrderSummaryEntrysBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOrderSummaryEntry);
+			List<OrderSummaryEntry> foundOrderSummaryEntry = findOrderSummaryEntrysBy(requestParams).getBody();
+			if(foundOrderSummaryEntry.size()==1){				return successful(foundOrderSummaryEntry.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{orderSummaryEntryId}")
-	public ResponseEntity<Object> deleteOrderSummaryEntryByIdUpdated(@PathVariable String orderSummaryEntryId) throws Exception {
+	public ResponseEntity<String> deleteOrderSummaryEntryByIdUpdated(@PathVariable String orderSummaryEntryId) throws Exception {
 		DeleteOrderSummaryEntry command = new DeleteOrderSummaryEntry(orderSummaryEntryId);
 
 		try {
 			if (((OrderSummaryEntryDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("OrderSummaryEntry could not be deleted");
+		return conflict();
 
 	}
 

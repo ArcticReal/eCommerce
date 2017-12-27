@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.glAccount.query.categor
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/glAccount/glAccountCategoryMembers")
 public class GlAccountCategoryMemberController {
@@ -52,7 +54,7 @@ public class GlAccountCategoryMemberController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findGlAccountCategoryMembersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<GlAccountCategoryMember>> findGlAccountCategoryMembersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGlAccountCategoryMembersBy query = new FindGlAccountCategoryMembersBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class GlAccountCategoryMemberController {
 		}
 
 		List<GlAccountCategoryMember> glAccountCategoryMembers =((GlAccountCategoryMemberFound) Scheduler.execute(query).data()).getGlAccountCategoryMembers();
-
-		if (glAccountCategoryMembers.size() == 1) {
-			return ResponseEntity.ok().body(glAccountCategoryMembers.get(0));
-		}
 
 		return ResponseEntity.ok().body(glAccountCategoryMembers);
 
@@ -78,7 +76,7 @@ public class GlAccountCategoryMemberController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createGlAccountCategoryMember(HttpServletRequest request) throws Exception {
+	public ResponseEntity<GlAccountCategoryMember> createGlAccountCategoryMember(HttpServletRequest request) throws Exception {
 
 		GlAccountCategoryMember glAccountCategoryMemberToBeAdded = new GlAccountCategoryMember();
 		try {
@@ -86,7 +84,7 @@ public class GlAccountCategoryMemberController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createGlAccountCategoryMember(glAccountCategoryMemberToBeAdded);
@@ -101,63 +99,15 @@ public class GlAccountCategoryMemberController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createGlAccountCategoryMember(@RequestBody GlAccountCategoryMember glAccountCategoryMemberToBeAdded) throws Exception {
+	public ResponseEntity<GlAccountCategoryMember> createGlAccountCategoryMember(@RequestBody GlAccountCategoryMember glAccountCategoryMemberToBeAdded) throws Exception {
 
 		AddGlAccountCategoryMember command = new AddGlAccountCategoryMember(glAccountCategoryMemberToBeAdded);
 		GlAccountCategoryMember glAccountCategoryMember = ((GlAccountCategoryMemberAdded) Scheduler.execute(command).data()).getAddedGlAccountCategoryMember();
 		
 		if (glAccountCategoryMember != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(glAccountCategoryMember);
+			return successful(glAccountCategoryMember);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("GlAccountCategoryMember could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateGlAccountCategoryMember(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		GlAccountCategoryMember glAccountCategoryMemberToBeUpdated = new GlAccountCategoryMember();
-
-		try {
-			glAccountCategoryMemberToBeUpdated = GlAccountCategoryMemberMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateGlAccountCategoryMember(glAccountCategoryMemberToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class GlAccountCategoryMemberController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateGlAccountCategoryMember(@RequestBody GlAccountCategoryMember glAccountCategoryMemberToBeUpdated,
+	public ResponseEntity<String> updateGlAccountCategoryMember(@RequestBody GlAccountCategoryMember glAccountCategoryMemberToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		glAccountCategoryMemberToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class GlAccountCategoryMemberController {
 
 		try {
 			if(((GlAccountCategoryMemberUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{glAccountCategoryMemberId}")
-	public ResponseEntity<Object> findById(@PathVariable String glAccountCategoryMemberId) throws Exception {
+	public ResponseEntity<GlAccountCategoryMember> findById(@PathVariable String glAccountCategoryMemberId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("glAccountCategoryMemberId", glAccountCategoryMemberId);
 		try {
 
-			Object foundGlAccountCategoryMember = findGlAccountCategoryMembersBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundGlAccountCategoryMember);
+			List<GlAccountCategoryMember> foundGlAccountCategoryMember = findGlAccountCategoryMembersBy(requestParams).getBody();
+			if(foundGlAccountCategoryMember.size()==1){				return successful(foundGlAccountCategoryMember.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{glAccountCategoryMemberId}")
-	public ResponseEntity<Object> deleteGlAccountCategoryMemberByIdUpdated(@PathVariable String glAccountCategoryMemberId) throws Exception {
+	public ResponseEntity<String> deleteGlAccountCategoryMemberByIdUpdated(@PathVariable String glAccountCategoryMemberId) throws Exception {
 		DeleteGlAccountCategoryMember command = new DeleteGlAccountCategoryMember(glAccountCategoryMemberId);
 
 		try {
 			if (((GlAccountCategoryMemberDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("GlAccountCategoryMember could not be deleted");
+		return conflict();
 
 	}
 

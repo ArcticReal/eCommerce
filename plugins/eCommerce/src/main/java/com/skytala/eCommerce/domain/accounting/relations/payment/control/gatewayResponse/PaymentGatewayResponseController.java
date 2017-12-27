@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.payment.query.gatewayRe
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/payment/paymentGatewayResponses")
 public class PaymentGatewayResponseController {
@@ -52,7 +54,7 @@ public class PaymentGatewayResponseController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPaymentGatewayResponsesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PaymentGatewayResponse>> findPaymentGatewayResponsesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentGatewayResponsesBy query = new FindPaymentGatewayResponsesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PaymentGatewayResponseController {
 		}
 
 		List<PaymentGatewayResponse> paymentGatewayResponses =((PaymentGatewayResponseFound) Scheduler.execute(query).data()).getPaymentGatewayResponses();
-
-		if (paymentGatewayResponses.size() == 1) {
-			return ResponseEntity.ok().body(paymentGatewayResponses.get(0));
-		}
 
 		return ResponseEntity.ok().body(paymentGatewayResponses);
 
@@ -78,7 +76,7 @@ public class PaymentGatewayResponseController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPaymentGatewayResponse(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PaymentGatewayResponse> createPaymentGatewayResponse(HttpServletRequest request) throws Exception {
 
 		PaymentGatewayResponse paymentGatewayResponseToBeAdded = new PaymentGatewayResponse();
 		try {
@@ -86,7 +84,7 @@ public class PaymentGatewayResponseController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPaymentGatewayResponse(paymentGatewayResponseToBeAdded);
@@ -101,63 +99,15 @@ public class PaymentGatewayResponseController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPaymentGatewayResponse(@RequestBody PaymentGatewayResponse paymentGatewayResponseToBeAdded) throws Exception {
+	public ResponseEntity<PaymentGatewayResponse> createPaymentGatewayResponse(@RequestBody PaymentGatewayResponse paymentGatewayResponseToBeAdded) throws Exception {
 
 		AddPaymentGatewayResponse command = new AddPaymentGatewayResponse(paymentGatewayResponseToBeAdded);
 		PaymentGatewayResponse paymentGatewayResponse = ((PaymentGatewayResponseAdded) Scheduler.execute(command).data()).getAddedPaymentGatewayResponse();
 		
 		if (paymentGatewayResponse != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(paymentGatewayResponse);
+			return successful(paymentGatewayResponse);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PaymentGatewayResponse could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePaymentGatewayResponse(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PaymentGatewayResponse paymentGatewayResponseToBeUpdated = new PaymentGatewayResponse();
-
-		try {
-			paymentGatewayResponseToBeUpdated = PaymentGatewayResponseMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePaymentGatewayResponse(paymentGatewayResponseToBeUpdated, paymentGatewayResponseToBeUpdated.getPaymentGatewayResponseId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PaymentGatewayResponseController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{paymentGatewayResponseId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePaymentGatewayResponse(@RequestBody PaymentGatewayResponse paymentGatewayResponseToBeUpdated,
+	public ResponseEntity<String> updatePaymentGatewayResponse(@RequestBody PaymentGatewayResponse paymentGatewayResponseToBeUpdated,
 			@PathVariable String paymentGatewayResponseId) throws Exception {
 
 		paymentGatewayResponseToBeUpdated.setPaymentGatewayResponseId(paymentGatewayResponseId);
@@ -178,41 +128,44 @@ public class PaymentGatewayResponseController {
 
 		try {
 			if(((PaymentGatewayResponseUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{paymentGatewayResponseId}")
-	public ResponseEntity<Object> findById(@PathVariable String paymentGatewayResponseId) throws Exception {
+	public ResponseEntity<PaymentGatewayResponse> findById(@PathVariable String paymentGatewayResponseId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentGatewayResponseId", paymentGatewayResponseId);
 		try {
 
-			Object foundPaymentGatewayResponse = findPaymentGatewayResponsesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPaymentGatewayResponse);
+			List<PaymentGatewayResponse> foundPaymentGatewayResponse = findPaymentGatewayResponsesBy(requestParams).getBody();
+			if(foundPaymentGatewayResponse.size()==1){				return successful(foundPaymentGatewayResponse.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{paymentGatewayResponseId}")
-	public ResponseEntity<Object> deletePaymentGatewayResponseByIdUpdated(@PathVariable String paymentGatewayResponseId) throws Exception {
+	public ResponseEntity<String> deletePaymentGatewayResponseByIdUpdated(@PathVariable String paymentGatewayResponseId) throws Exception {
 		DeletePaymentGatewayResponse command = new DeletePaymentGatewayResponse(paymentGatewayResponseId);
 
 		try {
 			if (((PaymentGatewayResponseDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PaymentGatewayResponse could not be deleted");
+		return conflict();
 
 	}
 

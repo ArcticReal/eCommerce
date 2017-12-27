@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.content.query.searchResult
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/content/contentSearchResults")
 public class ContentSearchResultController {
@@ -52,7 +54,7 @@ public class ContentSearchResultController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findContentSearchResultsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ContentSearchResult>> findContentSearchResultsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContentSearchResultsBy query = new FindContentSearchResultsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ContentSearchResultController {
 		}
 
 		List<ContentSearchResult> contentSearchResults =((ContentSearchResultFound) Scheduler.execute(query).data()).getContentSearchResults();
-
-		if (contentSearchResults.size() == 1) {
-			return ResponseEntity.ok().body(contentSearchResults.get(0));
-		}
 
 		return ResponseEntity.ok().body(contentSearchResults);
 
@@ -78,7 +76,7 @@ public class ContentSearchResultController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createContentSearchResult(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ContentSearchResult> createContentSearchResult(HttpServletRequest request) throws Exception {
 
 		ContentSearchResult contentSearchResultToBeAdded = new ContentSearchResult();
 		try {
@@ -86,7 +84,7 @@ public class ContentSearchResultController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createContentSearchResult(contentSearchResultToBeAdded);
@@ -101,63 +99,15 @@ public class ContentSearchResultController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createContentSearchResult(@RequestBody ContentSearchResult contentSearchResultToBeAdded) throws Exception {
+	public ResponseEntity<ContentSearchResult> createContentSearchResult(@RequestBody ContentSearchResult contentSearchResultToBeAdded) throws Exception {
 
 		AddContentSearchResult command = new AddContentSearchResult(contentSearchResultToBeAdded);
 		ContentSearchResult contentSearchResult = ((ContentSearchResultAdded) Scheduler.execute(command).data()).getAddedContentSearchResult();
 		
 		if (contentSearchResult != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(contentSearchResult);
+			return successful(contentSearchResult);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ContentSearchResult could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateContentSearchResult(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ContentSearchResult contentSearchResultToBeUpdated = new ContentSearchResult();
-
-		try {
-			contentSearchResultToBeUpdated = ContentSearchResultMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateContentSearchResult(contentSearchResultToBeUpdated, contentSearchResultToBeUpdated.getContentSearchResultId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ContentSearchResultController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{contentSearchResultId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateContentSearchResult(@RequestBody ContentSearchResult contentSearchResultToBeUpdated,
+	public ResponseEntity<String> updateContentSearchResult(@RequestBody ContentSearchResult contentSearchResultToBeUpdated,
 			@PathVariable String contentSearchResultId) throws Exception {
 
 		contentSearchResultToBeUpdated.setContentSearchResultId(contentSearchResultId);
@@ -178,41 +128,44 @@ public class ContentSearchResultController {
 
 		try {
 			if(((ContentSearchResultUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{contentSearchResultId}")
-	public ResponseEntity<Object> findById(@PathVariable String contentSearchResultId) throws Exception {
+	public ResponseEntity<ContentSearchResult> findById(@PathVariable String contentSearchResultId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contentSearchResultId", contentSearchResultId);
 		try {
 
-			Object foundContentSearchResult = findContentSearchResultsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundContentSearchResult);
+			List<ContentSearchResult> foundContentSearchResult = findContentSearchResultsBy(requestParams).getBody();
+			if(foundContentSearchResult.size()==1){				return successful(foundContentSearchResult.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{contentSearchResultId}")
-	public ResponseEntity<Object> deleteContentSearchResultByIdUpdated(@PathVariable String contentSearchResultId) throws Exception {
+	public ResponseEntity<String> deleteContentSearchResultByIdUpdated(@PathVariable String contentSearchResultId) throws Exception {
 		DeleteContentSearchResult command = new DeleteContentSearchResult(contentSearchResultId);
 
 		try {
 			if (((ContentSearchResultDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ContentSearchResult could not be deleted");
+		return conflict();
 
 	}
 

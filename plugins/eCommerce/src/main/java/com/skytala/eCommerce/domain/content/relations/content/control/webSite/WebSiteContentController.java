@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.content.query.webSite.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/content/webSiteContents")
 public class WebSiteContentController {
@@ -52,7 +54,7 @@ public class WebSiteContentController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWebSiteContentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WebSiteContent>> findWebSiteContentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWebSiteContentsBy query = new FindWebSiteContentsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WebSiteContentController {
 		}
 
 		List<WebSiteContent> webSiteContents =((WebSiteContentFound) Scheduler.execute(query).data()).getWebSiteContents();
-
-		if (webSiteContents.size() == 1) {
-			return ResponseEntity.ok().body(webSiteContents.get(0));
-		}
 
 		return ResponseEntity.ok().body(webSiteContents);
 
@@ -78,7 +76,7 @@ public class WebSiteContentController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWebSiteContent(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WebSiteContent> createWebSiteContent(HttpServletRequest request) throws Exception {
 
 		WebSiteContent webSiteContentToBeAdded = new WebSiteContent();
 		try {
@@ -86,7 +84,7 @@ public class WebSiteContentController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWebSiteContent(webSiteContentToBeAdded);
@@ -101,63 +99,15 @@ public class WebSiteContentController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWebSiteContent(@RequestBody WebSiteContent webSiteContentToBeAdded) throws Exception {
+	public ResponseEntity<WebSiteContent> createWebSiteContent(@RequestBody WebSiteContent webSiteContentToBeAdded) throws Exception {
 
 		AddWebSiteContent command = new AddWebSiteContent(webSiteContentToBeAdded);
 		WebSiteContent webSiteContent = ((WebSiteContentAdded) Scheduler.execute(command).data()).getAddedWebSiteContent();
 		
 		if (webSiteContent != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(webSiteContent);
+			return successful(webSiteContent);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WebSiteContent could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWebSiteContent(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WebSiteContent webSiteContentToBeUpdated = new WebSiteContent();
-
-		try {
-			webSiteContentToBeUpdated = WebSiteContentMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWebSiteContent(webSiteContentToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WebSiteContentController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWebSiteContent(@RequestBody WebSiteContent webSiteContentToBeUpdated,
+	public ResponseEntity<String> updateWebSiteContent(@RequestBody WebSiteContent webSiteContentToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		webSiteContentToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class WebSiteContentController {
 
 		try {
 			if(((WebSiteContentUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{webSiteContentId}")
-	public ResponseEntity<Object> findById(@PathVariable String webSiteContentId) throws Exception {
+	public ResponseEntity<WebSiteContent> findById(@PathVariable String webSiteContentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("webSiteContentId", webSiteContentId);
 		try {
 
-			Object foundWebSiteContent = findWebSiteContentsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWebSiteContent);
+			List<WebSiteContent> foundWebSiteContent = findWebSiteContentsBy(requestParams).getBody();
+			if(foundWebSiteContent.size()==1){				return successful(foundWebSiteContent.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{webSiteContentId}")
-	public ResponseEntity<Object> deleteWebSiteContentByIdUpdated(@PathVariable String webSiteContentId) throws Exception {
+	public ResponseEntity<String> deleteWebSiteContentByIdUpdated(@PathVariable String webSiteContentId) throws Exception {
 		DeleteWebSiteContent command = new DeleteWebSiteContent(webSiteContentId);
 
 		try {
 			if (((WebSiteContentDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WebSiteContent could not be deleted");
+		return conflict();
 
 	}
 

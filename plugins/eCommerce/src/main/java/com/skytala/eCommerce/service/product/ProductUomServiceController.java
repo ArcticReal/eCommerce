@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/productUom")
 public class ProductUomServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/convertUomProduct")
-	public ResponseEntity<Object> convertUomProduct(HttpSession session, @RequestParam(value="arguments") java.util.Map arguments) {
+	public ResponseEntity<Map<String, Object>> convertUomProduct(HttpSession session, @RequestParam(value="arguments") java.util.Map arguments) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("arguments",arguments);
@@ -39,23 +41,23 @@ public class ProductUomServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/interfaceUomFormula")
-	public ResponseEntity<Object> interfaceUomFormula(HttpSession session, @RequestParam(value="arguments") java.util.Map arguments) {
+	public ResponseEntity<Map<String, Object>> interfaceUomFormula(HttpSession session, @RequestParam(value="arguments") java.util.Map arguments) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("arguments",arguments);
@@ -68,19 +70,19 @@ public class ProductUomServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

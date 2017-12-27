@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.orderAdjustment.query.attrib
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/orderAdjustment/orderAdjustmentAttributes")
 public class OrderAdjustmentAttributeController {
@@ -52,7 +54,7 @@ public class OrderAdjustmentAttributeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findOrderAdjustmentAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OrderAdjustmentAttribute>> findOrderAdjustmentAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderAdjustmentAttributesBy query = new FindOrderAdjustmentAttributesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class OrderAdjustmentAttributeController {
 		}
 
 		List<OrderAdjustmentAttribute> orderAdjustmentAttributes =((OrderAdjustmentAttributeFound) Scheduler.execute(query).data()).getOrderAdjustmentAttributes();
-
-		if (orderAdjustmentAttributes.size() == 1) {
-			return ResponseEntity.ok().body(orderAdjustmentAttributes.get(0));
-		}
 
 		return ResponseEntity.ok().body(orderAdjustmentAttributes);
 
@@ -78,7 +76,7 @@ public class OrderAdjustmentAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOrderAdjustmentAttribute(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OrderAdjustmentAttribute> createOrderAdjustmentAttribute(HttpServletRequest request) throws Exception {
 
 		OrderAdjustmentAttribute orderAdjustmentAttributeToBeAdded = new OrderAdjustmentAttribute();
 		try {
@@ -86,7 +84,7 @@ public class OrderAdjustmentAttributeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createOrderAdjustmentAttribute(orderAdjustmentAttributeToBeAdded);
@@ -101,63 +99,15 @@ public class OrderAdjustmentAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOrderAdjustmentAttribute(@RequestBody OrderAdjustmentAttribute orderAdjustmentAttributeToBeAdded) throws Exception {
+	public ResponseEntity<OrderAdjustmentAttribute> createOrderAdjustmentAttribute(@RequestBody OrderAdjustmentAttribute orderAdjustmentAttributeToBeAdded) throws Exception {
 
 		AddOrderAdjustmentAttribute command = new AddOrderAdjustmentAttribute(orderAdjustmentAttributeToBeAdded);
 		OrderAdjustmentAttribute orderAdjustmentAttribute = ((OrderAdjustmentAttributeAdded) Scheduler.execute(command).data()).getAddedOrderAdjustmentAttribute();
 		
 		if (orderAdjustmentAttribute != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(orderAdjustmentAttribute);
+			return successful(orderAdjustmentAttribute);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OrderAdjustmentAttribute could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateOrderAdjustmentAttribute(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OrderAdjustmentAttribute orderAdjustmentAttributeToBeUpdated = new OrderAdjustmentAttribute();
-
-		try {
-			orderAdjustmentAttributeToBeUpdated = OrderAdjustmentAttributeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOrderAdjustmentAttribute(orderAdjustmentAttributeToBeUpdated, orderAdjustmentAttributeToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class OrderAdjustmentAttributeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOrderAdjustmentAttribute(@RequestBody OrderAdjustmentAttribute orderAdjustmentAttributeToBeUpdated,
+	public ResponseEntity<String> updateOrderAdjustmentAttribute(@RequestBody OrderAdjustmentAttribute orderAdjustmentAttributeToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		orderAdjustmentAttributeToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class OrderAdjustmentAttributeController {
 
 		try {
 			if(((OrderAdjustmentAttributeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{orderAdjustmentAttributeId}")
-	public ResponseEntity<Object> findById(@PathVariable String orderAdjustmentAttributeId) throws Exception {
+	public ResponseEntity<OrderAdjustmentAttribute> findById(@PathVariable String orderAdjustmentAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderAdjustmentAttributeId", orderAdjustmentAttributeId);
 		try {
 
-			Object foundOrderAdjustmentAttribute = findOrderAdjustmentAttributesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOrderAdjustmentAttribute);
+			List<OrderAdjustmentAttribute> foundOrderAdjustmentAttribute = findOrderAdjustmentAttributesBy(requestParams).getBody();
+			if(foundOrderAdjustmentAttribute.size()==1){				return successful(foundOrderAdjustmentAttribute.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{orderAdjustmentAttributeId}")
-	public ResponseEntity<Object> deleteOrderAdjustmentAttributeByIdUpdated(@PathVariable String orderAdjustmentAttributeId) throws Exception {
+	public ResponseEntity<String> deleteOrderAdjustmentAttributeByIdUpdated(@PathVariable String orderAdjustmentAttributeId) throws Exception {
 		DeleteOrderAdjustmentAttribute command = new DeleteOrderAdjustmentAttribute(orderAdjustmentAttributeId);
 
 		try {
 			if (((OrderAdjustmentAttributeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("OrderAdjustmentAttribute could not be deleted");
+		return conflict();
 
 	}
 

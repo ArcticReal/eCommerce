@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.glAccount.query.groupTy
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/glAccount/glAccountGroupTypes")
 public class GlAccountGroupTypeController {
@@ -52,7 +54,7 @@ public class GlAccountGroupTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findGlAccountGroupTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<GlAccountGroupType>> findGlAccountGroupTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGlAccountGroupTypesBy query = new FindGlAccountGroupTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class GlAccountGroupTypeController {
 		}
 
 		List<GlAccountGroupType> glAccountGroupTypes =((GlAccountGroupTypeFound) Scheduler.execute(query).data()).getGlAccountGroupTypes();
-
-		if (glAccountGroupTypes.size() == 1) {
-			return ResponseEntity.ok().body(glAccountGroupTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(glAccountGroupTypes);
 
@@ -78,7 +76,7 @@ public class GlAccountGroupTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createGlAccountGroupType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<GlAccountGroupType> createGlAccountGroupType(HttpServletRequest request) throws Exception {
 
 		GlAccountGroupType glAccountGroupTypeToBeAdded = new GlAccountGroupType();
 		try {
@@ -86,7 +84,7 @@ public class GlAccountGroupTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createGlAccountGroupType(glAccountGroupTypeToBeAdded);
@@ -101,63 +99,15 @@ public class GlAccountGroupTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createGlAccountGroupType(@RequestBody GlAccountGroupType glAccountGroupTypeToBeAdded) throws Exception {
+	public ResponseEntity<GlAccountGroupType> createGlAccountGroupType(@RequestBody GlAccountGroupType glAccountGroupTypeToBeAdded) throws Exception {
 
 		AddGlAccountGroupType command = new AddGlAccountGroupType(glAccountGroupTypeToBeAdded);
 		GlAccountGroupType glAccountGroupType = ((GlAccountGroupTypeAdded) Scheduler.execute(command).data()).getAddedGlAccountGroupType();
 		
 		if (glAccountGroupType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(glAccountGroupType);
+			return successful(glAccountGroupType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("GlAccountGroupType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateGlAccountGroupType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		GlAccountGroupType glAccountGroupTypeToBeUpdated = new GlAccountGroupType();
-
-		try {
-			glAccountGroupTypeToBeUpdated = GlAccountGroupTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateGlAccountGroupType(glAccountGroupTypeToBeUpdated, glAccountGroupTypeToBeUpdated.getGlAccountGroupTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class GlAccountGroupTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{glAccountGroupTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateGlAccountGroupType(@RequestBody GlAccountGroupType glAccountGroupTypeToBeUpdated,
+	public ResponseEntity<String> updateGlAccountGroupType(@RequestBody GlAccountGroupType glAccountGroupTypeToBeUpdated,
 			@PathVariable String glAccountGroupTypeId) throws Exception {
 
 		glAccountGroupTypeToBeUpdated.setGlAccountGroupTypeId(glAccountGroupTypeId);
@@ -178,41 +128,44 @@ public class GlAccountGroupTypeController {
 
 		try {
 			if(((GlAccountGroupTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{glAccountGroupTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String glAccountGroupTypeId) throws Exception {
+	public ResponseEntity<GlAccountGroupType> findById(@PathVariable String glAccountGroupTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("glAccountGroupTypeId", glAccountGroupTypeId);
 		try {
 
-			Object foundGlAccountGroupType = findGlAccountGroupTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundGlAccountGroupType);
+			List<GlAccountGroupType> foundGlAccountGroupType = findGlAccountGroupTypesBy(requestParams).getBody();
+			if(foundGlAccountGroupType.size()==1){				return successful(foundGlAccountGroupType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{glAccountGroupTypeId}")
-	public ResponseEntity<Object> deleteGlAccountGroupTypeByIdUpdated(@PathVariable String glAccountGroupTypeId) throws Exception {
+	public ResponseEntity<String> deleteGlAccountGroupTypeByIdUpdated(@PathVariable String glAccountGroupTypeId) throws Exception {
 		DeleteGlAccountGroupType command = new DeleteGlAccountGroupType(glAccountGroupTypeId);
 
 		try {
 			if (((GlAccountGroupTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("GlAccountGroupType could not be deleted");
+		return conflict();
 
 	}
 

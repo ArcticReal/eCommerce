@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.supplier.Fin
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/supplierProducts")
 public class SupplierProductController {
@@ -52,7 +54,7 @@ public class SupplierProductController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findSupplierProductsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<SupplierProduct>> findSupplierProductsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSupplierProductsBy query = new FindSupplierProductsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class SupplierProductController {
 		}
 
 		List<SupplierProduct> supplierProducts =((SupplierProductFound) Scheduler.execute(query).data()).getSupplierProducts();
-
-		if (supplierProducts.size() == 1) {
-			return ResponseEntity.ok().body(supplierProducts.get(0));
-		}
 
 		return ResponseEntity.ok().body(supplierProducts);
 
@@ -78,7 +76,7 @@ public class SupplierProductController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createSupplierProduct(HttpServletRequest request) throws Exception {
+	public ResponseEntity<SupplierProduct> createSupplierProduct(HttpServletRequest request) throws Exception {
 
 		SupplierProduct supplierProductToBeAdded = new SupplierProduct();
 		try {
@@ -86,7 +84,7 @@ public class SupplierProductController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createSupplierProduct(supplierProductToBeAdded);
@@ -101,63 +99,15 @@ public class SupplierProductController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createSupplierProduct(@RequestBody SupplierProduct supplierProductToBeAdded) throws Exception {
+	public ResponseEntity<SupplierProduct> createSupplierProduct(@RequestBody SupplierProduct supplierProductToBeAdded) throws Exception {
 
 		AddSupplierProduct command = new AddSupplierProduct(supplierProductToBeAdded);
 		SupplierProduct supplierProduct = ((SupplierProductAdded) Scheduler.execute(command).data()).getAddedSupplierProduct();
 		
 		if (supplierProduct != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(supplierProduct);
+			return successful(supplierProduct);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("SupplierProduct could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateSupplierProduct(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		SupplierProduct supplierProductToBeUpdated = new SupplierProduct();
-
-		try {
-			supplierProductToBeUpdated = SupplierProductMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateSupplierProduct(supplierProductToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class SupplierProductController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateSupplierProduct(@RequestBody SupplierProduct supplierProductToBeUpdated,
+	public ResponseEntity<String> updateSupplierProduct(@RequestBody SupplierProduct supplierProductToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		supplierProductToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class SupplierProductController {
 
 		try {
 			if(((SupplierProductUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{supplierProductId}")
-	public ResponseEntity<Object> findById(@PathVariable String supplierProductId) throws Exception {
+	public ResponseEntity<SupplierProduct> findById(@PathVariable String supplierProductId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("supplierProductId", supplierProductId);
 		try {
 
-			Object foundSupplierProduct = findSupplierProductsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundSupplierProduct);
+			List<SupplierProduct> foundSupplierProduct = findSupplierProductsBy(requestParams).getBody();
+			if(foundSupplierProduct.size()==1){				return successful(foundSupplierProduct.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{supplierProductId}")
-	public ResponseEntity<Object> deleteSupplierProductByIdUpdated(@PathVariable String supplierProductId) throws Exception {
+	public ResponseEntity<String> deleteSupplierProductByIdUpdated(@PathVariable String supplierProductId) throws Exception {
 		DeleteSupplierProduct command = new DeleteSupplierProduct(supplierProductId);
 
 		try {
 			if (((SupplierProductDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("SupplierProduct could not be deleted");
+		return conflict();
 
 	}
 

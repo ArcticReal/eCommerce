@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.requirement.query.role.FindR
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/requirement/requirementRoles")
 public class RequirementRoleController {
@@ -52,7 +54,7 @@ public class RequirementRoleController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findRequirementRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<RequirementRole>> findRequirementRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindRequirementRolesBy query = new FindRequirementRolesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class RequirementRoleController {
 		}
 
 		List<RequirementRole> requirementRoles =((RequirementRoleFound) Scheduler.execute(query).data()).getRequirementRoles();
-
-		if (requirementRoles.size() == 1) {
-			return ResponseEntity.ok().body(requirementRoles.get(0));
-		}
 
 		return ResponseEntity.ok().body(requirementRoles);
 
@@ -78,7 +76,7 @@ public class RequirementRoleController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createRequirementRole(HttpServletRequest request) throws Exception {
+	public ResponseEntity<RequirementRole> createRequirementRole(HttpServletRequest request) throws Exception {
 
 		RequirementRole requirementRoleToBeAdded = new RequirementRole();
 		try {
@@ -86,7 +84,7 @@ public class RequirementRoleController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createRequirementRole(requirementRoleToBeAdded);
@@ -101,63 +99,15 @@ public class RequirementRoleController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createRequirementRole(@RequestBody RequirementRole requirementRoleToBeAdded) throws Exception {
+	public ResponseEntity<RequirementRole> createRequirementRole(@RequestBody RequirementRole requirementRoleToBeAdded) throws Exception {
 
 		AddRequirementRole command = new AddRequirementRole(requirementRoleToBeAdded);
 		RequirementRole requirementRole = ((RequirementRoleAdded) Scheduler.execute(command).data()).getAddedRequirementRole();
 		
 		if (requirementRole != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(requirementRole);
+			return successful(requirementRole);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("RequirementRole could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateRequirementRole(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		RequirementRole requirementRoleToBeUpdated = new RequirementRole();
-
-		try {
-			requirementRoleToBeUpdated = RequirementRoleMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateRequirementRole(requirementRoleToBeUpdated, requirementRoleToBeUpdated.getRoleTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class RequirementRoleController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{roleTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateRequirementRole(@RequestBody RequirementRole requirementRoleToBeUpdated,
+	public ResponseEntity<String> updateRequirementRole(@RequestBody RequirementRole requirementRoleToBeUpdated,
 			@PathVariable String roleTypeId) throws Exception {
 
 		requirementRoleToBeUpdated.setRoleTypeId(roleTypeId);
@@ -178,41 +128,44 @@ public class RequirementRoleController {
 
 		try {
 			if(((RequirementRoleUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{requirementRoleId}")
-	public ResponseEntity<Object> findById(@PathVariable String requirementRoleId) throws Exception {
+	public ResponseEntity<RequirementRole> findById(@PathVariable String requirementRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("requirementRoleId", requirementRoleId);
 		try {
 
-			Object foundRequirementRole = findRequirementRolesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundRequirementRole);
+			List<RequirementRole> foundRequirementRole = findRequirementRolesBy(requestParams).getBody();
+			if(foundRequirementRole.size()==1){				return successful(foundRequirementRole.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{requirementRoleId}")
-	public ResponseEntity<Object> deleteRequirementRoleByIdUpdated(@PathVariable String requirementRoleId) throws Exception {
+	public ResponseEntity<String> deleteRequirementRoleByIdUpdated(@PathVariable String requirementRoleId) throws Exception {
 		DeleteRequirementRole command = new DeleteRequirementRole(requirementRoleId);
 
 		try {
 			if (((RequirementRoleDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("RequirementRole could not be deleted");
+		return conflict();
 
 	}
 

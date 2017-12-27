@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.dataResource.query.type.Fi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/dataResource/dataResourceTypes")
 public class DataResourceTypeController {
@@ -52,7 +54,7 @@ public class DataResourceTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findDataResourceTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<DataResourceType>> findDataResourceTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDataResourceTypesBy query = new FindDataResourceTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class DataResourceTypeController {
 		}
 
 		List<DataResourceType> dataResourceTypes =((DataResourceTypeFound) Scheduler.execute(query).data()).getDataResourceTypes();
-
-		if (dataResourceTypes.size() == 1) {
-			return ResponseEntity.ok().body(dataResourceTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(dataResourceTypes);
 
@@ -78,7 +76,7 @@ public class DataResourceTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createDataResourceType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<DataResourceType> createDataResourceType(HttpServletRequest request) throws Exception {
 
 		DataResourceType dataResourceTypeToBeAdded = new DataResourceType();
 		try {
@@ -86,7 +84,7 @@ public class DataResourceTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createDataResourceType(dataResourceTypeToBeAdded);
@@ -101,63 +99,15 @@ public class DataResourceTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createDataResourceType(@RequestBody DataResourceType dataResourceTypeToBeAdded) throws Exception {
+	public ResponseEntity<DataResourceType> createDataResourceType(@RequestBody DataResourceType dataResourceTypeToBeAdded) throws Exception {
 
 		AddDataResourceType command = new AddDataResourceType(dataResourceTypeToBeAdded);
 		DataResourceType dataResourceType = ((DataResourceTypeAdded) Scheduler.execute(command).data()).getAddedDataResourceType();
 		
 		if (dataResourceType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(dataResourceType);
+			return successful(dataResourceType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("DataResourceType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateDataResourceType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		DataResourceType dataResourceTypeToBeUpdated = new DataResourceType();
-
-		try {
-			dataResourceTypeToBeUpdated = DataResourceTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateDataResourceType(dataResourceTypeToBeUpdated, dataResourceTypeToBeUpdated.getDataResourceTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class DataResourceTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{dataResourceTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateDataResourceType(@RequestBody DataResourceType dataResourceTypeToBeUpdated,
+	public ResponseEntity<String> updateDataResourceType(@RequestBody DataResourceType dataResourceTypeToBeUpdated,
 			@PathVariable String dataResourceTypeId) throws Exception {
 
 		dataResourceTypeToBeUpdated.setDataResourceTypeId(dataResourceTypeId);
@@ -178,41 +128,44 @@ public class DataResourceTypeController {
 
 		try {
 			if(((DataResourceTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{dataResourceTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String dataResourceTypeId) throws Exception {
+	public ResponseEntity<DataResourceType> findById(@PathVariable String dataResourceTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("dataResourceTypeId", dataResourceTypeId);
 		try {
 
-			Object foundDataResourceType = findDataResourceTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundDataResourceType);
+			List<DataResourceType> foundDataResourceType = findDataResourceTypesBy(requestParams).getBody();
+			if(foundDataResourceType.size()==1){				return successful(foundDataResourceType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{dataResourceTypeId}")
-	public ResponseEntity<Object> deleteDataResourceTypeByIdUpdated(@PathVariable String dataResourceTypeId) throws Exception {
+	public ResponseEntity<String> deleteDataResourceTypeByIdUpdated(@PathVariable String dataResourceTypeId) throws Exception {
 		DeleteDataResourceType command = new DeleteDataResourceType(dataResourceTypeId);
 
 		try {
 			if (((DataResourceTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("DataResourceType could not be deleted");
+		return conflict();
 
 	}
 

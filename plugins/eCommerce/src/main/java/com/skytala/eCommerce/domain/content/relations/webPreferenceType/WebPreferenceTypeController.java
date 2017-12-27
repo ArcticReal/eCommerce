@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.webPreferenceType.query.Fi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/webPreferenceTypes")
 public class WebPreferenceTypeController {
@@ -52,7 +54,7 @@ public class WebPreferenceTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWebPreferenceTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WebPreferenceType>> findWebPreferenceTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWebPreferenceTypesBy query = new FindWebPreferenceTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WebPreferenceTypeController {
 		}
 
 		List<WebPreferenceType> webPreferenceTypes =((WebPreferenceTypeFound) Scheduler.execute(query).data()).getWebPreferenceTypes();
-
-		if (webPreferenceTypes.size() == 1) {
-			return ResponseEntity.ok().body(webPreferenceTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(webPreferenceTypes);
 
@@ -78,7 +76,7 @@ public class WebPreferenceTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWebPreferenceType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WebPreferenceType> createWebPreferenceType(HttpServletRequest request) throws Exception {
 
 		WebPreferenceType webPreferenceTypeToBeAdded = new WebPreferenceType();
 		try {
@@ -86,7 +84,7 @@ public class WebPreferenceTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWebPreferenceType(webPreferenceTypeToBeAdded);
@@ -101,63 +99,15 @@ public class WebPreferenceTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWebPreferenceType(@RequestBody WebPreferenceType webPreferenceTypeToBeAdded) throws Exception {
+	public ResponseEntity<WebPreferenceType> createWebPreferenceType(@RequestBody WebPreferenceType webPreferenceTypeToBeAdded) throws Exception {
 
 		AddWebPreferenceType command = new AddWebPreferenceType(webPreferenceTypeToBeAdded);
 		WebPreferenceType webPreferenceType = ((WebPreferenceTypeAdded) Scheduler.execute(command).data()).getAddedWebPreferenceType();
 		
 		if (webPreferenceType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(webPreferenceType);
+			return successful(webPreferenceType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WebPreferenceType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWebPreferenceType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WebPreferenceType webPreferenceTypeToBeUpdated = new WebPreferenceType();
-
-		try {
-			webPreferenceTypeToBeUpdated = WebPreferenceTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWebPreferenceType(webPreferenceTypeToBeUpdated, webPreferenceTypeToBeUpdated.getWebPreferenceTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WebPreferenceTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{webPreferenceTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWebPreferenceType(@RequestBody WebPreferenceType webPreferenceTypeToBeUpdated,
+	public ResponseEntity<String> updateWebPreferenceType(@RequestBody WebPreferenceType webPreferenceTypeToBeUpdated,
 			@PathVariable String webPreferenceTypeId) throws Exception {
 
 		webPreferenceTypeToBeUpdated.setWebPreferenceTypeId(webPreferenceTypeId);
@@ -178,41 +128,44 @@ public class WebPreferenceTypeController {
 
 		try {
 			if(((WebPreferenceTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{webPreferenceTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String webPreferenceTypeId) throws Exception {
+	public ResponseEntity<WebPreferenceType> findById(@PathVariable String webPreferenceTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("webPreferenceTypeId", webPreferenceTypeId);
 		try {
 
-			Object foundWebPreferenceType = findWebPreferenceTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWebPreferenceType);
+			List<WebPreferenceType> foundWebPreferenceType = findWebPreferenceTypesBy(requestParams).getBody();
+			if(foundWebPreferenceType.size()==1){				return successful(foundWebPreferenceType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{webPreferenceTypeId}")
-	public ResponseEntity<Object> deleteWebPreferenceTypeByIdUpdated(@PathVariable String webPreferenceTypeId) throws Exception {
+	public ResponseEntity<String> deleteWebPreferenceTypeByIdUpdated(@PathVariable String webPreferenceTypeId) throws Exception {
 		DeleteWebPreferenceType command = new DeleteWebPreferenceType(webPreferenceTypeId);
 
 		try {
 			if (((WebPreferenceTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WebPreferenceType could not be deleted");
+		return conflict();
 
 	}
 

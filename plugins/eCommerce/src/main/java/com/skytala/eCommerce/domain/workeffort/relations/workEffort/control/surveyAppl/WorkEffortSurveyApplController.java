@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.workeffort.relations.workEffort.query.survey
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/workeffort/workEffort/workEffortSurveyAppls")
 public class WorkEffortSurveyApplController {
@@ -52,7 +54,7 @@ public class WorkEffortSurveyApplController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWorkEffortSurveyApplsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WorkEffortSurveyAppl>> findWorkEffortSurveyApplsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortSurveyApplsBy query = new FindWorkEffortSurveyApplsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WorkEffortSurveyApplController {
 		}
 
 		List<WorkEffortSurveyAppl> workEffortSurveyAppls =((WorkEffortSurveyApplFound) Scheduler.execute(query).data()).getWorkEffortSurveyAppls();
-
-		if (workEffortSurveyAppls.size() == 1) {
-			return ResponseEntity.ok().body(workEffortSurveyAppls.get(0));
-		}
 
 		return ResponseEntity.ok().body(workEffortSurveyAppls);
 
@@ -78,7 +76,7 @@ public class WorkEffortSurveyApplController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWorkEffortSurveyAppl(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WorkEffortSurveyAppl> createWorkEffortSurveyAppl(HttpServletRequest request) throws Exception {
 
 		WorkEffortSurveyAppl workEffortSurveyApplToBeAdded = new WorkEffortSurveyAppl();
 		try {
@@ -86,7 +84,7 @@ public class WorkEffortSurveyApplController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWorkEffortSurveyAppl(workEffortSurveyApplToBeAdded);
@@ -101,63 +99,15 @@ public class WorkEffortSurveyApplController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWorkEffortSurveyAppl(@RequestBody WorkEffortSurveyAppl workEffortSurveyApplToBeAdded) throws Exception {
+	public ResponseEntity<WorkEffortSurveyAppl> createWorkEffortSurveyAppl(@RequestBody WorkEffortSurveyAppl workEffortSurveyApplToBeAdded) throws Exception {
 
 		AddWorkEffortSurveyAppl command = new AddWorkEffortSurveyAppl(workEffortSurveyApplToBeAdded);
 		WorkEffortSurveyAppl workEffortSurveyAppl = ((WorkEffortSurveyApplAdded) Scheduler.execute(command).data()).getAddedWorkEffortSurveyAppl();
 		
 		if (workEffortSurveyAppl != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(workEffortSurveyAppl);
+			return successful(workEffortSurveyAppl);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WorkEffortSurveyAppl could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWorkEffortSurveyAppl(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WorkEffortSurveyAppl workEffortSurveyApplToBeUpdated = new WorkEffortSurveyAppl();
-
-		try {
-			workEffortSurveyApplToBeUpdated = WorkEffortSurveyApplMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWorkEffortSurveyAppl(workEffortSurveyApplToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WorkEffortSurveyApplController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWorkEffortSurveyAppl(@RequestBody WorkEffortSurveyAppl workEffortSurveyApplToBeUpdated,
+	public ResponseEntity<String> updateWorkEffortSurveyAppl(@RequestBody WorkEffortSurveyAppl workEffortSurveyApplToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		workEffortSurveyApplToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class WorkEffortSurveyApplController {
 
 		try {
 			if(((WorkEffortSurveyApplUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{workEffortSurveyApplId}")
-	public ResponseEntity<Object> findById(@PathVariable String workEffortSurveyApplId) throws Exception {
+	public ResponseEntity<WorkEffortSurveyAppl> findById(@PathVariable String workEffortSurveyApplId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortSurveyApplId", workEffortSurveyApplId);
 		try {
 
-			Object foundWorkEffortSurveyAppl = findWorkEffortSurveyApplsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWorkEffortSurveyAppl);
+			List<WorkEffortSurveyAppl> foundWorkEffortSurveyAppl = findWorkEffortSurveyApplsBy(requestParams).getBody();
+			if(foundWorkEffortSurveyAppl.size()==1){				return successful(foundWorkEffortSurveyAppl.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{workEffortSurveyApplId}")
-	public ResponseEntity<Object> deleteWorkEffortSurveyApplByIdUpdated(@PathVariable String workEffortSurveyApplId) throws Exception {
+	public ResponseEntity<String> deleteWorkEffortSurveyApplByIdUpdated(@PathVariable String workEffortSurveyApplId) throws Exception {
 		DeleteWorkEffortSurveyAppl command = new DeleteWorkEffortSurveyAppl(workEffortSurveyApplId);
 
 		try {
 			if (((WorkEffortSurveyApplDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WorkEffortSurveyAppl could not be deleted");
+		return conflict();
 
 	}
 

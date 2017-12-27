@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.featureCateg
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productFeatureCategoryAppls")
 public class ProductFeatureCategoryApplController {
@@ -52,7 +54,7 @@ public class ProductFeatureCategoryApplController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductFeatureCategoryApplsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductFeatureCategoryAppl>> findProductFeatureCategoryApplsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductFeatureCategoryApplsBy query = new FindProductFeatureCategoryApplsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductFeatureCategoryApplController {
 		}
 
 		List<ProductFeatureCategoryAppl> productFeatureCategoryAppls =((ProductFeatureCategoryApplFound) Scheduler.execute(query).data()).getProductFeatureCategoryAppls();
-
-		if (productFeatureCategoryAppls.size() == 1) {
-			return ResponseEntity.ok().body(productFeatureCategoryAppls.get(0));
-		}
 
 		return ResponseEntity.ok().body(productFeatureCategoryAppls);
 
@@ -78,7 +76,7 @@ public class ProductFeatureCategoryApplController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductFeatureCategoryAppl(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductFeatureCategoryAppl> createProductFeatureCategoryAppl(HttpServletRequest request) throws Exception {
 
 		ProductFeatureCategoryAppl productFeatureCategoryApplToBeAdded = new ProductFeatureCategoryAppl();
 		try {
@@ -86,7 +84,7 @@ public class ProductFeatureCategoryApplController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductFeatureCategoryAppl(productFeatureCategoryApplToBeAdded);
@@ -101,63 +99,15 @@ public class ProductFeatureCategoryApplController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductFeatureCategoryAppl(@RequestBody ProductFeatureCategoryAppl productFeatureCategoryApplToBeAdded) throws Exception {
+	public ResponseEntity<ProductFeatureCategoryAppl> createProductFeatureCategoryAppl(@RequestBody ProductFeatureCategoryAppl productFeatureCategoryApplToBeAdded) throws Exception {
 
 		AddProductFeatureCategoryAppl command = new AddProductFeatureCategoryAppl(productFeatureCategoryApplToBeAdded);
 		ProductFeatureCategoryAppl productFeatureCategoryAppl = ((ProductFeatureCategoryApplAdded) Scheduler.execute(command).data()).getAddedProductFeatureCategoryAppl();
 		
 		if (productFeatureCategoryAppl != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productFeatureCategoryAppl);
+			return successful(productFeatureCategoryAppl);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductFeatureCategoryAppl could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductFeatureCategoryAppl(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductFeatureCategoryAppl productFeatureCategoryApplToBeUpdated = new ProductFeatureCategoryAppl();
-
-		try {
-			productFeatureCategoryApplToBeUpdated = ProductFeatureCategoryApplMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductFeatureCategoryAppl(productFeatureCategoryApplToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductFeatureCategoryApplController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductFeatureCategoryAppl(@RequestBody ProductFeatureCategoryAppl productFeatureCategoryApplToBeUpdated,
+	public ResponseEntity<String> updateProductFeatureCategoryAppl(@RequestBody ProductFeatureCategoryAppl productFeatureCategoryApplToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		productFeatureCategoryApplToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ProductFeatureCategoryApplController {
 
 		try {
 			if(((ProductFeatureCategoryApplUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productFeatureCategoryApplId}")
-	public ResponseEntity<Object> findById(@PathVariable String productFeatureCategoryApplId) throws Exception {
+	public ResponseEntity<ProductFeatureCategoryAppl> findById(@PathVariable String productFeatureCategoryApplId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productFeatureCategoryApplId", productFeatureCategoryApplId);
 		try {
 
-			Object foundProductFeatureCategoryAppl = findProductFeatureCategoryApplsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductFeatureCategoryAppl);
+			List<ProductFeatureCategoryAppl> foundProductFeatureCategoryAppl = findProductFeatureCategoryApplsBy(requestParams).getBody();
+			if(foundProductFeatureCategoryAppl.size()==1){				return successful(foundProductFeatureCategoryAppl.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productFeatureCategoryApplId}")
-	public ResponseEntity<Object> deleteProductFeatureCategoryApplByIdUpdated(@PathVariable String productFeatureCategoryApplId) throws Exception {
+	public ResponseEntity<String> deleteProductFeatureCategoryApplByIdUpdated(@PathVariable String productFeatureCategoryApplId) throws Exception {
 		DeleteProductFeatureCategoryAppl command = new DeleteProductFeatureCategoryAppl(productFeatureCategoryApplId);
 
 		try {
 			if (((ProductFeatureCategoryApplDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductFeatureCategoryAppl could not be deleted");
+		return conflict();
 
 	}
 

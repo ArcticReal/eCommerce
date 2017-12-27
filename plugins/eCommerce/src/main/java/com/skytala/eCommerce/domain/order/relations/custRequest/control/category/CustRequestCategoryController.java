@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.custRequest.query.category.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/custRequest/custRequestCategorys")
 public class CustRequestCategoryController {
@@ -52,7 +54,7 @@ public class CustRequestCategoryController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findCustRequestCategorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<CustRequestCategory>> findCustRequestCategorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCustRequestCategorysBy query = new FindCustRequestCategorysBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class CustRequestCategoryController {
 		}
 
 		List<CustRequestCategory> custRequestCategorys =((CustRequestCategoryFound) Scheduler.execute(query).data()).getCustRequestCategorys();
-
-		if (custRequestCategorys.size() == 1) {
-			return ResponseEntity.ok().body(custRequestCategorys.get(0));
-		}
 
 		return ResponseEntity.ok().body(custRequestCategorys);
 
@@ -78,7 +76,7 @@ public class CustRequestCategoryController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createCustRequestCategory(HttpServletRequest request) throws Exception {
+	public ResponseEntity<CustRequestCategory> createCustRequestCategory(HttpServletRequest request) throws Exception {
 
 		CustRequestCategory custRequestCategoryToBeAdded = new CustRequestCategory();
 		try {
@@ -86,7 +84,7 @@ public class CustRequestCategoryController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createCustRequestCategory(custRequestCategoryToBeAdded);
@@ -101,63 +99,15 @@ public class CustRequestCategoryController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createCustRequestCategory(@RequestBody CustRequestCategory custRequestCategoryToBeAdded) throws Exception {
+	public ResponseEntity<CustRequestCategory> createCustRequestCategory(@RequestBody CustRequestCategory custRequestCategoryToBeAdded) throws Exception {
 
 		AddCustRequestCategory command = new AddCustRequestCategory(custRequestCategoryToBeAdded);
 		CustRequestCategory custRequestCategory = ((CustRequestCategoryAdded) Scheduler.execute(command).data()).getAddedCustRequestCategory();
 		
 		if (custRequestCategory != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(custRequestCategory);
+			return successful(custRequestCategory);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("CustRequestCategory could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateCustRequestCategory(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		CustRequestCategory custRequestCategoryToBeUpdated = new CustRequestCategory();
-
-		try {
-			custRequestCategoryToBeUpdated = CustRequestCategoryMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateCustRequestCategory(custRequestCategoryToBeUpdated, custRequestCategoryToBeUpdated.getCustRequestCategoryId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class CustRequestCategoryController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{custRequestCategoryId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateCustRequestCategory(@RequestBody CustRequestCategory custRequestCategoryToBeUpdated,
+	public ResponseEntity<String> updateCustRequestCategory(@RequestBody CustRequestCategory custRequestCategoryToBeUpdated,
 			@PathVariable String custRequestCategoryId) throws Exception {
 
 		custRequestCategoryToBeUpdated.setCustRequestCategoryId(custRequestCategoryId);
@@ -178,41 +128,44 @@ public class CustRequestCategoryController {
 
 		try {
 			if(((CustRequestCategoryUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{custRequestCategoryId}")
-	public ResponseEntity<Object> findById(@PathVariable String custRequestCategoryId) throws Exception {
+	public ResponseEntity<CustRequestCategory> findById(@PathVariable String custRequestCategoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("custRequestCategoryId", custRequestCategoryId);
 		try {
 
-			Object foundCustRequestCategory = findCustRequestCategorysBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundCustRequestCategory);
+			List<CustRequestCategory> foundCustRequestCategory = findCustRequestCategorysBy(requestParams).getBody();
+			if(foundCustRequestCategory.size()==1){				return successful(foundCustRequestCategory.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{custRequestCategoryId}")
-	public ResponseEntity<Object> deleteCustRequestCategoryByIdUpdated(@PathVariable String custRequestCategoryId) throws Exception {
+	public ResponseEntity<String> deleteCustRequestCategoryByIdUpdated(@PathVariable String custRequestCategoryId) throws Exception {
 		DeleteCustRequestCategory command = new DeleteCustRequestCategory(custRequestCategoryId);
 
 		try {
 			if (((CustRequestCategoryDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("CustRequestCategory could not be deleted");
+		return conflict();
 
 	}
 

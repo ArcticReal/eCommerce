@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.fileExtension.query.FindFi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/fileExtensions")
 public class FileExtensionController {
@@ -52,7 +54,7 @@ public class FileExtensionController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findFileExtensionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<FileExtension>> findFileExtensionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFileExtensionsBy query = new FindFileExtensionsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class FileExtensionController {
 		}
 
 		List<FileExtension> fileExtensions =((FileExtensionFound) Scheduler.execute(query).data()).getFileExtensions();
-
-		if (fileExtensions.size() == 1) {
-			return ResponseEntity.ok().body(fileExtensions.get(0));
-		}
 
 		return ResponseEntity.ok().body(fileExtensions);
 
@@ -78,7 +76,7 @@ public class FileExtensionController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createFileExtension(HttpServletRequest request) throws Exception {
+	public ResponseEntity<FileExtension> createFileExtension(HttpServletRequest request) throws Exception {
 
 		FileExtension fileExtensionToBeAdded = new FileExtension();
 		try {
@@ -86,7 +84,7 @@ public class FileExtensionController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createFileExtension(fileExtensionToBeAdded);
@@ -101,63 +99,15 @@ public class FileExtensionController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createFileExtension(@RequestBody FileExtension fileExtensionToBeAdded) throws Exception {
+	public ResponseEntity<FileExtension> createFileExtension(@RequestBody FileExtension fileExtensionToBeAdded) throws Exception {
 
 		AddFileExtension command = new AddFileExtension(fileExtensionToBeAdded);
 		FileExtension fileExtension = ((FileExtensionAdded) Scheduler.execute(command).data()).getAddedFileExtension();
 		
 		if (fileExtension != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(fileExtension);
+			return successful(fileExtension);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("FileExtension could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateFileExtension(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		FileExtension fileExtensionToBeUpdated = new FileExtension();
-
-		try {
-			fileExtensionToBeUpdated = FileExtensionMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateFileExtension(fileExtensionToBeUpdated, fileExtensionToBeUpdated.getFileExtensionId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class FileExtensionController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{fileExtensionId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateFileExtension(@RequestBody FileExtension fileExtensionToBeUpdated,
+	public ResponseEntity<String> updateFileExtension(@RequestBody FileExtension fileExtensionToBeUpdated,
 			@PathVariable String fileExtensionId) throws Exception {
 
 		fileExtensionToBeUpdated.setFileExtensionId(fileExtensionId);
@@ -178,41 +128,44 @@ public class FileExtensionController {
 
 		try {
 			if(((FileExtensionUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{fileExtensionId}")
-	public ResponseEntity<Object> findById(@PathVariable String fileExtensionId) throws Exception {
+	public ResponseEntity<FileExtension> findById(@PathVariable String fileExtensionId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("fileExtensionId", fileExtensionId);
 		try {
 
-			Object foundFileExtension = findFileExtensionsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundFileExtension);
+			List<FileExtension> foundFileExtension = findFileExtensionsBy(requestParams).getBody();
+			if(foundFileExtension.size()==1){				return successful(foundFileExtension.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{fileExtensionId}")
-	public ResponseEntity<Object> deleteFileExtensionByIdUpdated(@PathVariable String fileExtensionId) throws Exception {
+	public ResponseEntity<String> deleteFileExtensionByIdUpdated(@PathVariable String fileExtensionId) throws Exception {
 		DeleteFileExtension command = new DeleteFileExtension(fileExtensionId);
 
 		try {
 			if (((FileExtensionDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("FileExtension could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.party.query.classificationGr
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/party/partyClassificationGroups")
 public class PartyClassificationGroupController {
@@ -52,7 +54,7 @@ public class PartyClassificationGroupController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPartyClassificationGroupsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PartyClassificationGroup>> findPartyClassificationGroupsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyClassificationGroupsBy query = new FindPartyClassificationGroupsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PartyClassificationGroupController {
 		}
 
 		List<PartyClassificationGroup> partyClassificationGroups =((PartyClassificationGroupFound) Scheduler.execute(query).data()).getPartyClassificationGroups();
-
-		if (partyClassificationGroups.size() == 1) {
-			return ResponseEntity.ok().body(partyClassificationGroups.get(0));
-		}
 
 		return ResponseEntity.ok().body(partyClassificationGroups);
 
@@ -78,7 +76,7 @@ public class PartyClassificationGroupController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPartyClassificationGroup(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PartyClassificationGroup> createPartyClassificationGroup(HttpServletRequest request) throws Exception {
 
 		PartyClassificationGroup partyClassificationGroupToBeAdded = new PartyClassificationGroup();
 		try {
@@ -86,7 +84,7 @@ public class PartyClassificationGroupController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPartyClassificationGroup(partyClassificationGroupToBeAdded);
@@ -101,63 +99,15 @@ public class PartyClassificationGroupController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPartyClassificationGroup(@RequestBody PartyClassificationGroup partyClassificationGroupToBeAdded) throws Exception {
+	public ResponseEntity<PartyClassificationGroup> createPartyClassificationGroup(@RequestBody PartyClassificationGroup partyClassificationGroupToBeAdded) throws Exception {
 
 		AddPartyClassificationGroup command = new AddPartyClassificationGroup(partyClassificationGroupToBeAdded);
 		PartyClassificationGroup partyClassificationGroup = ((PartyClassificationGroupAdded) Scheduler.execute(command).data()).getAddedPartyClassificationGroup();
 		
 		if (partyClassificationGroup != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(partyClassificationGroup);
+			return successful(partyClassificationGroup);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PartyClassificationGroup could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePartyClassificationGroup(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PartyClassificationGroup partyClassificationGroupToBeUpdated = new PartyClassificationGroup();
-
-		try {
-			partyClassificationGroupToBeUpdated = PartyClassificationGroupMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePartyClassificationGroup(partyClassificationGroupToBeUpdated, partyClassificationGroupToBeUpdated.getPartyClassificationGroupId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PartyClassificationGroupController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{partyClassificationGroupId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePartyClassificationGroup(@RequestBody PartyClassificationGroup partyClassificationGroupToBeUpdated,
+	public ResponseEntity<String> updatePartyClassificationGroup(@RequestBody PartyClassificationGroup partyClassificationGroupToBeUpdated,
 			@PathVariable String partyClassificationGroupId) throws Exception {
 
 		partyClassificationGroupToBeUpdated.setPartyClassificationGroupId(partyClassificationGroupId);
@@ -178,41 +128,44 @@ public class PartyClassificationGroupController {
 
 		try {
 			if(((PartyClassificationGroupUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{partyClassificationGroupId}")
-	public ResponseEntity<Object> findById(@PathVariable String partyClassificationGroupId) throws Exception {
+	public ResponseEntity<PartyClassificationGroup> findById(@PathVariable String partyClassificationGroupId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyClassificationGroupId", partyClassificationGroupId);
 		try {
 
-			Object foundPartyClassificationGroup = findPartyClassificationGroupsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPartyClassificationGroup);
+			List<PartyClassificationGroup> foundPartyClassificationGroup = findPartyClassificationGroupsBy(requestParams).getBody();
+			if(foundPartyClassificationGroup.size()==1){				return successful(foundPartyClassificationGroup.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{partyClassificationGroupId}")
-	public ResponseEntity<Object> deletePartyClassificationGroupByIdUpdated(@PathVariable String partyClassificationGroupId) throws Exception {
+	public ResponseEntity<String> deletePartyClassificationGroupByIdUpdated(@PathVariable String partyClassificationGroupId) throws Exception {
 		DeletePartyClassificationGroup command = new DeletePartyClassificationGroup(partyClassificationGroupId);
 
 		try {
 			if (((PartyClassificationGroupDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PartyClassificationGroup could not be deleted");
+		return conflict();
 
 	}
 

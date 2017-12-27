@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.facility.query.typeAttr.Fi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/facility/facilityTypeAttrs")
 public class FacilityTypeAttrController {
@@ -52,7 +54,7 @@ public class FacilityTypeAttrController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findFacilityTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<FacilityTypeAttr>> findFacilityTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFacilityTypeAttrsBy query = new FindFacilityTypeAttrsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class FacilityTypeAttrController {
 		}
 
 		List<FacilityTypeAttr> facilityTypeAttrs =((FacilityTypeAttrFound) Scheduler.execute(query).data()).getFacilityTypeAttrs();
-
-		if (facilityTypeAttrs.size() == 1) {
-			return ResponseEntity.ok().body(facilityTypeAttrs.get(0));
-		}
 
 		return ResponseEntity.ok().body(facilityTypeAttrs);
 
@@ -78,7 +76,7 @@ public class FacilityTypeAttrController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createFacilityTypeAttr(HttpServletRequest request) throws Exception {
+	public ResponseEntity<FacilityTypeAttr> createFacilityTypeAttr(HttpServletRequest request) throws Exception {
 
 		FacilityTypeAttr facilityTypeAttrToBeAdded = new FacilityTypeAttr();
 		try {
@@ -86,7 +84,7 @@ public class FacilityTypeAttrController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createFacilityTypeAttr(facilityTypeAttrToBeAdded);
@@ -101,63 +99,15 @@ public class FacilityTypeAttrController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createFacilityTypeAttr(@RequestBody FacilityTypeAttr facilityTypeAttrToBeAdded) throws Exception {
+	public ResponseEntity<FacilityTypeAttr> createFacilityTypeAttr(@RequestBody FacilityTypeAttr facilityTypeAttrToBeAdded) throws Exception {
 
 		AddFacilityTypeAttr command = new AddFacilityTypeAttr(facilityTypeAttrToBeAdded);
 		FacilityTypeAttr facilityTypeAttr = ((FacilityTypeAttrAdded) Scheduler.execute(command).data()).getAddedFacilityTypeAttr();
 		
 		if (facilityTypeAttr != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(facilityTypeAttr);
+			return successful(facilityTypeAttr);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("FacilityTypeAttr could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateFacilityTypeAttr(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		FacilityTypeAttr facilityTypeAttrToBeUpdated = new FacilityTypeAttr();
-
-		try {
-			facilityTypeAttrToBeUpdated = FacilityTypeAttrMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateFacilityTypeAttr(facilityTypeAttrToBeUpdated, facilityTypeAttrToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class FacilityTypeAttrController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateFacilityTypeAttr(@RequestBody FacilityTypeAttr facilityTypeAttrToBeUpdated,
+	public ResponseEntity<String> updateFacilityTypeAttr(@RequestBody FacilityTypeAttr facilityTypeAttrToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		facilityTypeAttrToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class FacilityTypeAttrController {
 
 		try {
 			if(((FacilityTypeAttrUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{facilityTypeAttrId}")
-	public ResponseEntity<Object> findById(@PathVariable String facilityTypeAttrId) throws Exception {
+	public ResponseEntity<FacilityTypeAttr> findById(@PathVariable String facilityTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("facilityTypeAttrId", facilityTypeAttrId);
 		try {
 
-			Object foundFacilityTypeAttr = findFacilityTypeAttrsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundFacilityTypeAttr);
+			List<FacilityTypeAttr> foundFacilityTypeAttr = findFacilityTypeAttrsBy(requestParams).getBody();
+			if(foundFacilityTypeAttr.size()==1){				return successful(foundFacilityTypeAttr.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{facilityTypeAttrId}")
-	public ResponseEntity<Object> deleteFacilityTypeAttrByIdUpdated(@PathVariable String facilityTypeAttrId) throws Exception {
+	public ResponseEntity<String> deleteFacilityTypeAttrByIdUpdated(@PathVariable String facilityTypeAttrId) throws Exception {
 		DeleteFacilityTypeAttr command = new DeleteFacilityTypeAttr(facilityTypeAttrId);
 
 		try {
 			if (((FacilityTypeAttrDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("FacilityTypeAttr could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.party.query.attribute.FindPa
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/party/partyAttributes")
 public class PartyAttributeController {
@@ -52,7 +54,7 @@ public class PartyAttributeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPartyAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PartyAttribute>> findPartyAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyAttributesBy query = new FindPartyAttributesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PartyAttributeController {
 		}
 
 		List<PartyAttribute> partyAttributes =((PartyAttributeFound) Scheduler.execute(query).data()).getPartyAttributes();
-
-		if (partyAttributes.size() == 1) {
-			return ResponseEntity.ok().body(partyAttributes.get(0));
-		}
 
 		return ResponseEntity.ok().body(partyAttributes);
 
@@ -78,7 +76,7 @@ public class PartyAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPartyAttribute(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PartyAttribute> createPartyAttribute(HttpServletRequest request) throws Exception {
 
 		PartyAttribute partyAttributeToBeAdded = new PartyAttribute();
 		try {
@@ -86,7 +84,7 @@ public class PartyAttributeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPartyAttribute(partyAttributeToBeAdded);
@@ -101,63 +99,15 @@ public class PartyAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPartyAttribute(@RequestBody PartyAttribute partyAttributeToBeAdded) throws Exception {
+	public ResponseEntity<PartyAttribute> createPartyAttribute(@RequestBody PartyAttribute partyAttributeToBeAdded) throws Exception {
 
 		AddPartyAttribute command = new AddPartyAttribute(partyAttributeToBeAdded);
 		PartyAttribute partyAttribute = ((PartyAttributeAdded) Scheduler.execute(command).data()).getAddedPartyAttribute();
 		
 		if (partyAttribute != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(partyAttribute);
+			return successful(partyAttribute);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PartyAttribute could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePartyAttribute(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PartyAttribute partyAttributeToBeUpdated = new PartyAttribute();
-
-		try {
-			partyAttributeToBeUpdated = PartyAttributeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePartyAttribute(partyAttributeToBeUpdated, partyAttributeToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PartyAttributeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePartyAttribute(@RequestBody PartyAttribute partyAttributeToBeUpdated,
+	public ResponseEntity<String> updatePartyAttribute(@RequestBody PartyAttribute partyAttributeToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		partyAttributeToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class PartyAttributeController {
 
 		try {
 			if(((PartyAttributeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{partyAttributeId}")
-	public ResponseEntity<Object> findById(@PathVariable String partyAttributeId) throws Exception {
+	public ResponseEntity<PartyAttribute> findById(@PathVariable String partyAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyAttributeId", partyAttributeId);
 		try {
 
-			Object foundPartyAttribute = findPartyAttributesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPartyAttribute);
+			List<PartyAttribute> foundPartyAttribute = findPartyAttributesBy(requestParams).getBody();
+			if(foundPartyAttribute.size()==1){				return successful(foundPartyAttribute.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{partyAttributeId}")
-	public ResponseEntity<Object> deletePartyAttributeByIdUpdated(@PathVariable String partyAttributeId) throws Exception {
+	public ResponseEntity<String> deletePartyAttributeByIdUpdated(@PathVariable String partyAttributeId) throws Exception {
 		DeletePartyAttribute command = new DeletePartyAttribute(partyAttributeId);
 
 		try {
 			if (((PartyAttributeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PartyAttribute could not be deleted");
+		return conflict();
 
 	}
 

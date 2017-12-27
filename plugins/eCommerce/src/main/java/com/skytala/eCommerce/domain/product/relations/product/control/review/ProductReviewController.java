@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.review.FindP
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productReviews")
 public class ProductReviewController {
@@ -52,7 +54,7 @@ public class ProductReviewController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductReviewsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductReview>> findProductReviewsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductReviewsBy query = new FindProductReviewsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductReviewController {
 		}
 
 		List<ProductReview> productReviews =((ProductReviewFound) Scheduler.execute(query).data()).getProductReviews();
-
-		if (productReviews.size() == 1) {
-			return ResponseEntity.ok().body(productReviews.get(0));
-		}
 
 		return ResponseEntity.ok().body(productReviews);
 
@@ -78,7 +76,7 @@ public class ProductReviewController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductReview(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductReview> createProductReview(HttpServletRequest request) throws Exception {
 
 		ProductReview productReviewToBeAdded = new ProductReview();
 		try {
@@ -86,7 +84,7 @@ public class ProductReviewController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductReview(productReviewToBeAdded);
@@ -101,63 +99,15 @@ public class ProductReviewController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductReview(@RequestBody ProductReview productReviewToBeAdded) throws Exception {
+	public ResponseEntity<ProductReview> createProductReview(@RequestBody ProductReview productReviewToBeAdded) throws Exception {
 
 		AddProductReview command = new AddProductReview(productReviewToBeAdded);
 		ProductReview productReview = ((ProductReviewAdded) Scheduler.execute(command).data()).getAddedProductReview();
 		
 		if (productReview != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productReview);
+			return successful(productReview);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductReview could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductReview(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductReview productReviewToBeUpdated = new ProductReview();
-
-		try {
-			productReviewToBeUpdated = ProductReviewMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductReview(productReviewToBeUpdated, productReviewToBeUpdated.getProductReviewId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductReviewController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{productReviewId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductReview(@RequestBody ProductReview productReviewToBeUpdated,
+	public ResponseEntity<String> updateProductReview(@RequestBody ProductReview productReviewToBeUpdated,
 			@PathVariable String productReviewId) throws Exception {
 
 		productReviewToBeUpdated.setProductReviewId(productReviewId);
@@ -178,41 +128,44 @@ public class ProductReviewController {
 
 		try {
 			if(((ProductReviewUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productReviewId}")
-	public ResponseEntity<Object> findById(@PathVariable String productReviewId) throws Exception {
+	public ResponseEntity<ProductReview> findById(@PathVariable String productReviewId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productReviewId", productReviewId);
 		try {
 
-			Object foundProductReview = findProductReviewsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductReview);
+			List<ProductReview> foundProductReview = findProductReviewsBy(requestParams).getBody();
+			if(foundProductReview.size()==1){				return successful(foundProductReview.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productReviewId}")
-	public ResponseEntity<Object> deleteProductReviewByIdUpdated(@PathVariable String productReviewId) throws Exception {
+	public ResponseEntity<String> deleteProductReviewByIdUpdated(@PathVariable String productReviewId) throws Exception {
 		DeleteProductReview command = new DeleteProductReview(productReviewId);
 
 		try {
 			if (((ProductReviewDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductReview could not be deleted");
+		return conflict();
 
 	}
 

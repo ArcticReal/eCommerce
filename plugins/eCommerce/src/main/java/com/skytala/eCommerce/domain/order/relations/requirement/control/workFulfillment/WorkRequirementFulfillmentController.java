@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.requirement.query.workFulfil
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/requirement/workRequirementFulfillments")
 public class WorkRequirementFulfillmentController {
@@ -52,7 +54,7 @@ public class WorkRequirementFulfillmentController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWorkRequirementFulfillmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WorkRequirementFulfillment>> findWorkRequirementFulfillmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkRequirementFulfillmentsBy query = new FindWorkRequirementFulfillmentsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WorkRequirementFulfillmentController {
 		}
 
 		List<WorkRequirementFulfillment> workRequirementFulfillments =((WorkRequirementFulfillmentFound) Scheduler.execute(query).data()).getWorkRequirementFulfillments();
-
-		if (workRequirementFulfillments.size() == 1) {
-			return ResponseEntity.ok().body(workRequirementFulfillments.get(0));
-		}
 
 		return ResponseEntity.ok().body(workRequirementFulfillments);
 
@@ -78,7 +76,7 @@ public class WorkRequirementFulfillmentController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWorkRequirementFulfillment(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WorkRequirementFulfillment> createWorkRequirementFulfillment(HttpServletRequest request) throws Exception {
 
 		WorkRequirementFulfillment workRequirementFulfillmentToBeAdded = new WorkRequirementFulfillment();
 		try {
@@ -86,7 +84,7 @@ public class WorkRequirementFulfillmentController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWorkRequirementFulfillment(workRequirementFulfillmentToBeAdded);
@@ -101,63 +99,15 @@ public class WorkRequirementFulfillmentController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWorkRequirementFulfillment(@RequestBody WorkRequirementFulfillment workRequirementFulfillmentToBeAdded) throws Exception {
+	public ResponseEntity<WorkRequirementFulfillment> createWorkRequirementFulfillment(@RequestBody WorkRequirementFulfillment workRequirementFulfillmentToBeAdded) throws Exception {
 
 		AddWorkRequirementFulfillment command = new AddWorkRequirementFulfillment(workRequirementFulfillmentToBeAdded);
 		WorkRequirementFulfillment workRequirementFulfillment = ((WorkRequirementFulfillmentAdded) Scheduler.execute(command).data()).getAddedWorkRequirementFulfillment();
 		
 		if (workRequirementFulfillment != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(workRequirementFulfillment);
+			return successful(workRequirementFulfillment);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WorkRequirementFulfillment could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWorkRequirementFulfillment(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WorkRequirementFulfillment workRequirementFulfillmentToBeUpdated = new WorkRequirementFulfillment();
-
-		try {
-			workRequirementFulfillmentToBeUpdated = WorkRequirementFulfillmentMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWorkRequirementFulfillment(workRequirementFulfillmentToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WorkRequirementFulfillmentController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWorkRequirementFulfillment(@RequestBody WorkRequirementFulfillment workRequirementFulfillmentToBeUpdated,
+	public ResponseEntity<String> updateWorkRequirementFulfillment(@RequestBody WorkRequirementFulfillment workRequirementFulfillmentToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		workRequirementFulfillmentToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class WorkRequirementFulfillmentController {
 
 		try {
 			if(((WorkRequirementFulfillmentUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{workRequirementFulfillmentId}")
-	public ResponseEntity<Object> findById(@PathVariable String workRequirementFulfillmentId) throws Exception {
+	public ResponseEntity<WorkRequirementFulfillment> findById(@PathVariable String workRequirementFulfillmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workRequirementFulfillmentId", workRequirementFulfillmentId);
 		try {
 
-			Object foundWorkRequirementFulfillment = findWorkRequirementFulfillmentsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWorkRequirementFulfillment);
+			List<WorkRequirementFulfillment> foundWorkRequirementFulfillment = findWorkRequirementFulfillmentsBy(requestParams).getBody();
+			if(foundWorkRequirementFulfillment.size()==1){				return successful(foundWorkRequirementFulfillment.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{workRequirementFulfillmentId}")
-	public ResponseEntity<Object> deleteWorkRequirementFulfillmentByIdUpdated(@PathVariable String workRequirementFulfillmentId) throws Exception {
+	public ResponseEntity<String> deleteWorkRequirementFulfillmentByIdUpdated(@PathVariable String workRequirementFulfillmentId) throws Exception {
 		DeleteWorkRequirementFulfillment command = new DeleteWorkRequirementFulfillment(workRequirementFulfillmentId);
 
 		try {
 			if (((WorkRequirementFulfillmentDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WorkRequirementFulfillment could not be deleted");
+		return conflict();
 
 	}
 

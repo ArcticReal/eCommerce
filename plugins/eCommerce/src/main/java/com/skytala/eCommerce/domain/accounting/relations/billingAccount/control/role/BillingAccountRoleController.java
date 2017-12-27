@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.billingAccount.query.ro
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/billingAccount/billingAccountRoles")
 public class BillingAccountRoleController {
@@ -52,7 +54,7 @@ public class BillingAccountRoleController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findBillingAccountRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<BillingAccountRole>> findBillingAccountRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindBillingAccountRolesBy query = new FindBillingAccountRolesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class BillingAccountRoleController {
 		}
 
 		List<BillingAccountRole> billingAccountRoles =((BillingAccountRoleFound) Scheduler.execute(query).data()).getBillingAccountRoles();
-
-		if (billingAccountRoles.size() == 1) {
-			return ResponseEntity.ok().body(billingAccountRoles.get(0));
-		}
 
 		return ResponseEntity.ok().body(billingAccountRoles);
 
@@ -78,7 +76,7 @@ public class BillingAccountRoleController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createBillingAccountRole(HttpServletRequest request) throws Exception {
+	public ResponseEntity<BillingAccountRole> createBillingAccountRole(HttpServletRequest request) throws Exception {
 
 		BillingAccountRole billingAccountRoleToBeAdded = new BillingAccountRole();
 		try {
@@ -86,7 +84,7 @@ public class BillingAccountRoleController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createBillingAccountRole(billingAccountRoleToBeAdded);
@@ -101,63 +99,15 @@ public class BillingAccountRoleController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createBillingAccountRole(@RequestBody BillingAccountRole billingAccountRoleToBeAdded) throws Exception {
+	public ResponseEntity<BillingAccountRole> createBillingAccountRole(@RequestBody BillingAccountRole billingAccountRoleToBeAdded) throws Exception {
 
 		AddBillingAccountRole command = new AddBillingAccountRole(billingAccountRoleToBeAdded);
 		BillingAccountRole billingAccountRole = ((BillingAccountRoleAdded) Scheduler.execute(command).data()).getAddedBillingAccountRole();
 		
 		if (billingAccountRole != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(billingAccountRole);
+			return successful(billingAccountRole);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("BillingAccountRole could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateBillingAccountRole(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		BillingAccountRole billingAccountRoleToBeUpdated = new BillingAccountRole();
-
-		try {
-			billingAccountRoleToBeUpdated = BillingAccountRoleMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateBillingAccountRole(billingAccountRoleToBeUpdated, billingAccountRoleToBeUpdated.getRoleTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class BillingAccountRoleController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{roleTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateBillingAccountRole(@RequestBody BillingAccountRole billingAccountRoleToBeUpdated,
+	public ResponseEntity<String> updateBillingAccountRole(@RequestBody BillingAccountRole billingAccountRoleToBeUpdated,
 			@PathVariable String roleTypeId) throws Exception {
 
 		billingAccountRoleToBeUpdated.setRoleTypeId(roleTypeId);
@@ -178,41 +128,44 @@ public class BillingAccountRoleController {
 
 		try {
 			if(((BillingAccountRoleUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{billingAccountRoleId}")
-	public ResponseEntity<Object> findById(@PathVariable String billingAccountRoleId) throws Exception {
+	public ResponseEntity<BillingAccountRole> findById(@PathVariable String billingAccountRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("billingAccountRoleId", billingAccountRoleId);
 		try {
 
-			Object foundBillingAccountRole = findBillingAccountRolesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundBillingAccountRole);
+			List<BillingAccountRole> foundBillingAccountRole = findBillingAccountRolesBy(requestParams).getBody();
+			if(foundBillingAccountRole.size()==1){				return successful(foundBillingAccountRole.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{billingAccountRoleId}")
-	public ResponseEntity<Object> deleteBillingAccountRoleByIdUpdated(@PathVariable String billingAccountRoleId) throws Exception {
+	public ResponseEntity<String> deleteBillingAccountRoleByIdUpdated(@PathVariable String billingAccountRoleId) throws Exception {
 		DeleteBillingAccountRole command = new DeleteBillingAccountRole(billingAccountRoleId);
 
 		try {
 			if (((BillingAccountRoleDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("BillingAccountRole could not be deleted");
+		return conflict();
 
 	}
 

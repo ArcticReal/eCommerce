@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.party.query.profileDefault.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/party/partyProfileDefaults")
 public class PartyProfileDefaultController {
@@ -52,7 +54,7 @@ public class PartyProfileDefaultController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPartyProfileDefaultsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PartyProfileDefault>> findPartyProfileDefaultsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyProfileDefaultsBy query = new FindPartyProfileDefaultsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PartyProfileDefaultController {
 		}
 
 		List<PartyProfileDefault> partyProfileDefaults =((PartyProfileDefaultFound) Scheduler.execute(query).data()).getPartyProfileDefaults();
-
-		if (partyProfileDefaults.size() == 1) {
-			return ResponseEntity.ok().body(partyProfileDefaults.get(0));
-		}
 
 		return ResponseEntity.ok().body(partyProfileDefaults);
 
@@ -78,7 +76,7 @@ public class PartyProfileDefaultController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPartyProfileDefault(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PartyProfileDefault> createPartyProfileDefault(HttpServletRequest request) throws Exception {
 
 		PartyProfileDefault partyProfileDefaultToBeAdded = new PartyProfileDefault();
 		try {
@@ -86,7 +84,7 @@ public class PartyProfileDefaultController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPartyProfileDefault(partyProfileDefaultToBeAdded);
@@ -101,63 +99,15 @@ public class PartyProfileDefaultController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPartyProfileDefault(@RequestBody PartyProfileDefault partyProfileDefaultToBeAdded) throws Exception {
+	public ResponseEntity<PartyProfileDefault> createPartyProfileDefault(@RequestBody PartyProfileDefault partyProfileDefaultToBeAdded) throws Exception {
 
 		AddPartyProfileDefault command = new AddPartyProfileDefault(partyProfileDefaultToBeAdded);
 		PartyProfileDefault partyProfileDefault = ((PartyProfileDefaultAdded) Scheduler.execute(command).data()).getAddedPartyProfileDefault();
 		
 		if (partyProfileDefault != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(partyProfileDefault);
+			return successful(partyProfileDefault);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PartyProfileDefault could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePartyProfileDefault(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PartyProfileDefault partyProfileDefaultToBeUpdated = new PartyProfileDefault();
-
-		try {
-			partyProfileDefaultToBeUpdated = PartyProfileDefaultMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePartyProfileDefault(partyProfileDefaultToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PartyProfileDefaultController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePartyProfileDefault(@RequestBody PartyProfileDefault partyProfileDefaultToBeUpdated,
+	public ResponseEntity<String> updatePartyProfileDefault(@RequestBody PartyProfileDefault partyProfileDefaultToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		partyProfileDefaultToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class PartyProfileDefaultController {
 
 		try {
 			if(((PartyProfileDefaultUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{partyProfileDefaultId}")
-	public ResponseEntity<Object> findById(@PathVariable String partyProfileDefaultId) throws Exception {
+	public ResponseEntity<PartyProfileDefault> findById(@PathVariable String partyProfileDefaultId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyProfileDefaultId", partyProfileDefaultId);
 		try {
 
-			Object foundPartyProfileDefault = findPartyProfileDefaultsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPartyProfileDefault);
+			List<PartyProfileDefault> foundPartyProfileDefault = findPartyProfileDefaultsBy(requestParams).getBody();
+			if(foundPartyProfileDefault.size()==1){				return successful(foundPartyProfileDefault.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{partyProfileDefaultId}")
-	public ResponseEntity<Object> deletePartyProfileDefaultByIdUpdated(@PathVariable String partyProfileDefaultId) throws Exception {
+	public ResponseEntity<String> deletePartyProfileDefaultByIdUpdated(@PathVariable String partyProfileDefaultId) throws Exception {
 		DeletePartyProfileDefault command = new DeletePartyProfileDefault(partyProfileDefaultId);
 
 		try {
 			if (((PartyProfileDefaultDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PartyProfileDefault could not be deleted");
+		return conflict();
 
 	}
 

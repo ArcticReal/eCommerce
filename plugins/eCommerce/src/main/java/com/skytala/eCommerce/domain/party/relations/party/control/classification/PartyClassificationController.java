@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.party.query.classification.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/party/partyClassifications")
 public class PartyClassificationController {
@@ -52,7 +54,7 @@ public class PartyClassificationController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPartyClassificationsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PartyClassification>> findPartyClassificationsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyClassificationsBy query = new FindPartyClassificationsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PartyClassificationController {
 		}
 
 		List<PartyClassification> partyClassifications =((PartyClassificationFound) Scheduler.execute(query).data()).getPartyClassifications();
-
-		if (partyClassifications.size() == 1) {
-			return ResponseEntity.ok().body(partyClassifications.get(0));
-		}
 
 		return ResponseEntity.ok().body(partyClassifications);
 
@@ -78,7 +76,7 @@ public class PartyClassificationController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPartyClassification(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PartyClassification> createPartyClassification(HttpServletRequest request) throws Exception {
 
 		PartyClassification partyClassificationToBeAdded = new PartyClassification();
 		try {
@@ -86,7 +84,7 @@ public class PartyClassificationController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPartyClassification(partyClassificationToBeAdded);
@@ -101,63 +99,15 @@ public class PartyClassificationController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPartyClassification(@RequestBody PartyClassification partyClassificationToBeAdded) throws Exception {
+	public ResponseEntity<PartyClassification> createPartyClassification(@RequestBody PartyClassification partyClassificationToBeAdded) throws Exception {
 
 		AddPartyClassification command = new AddPartyClassification(partyClassificationToBeAdded);
 		PartyClassification partyClassification = ((PartyClassificationAdded) Scheduler.execute(command).data()).getAddedPartyClassification();
 		
 		if (partyClassification != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(partyClassification);
+			return successful(partyClassification);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PartyClassification could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePartyClassification(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PartyClassification partyClassificationToBeUpdated = new PartyClassification();
-
-		try {
-			partyClassificationToBeUpdated = PartyClassificationMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePartyClassification(partyClassificationToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PartyClassificationController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePartyClassification(@RequestBody PartyClassification partyClassificationToBeUpdated,
+	public ResponseEntity<String> updatePartyClassification(@RequestBody PartyClassification partyClassificationToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		partyClassificationToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class PartyClassificationController {
 
 		try {
 			if(((PartyClassificationUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{partyClassificationId}")
-	public ResponseEntity<Object> findById(@PathVariable String partyClassificationId) throws Exception {
+	public ResponseEntity<PartyClassification> findById(@PathVariable String partyClassificationId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyClassificationId", partyClassificationId);
 		try {
 
-			Object foundPartyClassification = findPartyClassificationsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPartyClassification);
+			List<PartyClassification> foundPartyClassification = findPartyClassificationsBy(requestParams).getBody();
+			if(foundPartyClassification.size()==1){				return successful(foundPartyClassification.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{partyClassificationId}")
-	public ResponseEntity<Object> deletePartyClassificationByIdUpdated(@PathVariable String partyClassificationId) throws Exception {
+	public ResponseEntity<String> deletePartyClassificationByIdUpdated(@PathVariable String partyClassificationId) throws Exception {
 		DeletePartyClassification command = new DeletePartyClassification(partyClassificationId);
 
 		try {
 			if (((PartyClassificationDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PartyClassification could not be deleted");
+		return conflict();
 
 	}
 

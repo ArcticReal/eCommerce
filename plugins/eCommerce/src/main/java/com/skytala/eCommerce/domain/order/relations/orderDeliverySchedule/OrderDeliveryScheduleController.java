@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.orderDeliverySchedule.query.
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/orderDeliverySchedules")
 public class OrderDeliveryScheduleController {
@@ -52,7 +54,7 @@ public class OrderDeliveryScheduleController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findOrderDeliverySchedulesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OrderDeliverySchedule>> findOrderDeliverySchedulesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderDeliverySchedulesBy query = new FindOrderDeliverySchedulesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class OrderDeliveryScheduleController {
 		}
 
 		List<OrderDeliverySchedule> orderDeliverySchedules =((OrderDeliveryScheduleFound) Scheduler.execute(query).data()).getOrderDeliverySchedules();
-
-		if (orderDeliverySchedules.size() == 1) {
-			return ResponseEntity.ok().body(orderDeliverySchedules.get(0));
-		}
 
 		return ResponseEntity.ok().body(orderDeliverySchedules);
 
@@ -78,7 +76,7 @@ public class OrderDeliveryScheduleController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOrderDeliverySchedule(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OrderDeliverySchedule> createOrderDeliverySchedule(HttpServletRequest request) throws Exception {
 
 		OrderDeliverySchedule orderDeliveryScheduleToBeAdded = new OrderDeliverySchedule();
 		try {
@@ -86,7 +84,7 @@ public class OrderDeliveryScheduleController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createOrderDeliverySchedule(orderDeliveryScheduleToBeAdded);
@@ -101,63 +99,15 @@ public class OrderDeliveryScheduleController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOrderDeliverySchedule(@RequestBody OrderDeliverySchedule orderDeliveryScheduleToBeAdded) throws Exception {
+	public ResponseEntity<OrderDeliverySchedule> createOrderDeliverySchedule(@RequestBody OrderDeliverySchedule orderDeliveryScheduleToBeAdded) throws Exception {
 
 		AddOrderDeliverySchedule command = new AddOrderDeliverySchedule(orderDeliveryScheduleToBeAdded);
 		OrderDeliverySchedule orderDeliverySchedule = ((OrderDeliveryScheduleAdded) Scheduler.execute(command).data()).getAddedOrderDeliverySchedule();
 		
 		if (orderDeliverySchedule != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(orderDeliverySchedule);
+			return successful(orderDeliverySchedule);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OrderDeliverySchedule could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateOrderDeliverySchedule(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OrderDeliverySchedule orderDeliveryScheduleToBeUpdated = new OrderDeliverySchedule();
-
-		try {
-			orderDeliveryScheduleToBeUpdated = OrderDeliveryScheduleMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOrderDeliverySchedule(orderDeliveryScheduleToBeUpdated, orderDeliveryScheduleToBeUpdated.getOrderItemSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class OrderDeliveryScheduleController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{orderItemSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOrderDeliverySchedule(@RequestBody OrderDeliverySchedule orderDeliveryScheduleToBeUpdated,
+	public ResponseEntity<String> updateOrderDeliverySchedule(@RequestBody OrderDeliverySchedule orderDeliveryScheduleToBeUpdated,
 			@PathVariable String orderItemSeqId) throws Exception {
 
 		orderDeliveryScheduleToBeUpdated.setOrderItemSeqId(orderItemSeqId);
@@ -178,41 +128,44 @@ public class OrderDeliveryScheduleController {
 
 		try {
 			if(((OrderDeliveryScheduleUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{orderDeliveryScheduleId}")
-	public ResponseEntity<Object> findById(@PathVariable String orderDeliveryScheduleId) throws Exception {
+	public ResponseEntity<OrderDeliverySchedule> findById(@PathVariable String orderDeliveryScheduleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderDeliveryScheduleId", orderDeliveryScheduleId);
 		try {
 
-			Object foundOrderDeliverySchedule = findOrderDeliverySchedulesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOrderDeliverySchedule);
+			List<OrderDeliverySchedule> foundOrderDeliverySchedule = findOrderDeliverySchedulesBy(requestParams).getBody();
+			if(foundOrderDeliverySchedule.size()==1){				return successful(foundOrderDeliverySchedule.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{orderDeliveryScheduleId}")
-	public ResponseEntity<Object> deleteOrderDeliveryScheduleByIdUpdated(@PathVariable String orderDeliveryScheduleId) throws Exception {
+	public ResponseEntity<String> deleteOrderDeliveryScheduleByIdUpdated(@PathVariable String orderDeliveryScheduleId) throws Exception {
 		DeleteOrderDeliverySchedule command = new DeleteOrderDeliverySchedule(orderDeliveryScheduleId);
 
 		try {
 			if (((OrderDeliveryScheduleDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("OrderDeliverySchedule could not be deleted");
+		return conflict();
 
 	}
 

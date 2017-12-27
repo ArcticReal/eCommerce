@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.shoppingList.query.itemSurve
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/shoppingList/shoppingListItemSurveys")
 public class ShoppingListItemSurveyController {
@@ -52,7 +54,7 @@ public class ShoppingListItemSurveyController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findShoppingListItemSurveysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ShoppingListItemSurvey>> findShoppingListItemSurveysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShoppingListItemSurveysBy query = new FindShoppingListItemSurveysBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ShoppingListItemSurveyController {
 		}
 
 		List<ShoppingListItemSurvey> shoppingListItemSurveys =((ShoppingListItemSurveyFound) Scheduler.execute(query).data()).getShoppingListItemSurveys();
-
-		if (shoppingListItemSurveys.size() == 1) {
-			return ResponseEntity.ok().body(shoppingListItemSurveys.get(0));
-		}
 
 		return ResponseEntity.ok().body(shoppingListItemSurveys);
 
@@ -78,7 +76,7 @@ public class ShoppingListItemSurveyController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createShoppingListItemSurvey(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ShoppingListItemSurvey> createShoppingListItemSurvey(HttpServletRequest request) throws Exception {
 
 		ShoppingListItemSurvey shoppingListItemSurveyToBeAdded = new ShoppingListItemSurvey();
 		try {
@@ -86,7 +84,7 @@ public class ShoppingListItemSurveyController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createShoppingListItemSurvey(shoppingListItemSurveyToBeAdded);
@@ -101,63 +99,15 @@ public class ShoppingListItemSurveyController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createShoppingListItemSurvey(@RequestBody ShoppingListItemSurvey shoppingListItemSurveyToBeAdded) throws Exception {
+	public ResponseEntity<ShoppingListItemSurvey> createShoppingListItemSurvey(@RequestBody ShoppingListItemSurvey shoppingListItemSurveyToBeAdded) throws Exception {
 
 		AddShoppingListItemSurvey command = new AddShoppingListItemSurvey(shoppingListItemSurveyToBeAdded);
 		ShoppingListItemSurvey shoppingListItemSurvey = ((ShoppingListItemSurveyAdded) Scheduler.execute(command).data()).getAddedShoppingListItemSurvey();
 		
 		if (shoppingListItemSurvey != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(shoppingListItemSurvey);
+			return successful(shoppingListItemSurvey);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ShoppingListItemSurvey could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateShoppingListItemSurvey(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ShoppingListItemSurvey shoppingListItemSurveyToBeUpdated = new ShoppingListItemSurvey();
-
-		try {
-			shoppingListItemSurveyToBeUpdated = ShoppingListItemSurveyMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateShoppingListItemSurvey(shoppingListItemSurveyToBeUpdated, shoppingListItemSurveyToBeUpdated.getShoppingListItemSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ShoppingListItemSurveyController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{shoppingListItemSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateShoppingListItemSurvey(@RequestBody ShoppingListItemSurvey shoppingListItemSurveyToBeUpdated,
+	public ResponseEntity<String> updateShoppingListItemSurvey(@RequestBody ShoppingListItemSurvey shoppingListItemSurveyToBeUpdated,
 			@PathVariable String shoppingListItemSeqId) throws Exception {
 
 		shoppingListItemSurveyToBeUpdated.setShoppingListItemSeqId(shoppingListItemSeqId);
@@ -178,41 +128,44 @@ public class ShoppingListItemSurveyController {
 
 		try {
 			if(((ShoppingListItemSurveyUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{shoppingListItemSurveyId}")
-	public ResponseEntity<Object> findById(@PathVariable String shoppingListItemSurveyId) throws Exception {
+	public ResponseEntity<ShoppingListItemSurvey> findById(@PathVariable String shoppingListItemSurveyId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shoppingListItemSurveyId", shoppingListItemSurveyId);
 		try {
 
-			Object foundShoppingListItemSurvey = findShoppingListItemSurveysBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundShoppingListItemSurvey);
+			List<ShoppingListItemSurvey> foundShoppingListItemSurvey = findShoppingListItemSurveysBy(requestParams).getBody();
+			if(foundShoppingListItemSurvey.size()==1){				return successful(foundShoppingListItemSurvey.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{shoppingListItemSurveyId}")
-	public ResponseEntity<Object> deleteShoppingListItemSurveyByIdUpdated(@PathVariable String shoppingListItemSurveyId) throws Exception {
+	public ResponseEntity<String> deleteShoppingListItemSurveyByIdUpdated(@PathVariable String shoppingListItemSurveyId) throws Exception {
 		DeleteShoppingListItemSurvey command = new DeleteShoppingListItemSurvey(shoppingListItemSurveyId);
 
 		try {
 			if (((ShoppingListItemSurveyDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ShoppingListItemSurvey could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.content.query.webSiteType.
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/content/webSiteContentTypes")
 public class WebSiteContentTypeController {
@@ -52,7 +54,7 @@ public class WebSiteContentTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWebSiteContentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WebSiteContentType>> findWebSiteContentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWebSiteContentTypesBy query = new FindWebSiteContentTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WebSiteContentTypeController {
 		}
 
 		List<WebSiteContentType> webSiteContentTypes =((WebSiteContentTypeFound) Scheduler.execute(query).data()).getWebSiteContentTypes();
-
-		if (webSiteContentTypes.size() == 1) {
-			return ResponseEntity.ok().body(webSiteContentTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(webSiteContentTypes);
 
@@ -78,7 +76,7 @@ public class WebSiteContentTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWebSiteContentType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WebSiteContentType> createWebSiteContentType(HttpServletRequest request) throws Exception {
 
 		WebSiteContentType webSiteContentTypeToBeAdded = new WebSiteContentType();
 		try {
@@ -86,7 +84,7 @@ public class WebSiteContentTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWebSiteContentType(webSiteContentTypeToBeAdded);
@@ -101,63 +99,15 @@ public class WebSiteContentTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWebSiteContentType(@RequestBody WebSiteContentType webSiteContentTypeToBeAdded) throws Exception {
+	public ResponseEntity<WebSiteContentType> createWebSiteContentType(@RequestBody WebSiteContentType webSiteContentTypeToBeAdded) throws Exception {
 
 		AddWebSiteContentType command = new AddWebSiteContentType(webSiteContentTypeToBeAdded);
 		WebSiteContentType webSiteContentType = ((WebSiteContentTypeAdded) Scheduler.execute(command).data()).getAddedWebSiteContentType();
 		
 		if (webSiteContentType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(webSiteContentType);
+			return successful(webSiteContentType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WebSiteContentType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWebSiteContentType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WebSiteContentType webSiteContentTypeToBeUpdated = new WebSiteContentType();
-
-		try {
-			webSiteContentTypeToBeUpdated = WebSiteContentTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWebSiteContentType(webSiteContentTypeToBeUpdated, webSiteContentTypeToBeUpdated.getWebSiteContentTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WebSiteContentTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{webSiteContentTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWebSiteContentType(@RequestBody WebSiteContentType webSiteContentTypeToBeUpdated,
+	public ResponseEntity<String> updateWebSiteContentType(@RequestBody WebSiteContentType webSiteContentTypeToBeUpdated,
 			@PathVariable String webSiteContentTypeId) throws Exception {
 
 		webSiteContentTypeToBeUpdated.setWebSiteContentTypeId(webSiteContentTypeId);
@@ -178,41 +128,44 @@ public class WebSiteContentTypeController {
 
 		try {
 			if(((WebSiteContentTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{webSiteContentTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String webSiteContentTypeId) throws Exception {
+	public ResponseEntity<WebSiteContentType> findById(@PathVariable String webSiteContentTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("webSiteContentTypeId", webSiteContentTypeId);
 		try {
 
-			Object foundWebSiteContentType = findWebSiteContentTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWebSiteContentType);
+			List<WebSiteContentType> foundWebSiteContentType = findWebSiteContentTypesBy(requestParams).getBody();
+			if(foundWebSiteContentType.size()==1){				return successful(foundWebSiteContentType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{webSiteContentTypeId}")
-	public ResponseEntity<Object> deleteWebSiteContentTypeByIdUpdated(@PathVariable String webSiteContentTypeId) throws Exception {
+	public ResponseEntity<String> deleteWebSiteContentTypeByIdUpdated(@PathVariable String webSiteContentTypeId) throws Exception {
 		DeleteWebSiteContentType command = new DeleteWebSiteContentType(webSiteContentTypeId);
 
 		try {
 			if (((WebSiteContentTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WebSiteContentType could not be deleted");
+		return conflict();
 
 	}
 

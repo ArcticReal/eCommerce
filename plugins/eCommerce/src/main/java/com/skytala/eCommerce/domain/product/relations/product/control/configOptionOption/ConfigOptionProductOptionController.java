@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.configOption
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/configOptionProductOptions")
 public class ConfigOptionProductOptionController {
@@ -52,7 +54,7 @@ public class ConfigOptionProductOptionController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findConfigOptionProductOptionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ConfigOptionProductOption>> findConfigOptionProductOptionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindConfigOptionProductOptionsBy query = new FindConfigOptionProductOptionsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ConfigOptionProductOptionController {
 		}
 
 		List<ConfigOptionProductOption> configOptionProductOptions =((ConfigOptionProductOptionFound) Scheduler.execute(query).data()).getConfigOptionProductOptions();
-
-		if (configOptionProductOptions.size() == 1) {
-			return ResponseEntity.ok().body(configOptionProductOptions.get(0));
-		}
 
 		return ResponseEntity.ok().body(configOptionProductOptions);
 
@@ -78,7 +76,7 @@ public class ConfigOptionProductOptionController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createConfigOptionProductOption(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ConfigOptionProductOption> createConfigOptionProductOption(HttpServletRequest request) throws Exception {
 
 		ConfigOptionProductOption configOptionProductOptionToBeAdded = new ConfigOptionProductOption();
 		try {
@@ -86,7 +84,7 @@ public class ConfigOptionProductOptionController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createConfigOptionProductOption(configOptionProductOptionToBeAdded);
@@ -101,63 +99,15 @@ public class ConfigOptionProductOptionController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createConfigOptionProductOption(@RequestBody ConfigOptionProductOption configOptionProductOptionToBeAdded) throws Exception {
+	public ResponseEntity<ConfigOptionProductOption> createConfigOptionProductOption(@RequestBody ConfigOptionProductOption configOptionProductOptionToBeAdded) throws Exception {
 
 		AddConfigOptionProductOption command = new AddConfigOptionProductOption(configOptionProductOptionToBeAdded);
 		ConfigOptionProductOption configOptionProductOption = ((ConfigOptionProductOptionAdded) Scheduler.execute(command).data()).getAddedConfigOptionProductOption();
 		
 		if (configOptionProductOption != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(configOptionProductOption);
+			return successful(configOptionProductOption);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ConfigOptionProductOption could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateConfigOptionProductOption(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ConfigOptionProductOption configOptionProductOptionToBeUpdated = new ConfigOptionProductOption();
-
-		try {
-			configOptionProductOptionToBeUpdated = ConfigOptionProductOptionMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateConfigOptionProductOption(configOptionProductOptionToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ConfigOptionProductOptionController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateConfigOptionProductOption(@RequestBody ConfigOptionProductOption configOptionProductOptionToBeUpdated,
+	public ResponseEntity<String> updateConfigOptionProductOption(@RequestBody ConfigOptionProductOption configOptionProductOptionToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		configOptionProductOptionToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ConfigOptionProductOptionController {
 
 		try {
 			if(((ConfigOptionProductOptionUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{configOptionProductOptionId}")
-	public ResponseEntity<Object> findById(@PathVariable String configOptionProductOptionId) throws Exception {
+	public ResponseEntity<ConfigOptionProductOption> findById(@PathVariable String configOptionProductOptionId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("configOptionProductOptionId", configOptionProductOptionId);
 		try {
 
-			Object foundConfigOptionProductOption = findConfigOptionProductOptionsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundConfigOptionProductOption);
+			List<ConfigOptionProductOption> foundConfigOptionProductOption = findConfigOptionProductOptionsBy(requestParams).getBody();
+			if(foundConfigOptionProductOption.size()==1){				return successful(foundConfigOptionProductOption.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{configOptionProductOptionId}")
-	public ResponseEntity<Object> deleteConfigOptionProductOptionByIdUpdated(@PathVariable String configOptionProductOptionId) throws Exception {
+	public ResponseEntity<String> deleteConfigOptionProductOptionByIdUpdated(@PathVariable String configOptionProductOptionId) throws Exception {
 		DeleteConfigOptionProductOption command = new DeleteConfigOptionProductOption(configOptionProductOptionId);
 
 		try {
 			if (((ConfigOptionProductOptionDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ConfigOptionProductOption could not be deleted");
+		return conflict();
 
 	}
 

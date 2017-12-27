@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.content.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productContents")
 public class ProductContentController {
@@ -52,7 +54,7 @@ public class ProductContentController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductContentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductContent>> findProductContentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductContentsBy query = new FindProductContentsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductContentController {
 		}
 
 		List<ProductContent> productContents =((ProductContentFound) Scheduler.execute(query).data()).getProductContents();
-
-		if (productContents.size() == 1) {
-			return ResponseEntity.ok().body(productContents.get(0));
-		}
 
 		return ResponseEntity.ok().body(productContents);
 
@@ -78,7 +76,7 @@ public class ProductContentController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductContent(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductContent> createProductContent(HttpServletRequest request) throws Exception {
 
 		ProductContent productContentToBeAdded = new ProductContent();
 		try {
@@ -86,7 +84,7 @@ public class ProductContentController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductContent(productContentToBeAdded);
@@ -101,63 +99,15 @@ public class ProductContentController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductContent(@RequestBody ProductContent productContentToBeAdded) throws Exception {
+	public ResponseEntity<ProductContent> createProductContent(@RequestBody ProductContent productContentToBeAdded) throws Exception {
 
 		AddProductContent command = new AddProductContent(productContentToBeAdded);
 		ProductContent productContent = ((ProductContentAdded) Scheduler.execute(command).data()).getAddedProductContent();
 		
 		if (productContent != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productContent);
+			return successful(productContent);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductContent could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductContent(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductContent productContentToBeUpdated = new ProductContent();
-
-		try {
-			productContentToBeUpdated = ProductContentMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductContent(productContentToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductContentController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductContent(@RequestBody ProductContent productContentToBeUpdated,
+	public ResponseEntity<String> updateProductContent(@RequestBody ProductContent productContentToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		productContentToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ProductContentController {
 
 		try {
 			if(((ProductContentUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productContentId}")
-	public ResponseEntity<Object> findById(@PathVariable String productContentId) throws Exception {
+	public ResponseEntity<ProductContent> findById(@PathVariable String productContentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productContentId", productContentId);
 		try {
 
-			Object foundProductContent = findProductContentsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductContent);
+			List<ProductContent> foundProductContent = findProductContentsBy(requestParams).getBody();
+			if(foundProductContent.size()==1){				return successful(foundProductContent.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productContentId}")
-	public ResponseEntity<Object> deleteProductContentByIdUpdated(@PathVariable String productContentId) throws Exception {
+	public ResponseEntity<String> deleteProductContentByIdUpdated(@PathVariable String productContentId) throws Exception {
 		DeleteProductContent command = new DeleteProductContent(productContentId);
 
 		try {
 			if (((ProductContentDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductContent could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.accommodationClass.quer
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/accommodationClasss")
 public class AccommodationClassController {
@@ -52,7 +54,7 @@ public class AccommodationClassController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findAccommodationClasssBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<AccommodationClass>> findAccommodationClasssBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAccommodationClasssBy query = new FindAccommodationClasssBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class AccommodationClassController {
 		}
 
 		List<AccommodationClass> accommodationClasss =((AccommodationClassFound) Scheduler.execute(query).data()).getAccommodationClasss();
-
-		if (accommodationClasss.size() == 1) {
-			return ResponseEntity.ok().body(accommodationClasss.get(0));
-		}
 
 		return ResponseEntity.ok().body(accommodationClasss);
 
@@ -78,7 +76,7 @@ public class AccommodationClassController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createAccommodationClass(HttpServletRequest request) throws Exception {
+	public ResponseEntity<AccommodationClass> createAccommodationClass(HttpServletRequest request) throws Exception {
 
 		AccommodationClass accommodationClassToBeAdded = new AccommodationClass();
 		try {
@@ -86,7 +84,7 @@ public class AccommodationClassController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createAccommodationClass(accommodationClassToBeAdded);
@@ -101,63 +99,15 @@ public class AccommodationClassController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createAccommodationClass(@RequestBody AccommodationClass accommodationClassToBeAdded) throws Exception {
+	public ResponseEntity<AccommodationClass> createAccommodationClass(@RequestBody AccommodationClass accommodationClassToBeAdded) throws Exception {
 
 		AddAccommodationClass command = new AddAccommodationClass(accommodationClassToBeAdded);
 		AccommodationClass accommodationClass = ((AccommodationClassAdded) Scheduler.execute(command).data()).getAddedAccommodationClass();
 		
 		if (accommodationClass != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(accommodationClass);
+			return successful(accommodationClass);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("AccommodationClass could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateAccommodationClass(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		AccommodationClass accommodationClassToBeUpdated = new AccommodationClass();
-
-		try {
-			accommodationClassToBeUpdated = AccommodationClassMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateAccommodationClass(accommodationClassToBeUpdated, accommodationClassToBeUpdated.getAccommodationClassId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class AccommodationClassController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{accommodationClassId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateAccommodationClass(@RequestBody AccommodationClass accommodationClassToBeUpdated,
+	public ResponseEntity<String> updateAccommodationClass(@RequestBody AccommodationClass accommodationClassToBeUpdated,
 			@PathVariable String accommodationClassId) throws Exception {
 
 		accommodationClassToBeUpdated.setAccommodationClassId(accommodationClassId);
@@ -178,41 +128,44 @@ public class AccommodationClassController {
 
 		try {
 			if(((AccommodationClassUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{accommodationClassId}")
-	public ResponseEntity<Object> findById(@PathVariable String accommodationClassId) throws Exception {
+	public ResponseEntity<AccommodationClass> findById(@PathVariable String accommodationClassId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("accommodationClassId", accommodationClassId);
 		try {
 
-			Object foundAccommodationClass = findAccommodationClasssBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundAccommodationClass);
+			List<AccommodationClass> foundAccommodationClass = findAccommodationClasssBy(requestParams).getBody();
+			if(foundAccommodationClass.size()==1){				return successful(foundAccommodationClass.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{accommodationClassId}")
-	public ResponseEntity<Object> deleteAccommodationClassByIdUpdated(@PathVariable String accommodationClassId) throws Exception {
+	public ResponseEntity<String> deleteAccommodationClassByIdUpdated(@PathVariable String accommodationClassId) throws Exception {
 		DeleteAccommodationClass command = new DeleteAccommodationClass(accommodationClassId);
 
 		try {
 			if (((AccommodationClassDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("AccommodationClass could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.budget.query.revision.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/budget/budgetRevisions")
 public class BudgetRevisionController {
@@ -52,7 +54,7 @@ public class BudgetRevisionController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findBudgetRevisionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<BudgetRevision>> findBudgetRevisionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindBudgetRevisionsBy query = new FindBudgetRevisionsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class BudgetRevisionController {
 		}
 
 		List<BudgetRevision> budgetRevisions =((BudgetRevisionFound) Scheduler.execute(query).data()).getBudgetRevisions();
-
-		if (budgetRevisions.size() == 1) {
-			return ResponseEntity.ok().body(budgetRevisions.get(0));
-		}
 
 		return ResponseEntity.ok().body(budgetRevisions);
 
@@ -78,7 +76,7 @@ public class BudgetRevisionController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createBudgetRevision(HttpServletRequest request) throws Exception {
+	public ResponseEntity<BudgetRevision> createBudgetRevision(HttpServletRequest request) throws Exception {
 
 		BudgetRevision budgetRevisionToBeAdded = new BudgetRevision();
 		try {
@@ -86,7 +84,7 @@ public class BudgetRevisionController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createBudgetRevision(budgetRevisionToBeAdded);
@@ -101,63 +99,15 @@ public class BudgetRevisionController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createBudgetRevision(@RequestBody BudgetRevision budgetRevisionToBeAdded) throws Exception {
+	public ResponseEntity<BudgetRevision> createBudgetRevision(@RequestBody BudgetRevision budgetRevisionToBeAdded) throws Exception {
 
 		AddBudgetRevision command = new AddBudgetRevision(budgetRevisionToBeAdded);
 		BudgetRevision budgetRevision = ((BudgetRevisionAdded) Scheduler.execute(command).data()).getAddedBudgetRevision();
 		
 		if (budgetRevision != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(budgetRevision);
+			return successful(budgetRevision);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("BudgetRevision could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateBudgetRevision(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		BudgetRevision budgetRevisionToBeUpdated = new BudgetRevision();
-
-		try {
-			budgetRevisionToBeUpdated = BudgetRevisionMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateBudgetRevision(budgetRevisionToBeUpdated, budgetRevisionToBeUpdated.getRevisionSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class BudgetRevisionController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{revisionSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateBudgetRevision(@RequestBody BudgetRevision budgetRevisionToBeUpdated,
+	public ResponseEntity<String> updateBudgetRevision(@RequestBody BudgetRevision budgetRevisionToBeUpdated,
 			@PathVariable String revisionSeqId) throws Exception {
 
 		budgetRevisionToBeUpdated.setRevisionSeqId(revisionSeqId);
@@ -178,41 +128,44 @@ public class BudgetRevisionController {
 
 		try {
 			if(((BudgetRevisionUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{budgetRevisionId}")
-	public ResponseEntity<Object> findById(@PathVariable String budgetRevisionId) throws Exception {
+	public ResponseEntity<BudgetRevision> findById(@PathVariable String budgetRevisionId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("budgetRevisionId", budgetRevisionId);
 		try {
 
-			Object foundBudgetRevision = findBudgetRevisionsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundBudgetRevision);
+			List<BudgetRevision> foundBudgetRevision = findBudgetRevisionsBy(requestParams).getBody();
+			if(foundBudgetRevision.size()==1){				return successful(foundBudgetRevision.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{budgetRevisionId}")
-	public ResponseEntity<Object> deleteBudgetRevisionByIdUpdated(@PathVariable String budgetRevisionId) throws Exception {
+	public ResponseEntity<String> deleteBudgetRevisionByIdUpdated(@PathVariable String budgetRevisionId) throws Exception {
 		DeleteBudgetRevision command = new DeleteBudgetRevision(budgetRevisionId);
 
 		try {
 			if (((BudgetRevisionDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("BudgetRevision could not be deleted");
+		return conflict();
 
 	}
 

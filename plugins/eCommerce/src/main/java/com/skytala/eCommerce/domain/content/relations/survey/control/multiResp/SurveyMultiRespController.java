@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.survey.query.multiResp.Fin
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/survey/surveyMultiResps")
 public class SurveyMultiRespController {
@@ -52,7 +54,7 @@ public class SurveyMultiRespController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findSurveyMultiRespsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<SurveyMultiResp>> findSurveyMultiRespsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSurveyMultiRespsBy query = new FindSurveyMultiRespsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class SurveyMultiRespController {
 		}
 
 		List<SurveyMultiResp> surveyMultiResps =((SurveyMultiRespFound) Scheduler.execute(query).data()).getSurveyMultiResps();
-
-		if (surveyMultiResps.size() == 1) {
-			return ResponseEntity.ok().body(surveyMultiResps.get(0));
-		}
 
 		return ResponseEntity.ok().body(surveyMultiResps);
 
@@ -78,7 +76,7 @@ public class SurveyMultiRespController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createSurveyMultiResp(HttpServletRequest request) throws Exception {
+	public ResponseEntity<SurveyMultiResp> createSurveyMultiResp(HttpServletRequest request) throws Exception {
 
 		SurveyMultiResp surveyMultiRespToBeAdded = new SurveyMultiResp();
 		try {
@@ -86,7 +84,7 @@ public class SurveyMultiRespController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createSurveyMultiResp(surveyMultiRespToBeAdded);
@@ -101,63 +99,15 @@ public class SurveyMultiRespController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createSurveyMultiResp(@RequestBody SurveyMultiResp surveyMultiRespToBeAdded) throws Exception {
+	public ResponseEntity<SurveyMultiResp> createSurveyMultiResp(@RequestBody SurveyMultiResp surveyMultiRespToBeAdded) throws Exception {
 
 		AddSurveyMultiResp command = new AddSurveyMultiResp(surveyMultiRespToBeAdded);
 		SurveyMultiResp surveyMultiResp = ((SurveyMultiRespAdded) Scheduler.execute(command).data()).getAddedSurveyMultiResp();
 		
 		if (surveyMultiResp != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(surveyMultiResp);
+			return successful(surveyMultiResp);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("SurveyMultiResp could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateSurveyMultiResp(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		SurveyMultiResp surveyMultiRespToBeUpdated = new SurveyMultiResp();
-
-		try {
-			surveyMultiRespToBeUpdated = SurveyMultiRespMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateSurveyMultiResp(surveyMultiRespToBeUpdated, surveyMultiRespToBeUpdated.getSurveyMultiRespId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class SurveyMultiRespController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{surveyMultiRespId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateSurveyMultiResp(@RequestBody SurveyMultiResp surveyMultiRespToBeUpdated,
+	public ResponseEntity<String> updateSurveyMultiResp(@RequestBody SurveyMultiResp surveyMultiRespToBeUpdated,
 			@PathVariable String surveyMultiRespId) throws Exception {
 
 		surveyMultiRespToBeUpdated.setSurveyMultiRespId(surveyMultiRespId);
@@ -178,41 +128,44 @@ public class SurveyMultiRespController {
 
 		try {
 			if(((SurveyMultiRespUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{surveyMultiRespId}")
-	public ResponseEntity<Object> findById(@PathVariable String surveyMultiRespId) throws Exception {
+	public ResponseEntity<SurveyMultiResp> findById(@PathVariable String surveyMultiRespId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("surveyMultiRespId", surveyMultiRespId);
 		try {
 
-			Object foundSurveyMultiResp = findSurveyMultiRespsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundSurveyMultiResp);
+			List<SurveyMultiResp> foundSurveyMultiResp = findSurveyMultiRespsBy(requestParams).getBody();
+			if(foundSurveyMultiResp.size()==1){				return successful(foundSurveyMultiResp.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{surveyMultiRespId}")
-	public ResponseEntity<Object> deleteSurveyMultiRespByIdUpdated(@PathVariable String surveyMultiRespId) throws Exception {
+	public ResponseEntity<String> deleteSurveyMultiRespByIdUpdated(@PathVariable String surveyMultiRespId) throws Exception {
 		DeleteSurveyMultiResp command = new DeleteSurveyMultiResp(surveyMultiRespId);
 
 		try {
 			if (((SurveyMultiRespDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("SurveyMultiResp could not be deleted");
+		return conflict();
 
 	}
 

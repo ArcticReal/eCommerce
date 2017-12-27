@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/webtoolss")
 public class WebtoolssServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/entityImportDir")
-	public ResponseEntity<Object> entityImportDir(HttpSession session, @RequestParam(value="path", required=false) String path, @RequestParam(value="deleteFiles", required=false) String deleteFiles, @RequestParam(value="placeholderValues", required=false) java.util.Map placeholderValues, @RequestParam(value="checkDataOnly", required=false) String checkDataOnly, @RequestParam(value="filePause", required=false) Long filePause, @RequestParam(value="createDummyFks", required=false) String createDummyFks, @RequestParam(value="maintainTimeStamps", required=false) String maintainTimeStamps, @RequestParam(value="txTimeout", required=false) Integer txTimeout, @RequestParam(value="mostlyInserts", required=false) String mostlyInserts) {
+	public ResponseEntity<Map<String, Object>> entityImportDir(HttpSession session, @RequestParam(value="path", required=false) String path, @RequestParam(value="deleteFiles", required=false) String deleteFiles, @RequestParam(value="placeholderValues", required=false) java.util.Map placeholderValues, @RequestParam(value="checkDataOnly", required=false) String checkDataOnly, @RequestParam(value="filePause", required=false) Long filePause, @RequestParam(value="createDummyFks", required=false) String createDummyFks, @RequestParam(value="maintainTimeStamps", required=false) String maintainTimeStamps, @RequestParam(value="txTimeout", required=false) Integer txTimeout, @RequestParam(value="mostlyInserts", required=false) String mostlyInserts) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("path",path);
@@ -47,23 +49,23 @@ public class WebtoolssServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/exportServiceEoModelBundle")
-	public ResponseEntity<Object> exportServiceEoModelBundle(HttpSession session, @RequestParam(value="eomodeldFullPath") java.lang.String eomodeldFullPath, @RequestParam(value="serviceName") java.lang.String serviceName) {
+	public ResponseEntity<Map<String, Object>> exportServiceEoModelBundle(HttpSession session, @RequestParam(value="eomodeldFullPath") java.lang.String eomodeldFullPath, @RequestParam(value="serviceName") java.lang.String serviceName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("eomodeldFullPath",eomodeldFullPath);
@@ -77,23 +79,23 @@ public class WebtoolssServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/saveLabelsToXmlFile")
-	public ResponseEntity<Object> saveLabelsToXmlFile(HttpSession session, @RequestParam(value="fileName") String fileName, @RequestParam(value="update_label") String update_label, @RequestParam(value="confirm", required=false) String confirm, @RequestParam(value="localeNames", required=false) List localeNames, @RequestParam(value="localeValues", required=false) List localeValues, @RequestParam(value="localeComments", required=false) List localeComments, @RequestParam(value="removeLabel", required=false) String removeLabel, @RequestParam(value="key", required=false) String key, @RequestParam(value="keyComment", required=false) String keyComment) {
+	public ResponseEntity<Map<String, Object>> saveLabelsToXmlFile(HttpSession session, @RequestParam(value="fileName") String fileName, @RequestParam(value="update_label") String update_label, @RequestParam(value="confirm", required=false) String confirm, @RequestParam(value="localeNames", required=false) List localeNames, @RequestParam(value="localeValues", required=false) List localeValues, @RequestParam(value="localeComments", required=false) List localeComments, @RequestParam(value="removeLabel", required=false) String removeLabel, @RequestParam(value="key", required=false) String key, @RequestParam(value="keyComment", required=false) String keyComment) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fileName",fileName);
@@ -114,23 +116,23 @@ public class WebtoolssServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/entityImportReaders")
-	public ResponseEntity<Object> entityImportReaders(HttpSession session, @RequestParam(value="overrideDelegator", required=false) String overrideDelegator, @RequestParam(value="checkDataOnly", required=false) String checkDataOnly, @RequestParam(value="readers", required=false) String readers, @RequestParam(value="createDummyFks", required=false) String createDummyFks, @RequestParam(value="maintainTimeStamps", required=false) String maintainTimeStamps, @RequestParam(value="txTimeout", required=false) Integer txTimeout, @RequestParam(value="mostlyInserts", required=false) String mostlyInserts, @RequestParam(value="overrideGroup", required=false) String overrideGroup) {
+	public ResponseEntity<Map<String, Object>> entityImportReaders(HttpSession session, @RequestParam(value="overrideDelegator", required=false) String overrideDelegator, @RequestParam(value="checkDataOnly", required=false) String checkDataOnly, @RequestParam(value="readers", required=false) String readers, @RequestParam(value="createDummyFks", required=false) String createDummyFks, @RequestParam(value="maintainTimeStamps", required=false) String maintainTimeStamps, @RequestParam(value="txTimeout", required=false) Integer txTimeout, @RequestParam(value="mostlyInserts", required=false) String mostlyInserts, @RequestParam(value="overrideGroup", required=false) String overrideGroup) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("overrideDelegator",overrideDelegator);
@@ -150,23 +152,23 @@ public class WebtoolssServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/entityExportAll")
-	public ResponseEntity<Object> entityExportAll(HttpSession session, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="outpath", required=false) String outpath, @RequestParam(value="txTimeout", required=false) Integer txTimeout) {
+	public ResponseEntity<Map<String, Object>> entityExportAll(HttpSession session, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="outpath", required=false) String outpath, @RequestParam(value="txTimeout", required=false) Integer txTimeout) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -181,23 +183,23 @@ public class WebtoolssServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/entityMaintPermCheck")
-	public ResponseEntity<Object> entityMaintPermCheck(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="mainAction", required=false) String mainAction) {
+	public ResponseEntity<Map<String, Object>> entityMaintPermCheck(HttpSession session, @RequestParam(value="primaryPermission", required=false) String primaryPermission, @RequestParam(value="altPermission", required=false) String altPermission, @RequestParam(value="resourceDescription", required=false) String resourceDescription, @RequestParam(value="mainAction", required=false) String mainAction) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("primaryPermission",primaryPermission);
@@ -213,23 +215,23 @@ public class WebtoolssServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/parseEntityXmlFile")
-	public ResponseEntity<Object> parseEntityXmlFile(HttpSession session, @RequestParam(value="xmltext", required=false) String xmltext, @RequestParam(value="placeholderValues", required=false) java.util.Map placeholderValues, @RequestParam(value="checkDataOnly", required=false) String checkDataOnly, @RequestParam(value="createDummyFks", required=false) String createDummyFks, @RequestParam(value="maintainTimeStamps", required=false) String maintainTimeStamps, @RequestParam(value="txTimeout", required=false) Integer txTimeout, @RequestParam(value="mostlyInserts", required=false) String mostlyInserts, @RequestParam(value="url", required=false) java.net.URL url) {
+	public ResponseEntity<Map<String, Object>> parseEntityXmlFile(HttpSession session, @RequestParam(value="xmltext", required=false) String xmltext, @RequestParam(value="placeholderValues", required=false) java.util.Map placeholderValues, @RequestParam(value="checkDataOnly", required=false) String checkDataOnly, @RequestParam(value="createDummyFks", required=false) String createDummyFks, @RequestParam(value="maintainTimeStamps", required=false) String maintainTimeStamps, @RequestParam(value="txTimeout", required=false) Integer txTimeout, @RequestParam(value="mostlyInserts", required=false) String mostlyInserts, @RequestParam(value="url", required=false) java.net.URL url) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("xmltext",xmltext);
@@ -249,23 +251,23 @@ public class WebtoolssServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getEntityRefData")
-	public ResponseEntity<Object> getEntityRefData(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> getEntityRefData(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -277,23 +279,23 @@ public class WebtoolssServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/exportEntityEoModelBundle")
-	public ResponseEntity<Object> exportEntityEoModelBundle(HttpSession session, @RequestParam(value="eomodeldFullPath") java.lang.String eomodeldFullPath, @RequestParam(value="entityNamePrefix", required=false) java.lang.String entityNamePrefix, @RequestParam(value="entityGroupId", required=false) java.lang.String entityGroupId, @RequestParam(value="datasourceName", required=false) java.lang.String datasourceName, @RequestParam(value="entityPackageName", required=false) java.lang.String entityPackageName) {
+	public ResponseEntity<Map<String, Object>> exportEntityEoModelBundle(HttpSession session, @RequestParam(value="eomodeldFullPath") java.lang.String eomodeldFullPath, @RequestParam(value="entityNamePrefix", required=false) java.lang.String entityNamePrefix, @RequestParam(value="entityGroupId", required=false) java.lang.String entityGroupId, @RequestParam(value="datasourceName", required=false) java.lang.String datasourceName, @RequestParam(value="entityPackageName", required=false) java.lang.String entityPackageName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("eomodeldFullPath",eomodeldFullPath);
@@ -310,23 +312,23 @@ public class WebtoolssServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/entityImport")
-	public ResponseEntity<Object> entityImport(HttpSession session, @RequestParam(value="placeholderValues", required=false) java.util.Map placeholderValues, @RequestParam(value="filename", required=false) String filename, @RequestParam(value="checkDataOnly", required=false) String checkDataOnly, @RequestParam(value="fmfilename", required=false) String fmfilename, @RequestParam(value="createDummyFks", required=false) String createDummyFks, @RequestParam(value="maintainTimeStamps", required=false) String maintainTimeStamps, @RequestParam(value="fulltext", required=false) String fulltext, @RequestParam(value="isUrl", required=false) String isUrl, @RequestParam(value="txTimeout", required=false) Integer txTimeout, @RequestParam(value="mostlyInserts", required=false) String mostlyInserts) {
+	public ResponseEntity<Map<String, Object>> entityImport(HttpSession session, @RequestParam(value="placeholderValues", required=false) java.util.Map placeholderValues, @RequestParam(value="filename", required=false) String filename, @RequestParam(value="checkDataOnly", required=false) String checkDataOnly, @RequestParam(value="fmfilename", required=false) String fmfilename, @RequestParam(value="createDummyFks", required=false) String createDummyFks, @RequestParam(value="maintainTimeStamps", required=false) String maintainTimeStamps, @RequestParam(value="fulltext", required=false) String fulltext, @RequestParam(value="isUrl", required=false) String isUrl, @RequestParam(value="txTimeout", required=false) Integer txTimeout, @RequestParam(value="mostlyInserts", required=false) String mostlyInserts) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("placeholderValues",placeholderValues);
@@ -348,19 +350,19 @@ public class WebtoolssServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

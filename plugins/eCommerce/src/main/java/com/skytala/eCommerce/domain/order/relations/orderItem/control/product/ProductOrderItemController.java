@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.orderItem.query.product.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/orderItem/productOrderItems")
 public class ProductOrderItemController {
@@ -52,7 +54,7 @@ public class ProductOrderItemController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductOrderItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductOrderItem>> findProductOrderItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductOrderItemsBy query = new FindProductOrderItemsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductOrderItemController {
 		}
 
 		List<ProductOrderItem> productOrderItems =((ProductOrderItemFound) Scheduler.execute(query).data()).getProductOrderItems();
-
-		if (productOrderItems.size() == 1) {
-			return ResponseEntity.ok().body(productOrderItems.get(0));
-		}
 
 		return ResponseEntity.ok().body(productOrderItems);
 
@@ -78,7 +76,7 @@ public class ProductOrderItemController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductOrderItem(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductOrderItem> createProductOrderItem(HttpServletRequest request) throws Exception {
 
 		ProductOrderItem productOrderItemToBeAdded = new ProductOrderItem();
 		try {
@@ -86,7 +84,7 @@ public class ProductOrderItemController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductOrderItem(productOrderItemToBeAdded);
@@ -101,63 +99,15 @@ public class ProductOrderItemController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductOrderItem(@RequestBody ProductOrderItem productOrderItemToBeAdded) throws Exception {
+	public ResponseEntity<ProductOrderItem> createProductOrderItem(@RequestBody ProductOrderItem productOrderItemToBeAdded) throws Exception {
 
 		AddProductOrderItem command = new AddProductOrderItem(productOrderItemToBeAdded);
 		ProductOrderItem productOrderItem = ((ProductOrderItemAdded) Scheduler.execute(command).data()).getAddedProductOrderItem();
 		
 		if (productOrderItem != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productOrderItem);
+			return successful(productOrderItem);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductOrderItem could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductOrderItem(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductOrderItem productOrderItemToBeUpdated = new ProductOrderItem();
-
-		try {
-			productOrderItemToBeUpdated = ProductOrderItemMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductOrderItem(productOrderItemToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductOrderItemController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductOrderItem(@RequestBody ProductOrderItem productOrderItemToBeUpdated,
+	public ResponseEntity<String> updateProductOrderItem(@RequestBody ProductOrderItem productOrderItemToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		productOrderItemToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ProductOrderItemController {
 
 		try {
 			if(((ProductOrderItemUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productOrderItemId}")
-	public ResponseEntity<Object> findById(@PathVariable String productOrderItemId) throws Exception {
+	public ResponseEntity<ProductOrderItem> findById(@PathVariable String productOrderItemId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productOrderItemId", productOrderItemId);
 		try {
 
-			Object foundProductOrderItem = findProductOrderItemsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductOrderItem);
+			List<ProductOrderItem> foundProductOrderItem = findProductOrderItemsBy(requestParams).getBody();
+			if(foundProductOrderItem.size()==1){				return successful(foundProductOrderItem.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productOrderItemId}")
-	public ResponseEntity<Object> deleteProductOrderItemByIdUpdated(@PathVariable String productOrderItemId) throws Exception {
+	public ResponseEntity<String> deleteProductOrderItemByIdUpdated(@PathVariable String productOrderItemId) throws Exception {
 		DeleteProductOrderItem command = new DeleteProductOrderItem(productOrderItemId);
 
 		try {
 			if (((ProductOrderItemDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductOrderItem could not be deleted");
+		return conflict();
 
 	}
 

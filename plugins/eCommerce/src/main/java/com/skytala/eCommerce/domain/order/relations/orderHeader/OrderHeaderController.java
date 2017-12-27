@@ -53,7 +53,7 @@ public class OrderHeaderController {
 
 		validRequests.put("find", RequestMethod.GET);
 		validRequests.put("add", RequestMethod.POST);
-		validRequests.put("update", RequestMethod.PUT);
+		validRequests.put("updapte", RequestMethod.PUT);
 		validRequests.put("removeById", RequestMethod.DELETE);
 	}
 
@@ -71,7 +71,7 @@ public class OrderHeaderController {
 
 		UserDetailsDTO userDetails = loginServicesController.getLoggedInPerson(principal).getBody();
 		if(!userDetails.getAuthorities().contains(ADMIN))
-			allRequestParams.put("partyIdTo", userDetails.getPartyId());
+			allRequestParams.put("createdBy", userDetails.getPartyId());
 
 		FindOrderHeadersBy query = new FindOrderHeadersBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -131,53 +131,6 @@ public class OrderHeaderController {
 		else 
 			return ResponseEntity.status(HttpStatus.CONFLICT)
 					             .body(null);
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@RequestMapping(method = RequestMethod.PUT, value = "/update", consumes = "application/x-www-form-urlencoded")
-	@PreAuthorize(AUTHENTICATED)
-	public boolean updateOrderHeader(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OrderHeader orderHeaderToBeUpdated = new OrderHeader();
-
-		try {
-			orderHeaderToBeUpdated = OrderHeaderMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOrderHeader(orderHeaderToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
 	}
 
 	/**

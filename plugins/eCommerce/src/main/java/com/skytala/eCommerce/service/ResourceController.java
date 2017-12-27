@@ -12,6 +12,7 @@ import com.skytala.eCommerce.domain.product.relations.product.model.content.Prod
 import com.skytala.eCommerce.domain.product.relations.product.query.content.FindProductContentsBy;
 import com.skytala.eCommerce.framework.pubsub.Event;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,7 +27,7 @@ import java.util.Map;
 public class ResourceController {
 
 
-    @RequestMapping("/productImageURLs/{productId}")
+    @GetMapping("/productImageURLs/{productId}")
     public List getProductImageUrls(@PathVariable("productId")String productId) throws Exception {
         Map<String, String> filter = new HashMap<>();
         filter.put("productId",productId);

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.marketing.relations.marketingCampaign.query.
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/marketing/marketingCampaigns")
 public class MarketingCampaignController {
@@ -52,7 +54,7 @@ public class MarketingCampaignController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findMarketingCampaignsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<MarketingCampaign>> findMarketingCampaignsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindMarketingCampaignsBy query = new FindMarketingCampaignsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class MarketingCampaignController {
 		}
 
 		List<MarketingCampaign> marketingCampaigns =((MarketingCampaignFound) Scheduler.execute(query).data()).getMarketingCampaigns();
-
-		if (marketingCampaigns.size() == 1) {
-			return ResponseEntity.ok().body(marketingCampaigns.get(0));
-		}
 
 		return ResponseEntity.ok().body(marketingCampaigns);
 
@@ -78,7 +76,7 @@ public class MarketingCampaignController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createMarketingCampaign(HttpServletRequest request) throws Exception {
+	public ResponseEntity<MarketingCampaign> createMarketingCampaign(HttpServletRequest request) throws Exception {
 
 		MarketingCampaign marketingCampaignToBeAdded = new MarketingCampaign();
 		try {
@@ -86,7 +84,7 @@ public class MarketingCampaignController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createMarketingCampaign(marketingCampaignToBeAdded);
@@ -101,63 +99,15 @@ public class MarketingCampaignController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createMarketingCampaign(@RequestBody MarketingCampaign marketingCampaignToBeAdded) throws Exception {
+	public ResponseEntity<MarketingCampaign> createMarketingCampaign(@RequestBody MarketingCampaign marketingCampaignToBeAdded) throws Exception {
 
 		AddMarketingCampaign command = new AddMarketingCampaign(marketingCampaignToBeAdded);
 		MarketingCampaign marketingCampaign = ((MarketingCampaignAdded) Scheduler.execute(command).data()).getAddedMarketingCampaign();
 		
 		if (marketingCampaign != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(marketingCampaign);
+			return successful(marketingCampaign);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("MarketingCampaign could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateMarketingCampaign(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		MarketingCampaign marketingCampaignToBeUpdated = new MarketingCampaign();
-
-		try {
-			marketingCampaignToBeUpdated = MarketingCampaignMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateMarketingCampaign(marketingCampaignToBeUpdated, marketingCampaignToBeUpdated.getMarketingCampaignId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class MarketingCampaignController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{marketingCampaignId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateMarketingCampaign(@RequestBody MarketingCampaign marketingCampaignToBeUpdated,
+	public ResponseEntity<String> updateMarketingCampaign(@RequestBody MarketingCampaign marketingCampaignToBeUpdated,
 			@PathVariable String marketingCampaignId) throws Exception {
 
 		marketingCampaignToBeUpdated.setMarketingCampaignId(marketingCampaignId);
@@ -178,41 +128,44 @@ public class MarketingCampaignController {
 
 		try {
 			if(((MarketingCampaignUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{marketingCampaignId}")
-	public ResponseEntity<Object> findById(@PathVariable String marketingCampaignId) throws Exception {
+	public ResponseEntity<MarketingCampaign> findById(@PathVariable String marketingCampaignId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("marketingCampaignId", marketingCampaignId);
 		try {
 
-			Object foundMarketingCampaign = findMarketingCampaignsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundMarketingCampaign);
+			List<MarketingCampaign> foundMarketingCampaign = findMarketingCampaignsBy(requestParams).getBody();
+			if(foundMarketingCampaign.size()==1){				return successful(foundMarketingCampaign.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{marketingCampaignId}")
-	public ResponseEntity<Object> deleteMarketingCampaignByIdUpdated(@PathVariable String marketingCampaignId) throws Exception {
+	public ResponseEntity<String> deleteMarketingCampaignByIdUpdated(@PathVariable String marketingCampaignId) throws Exception {
 		DeleteMarketingCampaign command = new DeleteMarketingCampaign(marketingCampaignId);
 
 		try {
 			if (((MarketingCampaignDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("MarketingCampaign could not be deleted");
+		return conflict();
 
 	}
 

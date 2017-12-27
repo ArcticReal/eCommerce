@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.payment.query.type.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/payment/paymentTypes")
 public class PaymentTypeController {
@@ -52,7 +54,7 @@ public class PaymentTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPaymentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PaymentType>> findPaymentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentTypesBy query = new FindPaymentTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PaymentTypeController {
 		}
 
 		List<PaymentType> paymentTypes =((PaymentTypeFound) Scheduler.execute(query).data()).getPaymentTypes();
-
-		if (paymentTypes.size() == 1) {
-			return ResponseEntity.ok().body(paymentTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(paymentTypes);
 
@@ -78,7 +76,7 @@ public class PaymentTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPaymentType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PaymentType> createPaymentType(HttpServletRequest request) throws Exception {
 
 		PaymentType paymentTypeToBeAdded = new PaymentType();
 		try {
@@ -86,7 +84,7 @@ public class PaymentTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPaymentType(paymentTypeToBeAdded);
@@ -101,63 +99,15 @@ public class PaymentTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPaymentType(@RequestBody PaymentType paymentTypeToBeAdded) throws Exception {
+	public ResponseEntity<PaymentType> createPaymentType(@RequestBody PaymentType paymentTypeToBeAdded) throws Exception {
 
 		AddPaymentType command = new AddPaymentType(paymentTypeToBeAdded);
 		PaymentType paymentType = ((PaymentTypeAdded) Scheduler.execute(command).data()).getAddedPaymentType();
 		
 		if (paymentType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(paymentType);
+			return successful(paymentType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PaymentType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePaymentType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PaymentType paymentTypeToBeUpdated = new PaymentType();
-
-		try {
-			paymentTypeToBeUpdated = PaymentTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePaymentType(paymentTypeToBeUpdated, paymentTypeToBeUpdated.getPaymentTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PaymentTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{paymentTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePaymentType(@RequestBody PaymentType paymentTypeToBeUpdated,
+	public ResponseEntity<String> updatePaymentType(@RequestBody PaymentType paymentTypeToBeUpdated,
 			@PathVariable String paymentTypeId) throws Exception {
 
 		paymentTypeToBeUpdated.setPaymentTypeId(paymentTypeId);
@@ -178,41 +128,44 @@ public class PaymentTypeController {
 
 		try {
 			if(((PaymentTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{paymentTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String paymentTypeId) throws Exception {
+	public ResponseEntity<PaymentType> findById(@PathVariable String paymentTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentTypeId", paymentTypeId);
 		try {
 
-			Object foundPaymentType = findPaymentTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPaymentType);
+			List<PaymentType> foundPaymentType = findPaymentTypesBy(requestParams).getBody();
+			if(foundPaymentType.size()==1){				return successful(foundPaymentType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{paymentTypeId}")
-	public ResponseEntity<Object> deletePaymentTypeByIdUpdated(@PathVariable String paymentTypeId) throws Exception {
+	public ResponseEntity<String> deletePaymentTypeByIdUpdated(@PathVariable String paymentTypeId) throws Exception {
 		DeletePaymentType command = new DeletePaymentType(paymentTypeId);
 
 		try {
 			if (((PaymentTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PaymentType could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.addendum.query.FindAddendums
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/addendums")
 public class AddendumController {
@@ -52,7 +54,7 @@ public class AddendumController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findAddendumsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<Addendum>> findAddendumsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAddendumsBy query = new FindAddendumsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class AddendumController {
 		}
 
 		List<Addendum> addendums =((AddendumFound) Scheduler.execute(query).data()).getAddendums();
-
-		if (addendums.size() == 1) {
-			return ResponseEntity.ok().body(addendums.get(0));
-		}
 
 		return ResponseEntity.ok().body(addendums);
 
@@ -78,7 +76,7 @@ public class AddendumController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createAddendum(HttpServletRequest request) throws Exception {
+	public ResponseEntity<Addendum> createAddendum(HttpServletRequest request) throws Exception {
 
 		Addendum addendumToBeAdded = new Addendum();
 		try {
@@ -86,7 +84,7 @@ public class AddendumController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createAddendum(addendumToBeAdded);
@@ -101,63 +99,15 @@ public class AddendumController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createAddendum(@RequestBody Addendum addendumToBeAdded) throws Exception {
+	public ResponseEntity<Addendum> createAddendum(@RequestBody Addendum addendumToBeAdded) throws Exception {
 
 		AddAddendum command = new AddAddendum(addendumToBeAdded);
 		Addendum addendum = ((AddendumAdded) Scheduler.execute(command).data()).getAddedAddendum();
 		
 		if (addendum != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(addendum);
+			return successful(addendum);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("Addendum could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateAddendum(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		Addendum addendumToBeUpdated = new Addendum();
-
-		try {
-			addendumToBeUpdated = AddendumMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateAddendum(addendumToBeUpdated, addendumToBeUpdated.getAddendumId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class AddendumController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{addendumId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateAddendum(@RequestBody Addendum addendumToBeUpdated,
+	public ResponseEntity<String> updateAddendum(@RequestBody Addendum addendumToBeUpdated,
 			@PathVariable String addendumId) throws Exception {
 
 		addendumToBeUpdated.setAddendumId(addendumId);
@@ -178,41 +128,44 @@ public class AddendumController {
 
 		try {
 			if(((AddendumUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{addendumId}")
-	public ResponseEntity<Object> findById(@PathVariable String addendumId) throws Exception {
+	public ResponseEntity<Addendum> findById(@PathVariable String addendumId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("addendumId", addendumId);
 		try {
 
-			Object foundAddendum = findAddendumsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundAddendum);
+			List<Addendum> foundAddendum = findAddendumsBy(requestParams).getBody();
+			if(foundAddendum.size()==1){				return successful(foundAddendum.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{addendumId}")
-	public ResponseEntity<Object> deleteAddendumByIdUpdated(@PathVariable String addendumId) throws Exception {
+	public ResponseEntity<String> deleteAddendumByIdUpdated(@PathVariable String addendumId) throws Exception {
 		DeleteAddendum command = new DeleteAddendum(addendumId);
 
 		try {
 			if (((AddendumDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("Addendum could not be deleted");
+		return conflict();
 
 	}
 

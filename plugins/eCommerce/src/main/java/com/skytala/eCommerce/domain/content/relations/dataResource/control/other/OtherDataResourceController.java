@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.dataResource.query.other.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/dataResource/otherDataResources")
 public class OtherDataResourceController {
@@ -52,7 +54,7 @@ public class OtherDataResourceController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findOtherDataResourcesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OtherDataResource>> findOtherDataResourcesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOtherDataResourcesBy query = new FindOtherDataResourcesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class OtherDataResourceController {
 		}
 
 		List<OtherDataResource> otherDataResources =((OtherDataResourceFound) Scheduler.execute(query).data()).getOtherDataResources();
-
-		if (otherDataResources.size() == 1) {
-			return ResponseEntity.ok().body(otherDataResources.get(0));
-		}
 
 		return ResponseEntity.ok().body(otherDataResources);
 
@@ -78,7 +76,7 @@ public class OtherDataResourceController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOtherDataResource(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OtherDataResource> createOtherDataResource(HttpServletRequest request) throws Exception {
 
 		OtherDataResource otherDataResourceToBeAdded = new OtherDataResource();
 		try {
@@ -86,7 +84,7 @@ public class OtherDataResourceController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createOtherDataResource(otherDataResourceToBeAdded);
@@ -101,63 +99,15 @@ public class OtherDataResourceController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOtherDataResource(@RequestBody OtherDataResource otherDataResourceToBeAdded) throws Exception {
+	public ResponseEntity<OtherDataResource> createOtherDataResource(@RequestBody OtherDataResource otherDataResourceToBeAdded) throws Exception {
 
 		AddOtherDataResource command = new AddOtherDataResource(otherDataResourceToBeAdded);
 		OtherDataResource otherDataResource = ((OtherDataResourceAdded) Scheduler.execute(command).data()).getAddedOtherDataResource();
 		
 		if (otherDataResource != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(otherDataResource);
+			return successful(otherDataResource);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OtherDataResource could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateOtherDataResource(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OtherDataResource otherDataResourceToBeUpdated = new OtherDataResource();
-
-		try {
-			otherDataResourceToBeUpdated = OtherDataResourceMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOtherDataResource(otherDataResourceToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class OtherDataResourceController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOtherDataResource(@RequestBody OtherDataResource otherDataResourceToBeUpdated,
+	public ResponseEntity<String> updateOtherDataResource(@RequestBody OtherDataResource otherDataResourceToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		otherDataResourceToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class OtherDataResourceController {
 
 		try {
 			if(((OtherDataResourceUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{otherDataResourceId}")
-	public ResponseEntity<Object> findById(@PathVariable String otherDataResourceId) throws Exception {
+	public ResponseEntity<OtherDataResource> findById(@PathVariable String otherDataResourceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("otherDataResourceId", otherDataResourceId);
 		try {
 
-			Object foundOtherDataResource = findOtherDataResourcesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOtherDataResource);
+			List<OtherDataResource> foundOtherDataResource = findOtherDataResourcesBy(requestParams).getBody();
+			if(foundOtherDataResource.size()==1){				return successful(foundOtherDataResource.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{otherDataResourceId}")
-	public ResponseEntity<Object> deleteOtherDataResourceByIdUpdated(@PathVariable String otherDataResourceId) throws Exception {
+	public ResponseEntity<String> deleteOtherDataResourceByIdUpdated(@PathVariable String otherDataResourceId) throws Exception {
 		DeleteOtherDataResource command = new DeleteOtherDataResource(otherDataResourceId);
 
 		try {
 			if (((OtherDataResourceDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("OtherDataResource could not be deleted");
+		return conflict();
 
 	}
 

@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/partyView")
 public class PartyViewServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getPartyFromUserLogin")
-	public ResponseEntity<Object> getPartyFromUserLogin(HttpSession session, @RequestParam(value="userLoginId") String userLoginId) {
+	public ResponseEntity<Map<String, Object>> getPartyFromUserLogin(HttpSession session, @RequestParam(value="userLoginId") String userLoginId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLoginId",userLoginId);
@@ -39,23 +41,23 @@ public class PartyViewServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getPartyFromName")
-	public ResponseEntity<Object> getPartyFromName(HttpSession session, @RequestParam(value="firstName", required=false) String firstName, @RequestParam(value="lastName", required=false) String lastName) {
+	public ResponseEntity<Map<String, Object>> getPartyFromName(HttpSession session, @RequestParam(value="firstName", required=false) String firstName, @RequestParam(value="lastName", required=false) String lastName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("firstName",firstName);
@@ -69,23 +71,23 @@ public class PartyViewServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getPartiesByRelationship")
-	public ResponseEntity<Object> getPartiesByRelationship(HttpSession session, @RequestParam(value="partyIdFrom") String partyIdFrom, @RequestParam(value="roleTypeIdTo", required=false) String roleTypeIdTo, @RequestParam(value="positionTitle", required=false) String positionTitle, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="priorityTypeId", required=false) String priorityTypeId, @RequestParam(value="permissionsEnumId", required=false) String permissionsEnumId, @RequestParam(value="roleTypeIdFrom", required=false) String roleTypeIdFrom, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="relationshipName", required=false) String relationshipName, @RequestParam(value="securityGroupId", required=false) String securityGroupId, @RequestParam(value="partyRelationshipTypeId", required=false) String partyRelationshipTypeId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="partyIdTo", required=false) String partyIdTo) {
+	public ResponseEntity<Map<String, Object>> getPartiesByRelationship(HttpSession session, @RequestParam(value="partyIdFrom") String partyIdFrom, @RequestParam(value="roleTypeIdTo", required=false) String roleTypeIdTo, @RequestParam(value="positionTitle", required=false) String positionTitle, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="priorityTypeId", required=false) String priorityTypeId, @RequestParam(value="permissionsEnumId", required=false) String permissionsEnumId, @RequestParam(value="roleTypeIdFrom", required=false) String roleTypeIdFrom, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="relationshipName", required=false) String relationshipName, @RequestParam(value="securityGroupId", required=false) String securityGroupId, @RequestParam(value="partyRelationshipTypeId", required=false) String partyRelationshipTypeId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="partyIdTo", required=false) String partyIdTo) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("partyIdFrom",partyIdFrom);
@@ -111,23 +113,23 @@ public class PartyViewServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getPartyFromEmail")
-	public ResponseEntity<Object> getPartyFromEmail(HttpSession session, @RequestParam(value="email") String email) {
+	public ResponseEntity<Map<String, Object>> getPartyFromEmail(HttpSession session, @RequestParam(value="email") String email) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("email",email);
@@ -140,23 +142,23 @@ public class PartyViewServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/findParty")
-	public ResponseEntity<Object> findParty(HttpSession session, @RequestParam(value="lastName", required=false) String lastName, @RequestParam(value="VIEW_SIZE", required=false) String VIEW_SIZE, @RequestParam(value="city", required=false) String city, @RequestParam(value="postalCode", required=false) String postalCode, @RequestParam(value="softIdentifier", required=false) String softIdentifier, @RequestParam(value="extInfo", required=false) String extInfo, @RequestParam(value="partyTypeId", required=false) String partyTypeId, @RequestParam(value="showAll", required=false) String showAll, @RequestParam(value="infoString", required=false) String infoString, @RequestParam(value="countryCode", required=false) String countryCode, @RequestParam(value="contactNumber", required=false) String contactNumber, @RequestParam(value="sortField", required=false) String sortField, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="ownerPartyIds", required=false) List ownerPartyIds, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="serialNumber", required=false) String serialNumber, @RequestParam(value="address2", required=false) String address2, @RequestParam(value="address1", required=false) String address1, @RequestParam(value="userLoginId", required=false) String userLoginId, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="lookupFlag", required=false) String lookupFlag, @RequestParam(value="firstName", required=false) String firstName, @RequestParam(value="partyRelationshipTypeId", required=false) String partyRelationshipTypeId, @RequestParam(value="groupName", required=false) String groupName, @RequestParam(value="areaCode", required=false) String areaCode, @RequestParam(value="stateProvinceGeoId", required=false) String stateProvinceGeoId, @RequestParam(value="VIEW_INDEX", required=false) String VIEW_INDEX) {
+	public ResponseEntity<Map<String, Object>> findParty(HttpSession session, @RequestParam(value="lastName", required=false) String lastName, @RequestParam(value="VIEW_SIZE", required=false) String VIEW_SIZE, @RequestParam(value="city", required=false) String city, @RequestParam(value="postalCode", required=false) String postalCode, @RequestParam(value="softIdentifier", required=false) String softIdentifier, @RequestParam(value="extInfo", required=false) String extInfo, @RequestParam(value="partyTypeId", required=false) String partyTypeId, @RequestParam(value="showAll", required=false) String showAll, @RequestParam(value="infoString", required=false) String infoString, @RequestParam(value="countryCode", required=false) String countryCode, @RequestParam(value="contactNumber", required=false) String contactNumber, @RequestParam(value="sortField", required=false) String sortField, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="ownerPartyIds", required=false) List ownerPartyIds, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="serialNumber", required=false) String serialNumber, @RequestParam(value="address2", required=false) String address2, @RequestParam(value="address1", required=false) String address1, @RequestParam(value="userLoginId", required=false) String userLoginId, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="lookupFlag", required=false) String lookupFlag, @RequestParam(value="firstName", required=false) String firstName, @RequestParam(value="partyRelationshipTypeId", required=false) String partyRelationshipTypeId, @RequestParam(value="groupName", required=false) String groupName, @RequestParam(value="areaCode", required=false) String areaCode, @RequestParam(value="stateProvinceGeoId", required=false) String stateProvinceGeoId, @RequestParam(value="VIEW_INDEX", required=false) String VIEW_INDEX) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("lastName",lastName);
@@ -195,23 +197,23 @@ public class PartyViewServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getPerson")
-	public ResponseEntity<Object> getPerson(HttpSession session, @RequestParam(value="partyId") String partyId) {
+	public ResponseEntity<Map<String, Object>> getPerson(HttpSession session, @RequestParam(value="partyId") String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("partyId",partyId);
@@ -224,23 +226,23 @@ public class PartyViewServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getParentOrganizations")
-	public ResponseEntity<Object> getParentOrganizations(HttpSession session, @RequestParam(value="organizationPartyId") String organizationPartyId, @RequestParam(value="getParentsOfParents", required=false) String getParentsOfParents) {
+	public ResponseEntity<Map<String, Object>> getParentOrganizations(HttpSession session, @RequestParam(value="organizationPartyId") String organizationPartyId, @RequestParam(value="getParentsOfParents", required=false) String getParentsOfParents) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("organizationPartyId",organizationPartyId);
@@ -254,23 +256,23 @@ public class PartyViewServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getPostalAddressBoundary")
-	public ResponseEntity<Object> getPostalAddressBoundary(HttpSession session, @RequestParam(value="contactMechId") String contactMechId) {
+	public ResponseEntity<Map<String, Object>> getPostalAddressBoundary(HttpSession session, @RequestParam(value="contactMechId") String contactMechId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("contactMechId",contactMechId);
@@ -283,23 +285,23 @@ public class PartyViewServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getPartyContactMechValueMaps")
-	public ResponseEntity<Object> getPartyContactMechValueMaps(HttpSession session, @RequestParam(value="userLogin", required=false) org.apache.ofbiz.entity.GenericValue userLogin, @RequestParam(value="showOld", required=false) Boolean showOld, @RequestParam(value="contactMechTypeId", required=false) String contactMechTypeId, @RequestParam(value="partyId", required=false) String partyId) {
+	public ResponseEntity<Map<String, Object>> getPartyContactMechValueMaps(HttpSession session, @RequestParam(value="userLogin", required=false) org.apache.ofbiz.entity.GenericValue userLogin, @RequestParam(value="showOld", required=false) Boolean showOld, @RequestParam(value="contactMechTypeId", required=false) String contactMechTypeId, @RequestParam(value="partyId", required=false) String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin",userLogin);
@@ -314,23 +316,23 @@ public class PartyViewServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getRelatedParties")
-	public ResponseEntity<Object> getRelatedParties(HttpSession session, @RequestParam(value="partyIdFrom") String partyIdFrom, @RequestParam(value="roleTypeIdTo", required=false) String roleTypeIdTo, @RequestParam(value="partyRelationshipTypeId", required=false) String partyRelationshipTypeId, @RequestParam(value="includeFromToSwitched", required=false) String includeFromToSwitched, @RequestParam(value="roleTypeIdToIncludeAllChildTypes", required=false) String roleTypeIdToIncludeAllChildTypes, @RequestParam(value="recurse", required=false) String recurse, @RequestParam(value="useCache", required=false) String useCache, @RequestParam(value="roleTypeIdFromInclueAllChildTypes", required=false) String roleTypeIdFromInclueAllChildTypes, @RequestParam(value="roleTypeIdFrom", required=false) String roleTypeIdFrom) {
+	public ResponseEntity<Map<String, Object>> getRelatedParties(HttpSession session, @RequestParam(value="partyIdFrom") String partyIdFrom, @RequestParam(value="roleTypeIdTo", required=false) String roleTypeIdTo, @RequestParam(value="partyRelationshipTypeId", required=false) String partyRelationshipTypeId, @RequestParam(value="includeFromToSwitched", required=false) String includeFromToSwitched, @RequestParam(value="roleTypeIdToIncludeAllChildTypes", required=false) String roleTypeIdToIncludeAllChildTypes, @RequestParam(value="recurse", required=false) String recurse, @RequestParam(value="useCache", required=false) String useCache, @RequestParam(value="roleTypeIdFromInclueAllChildTypes", required=false) String roleTypeIdFromInclueAllChildTypes, @RequestParam(value="roleTypeIdFrom", required=false) String roleTypeIdFrom) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("partyIdFrom",partyIdFrom);
@@ -351,23 +353,23 @@ public class PartyViewServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/performFindParty")
-	public ResponseEntity<Object> performFindParty(HttpSession session, @RequestParam(value="lastName", required=false) String lastName, @RequestParam(value="city", required=false) String city, @RequestParam(value="postalCode", required=false) String postalCode, @RequestParam(value="softIdentifier", required=false) String softIdentifier, @RequestParam(value="extInfo", required=false) String extInfo, @RequestParam(value="partyTypeId", required=false) String partyTypeId, @RequestParam(value="infoString", required=false) String infoString, @RequestParam(value="countryCode", required=false) String countryCode, @RequestParam(value="partyIdentificationTypeId", required=false) String partyIdentificationTypeId, @RequestParam(value="contactNumber", required=false) String contactNumber, @RequestParam(value="sortField", required=false) String sortField, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="ownerPartyIds", required=false) List ownerPartyIds, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="serialNumber", required=false) String serialNumber, @RequestParam(value="address2", required=false) String address2, @RequestParam(value="address1", required=false) String address1, @RequestParam(value="noConditionFind", required=false) String noConditionFind, @RequestParam(value="externalId", required=false) String externalId, @RequestParam(value="idValue", required=false) String idValue, @RequestParam(value="userLoginId", required=false) String userLoginId, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="firstName", required=false) String firstName, @RequestParam(value="partyRelationshipTypeId", required=false) String partyRelationshipTypeId, @RequestParam(value="groupName", required=false) String groupName, @RequestParam(value="areaCode", required=false) String areaCode, @RequestParam(value="stateProvinceGeoId", required=false) String stateProvinceGeoId, @RequestParam(value="extCond", required=false) org.apache.ofbiz.entity.condition.EntityCondition extCond) {
+	public ResponseEntity<Map<String, Object>> performFindParty(HttpSession session, @RequestParam(value="lastName", required=false) String lastName, @RequestParam(value="city", required=false) String city, @RequestParam(value="postalCode", required=false) String postalCode, @RequestParam(value="softIdentifier", required=false) String softIdentifier, @RequestParam(value="extInfo", required=false) String extInfo, @RequestParam(value="partyTypeId", required=false) String partyTypeId, @RequestParam(value="infoString", required=false) String infoString, @RequestParam(value="countryCode", required=false) String countryCode, @RequestParam(value="partyIdentificationTypeId", required=false) String partyIdentificationTypeId, @RequestParam(value="contactNumber", required=false) String contactNumber, @RequestParam(value="sortField", required=false) String sortField, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="ownerPartyIds", required=false) List ownerPartyIds, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="serialNumber", required=false) String serialNumber, @RequestParam(value="address2", required=false) String address2, @RequestParam(value="address1", required=false) String address1, @RequestParam(value="noConditionFind", required=false) String noConditionFind, @RequestParam(value="externalId", required=false) String externalId, @RequestParam(value="idValue", required=false) String idValue, @RequestParam(value="userLoginId", required=false) String userLoginId, @RequestParam(value="inventoryItemId", required=false) String inventoryItemId, @RequestParam(value="firstName", required=false) String firstName, @RequestParam(value="partyRelationshipTypeId", required=false) String partyRelationshipTypeId, @RequestParam(value="groupName", required=false) String groupName, @RequestParam(value="areaCode", required=false) String areaCode, @RequestParam(value="stateProvinceGeoId", required=false) String stateProvinceGeoId, @RequestParam(value="extCond", required=false) org.apache.ofbiz.entity.condition.EntityCondition extCond) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("lastName",lastName);
@@ -407,23 +409,23 @@ public class PartyViewServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getPartyFromGroupName")
-	public ResponseEntity<Object> getPartyFromGroupName(HttpSession session, @RequestParam(value="groupName") String groupName) {
+	public ResponseEntity<Map<String, Object>> getPartyFromGroupName(HttpSession session, @RequestParam(value="groupName") String groupName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("groupName",groupName);
@@ -436,23 +438,23 @@ public class PartyViewServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getPartyFromExternalId")
-	public ResponseEntity<Object> getPartyFromExternalId(HttpSession session, @RequestParam(value="externalId") String externalId) {
+	public ResponseEntity<Map<String, Object>> getPartyFromExternalId(HttpSession session, @RequestParam(value="externalId") String externalId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("externalId",externalId);
@@ -465,23 +467,23 @@ public class PartyViewServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getChildRoleTypes")
-	public ResponseEntity<Object> getChildRoleTypes(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId) {
+	public ResponseEntity<Map<String, Object>> getChildRoleTypes(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("roleTypeId",roleTypeId);
@@ -494,19 +496,19 @@ public class PartyViewServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

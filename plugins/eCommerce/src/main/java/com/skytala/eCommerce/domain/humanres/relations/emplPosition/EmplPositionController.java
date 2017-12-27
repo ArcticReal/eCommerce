@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.humanres.relations.emplPosition.query.FindEm
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/humanres/emplPositions")
 public class EmplPositionController {
@@ -52,7 +54,7 @@ public class EmplPositionController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findEmplPositionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<EmplPosition>> findEmplPositionsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindEmplPositionsBy query = new FindEmplPositionsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class EmplPositionController {
 		}
 
 		List<EmplPosition> emplPositions =((EmplPositionFound) Scheduler.execute(query).data()).getEmplPositions();
-
-		if (emplPositions.size() == 1) {
-			return ResponseEntity.ok().body(emplPositions.get(0));
-		}
 
 		return ResponseEntity.ok().body(emplPositions);
 
@@ -78,7 +76,7 @@ public class EmplPositionController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createEmplPosition(HttpServletRequest request) throws Exception {
+	public ResponseEntity<EmplPosition> createEmplPosition(HttpServletRequest request) throws Exception {
 
 		EmplPosition emplPositionToBeAdded = new EmplPosition();
 		try {
@@ -86,7 +84,7 @@ public class EmplPositionController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createEmplPosition(emplPositionToBeAdded);
@@ -101,63 +99,15 @@ public class EmplPositionController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createEmplPosition(@RequestBody EmplPosition emplPositionToBeAdded) throws Exception {
+	public ResponseEntity<EmplPosition> createEmplPosition(@RequestBody EmplPosition emplPositionToBeAdded) throws Exception {
 
 		AddEmplPosition command = new AddEmplPosition(emplPositionToBeAdded);
 		EmplPosition emplPosition = ((EmplPositionAdded) Scheduler.execute(command).data()).getAddedEmplPosition();
 		
 		if (emplPosition != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(emplPosition);
+			return successful(emplPosition);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("EmplPosition could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateEmplPosition(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		EmplPosition emplPositionToBeUpdated = new EmplPosition();
-
-		try {
-			emplPositionToBeUpdated = EmplPositionMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateEmplPosition(emplPositionToBeUpdated, emplPositionToBeUpdated.getEmplPositionId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class EmplPositionController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{emplPositionId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateEmplPosition(@RequestBody EmplPosition emplPositionToBeUpdated,
+	public ResponseEntity<String> updateEmplPosition(@RequestBody EmplPosition emplPositionToBeUpdated,
 			@PathVariable String emplPositionId) throws Exception {
 
 		emplPositionToBeUpdated.setEmplPositionId(emplPositionId);
@@ -178,41 +128,44 @@ public class EmplPositionController {
 
 		try {
 			if(((EmplPositionUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{emplPositionId}")
-	public ResponseEntity<Object> findById(@PathVariable String emplPositionId) throws Exception {
+	public ResponseEntity<EmplPosition> findById(@PathVariable String emplPositionId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("emplPositionId", emplPositionId);
 		try {
 
-			Object foundEmplPosition = findEmplPositionsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundEmplPosition);
+			List<EmplPosition> foundEmplPosition = findEmplPositionsBy(requestParams).getBody();
+			if(foundEmplPosition.size()==1){				return successful(foundEmplPosition.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{emplPositionId}")
-	public ResponseEntity<Object> deleteEmplPositionByIdUpdated(@PathVariable String emplPositionId) throws Exception {
+	public ResponseEntity<String> deleteEmplPositionByIdUpdated(@PathVariable String emplPositionId) throws Exception {
 		DeleteEmplPosition command = new DeleteEmplPosition(emplPositionId);
 
 		try {
 			if (((EmplPositionDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("EmplPosition could not be deleted");
+		return conflict();
 
 	}
 

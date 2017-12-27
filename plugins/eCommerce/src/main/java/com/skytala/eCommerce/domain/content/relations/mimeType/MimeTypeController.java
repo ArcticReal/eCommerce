@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.mimeType.query.FindMimeTyp
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/mimeTypes")
 public class MimeTypeController {
@@ -52,7 +54,7 @@ public class MimeTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findMimeTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<MimeType>> findMimeTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindMimeTypesBy query = new FindMimeTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class MimeTypeController {
 		}
 
 		List<MimeType> mimeTypes =((MimeTypeFound) Scheduler.execute(query).data()).getMimeTypes();
-
-		if (mimeTypes.size() == 1) {
-			return ResponseEntity.ok().body(mimeTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(mimeTypes);
 
@@ -78,7 +76,7 @@ public class MimeTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createMimeType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<MimeType> createMimeType(HttpServletRequest request) throws Exception {
 
 		MimeType mimeTypeToBeAdded = new MimeType();
 		try {
@@ -86,7 +84,7 @@ public class MimeTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createMimeType(mimeTypeToBeAdded);
@@ -101,63 +99,15 @@ public class MimeTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createMimeType(@RequestBody MimeType mimeTypeToBeAdded) throws Exception {
+	public ResponseEntity<MimeType> createMimeType(@RequestBody MimeType mimeTypeToBeAdded) throws Exception {
 
 		AddMimeType command = new AddMimeType(mimeTypeToBeAdded);
 		MimeType mimeType = ((MimeTypeAdded) Scheduler.execute(command).data()).getAddedMimeType();
 		
 		if (mimeType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(mimeType);
+			return successful(mimeType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("MimeType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateMimeType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		MimeType mimeTypeToBeUpdated = new MimeType();
-
-		try {
-			mimeTypeToBeUpdated = MimeTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateMimeType(mimeTypeToBeUpdated, mimeTypeToBeUpdated.getMimeTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class MimeTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{mimeTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateMimeType(@RequestBody MimeType mimeTypeToBeUpdated,
+	public ResponseEntity<String> updateMimeType(@RequestBody MimeType mimeTypeToBeUpdated,
 			@PathVariable String mimeTypeId) throws Exception {
 
 		mimeTypeToBeUpdated.setMimeTypeId(mimeTypeId);
@@ -178,41 +128,44 @@ public class MimeTypeController {
 
 		try {
 			if(((MimeTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{mimeTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String mimeTypeId) throws Exception {
+	public ResponseEntity<MimeType> findById(@PathVariable String mimeTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("mimeTypeId", mimeTypeId);
 		try {
 
-			Object foundMimeType = findMimeTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundMimeType);
+			List<MimeType> foundMimeType = findMimeTypesBy(requestParams).getBody();
+			if(foundMimeType.size()==1){				return successful(foundMimeType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{mimeTypeId}")
-	public ResponseEntity<Object> deleteMimeTypeByIdUpdated(@PathVariable String mimeTypeId) throws Exception {
+	public ResponseEntity<String> deleteMimeTypeByIdUpdated(@PathVariable String mimeTypeId) throws Exception {
 		DeleteMimeType command = new DeleteMimeType(mimeTypeId);
 
 		try {
 			if (((MimeTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("MimeType could not be deleted");
+		return conflict();
 
 	}
 

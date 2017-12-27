@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.webAnalyticsType.query.Fin
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/webAnalyticsTypes")
 public class WebAnalyticsTypeController {
@@ -52,7 +54,7 @@ public class WebAnalyticsTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWebAnalyticsTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WebAnalyticsType>> findWebAnalyticsTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWebAnalyticsTypesBy query = new FindWebAnalyticsTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WebAnalyticsTypeController {
 		}
 
 		List<WebAnalyticsType> webAnalyticsTypes =((WebAnalyticsTypeFound) Scheduler.execute(query).data()).getWebAnalyticsTypes();
-
-		if (webAnalyticsTypes.size() == 1) {
-			return ResponseEntity.ok().body(webAnalyticsTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(webAnalyticsTypes);
 
@@ -78,7 +76,7 @@ public class WebAnalyticsTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWebAnalyticsType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WebAnalyticsType> createWebAnalyticsType(HttpServletRequest request) throws Exception {
 
 		WebAnalyticsType webAnalyticsTypeToBeAdded = new WebAnalyticsType();
 		try {
@@ -86,7 +84,7 @@ public class WebAnalyticsTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWebAnalyticsType(webAnalyticsTypeToBeAdded);
@@ -101,63 +99,15 @@ public class WebAnalyticsTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWebAnalyticsType(@RequestBody WebAnalyticsType webAnalyticsTypeToBeAdded) throws Exception {
+	public ResponseEntity<WebAnalyticsType> createWebAnalyticsType(@RequestBody WebAnalyticsType webAnalyticsTypeToBeAdded) throws Exception {
 
 		AddWebAnalyticsType command = new AddWebAnalyticsType(webAnalyticsTypeToBeAdded);
 		WebAnalyticsType webAnalyticsType = ((WebAnalyticsTypeAdded) Scheduler.execute(command).data()).getAddedWebAnalyticsType();
 		
 		if (webAnalyticsType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(webAnalyticsType);
+			return successful(webAnalyticsType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WebAnalyticsType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWebAnalyticsType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WebAnalyticsType webAnalyticsTypeToBeUpdated = new WebAnalyticsType();
-
-		try {
-			webAnalyticsTypeToBeUpdated = WebAnalyticsTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWebAnalyticsType(webAnalyticsTypeToBeUpdated, webAnalyticsTypeToBeUpdated.getWebAnalyticsTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WebAnalyticsTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{webAnalyticsTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWebAnalyticsType(@RequestBody WebAnalyticsType webAnalyticsTypeToBeUpdated,
+	public ResponseEntity<String> updateWebAnalyticsType(@RequestBody WebAnalyticsType webAnalyticsTypeToBeUpdated,
 			@PathVariable String webAnalyticsTypeId) throws Exception {
 
 		webAnalyticsTypeToBeUpdated.setWebAnalyticsTypeId(webAnalyticsTypeId);
@@ -178,41 +128,44 @@ public class WebAnalyticsTypeController {
 
 		try {
 			if(((WebAnalyticsTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{webAnalyticsTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String webAnalyticsTypeId) throws Exception {
+	public ResponseEntity<WebAnalyticsType> findById(@PathVariable String webAnalyticsTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("webAnalyticsTypeId", webAnalyticsTypeId);
 		try {
 
-			Object foundWebAnalyticsType = findWebAnalyticsTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWebAnalyticsType);
+			List<WebAnalyticsType> foundWebAnalyticsType = findWebAnalyticsTypesBy(requestParams).getBody();
+			if(foundWebAnalyticsType.size()==1){				return successful(foundWebAnalyticsType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{webAnalyticsTypeId}")
-	public ResponseEntity<Object> deleteWebAnalyticsTypeByIdUpdated(@PathVariable String webAnalyticsTypeId) throws Exception {
+	public ResponseEntity<String> deleteWebAnalyticsTypeByIdUpdated(@PathVariable String webAnalyticsTypeId) throws Exception {
 		DeleteWebAnalyticsType command = new DeleteWebAnalyticsType(webAnalyticsTypeId);
 
 		try {
 			if (((WebAnalyticsTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WebAnalyticsType could not be deleted");
+		return conflict();
 
 	}
 

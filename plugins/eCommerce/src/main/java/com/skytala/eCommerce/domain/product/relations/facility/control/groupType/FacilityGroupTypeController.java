@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.facility.query.groupType.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/facility/facilityGroupTypes")
 public class FacilityGroupTypeController {
@@ -52,7 +54,7 @@ public class FacilityGroupTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findFacilityGroupTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<FacilityGroupType>> findFacilityGroupTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFacilityGroupTypesBy query = new FindFacilityGroupTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class FacilityGroupTypeController {
 		}
 
 		List<FacilityGroupType> facilityGroupTypes =((FacilityGroupTypeFound) Scheduler.execute(query).data()).getFacilityGroupTypes();
-
-		if (facilityGroupTypes.size() == 1) {
-			return ResponseEntity.ok().body(facilityGroupTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(facilityGroupTypes);
 
@@ -78,7 +76,7 @@ public class FacilityGroupTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createFacilityGroupType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<FacilityGroupType> createFacilityGroupType(HttpServletRequest request) throws Exception {
 
 		FacilityGroupType facilityGroupTypeToBeAdded = new FacilityGroupType();
 		try {
@@ -86,7 +84,7 @@ public class FacilityGroupTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createFacilityGroupType(facilityGroupTypeToBeAdded);
@@ -101,63 +99,15 @@ public class FacilityGroupTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createFacilityGroupType(@RequestBody FacilityGroupType facilityGroupTypeToBeAdded) throws Exception {
+	public ResponseEntity<FacilityGroupType> createFacilityGroupType(@RequestBody FacilityGroupType facilityGroupTypeToBeAdded) throws Exception {
 
 		AddFacilityGroupType command = new AddFacilityGroupType(facilityGroupTypeToBeAdded);
 		FacilityGroupType facilityGroupType = ((FacilityGroupTypeAdded) Scheduler.execute(command).data()).getAddedFacilityGroupType();
 		
 		if (facilityGroupType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(facilityGroupType);
+			return successful(facilityGroupType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("FacilityGroupType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateFacilityGroupType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		FacilityGroupType facilityGroupTypeToBeUpdated = new FacilityGroupType();
-
-		try {
-			facilityGroupTypeToBeUpdated = FacilityGroupTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateFacilityGroupType(facilityGroupTypeToBeUpdated, facilityGroupTypeToBeUpdated.getFacilityGroupTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class FacilityGroupTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{facilityGroupTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateFacilityGroupType(@RequestBody FacilityGroupType facilityGroupTypeToBeUpdated,
+	public ResponseEntity<String> updateFacilityGroupType(@RequestBody FacilityGroupType facilityGroupTypeToBeUpdated,
 			@PathVariable String facilityGroupTypeId) throws Exception {
 
 		facilityGroupTypeToBeUpdated.setFacilityGroupTypeId(facilityGroupTypeId);
@@ -178,41 +128,44 @@ public class FacilityGroupTypeController {
 
 		try {
 			if(((FacilityGroupTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{facilityGroupTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String facilityGroupTypeId) throws Exception {
+	public ResponseEntity<FacilityGroupType> findById(@PathVariable String facilityGroupTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("facilityGroupTypeId", facilityGroupTypeId);
 		try {
 
-			Object foundFacilityGroupType = findFacilityGroupTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundFacilityGroupType);
+			List<FacilityGroupType> foundFacilityGroupType = findFacilityGroupTypesBy(requestParams).getBody();
+			if(foundFacilityGroupType.size()==1){				return successful(foundFacilityGroupType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{facilityGroupTypeId}")
-	public ResponseEntity<Object> deleteFacilityGroupTypeByIdUpdated(@PathVariable String facilityGroupTypeId) throws Exception {
+	public ResponseEntity<String> deleteFacilityGroupTypeByIdUpdated(@PathVariable String facilityGroupTypeId) throws Exception {
 		DeleteFacilityGroupType command = new DeleteFacilityGroupType(facilityGroupTypeId);
 
 		try {
 			if (((FacilityGroupTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("FacilityGroupType could not be deleted");
+		return conflict();
 
 	}
 

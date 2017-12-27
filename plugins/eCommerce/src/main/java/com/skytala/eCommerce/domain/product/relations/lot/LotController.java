@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.lot.query.FindLotsBy;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/lots")
 public class LotController {
@@ -52,7 +54,7 @@ public class LotController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findLotsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<Lot>> findLotsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindLotsBy query = new FindLotsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class LotController {
 		}
 
 		List<Lot> lots =((LotFound) Scheduler.execute(query).data()).getLots();
-
-		if (lots.size() == 1) {
-			return ResponseEntity.ok().body(lots.get(0));
-		}
 
 		return ResponseEntity.ok().body(lots);
 
@@ -78,7 +76,7 @@ public class LotController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createLot(HttpServletRequest request) throws Exception {
+	public ResponseEntity<Lot> createLot(HttpServletRequest request) throws Exception {
 
 		Lot lotToBeAdded = new Lot();
 		try {
@@ -86,7 +84,7 @@ public class LotController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createLot(lotToBeAdded);
@@ -101,63 +99,15 @@ public class LotController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createLot(@RequestBody Lot lotToBeAdded) throws Exception {
+	public ResponseEntity<Lot> createLot(@RequestBody Lot lotToBeAdded) throws Exception {
 
 		AddLot command = new AddLot(lotToBeAdded);
 		Lot lot = ((LotAdded) Scheduler.execute(command).data()).getAddedLot();
 		
 		if (lot != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(lot);
+			return successful(lot);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("Lot could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateLot(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		Lot lotToBeUpdated = new Lot();
-
-		try {
-			lotToBeUpdated = LotMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateLot(lotToBeUpdated, lotToBeUpdated.getLotId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class LotController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{lotId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateLot(@RequestBody Lot lotToBeUpdated,
+	public ResponseEntity<String> updateLot(@RequestBody Lot lotToBeUpdated,
 			@PathVariable String lotId) throws Exception {
 
 		lotToBeUpdated.setLotId(lotId);
@@ -178,41 +128,44 @@ public class LotController {
 
 		try {
 			if(((LotUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{lotId}")
-	public ResponseEntity<Object> findById(@PathVariable String lotId) throws Exception {
+	public ResponseEntity<Lot> findById(@PathVariable String lotId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("lotId", lotId);
 		try {
 
-			Object foundLot = findLotsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundLot);
+			List<Lot> foundLot = findLotsBy(requestParams).getBody();
+			if(foundLot.size()==1){				return successful(foundLot.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{lotId}")
-	public ResponseEntity<Object> deleteLotByIdUpdated(@PathVariable String lotId) throws Exception {
+	public ResponseEntity<String> deleteLotByIdUpdated(@PathVariable String lotId) throws Exception {
 		DeleteLot command = new DeleteLot(lotId);
 
 		try {
 			if (((LotDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("Lot could not be deleted");
+		return conflict();
 
 	}
 

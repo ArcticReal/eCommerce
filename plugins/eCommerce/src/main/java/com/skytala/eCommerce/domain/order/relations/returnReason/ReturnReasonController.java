@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.returnReason.query.FindRetur
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/returnReasons")
 public class ReturnReasonController {
@@ -52,7 +54,7 @@ public class ReturnReasonController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findReturnReasonsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ReturnReason>> findReturnReasonsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindReturnReasonsBy query = new FindReturnReasonsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ReturnReasonController {
 		}
 
 		List<ReturnReason> returnReasons =((ReturnReasonFound) Scheduler.execute(query).data()).getReturnReasons();
-
-		if (returnReasons.size() == 1) {
-			return ResponseEntity.ok().body(returnReasons.get(0));
-		}
 
 		return ResponseEntity.ok().body(returnReasons);
 
@@ -78,7 +76,7 @@ public class ReturnReasonController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createReturnReason(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ReturnReason> createReturnReason(HttpServletRequest request) throws Exception {
 
 		ReturnReason returnReasonToBeAdded = new ReturnReason();
 		try {
@@ -86,7 +84,7 @@ public class ReturnReasonController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createReturnReason(returnReasonToBeAdded);
@@ -101,63 +99,15 @@ public class ReturnReasonController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createReturnReason(@RequestBody ReturnReason returnReasonToBeAdded) throws Exception {
+	public ResponseEntity<ReturnReason> createReturnReason(@RequestBody ReturnReason returnReasonToBeAdded) throws Exception {
 
 		AddReturnReason command = new AddReturnReason(returnReasonToBeAdded);
 		ReturnReason returnReason = ((ReturnReasonAdded) Scheduler.execute(command).data()).getAddedReturnReason();
 		
 		if (returnReason != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(returnReason);
+			return successful(returnReason);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ReturnReason could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateReturnReason(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ReturnReason returnReasonToBeUpdated = new ReturnReason();
-
-		try {
-			returnReasonToBeUpdated = ReturnReasonMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateReturnReason(returnReasonToBeUpdated, returnReasonToBeUpdated.getReturnReasonId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ReturnReasonController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{returnReasonId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateReturnReason(@RequestBody ReturnReason returnReasonToBeUpdated,
+	public ResponseEntity<String> updateReturnReason(@RequestBody ReturnReason returnReasonToBeUpdated,
 			@PathVariable String returnReasonId) throws Exception {
 
 		returnReasonToBeUpdated.setReturnReasonId(returnReasonId);
@@ -178,41 +128,44 @@ public class ReturnReasonController {
 
 		try {
 			if(((ReturnReasonUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{returnReasonId}")
-	public ResponseEntity<Object> findById(@PathVariable String returnReasonId) throws Exception {
+	public ResponseEntity<ReturnReason> findById(@PathVariable String returnReasonId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("returnReasonId", returnReasonId);
 		try {
 
-			Object foundReturnReason = findReturnReasonsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundReturnReason);
+			List<ReturnReason> foundReturnReason = findReturnReasonsBy(requestParams).getBody();
+			if(foundReturnReason.size()==1){				return successful(foundReturnReason.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{returnReasonId}")
-	public ResponseEntity<Object> deleteReturnReasonByIdUpdated(@PathVariable String returnReasonId) throws Exception {
+	public ResponseEntity<String> deleteReturnReasonByIdUpdated(@PathVariable String returnReasonId) throws Exception {
 		DeleteReturnReason command = new DeleteReturnReason(returnReasonId);
 
 		try {
 			if (((ReturnReasonDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ReturnReason could not be deleted");
+		return conflict();
 
 	}
 

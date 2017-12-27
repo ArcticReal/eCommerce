@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.storeGroupRo
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productStoreGroupRoles")
 public class ProductStoreGroupRoleController {
@@ -52,7 +54,7 @@ public class ProductStoreGroupRoleController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductStoreGroupRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductStoreGroupRole>> findProductStoreGroupRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductStoreGroupRolesBy query = new FindProductStoreGroupRolesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductStoreGroupRoleController {
 		}
 
 		List<ProductStoreGroupRole> productStoreGroupRoles =((ProductStoreGroupRoleFound) Scheduler.execute(query).data()).getProductStoreGroupRoles();
-
-		if (productStoreGroupRoles.size() == 1) {
-			return ResponseEntity.ok().body(productStoreGroupRoles.get(0));
-		}
 
 		return ResponseEntity.ok().body(productStoreGroupRoles);
 
@@ -78,7 +76,7 @@ public class ProductStoreGroupRoleController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductStoreGroupRole(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductStoreGroupRole> createProductStoreGroupRole(HttpServletRequest request) throws Exception {
 
 		ProductStoreGroupRole productStoreGroupRoleToBeAdded = new ProductStoreGroupRole();
 		try {
@@ -86,7 +84,7 @@ public class ProductStoreGroupRoleController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductStoreGroupRole(productStoreGroupRoleToBeAdded);
@@ -101,63 +99,15 @@ public class ProductStoreGroupRoleController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductStoreGroupRole(@RequestBody ProductStoreGroupRole productStoreGroupRoleToBeAdded) throws Exception {
+	public ResponseEntity<ProductStoreGroupRole> createProductStoreGroupRole(@RequestBody ProductStoreGroupRole productStoreGroupRoleToBeAdded) throws Exception {
 
 		AddProductStoreGroupRole command = new AddProductStoreGroupRole(productStoreGroupRoleToBeAdded);
 		ProductStoreGroupRole productStoreGroupRole = ((ProductStoreGroupRoleAdded) Scheduler.execute(command).data()).getAddedProductStoreGroupRole();
 		
 		if (productStoreGroupRole != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productStoreGroupRole);
+			return successful(productStoreGroupRole);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductStoreGroupRole could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductStoreGroupRole(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductStoreGroupRole productStoreGroupRoleToBeUpdated = new ProductStoreGroupRole();
-
-		try {
-			productStoreGroupRoleToBeUpdated = ProductStoreGroupRoleMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductStoreGroupRole(productStoreGroupRoleToBeUpdated, productStoreGroupRoleToBeUpdated.getRoleTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductStoreGroupRoleController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{roleTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductStoreGroupRole(@RequestBody ProductStoreGroupRole productStoreGroupRoleToBeUpdated,
+	public ResponseEntity<String> updateProductStoreGroupRole(@RequestBody ProductStoreGroupRole productStoreGroupRoleToBeUpdated,
 			@PathVariable String roleTypeId) throws Exception {
 
 		productStoreGroupRoleToBeUpdated.setRoleTypeId(roleTypeId);
@@ -178,41 +128,44 @@ public class ProductStoreGroupRoleController {
 
 		try {
 			if(((ProductStoreGroupRoleUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productStoreGroupRoleId}")
-	public ResponseEntity<Object> findById(@PathVariable String productStoreGroupRoleId) throws Exception {
+	public ResponseEntity<ProductStoreGroupRole> findById(@PathVariable String productStoreGroupRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productStoreGroupRoleId", productStoreGroupRoleId);
 		try {
 
-			Object foundProductStoreGroupRole = findProductStoreGroupRolesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductStoreGroupRole);
+			List<ProductStoreGroupRole> foundProductStoreGroupRole = findProductStoreGroupRolesBy(requestParams).getBody();
+			if(foundProductStoreGroupRole.size()==1){				return successful(foundProductStoreGroupRole.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productStoreGroupRoleId}")
-	public ResponseEntity<Object> deleteProductStoreGroupRoleByIdUpdated(@PathVariable String productStoreGroupRoleId) throws Exception {
+	public ResponseEntity<String> deleteProductStoreGroupRoleByIdUpdated(@PathVariable String productStoreGroupRoleId) throws Exception {
 		DeleteProductStoreGroupRole command = new DeleteProductStoreGroupRole(productStoreGroupRoleId);
 
 		try {
 			if (((ProductStoreGroupRoleDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductStoreGroupRole could not be deleted");
+		return conflict();
 
 	}
 

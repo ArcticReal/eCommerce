@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.orderItem.query.shipGroup.Fi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/orderItem/orderItemShipGroups")
 public class OrderItemShipGroupController {
@@ -52,7 +54,7 @@ public class OrderItemShipGroupController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findOrderItemShipGroupsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OrderItemShipGroup>> findOrderItemShipGroupsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderItemShipGroupsBy query = new FindOrderItemShipGroupsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class OrderItemShipGroupController {
 		}
 
 		List<OrderItemShipGroup> orderItemShipGroups =((OrderItemShipGroupFound) Scheduler.execute(query).data()).getOrderItemShipGroups();
-
-		if (orderItemShipGroups.size() == 1) {
-			return ResponseEntity.ok().body(orderItemShipGroups.get(0));
-		}
 
 		return ResponseEntity.ok().body(orderItemShipGroups);
 
@@ -78,7 +76,7 @@ public class OrderItemShipGroupController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOrderItemShipGroup(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OrderItemShipGroup> createOrderItemShipGroup(HttpServletRequest request) throws Exception {
 
 		OrderItemShipGroup orderItemShipGroupToBeAdded = new OrderItemShipGroup();
 		try {
@@ -86,7 +84,7 @@ public class OrderItemShipGroupController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createOrderItemShipGroup(orderItemShipGroupToBeAdded);
@@ -101,63 +99,15 @@ public class OrderItemShipGroupController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOrderItemShipGroup(@RequestBody OrderItemShipGroup orderItemShipGroupToBeAdded) throws Exception {
+	public ResponseEntity<OrderItemShipGroup> createOrderItemShipGroup(@RequestBody OrderItemShipGroup orderItemShipGroupToBeAdded) throws Exception {
 
 		AddOrderItemShipGroup command = new AddOrderItemShipGroup(orderItemShipGroupToBeAdded);
 		OrderItemShipGroup orderItemShipGroup = ((OrderItemShipGroupAdded) Scheduler.execute(command).data()).getAddedOrderItemShipGroup();
 		
 		if (orderItemShipGroup != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(orderItemShipGroup);
+			return successful(orderItemShipGroup);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OrderItemShipGroup could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateOrderItemShipGroup(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OrderItemShipGroup orderItemShipGroupToBeUpdated = new OrderItemShipGroup();
-
-		try {
-			orderItemShipGroupToBeUpdated = OrderItemShipGroupMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOrderItemShipGroup(orderItemShipGroupToBeUpdated, orderItemShipGroupToBeUpdated.getShipGroupSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class OrderItemShipGroupController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{shipGroupSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOrderItemShipGroup(@RequestBody OrderItemShipGroup orderItemShipGroupToBeUpdated,
+	public ResponseEntity<String> updateOrderItemShipGroup(@RequestBody OrderItemShipGroup orderItemShipGroupToBeUpdated,
 			@PathVariable String shipGroupSeqId) throws Exception {
 
 		orderItemShipGroupToBeUpdated.setShipGroupSeqId(shipGroupSeqId);
@@ -178,41 +128,44 @@ public class OrderItemShipGroupController {
 
 		try {
 			if(((OrderItemShipGroupUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{orderItemShipGroupId}")
-	public ResponseEntity<Object> findById(@PathVariable String orderItemShipGroupId) throws Exception {
+	public ResponseEntity<OrderItemShipGroup> findById(@PathVariable String orderItemShipGroupId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderItemShipGroupId", orderItemShipGroupId);
 		try {
 
-			Object foundOrderItemShipGroup = findOrderItemShipGroupsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOrderItemShipGroup);
+			List<OrderItemShipGroup> foundOrderItemShipGroup = findOrderItemShipGroupsBy(requestParams).getBody();
+			if(foundOrderItemShipGroup.size()==1){				return successful(foundOrderItemShipGroup.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{orderItemShipGroupId}")
-	public ResponseEntity<Object> deleteOrderItemShipGroupByIdUpdated(@PathVariable String orderItemShipGroupId) throws Exception {
+	public ResponseEntity<String> deleteOrderItemShipGroupByIdUpdated(@PathVariable String orderItemShipGroupId) throws Exception {
 		DeleteOrderItemShipGroup command = new DeleteOrderItemShipGroup(orderItemShipGroupId);
 
 		try {
 			if (((OrderItemShipGroupDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("OrderItemShipGroup could not be deleted");
+		return conflict();
 
 	}
 

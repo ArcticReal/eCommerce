@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.priceChange.
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productPriceChanges")
 public class ProductPriceChangeController {
@@ -52,7 +54,7 @@ public class ProductPriceChangeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductPriceChangesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductPriceChange>> findProductPriceChangesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductPriceChangesBy query = new FindProductPriceChangesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductPriceChangeController {
 		}
 
 		List<ProductPriceChange> productPriceChanges =((ProductPriceChangeFound) Scheduler.execute(query).data()).getProductPriceChanges();
-
-		if (productPriceChanges.size() == 1) {
-			return ResponseEntity.ok().body(productPriceChanges.get(0));
-		}
 
 		return ResponseEntity.ok().body(productPriceChanges);
 
@@ -78,7 +76,7 @@ public class ProductPriceChangeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductPriceChange(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductPriceChange> createProductPriceChange(HttpServletRequest request) throws Exception {
 
 		ProductPriceChange productPriceChangeToBeAdded = new ProductPriceChange();
 		try {
@@ -86,7 +84,7 @@ public class ProductPriceChangeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductPriceChange(productPriceChangeToBeAdded);
@@ -101,63 +99,15 @@ public class ProductPriceChangeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductPriceChange(@RequestBody ProductPriceChange productPriceChangeToBeAdded) throws Exception {
+	public ResponseEntity<ProductPriceChange> createProductPriceChange(@RequestBody ProductPriceChange productPriceChangeToBeAdded) throws Exception {
 
 		AddProductPriceChange command = new AddProductPriceChange(productPriceChangeToBeAdded);
 		ProductPriceChange productPriceChange = ((ProductPriceChangeAdded) Scheduler.execute(command).data()).getAddedProductPriceChange();
 		
 		if (productPriceChange != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productPriceChange);
+			return successful(productPriceChange);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductPriceChange could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductPriceChange(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductPriceChange productPriceChangeToBeUpdated = new ProductPriceChange();
-
-		try {
-			productPriceChangeToBeUpdated = ProductPriceChangeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductPriceChange(productPriceChangeToBeUpdated, productPriceChangeToBeUpdated.getProductPriceChangeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductPriceChangeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{productPriceChangeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductPriceChange(@RequestBody ProductPriceChange productPriceChangeToBeUpdated,
+	public ResponseEntity<String> updateProductPriceChange(@RequestBody ProductPriceChange productPriceChangeToBeUpdated,
 			@PathVariable String productPriceChangeId) throws Exception {
 
 		productPriceChangeToBeUpdated.setProductPriceChangeId(productPriceChangeId);
@@ -178,41 +128,44 @@ public class ProductPriceChangeController {
 
 		try {
 			if(((ProductPriceChangeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productPriceChangeId}")
-	public ResponseEntity<Object> findById(@PathVariable String productPriceChangeId) throws Exception {
+	public ResponseEntity<ProductPriceChange> findById(@PathVariable String productPriceChangeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productPriceChangeId", productPriceChangeId);
 		try {
 
-			Object foundProductPriceChange = findProductPriceChangesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductPriceChange);
+			List<ProductPriceChange> foundProductPriceChange = findProductPriceChangesBy(requestParams).getBody();
+			if(foundProductPriceChange.size()==1){				return successful(foundProductPriceChange.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productPriceChangeId}")
-	public ResponseEntity<Object> deleteProductPriceChangeByIdUpdated(@PathVariable String productPriceChangeId) throws Exception {
+	public ResponseEntity<String> deleteProductPriceChangeByIdUpdated(@PathVariable String productPriceChangeId) throws Exception {
 		DeleteProductPriceChange command = new DeleteProductPriceChange(productPriceChangeId);
 
 		try {
 			if (((ProductPriceChangeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductPriceChange could not be deleted");
+		return conflict();
 
 	}
 

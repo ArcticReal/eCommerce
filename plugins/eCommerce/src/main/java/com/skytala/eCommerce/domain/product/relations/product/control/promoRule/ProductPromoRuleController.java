@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.promoRule.Fi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productPromoRules")
 public class ProductPromoRuleController {
@@ -52,7 +54,7 @@ public class ProductPromoRuleController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductPromoRulesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductPromoRule>> findProductPromoRulesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductPromoRulesBy query = new FindProductPromoRulesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductPromoRuleController {
 		}
 
 		List<ProductPromoRule> productPromoRules =((ProductPromoRuleFound) Scheduler.execute(query).data()).getProductPromoRules();
-
-		if (productPromoRules.size() == 1) {
-			return ResponseEntity.ok().body(productPromoRules.get(0));
-		}
 
 		return ResponseEntity.ok().body(productPromoRules);
 
@@ -78,7 +76,7 @@ public class ProductPromoRuleController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductPromoRule(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductPromoRule> createProductPromoRule(HttpServletRequest request) throws Exception {
 
 		ProductPromoRule productPromoRuleToBeAdded = new ProductPromoRule();
 		try {
@@ -86,7 +84,7 @@ public class ProductPromoRuleController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductPromoRule(productPromoRuleToBeAdded);
@@ -101,63 +99,15 @@ public class ProductPromoRuleController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductPromoRule(@RequestBody ProductPromoRule productPromoRuleToBeAdded) throws Exception {
+	public ResponseEntity<ProductPromoRule> createProductPromoRule(@RequestBody ProductPromoRule productPromoRuleToBeAdded) throws Exception {
 
 		AddProductPromoRule command = new AddProductPromoRule(productPromoRuleToBeAdded);
 		ProductPromoRule productPromoRule = ((ProductPromoRuleAdded) Scheduler.execute(command).data()).getAddedProductPromoRule();
 		
 		if (productPromoRule != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productPromoRule);
+			return successful(productPromoRule);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductPromoRule could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductPromoRule(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductPromoRule productPromoRuleToBeUpdated = new ProductPromoRule();
-
-		try {
-			productPromoRuleToBeUpdated = ProductPromoRuleMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductPromoRule(productPromoRuleToBeUpdated, productPromoRuleToBeUpdated.getProductPromoRuleId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductPromoRuleController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{productPromoRuleId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductPromoRule(@RequestBody ProductPromoRule productPromoRuleToBeUpdated,
+	public ResponseEntity<String> updateProductPromoRule(@RequestBody ProductPromoRule productPromoRuleToBeUpdated,
 			@PathVariable String productPromoRuleId) throws Exception {
 
 		productPromoRuleToBeUpdated.setProductPromoRuleId(productPromoRuleId);
@@ -178,41 +128,44 @@ public class ProductPromoRuleController {
 
 		try {
 			if(((ProductPromoRuleUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productPromoRuleId}")
-	public ResponseEntity<Object> findById(@PathVariable String productPromoRuleId) throws Exception {
+	public ResponseEntity<ProductPromoRule> findById(@PathVariable String productPromoRuleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productPromoRuleId", productPromoRuleId);
 		try {
 
-			Object foundProductPromoRule = findProductPromoRulesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductPromoRule);
+			List<ProductPromoRule> foundProductPromoRule = findProductPromoRulesBy(requestParams).getBody();
+			if(foundProductPromoRule.size()==1){				return successful(foundProductPromoRule.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productPromoRuleId}")
-	public ResponseEntity<Object> deleteProductPromoRuleByIdUpdated(@PathVariable String productPromoRuleId) throws Exception {
+	public ResponseEntity<String> deleteProductPromoRuleByIdUpdated(@PathVariable String productPromoRuleId) throws Exception {
 		DeleteProductPromoRule command = new DeleteProductPromoRule(productPromoRuleId);
 
 		try {
 			if (((ProductPromoRuleDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductPromoRule could not be deleted");
+		return conflict();
 
 	}
 

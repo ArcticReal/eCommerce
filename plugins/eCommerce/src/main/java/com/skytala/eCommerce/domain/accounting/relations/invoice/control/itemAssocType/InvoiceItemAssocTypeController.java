@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.invoice.query.itemAssoc
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/invoice/invoiceItemAssocTypes")
 public class InvoiceItemAssocTypeController {
@@ -52,7 +54,7 @@ public class InvoiceItemAssocTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findInvoiceItemAssocTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<InvoiceItemAssocType>> findInvoiceItemAssocTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInvoiceItemAssocTypesBy query = new FindInvoiceItemAssocTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class InvoiceItemAssocTypeController {
 		}
 
 		List<InvoiceItemAssocType> invoiceItemAssocTypes =((InvoiceItemAssocTypeFound) Scheduler.execute(query).data()).getInvoiceItemAssocTypes();
-
-		if (invoiceItemAssocTypes.size() == 1) {
-			return ResponseEntity.ok().body(invoiceItemAssocTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(invoiceItemAssocTypes);
 
@@ -78,7 +76,7 @@ public class InvoiceItemAssocTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createInvoiceItemAssocType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<InvoiceItemAssocType> createInvoiceItemAssocType(HttpServletRequest request) throws Exception {
 
 		InvoiceItemAssocType invoiceItemAssocTypeToBeAdded = new InvoiceItemAssocType();
 		try {
@@ -86,7 +84,7 @@ public class InvoiceItemAssocTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createInvoiceItemAssocType(invoiceItemAssocTypeToBeAdded);
@@ -101,63 +99,15 @@ public class InvoiceItemAssocTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createInvoiceItemAssocType(@RequestBody InvoiceItemAssocType invoiceItemAssocTypeToBeAdded) throws Exception {
+	public ResponseEntity<InvoiceItemAssocType> createInvoiceItemAssocType(@RequestBody InvoiceItemAssocType invoiceItemAssocTypeToBeAdded) throws Exception {
 
 		AddInvoiceItemAssocType command = new AddInvoiceItemAssocType(invoiceItemAssocTypeToBeAdded);
 		InvoiceItemAssocType invoiceItemAssocType = ((InvoiceItemAssocTypeAdded) Scheduler.execute(command).data()).getAddedInvoiceItemAssocType();
 		
 		if (invoiceItemAssocType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(invoiceItemAssocType);
+			return successful(invoiceItemAssocType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("InvoiceItemAssocType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateInvoiceItemAssocType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		InvoiceItemAssocType invoiceItemAssocTypeToBeUpdated = new InvoiceItemAssocType();
-
-		try {
-			invoiceItemAssocTypeToBeUpdated = InvoiceItemAssocTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateInvoiceItemAssocType(invoiceItemAssocTypeToBeUpdated, invoiceItemAssocTypeToBeUpdated.getInvoiceItemAssocTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class InvoiceItemAssocTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{invoiceItemAssocTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateInvoiceItemAssocType(@RequestBody InvoiceItemAssocType invoiceItemAssocTypeToBeUpdated,
+	public ResponseEntity<String> updateInvoiceItemAssocType(@RequestBody InvoiceItemAssocType invoiceItemAssocTypeToBeUpdated,
 			@PathVariable String invoiceItemAssocTypeId) throws Exception {
 
 		invoiceItemAssocTypeToBeUpdated.setInvoiceItemAssocTypeId(invoiceItemAssocTypeId);
@@ -178,41 +128,44 @@ public class InvoiceItemAssocTypeController {
 
 		try {
 			if(((InvoiceItemAssocTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{invoiceItemAssocTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String invoiceItemAssocTypeId) throws Exception {
+	public ResponseEntity<InvoiceItemAssocType> findById(@PathVariable String invoiceItemAssocTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("invoiceItemAssocTypeId", invoiceItemAssocTypeId);
 		try {
 
-			Object foundInvoiceItemAssocType = findInvoiceItemAssocTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundInvoiceItemAssocType);
+			List<InvoiceItemAssocType> foundInvoiceItemAssocType = findInvoiceItemAssocTypesBy(requestParams).getBody();
+			if(foundInvoiceItemAssocType.size()==1){				return successful(foundInvoiceItemAssocType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{invoiceItemAssocTypeId}")
-	public ResponseEntity<Object> deleteInvoiceItemAssocTypeByIdUpdated(@PathVariable String invoiceItemAssocTypeId) throws Exception {
+	public ResponseEntity<String> deleteInvoiceItemAssocTypeByIdUpdated(@PathVariable String invoiceItemAssocTypeId) throws Exception {
 		DeleteInvoiceItemAssocType command = new DeleteInvoiceItemAssocType(invoiceItemAssocTypeId);
 
 		try {
 			if (((InvoiceItemAssocTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("InvoiceItemAssocType could not be deleted");
+		return conflict();
 
 	}
 

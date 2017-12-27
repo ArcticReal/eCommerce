@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.contactMech.query.typePurpos
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/contactMech/contactMechTypePurposes")
 public class ContactMechTypePurposeController {
@@ -52,7 +54,7 @@ public class ContactMechTypePurposeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findContactMechTypePurposesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ContactMechTypePurpose>> findContactMechTypePurposesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContactMechTypePurposesBy query = new FindContactMechTypePurposesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ContactMechTypePurposeController {
 		}
 
 		List<ContactMechTypePurpose> contactMechTypePurposes =((ContactMechTypePurposeFound) Scheduler.execute(query).data()).getContactMechTypePurposes();
-
-		if (contactMechTypePurposes.size() == 1) {
-			return ResponseEntity.ok().body(contactMechTypePurposes.get(0));
-		}
 
 		return ResponseEntity.ok().body(contactMechTypePurposes);
 
@@ -78,7 +76,7 @@ public class ContactMechTypePurposeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createContactMechTypePurpose(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ContactMechTypePurpose> createContactMechTypePurpose(HttpServletRequest request) throws Exception {
 
 		ContactMechTypePurpose contactMechTypePurposeToBeAdded = new ContactMechTypePurpose();
 		try {
@@ -86,7 +84,7 @@ public class ContactMechTypePurposeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createContactMechTypePurpose(contactMechTypePurposeToBeAdded);
@@ -101,63 +99,15 @@ public class ContactMechTypePurposeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createContactMechTypePurpose(@RequestBody ContactMechTypePurpose contactMechTypePurposeToBeAdded) throws Exception {
+	public ResponseEntity<ContactMechTypePurpose> createContactMechTypePurpose(@RequestBody ContactMechTypePurpose contactMechTypePurposeToBeAdded) throws Exception {
 
 		AddContactMechTypePurpose command = new AddContactMechTypePurpose(contactMechTypePurposeToBeAdded);
 		ContactMechTypePurpose contactMechTypePurpose = ((ContactMechTypePurposeAdded) Scheduler.execute(command).data()).getAddedContactMechTypePurpose();
 		
 		if (contactMechTypePurpose != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(contactMechTypePurpose);
+			return successful(contactMechTypePurpose);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ContactMechTypePurpose could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateContactMechTypePurpose(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ContactMechTypePurpose contactMechTypePurposeToBeUpdated = new ContactMechTypePurpose();
-
-		try {
-			contactMechTypePurposeToBeUpdated = ContactMechTypePurposeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateContactMechTypePurpose(contactMechTypePurposeToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ContactMechTypePurposeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateContactMechTypePurpose(@RequestBody ContactMechTypePurpose contactMechTypePurposeToBeUpdated,
+	public ResponseEntity<String> updateContactMechTypePurpose(@RequestBody ContactMechTypePurpose contactMechTypePurposeToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		contactMechTypePurposeToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ContactMechTypePurposeController {
 
 		try {
 			if(((ContactMechTypePurposeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{contactMechTypePurposeId}")
-	public ResponseEntity<Object> findById(@PathVariable String contactMechTypePurposeId) throws Exception {
+	public ResponseEntity<ContactMechTypePurpose> findById(@PathVariable String contactMechTypePurposeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contactMechTypePurposeId", contactMechTypePurposeId);
 		try {
 
-			Object foundContactMechTypePurpose = findContactMechTypePurposesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundContactMechTypePurpose);
+			List<ContactMechTypePurpose> foundContactMechTypePurpose = findContactMechTypePurposesBy(requestParams).getBody();
+			if(foundContactMechTypePurpose.size()==1){				return successful(foundContactMechTypePurpose.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{contactMechTypePurposeId}")
-	public ResponseEntity<Object> deleteContactMechTypePurposeByIdUpdated(@PathVariable String contactMechTypePurposeId) throws Exception {
+	public ResponseEntity<String> deleteContactMechTypePurposeByIdUpdated(@PathVariable String contactMechTypePurposeId) throws Exception {
 		DeleteContactMechTypePurpose command = new DeleteContactMechTypePurpose(contactMechTypePurposeId);
 
 		try {
 			if (((ContactMechTypePurposeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ContactMechTypePurpose could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.quote.query.typeAttr.FindQuo
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/quote/quoteTypeAttrs")
 public class QuoteTypeAttrController {
@@ -52,7 +54,7 @@ public class QuoteTypeAttrController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findQuoteTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<QuoteTypeAttr>> findQuoteTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindQuoteTypeAttrsBy query = new FindQuoteTypeAttrsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class QuoteTypeAttrController {
 		}
 
 		List<QuoteTypeAttr> quoteTypeAttrs =((QuoteTypeAttrFound) Scheduler.execute(query).data()).getQuoteTypeAttrs();
-
-		if (quoteTypeAttrs.size() == 1) {
-			return ResponseEntity.ok().body(quoteTypeAttrs.get(0));
-		}
 
 		return ResponseEntity.ok().body(quoteTypeAttrs);
 
@@ -78,7 +76,7 @@ public class QuoteTypeAttrController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createQuoteTypeAttr(HttpServletRequest request) throws Exception {
+	public ResponseEntity<QuoteTypeAttr> createQuoteTypeAttr(HttpServletRequest request) throws Exception {
 
 		QuoteTypeAttr quoteTypeAttrToBeAdded = new QuoteTypeAttr();
 		try {
@@ -86,7 +84,7 @@ public class QuoteTypeAttrController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createQuoteTypeAttr(quoteTypeAttrToBeAdded);
@@ -101,63 +99,15 @@ public class QuoteTypeAttrController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createQuoteTypeAttr(@RequestBody QuoteTypeAttr quoteTypeAttrToBeAdded) throws Exception {
+	public ResponseEntity<QuoteTypeAttr> createQuoteTypeAttr(@RequestBody QuoteTypeAttr quoteTypeAttrToBeAdded) throws Exception {
 
 		AddQuoteTypeAttr command = new AddQuoteTypeAttr(quoteTypeAttrToBeAdded);
 		QuoteTypeAttr quoteTypeAttr = ((QuoteTypeAttrAdded) Scheduler.execute(command).data()).getAddedQuoteTypeAttr();
 		
 		if (quoteTypeAttr != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(quoteTypeAttr);
+			return successful(quoteTypeAttr);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("QuoteTypeAttr could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateQuoteTypeAttr(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		QuoteTypeAttr quoteTypeAttrToBeUpdated = new QuoteTypeAttr();
-
-		try {
-			quoteTypeAttrToBeUpdated = QuoteTypeAttrMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateQuoteTypeAttr(quoteTypeAttrToBeUpdated, quoteTypeAttrToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class QuoteTypeAttrController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateQuoteTypeAttr(@RequestBody QuoteTypeAttr quoteTypeAttrToBeUpdated,
+	public ResponseEntity<String> updateQuoteTypeAttr(@RequestBody QuoteTypeAttr quoteTypeAttrToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		quoteTypeAttrToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class QuoteTypeAttrController {
 
 		try {
 			if(((QuoteTypeAttrUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{quoteTypeAttrId}")
-	public ResponseEntity<Object> findById(@PathVariable String quoteTypeAttrId) throws Exception {
+	public ResponseEntity<QuoteTypeAttr> findById(@PathVariable String quoteTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("quoteTypeAttrId", quoteTypeAttrId);
 		try {
 
-			Object foundQuoteTypeAttr = findQuoteTypeAttrsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundQuoteTypeAttr);
+			List<QuoteTypeAttr> foundQuoteTypeAttr = findQuoteTypeAttrsBy(requestParams).getBody();
+			if(foundQuoteTypeAttr.size()==1){				return successful(foundQuoteTypeAttr.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{quoteTypeAttrId}")
-	public ResponseEntity<Object> deleteQuoteTypeAttrByIdUpdated(@PathVariable String quoteTypeAttrId) throws Exception {
+	public ResponseEntity<String> deleteQuoteTypeAttrByIdUpdated(@PathVariable String quoteTypeAttrId) throws Exception {
 		DeleteQuoteTypeAttr command = new DeleteQuoteTypeAttr(quoteTypeAttrId);
 
 		try {
 			if (((QuoteTypeAttrDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("QuoteTypeAttr could not be deleted");
+		return conflict();
 
 	}
 

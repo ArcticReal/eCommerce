@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.humanres.relations.trainingClassType.query.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/humanres/trainingClassTypes")
 public class TrainingClassTypeController {
@@ -52,7 +54,7 @@ public class TrainingClassTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findTrainingClassTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<TrainingClassType>> findTrainingClassTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTrainingClassTypesBy query = new FindTrainingClassTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class TrainingClassTypeController {
 		}
 
 		List<TrainingClassType> trainingClassTypes =((TrainingClassTypeFound) Scheduler.execute(query).data()).getTrainingClassTypes();
-
-		if (trainingClassTypes.size() == 1) {
-			return ResponseEntity.ok().body(trainingClassTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(trainingClassTypes);
 
@@ -78,7 +76,7 @@ public class TrainingClassTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createTrainingClassType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<TrainingClassType> createTrainingClassType(HttpServletRequest request) throws Exception {
 
 		TrainingClassType trainingClassTypeToBeAdded = new TrainingClassType();
 		try {
@@ -86,7 +84,7 @@ public class TrainingClassTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createTrainingClassType(trainingClassTypeToBeAdded);
@@ -101,63 +99,15 @@ public class TrainingClassTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createTrainingClassType(@RequestBody TrainingClassType trainingClassTypeToBeAdded) throws Exception {
+	public ResponseEntity<TrainingClassType> createTrainingClassType(@RequestBody TrainingClassType trainingClassTypeToBeAdded) throws Exception {
 
 		AddTrainingClassType command = new AddTrainingClassType(trainingClassTypeToBeAdded);
 		TrainingClassType trainingClassType = ((TrainingClassTypeAdded) Scheduler.execute(command).data()).getAddedTrainingClassType();
 		
 		if (trainingClassType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(trainingClassType);
+			return successful(trainingClassType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("TrainingClassType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateTrainingClassType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		TrainingClassType trainingClassTypeToBeUpdated = new TrainingClassType();
-
-		try {
-			trainingClassTypeToBeUpdated = TrainingClassTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateTrainingClassType(trainingClassTypeToBeUpdated, trainingClassTypeToBeUpdated.getTrainingClassTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class TrainingClassTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{trainingClassTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateTrainingClassType(@RequestBody TrainingClassType trainingClassTypeToBeUpdated,
+	public ResponseEntity<String> updateTrainingClassType(@RequestBody TrainingClassType trainingClassTypeToBeUpdated,
 			@PathVariable String trainingClassTypeId) throws Exception {
 
 		trainingClassTypeToBeUpdated.setTrainingClassTypeId(trainingClassTypeId);
@@ -178,41 +128,44 @@ public class TrainingClassTypeController {
 
 		try {
 			if(((TrainingClassTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{trainingClassTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String trainingClassTypeId) throws Exception {
+	public ResponseEntity<TrainingClassType> findById(@PathVariable String trainingClassTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("trainingClassTypeId", trainingClassTypeId);
 		try {
 
-			Object foundTrainingClassType = findTrainingClassTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundTrainingClassType);
+			List<TrainingClassType> foundTrainingClassType = findTrainingClassTypesBy(requestParams).getBody();
+			if(foundTrainingClassType.size()==1){				return successful(foundTrainingClassType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{trainingClassTypeId}")
-	public ResponseEntity<Object> deleteTrainingClassTypeByIdUpdated(@PathVariable String trainingClassTypeId) throws Exception {
+	public ResponseEntity<String> deleteTrainingClassTypeByIdUpdated(@PathVariable String trainingClassTypeId) throws Exception {
 		DeleteTrainingClassType command = new DeleteTrainingClassType(trainingClassTypeId);
 
 		try {
 			if (((TrainingClassTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("TrainingClassType could not be deleted");
+		return conflict();
 
 	}
 

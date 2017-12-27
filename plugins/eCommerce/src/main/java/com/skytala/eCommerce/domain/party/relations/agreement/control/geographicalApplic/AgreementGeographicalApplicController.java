@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.agreement.query.geographical
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/agreement/agreementGeographicalApplics")
 public class AgreementGeographicalApplicController {
@@ -52,7 +54,7 @@ public class AgreementGeographicalApplicController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findAgreementGeographicalApplicsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<AgreementGeographicalApplic>> findAgreementGeographicalApplicsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAgreementGeographicalApplicsBy query = new FindAgreementGeographicalApplicsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class AgreementGeographicalApplicController {
 		}
 
 		List<AgreementGeographicalApplic> agreementGeographicalApplics =((AgreementGeographicalApplicFound) Scheduler.execute(query).data()).getAgreementGeographicalApplics();
-
-		if (agreementGeographicalApplics.size() == 1) {
-			return ResponseEntity.ok().body(agreementGeographicalApplics.get(0));
-		}
 
 		return ResponseEntity.ok().body(agreementGeographicalApplics);
 
@@ -78,7 +76,7 @@ public class AgreementGeographicalApplicController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createAgreementGeographicalApplic(HttpServletRequest request) throws Exception {
+	public ResponseEntity<AgreementGeographicalApplic> createAgreementGeographicalApplic(HttpServletRequest request) throws Exception {
 
 		AgreementGeographicalApplic agreementGeographicalApplicToBeAdded = new AgreementGeographicalApplic();
 		try {
@@ -86,7 +84,7 @@ public class AgreementGeographicalApplicController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createAgreementGeographicalApplic(agreementGeographicalApplicToBeAdded);
@@ -101,63 +99,15 @@ public class AgreementGeographicalApplicController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createAgreementGeographicalApplic(@RequestBody AgreementGeographicalApplic agreementGeographicalApplicToBeAdded) throws Exception {
+	public ResponseEntity<AgreementGeographicalApplic> createAgreementGeographicalApplic(@RequestBody AgreementGeographicalApplic agreementGeographicalApplicToBeAdded) throws Exception {
 
 		AddAgreementGeographicalApplic command = new AddAgreementGeographicalApplic(agreementGeographicalApplicToBeAdded);
 		AgreementGeographicalApplic agreementGeographicalApplic = ((AgreementGeographicalApplicAdded) Scheduler.execute(command).data()).getAddedAgreementGeographicalApplic();
 		
 		if (agreementGeographicalApplic != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(agreementGeographicalApplic);
+			return successful(agreementGeographicalApplic);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("AgreementGeographicalApplic could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateAgreementGeographicalApplic(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		AgreementGeographicalApplic agreementGeographicalApplicToBeUpdated = new AgreementGeographicalApplic();
-
-		try {
-			agreementGeographicalApplicToBeUpdated = AgreementGeographicalApplicMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateAgreementGeographicalApplic(agreementGeographicalApplicToBeUpdated, agreementGeographicalApplicToBeUpdated.getAgreementItemSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class AgreementGeographicalApplicController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{agreementItemSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateAgreementGeographicalApplic(@RequestBody AgreementGeographicalApplic agreementGeographicalApplicToBeUpdated,
+	public ResponseEntity<String> updateAgreementGeographicalApplic(@RequestBody AgreementGeographicalApplic agreementGeographicalApplicToBeUpdated,
 			@PathVariable String agreementItemSeqId) throws Exception {
 
 		agreementGeographicalApplicToBeUpdated.setAgreementItemSeqId(agreementItemSeqId);
@@ -178,41 +128,44 @@ public class AgreementGeographicalApplicController {
 
 		try {
 			if(((AgreementGeographicalApplicUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{agreementGeographicalApplicId}")
-	public ResponseEntity<Object> findById(@PathVariable String agreementGeographicalApplicId) throws Exception {
+	public ResponseEntity<AgreementGeographicalApplic> findById(@PathVariable String agreementGeographicalApplicId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("agreementGeographicalApplicId", agreementGeographicalApplicId);
 		try {
 
-			Object foundAgreementGeographicalApplic = findAgreementGeographicalApplicsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundAgreementGeographicalApplic);
+			List<AgreementGeographicalApplic> foundAgreementGeographicalApplic = findAgreementGeographicalApplicsBy(requestParams).getBody();
+			if(foundAgreementGeographicalApplic.size()==1){				return successful(foundAgreementGeographicalApplic.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{agreementGeographicalApplicId}")
-	public ResponseEntity<Object> deleteAgreementGeographicalApplicByIdUpdated(@PathVariable String agreementGeographicalApplicId) throws Exception {
+	public ResponseEntity<String> deleteAgreementGeographicalApplicByIdUpdated(@PathVariable String agreementGeographicalApplicId) throws Exception {
 		DeleteAgreementGeographicalApplic command = new DeleteAgreementGeographicalApplic(agreementGeographicalApplicId);
 
 		try {
 			if (((AgreementGeographicalApplicDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("AgreementGeographicalApplic could not be deleted");
+		return conflict();
 
 	}
 

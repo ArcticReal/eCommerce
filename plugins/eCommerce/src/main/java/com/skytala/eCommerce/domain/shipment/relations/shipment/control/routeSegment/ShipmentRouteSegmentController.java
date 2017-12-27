@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.shipment.relations.shipment.query.routeSegme
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/shipment/shipment/shipmentRouteSegments")
 public class ShipmentRouteSegmentController {
@@ -52,7 +54,7 @@ public class ShipmentRouteSegmentController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findShipmentRouteSegmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ShipmentRouteSegment>> findShipmentRouteSegmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentRouteSegmentsBy query = new FindShipmentRouteSegmentsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ShipmentRouteSegmentController {
 		}
 
 		List<ShipmentRouteSegment> shipmentRouteSegments =((ShipmentRouteSegmentFound) Scheduler.execute(query).data()).getShipmentRouteSegments();
-
-		if (shipmentRouteSegments.size() == 1) {
-			return ResponseEntity.ok().body(shipmentRouteSegments.get(0));
-		}
 
 		return ResponseEntity.ok().body(shipmentRouteSegments);
 
@@ -78,7 +76,7 @@ public class ShipmentRouteSegmentController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createShipmentRouteSegment(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ShipmentRouteSegment> createShipmentRouteSegment(HttpServletRequest request) throws Exception {
 
 		ShipmentRouteSegment shipmentRouteSegmentToBeAdded = new ShipmentRouteSegment();
 		try {
@@ -86,7 +84,7 @@ public class ShipmentRouteSegmentController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createShipmentRouteSegment(shipmentRouteSegmentToBeAdded);
@@ -101,63 +99,15 @@ public class ShipmentRouteSegmentController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createShipmentRouteSegment(@RequestBody ShipmentRouteSegment shipmentRouteSegmentToBeAdded) throws Exception {
+	public ResponseEntity<ShipmentRouteSegment> createShipmentRouteSegment(@RequestBody ShipmentRouteSegment shipmentRouteSegmentToBeAdded) throws Exception {
 
 		AddShipmentRouteSegment command = new AddShipmentRouteSegment(shipmentRouteSegmentToBeAdded);
 		ShipmentRouteSegment shipmentRouteSegment = ((ShipmentRouteSegmentAdded) Scheduler.execute(command).data()).getAddedShipmentRouteSegment();
 		
 		if (shipmentRouteSegment != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(shipmentRouteSegment);
+			return successful(shipmentRouteSegment);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ShipmentRouteSegment could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateShipmentRouteSegment(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ShipmentRouteSegment shipmentRouteSegmentToBeUpdated = new ShipmentRouteSegment();
-
-		try {
-			shipmentRouteSegmentToBeUpdated = ShipmentRouteSegmentMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateShipmentRouteSegment(shipmentRouteSegmentToBeUpdated, shipmentRouteSegmentToBeUpdated.getShipmentRouteSegmentId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ShipmentRouteSegmentController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{shipmentRouteSegmentId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateShipmentRouteSegment(@RequestBody ShipmentRouteSegment shipmentRouteSegmentToBeUpdated,
+	public ResponseEntity<String> updateShipmentRouteSegment(@RequestBody ShipmentRouteSegment shipmentRouteSegmentToBeUpdated,
 			@PathVariable String shipmentRouteSegmentId) throws Exception {
 
 		shipmentRouteSegmentToBeUpdated.setShipmentRouteSegmentId(shipmentRouteSegmentId);
@@ -178,41 +128,44 @@ public class ShipmentRouteSegmentController {
 
 		try {
 			if(((ShipmentRouteSegmentUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{shipmentRouteSegmentId}")
-	public ResponseEntity<Object> findById(@PathVariable String shipmentRouteSegmentId) throws Exception {
+	public ResponseEntity<ShipmentRouteSegment> findById(@PathVariable String shipmentRouteSegmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentRouteSegmentId", shipmentRouteSegmentId);
 		try {
 
-			Object foundShipmentRouteSegment = findShipmentRouteSegmentsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundShipmentRouteSegment);
+			List<ShipmentRouteSegment> foundShipmentRouteSegment = findShipmentRouteSegmentsBy(requestParams).getBody();
+			if(foundShipmentRouteSegment.size()==1){				return successful(foundShipmentRouteSegment.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{shipmentRouteSegmentId}")
-	public ResponseEntity<Object> deleteShipmentRouteSegmentByIdUpdated(@PathVariable String shipmentRouteSegmentId) throws Exception {
+	public ResponseEntity<String> deleteShipmentRouteSegmentByIdUpdated(@PathVariable String shipmentRouteSegmentId) throws Exception {
 		DeleteShipmentRouteSegment command = new DeleteShipmentRouteSegment(shipmentRouteSegmentId);
 
 		try {
 			if (((ShipmentRouteSegmentDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ShipmentRouteSegment could not be deleted");
+		return conflict();
 
 	}
 

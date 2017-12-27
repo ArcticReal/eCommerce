@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.shipment.relations.shipment.query.packageRou
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/shipment/shipment/shipmentPackageRouteSegs")
 public class ShipmentPackageRouteSegController {
@@ -52,7 +54,7 @@ public class ShipmentPackageRouteSegController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findShipmentPackageRouteSegsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ShipmentPackageRouteSeg>> findShipmentPackageRouteSegsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentPackageRouteSegsBy query = new FindShipmentPackageRouteSegsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ShipmentPackageRouteSegController {
 		}
 
 		List<ShipmentPackageRouteSeg> shipmentPackageRouteSegs =((ShipmentPackageRouteSegFound) Scheduler.execute(query).data()).getShipmentPackageRouteSegs();
-
-		if (shipmentPackageRouteSegs.size() == 1) {
-			return ResponseEntity.ok().body(shipmentPackageRouteSegs.get(0));
-		}
 
 		return ResponseEntity.ok().body(shipmentPackageRouteSegs);
 
@@ -78,7 +76,7 @@ public class ShipmentPackageRouteSegController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createShipmentPackageRouteSeg(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ShipmentPackageRouteSeg> createShipmentPackageRouteSeg(HttpServletRequest request) throws Exception {
 
 		ShipmentPackageRouteSeg shipmentPackageRouteSegToBeAdded = new ShipmentPackageRouteSeg();
 		try {
@@ -86,7 +84,7 @@ public class ShipmentPackageRouteSegController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createShipmentPackageRouteSeg(shipmentPackageRouteSegToBeAdded);
@@ -101,63 +99,15 @@ public class ShipmentPackageRouteSegController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createShipmentPackageRouteSeg(@RequestBody ShipmentPackageRouteSeg shipmentPackageRouteSegToBeAdded) throws Exception {
+	public ResponseEntity<ShipmentPackageRouteSeg> createShipmentPackageRouteSeg(@RequestBody ShipmentPackageRouteSeg shipmentPackageRouteSegToBeAdded) throws Exception {
 
 		AddShipmentPackageRouteSeg command = new AddShipmentPackageRouteSeg(shipmentPackageRouteSegToBeAdded);
 		ShipmentPackageRouteSeg shipmentPackageRouteSeg = ((ShipmentPackageRouteSegAdded) Scheduler.execute(command).data()).getAddedShipmentPackageRouteSeg();
 		
 		if (shipmentPackageRouteSeg != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(shipmentPackageRouteSeg);
+			return successful(shipmentPackageRouteSeg);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ShipmentPackageRouteSeg could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateShipmentPackageRouteSeg(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ShipmentPackageRouteSeg shipmentPackageRouteSegToBeUpdated = new ShipmentPackageRouteSeg();
-
-		try {
-			shipmentPackageRouteSegToBeUpdated = ShipmentPackageRouteSegMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateShipmentPackageRouteSeg(shipmentPackageRouteSegToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ShipmentPackageRouteSegController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateShipmentPackageRouteSeg(@RequestBody ShipmentPackageRouteSeg shipmentPackageRouteSegToBeUpdated,
+	public ResponseEntity<String> updateShipmentPackageRouteSeg(@RequestBody ShipmentPackageRouteSeg shipmentPackageRouteSegToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		shipmentPackageRouteSegToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ShipmentPackageRouteSegController {
 
 		try {
 			if(((ShipmentPackageRouteSegUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{shipmentPackageRouteSegId}")
-	public ResponseEntity<Object> findById(@PathVariable String shipmentPackageRouteSegId) throws Exception {
+	public ResponseEntity<ShipmentPackageRouteSeg> findById(@PathVariable String shipmentPackageRouteSegId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentPackageRouteSegId", shipmentPackageRouteSegId);
 		try {
 
-			Object foundShipmentPackageRouteSeg = findShipmentPackageRouteSegsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundShipmentPackageRouteSeg);
+			List<ShipmentPackageRouteSeg> foundShipmentPackageRouteSeg = findShipmentPackageRouteSegsBy(requestParams).getBody();
+			if(foundShipmentPackageRouteSeg.size()==1){				return successful(foundShipmentPackageRouteSeg.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{shipmentPackageRouteSegId}")
-	public ResponseEntity<Object> deleteShipmentPackageRouteSegByIdUpdated(@PathVariable String shipmentPackageRouteSegId) throws Exception {
+	public ResponseEntity<String> deleteShipmentPackageRouteSegByIdUpdated(@PathVariable String shipmentPackageRouteSegId) throws Exception {
 		DeleteShipmentPackageRouteSeg command = new DeleteShipmentPackageRouteSeg(shipmentPackageRouteSegId);
 
 		try {
 			if (((ShipmentPackageRouteSegDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ShipmentPackageRouteSeg could not be deleted");
+		return conflict();
 
 	}
 

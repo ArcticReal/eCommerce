@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.priorityType.query.FindPrior
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/priorityTypes")
 public class PriorityTypeController {
@@ -52,7 +54,7 @@ public class PriorityTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPriorityTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PriorityType>> findPriorityTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPriorityTypesBy query = new FindPriorityTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PriorityTypeController {
 		}
 
 		List<PriorityType> priorityTypes =((PriorityTypeFound) Scheduler.execute(query).data()).getPriorityTypes();
-
-		if (priorityTypes.size() == 1) {
-			return ResponseEntity.ok().body(priorityTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(priorityTypes);
 
@@ -78,7 +76,7 @@ public class PriorityTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPriorityType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PriorityType> createPriorityType(HttpServletRequest request) throws Exception {
 
 		PriorityType priorityTypeToBeAdded = new PriorityType();
 		try {
@@ -86,7 +84,7 @@ public class PriorityTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPriorityType(priorityTypeToBeAdded);
@@ -101,63 +99,15 @@ public class PriorityTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPriorityType(@RequestBody PriorityType priorityTypeToBeAdded) throws Exception {
+	public ResponseEntity<PriorityType> createPriorityType(@RequestBody PriorityType priorityTypeToBeAdded) throws Exception {
 
 		AddPriorityType command = new AddPriorityType(priorityTypeToBeAdded);
 		PriorityType priorityType = ((PriorityTypeAdded) Scheduler.execute(command).data()).getAddedPriorityType();
 		
 		if (priorityType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(priorityType);
+			return successful(priorityType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PriorityType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePriorityType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PriorityType priorityTypeToBeUpdated = new PriorityType();
-
-		try {
-			priorityTypeToBeUpdated = PriorityTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePriorityType(priorityTypeToBeUpdated, priorityTypeToBeUpdated.getPriorityTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PriorityTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{priorityTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePriorityType(@RequestBody PriorityType priorityTypeToBeUpdated,
+	public ResponseEntity<String> updatePriorityType(@RequestBody PriorityType priorityTypeToBeUpdated,
 			@PathVariable String priorityTypeId) throws Exception {
 
 		priorityTypeToBeUpdated.setPriorityTypeId(priorityTypeId);
@@ -178,41 +128,44 @@ public class PriorityTypeController {
 
 		try {
 			if(((PriorityTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{priorityTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String priorityTypeId) throws Exception {
+	public ResponseEntity<PriorityType> findById(@PathVariable String priorityTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("priorityTypeId", priorityTypeId);
 		try {
 
-			Object foundPriorityType = findPriorityTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPriorityType);
+			List<PriorityType> foundPriorityType = findPriorityTypesBy(requestParams).getBody();
+			if(foundPriorityType.size()==1){				return successful(foundPriorityType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{priorityTypeId}")
-	public ResponseEntity<Object> deletePriorityTypeByIdUpdated(@PathVariable String priorityTypeId) throws Exception {
+	public ResponseEntity<String> deletePriorityTypeByIdUpdated(@PathVariable String priorityTypeId) throws Exception {
 		DeletePriorityType command = new DeletePriorityType(priorityTypeId);
 
 		try {
 			if (((PriorityTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PriorityType could not be deleted");
+		return conflict();
 
 	}
 

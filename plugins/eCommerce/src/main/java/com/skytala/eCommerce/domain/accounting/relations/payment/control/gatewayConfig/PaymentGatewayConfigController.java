@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.payment.query.gatewayCo
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/payment/paymentGatewayConfigs")
 public class PaymentGatewayConfigController {
@@ -52,7 +54,7 @@ public class PaymentGatewayConfigController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPaymentGatewayConfigsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PaymentGatewayConfig>> findPaymentGatewayConfigsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentGatewayConfigsBy query = new FindPaymentGatewayConfigsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PaymentGatewayConfigController {
 		}
 
 		List<PaymentGatewayConfig> paymentGatewayConfigs =((PaymentGatewayConfigFound) Scheduler.execute(query).data()).getPaymentGatewayConfigs();
-
-		if (paymentGatewayConfigs.size() == 1) {
-			return ResponseEntity.ok().body(paymentGatewayConfigs.get(0));
-		}
 
 		return ResponseEntity.ok().body(paymentGatewayConfigs);
 
@@ -78,7 +76,7 @@ public class PaymentGatewayConfigController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPaymentGatewayConfig(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PaymentGatewayConfig> createPaymentGatewayConfig(HttpServletRequest request) throws Exception {
 
 		PaymentGatewayConfig paymentGatewayConfigToBeAdded = new PaymentGatewayConfig();
 		try {
@@ -86,7 +84,7 @@ public class PaymentGatewayConfigController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPaymentGatewayConfig(paymentGatewayConfigToBeAdded);
@@ -101,63 +99,15 @@ public class PaymentGatewayConfigController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPaymentGatewayConfig(@RequestBody PaymentGatewayConfig paymentGatewayConfigToBeAdded) throws Exception {
+	public ResponseEntity<PaymentGatewayConfig> createPaymentGatewayConfig(@RequestBody PaymentGatewayConfig paymentGatewayConfigToBeAdded) throws Exception {
 
 		AddPaymentGatewayConfig command = new AddPaymentGatewayConfig(paymentGatewayConfigToBeAdded);
 		PaymentGatewayConfig paymentGatewayConfig = ((PaymentGatewayConfigAdded) Scheduler.execute(command).data()).getAddedPaymentGatewayConfig();
 		
 		if (paymentGatewayConfig != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(paymentGatewayConfig);
+			return successful(paymentGatewayConfig);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PaymentGatewayConfig could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePaymentGatewayConfig(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PaymentGatewayConfig paymentGatewayConfigToBeUpdated = new PaymentGatewayConfig();
-
-		try {
-			paymentGatewayConfigToBeUpdated = PaymentGatewayConfigMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePaymentGatewayConfig(paymentGatewayConfigToBeUpdated, paymentGatewayConfigToBeUpdated.getPaymentGatewayConfigId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PaymentGatewayConfigController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{paymentGatewayConfigId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePaymentGatewayConfig(@RequestBody PaymentGatewayConfig paymentGatewayConfigToBeUpdated,
+	public ResponseEntity<String> updatePaymentGatewayConfig(@RequestBody PaymentGatewayConfig paymentGatewayConfigToBeUpdated,
 			@PathVariable String paymentGatewayConfigId) throws Exception {
 
 		paymentGatewayConfigToBeUpdated.setPaymentGatewayConfigId(paymentGatewayConfigId);
@@ -178,41 +128,44 @@ public class PaymentGatewayConfigController {
 
 		try {
 			if(((PaymentGatewayConfigUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{paymentGatewayConfigId}")
-	public ResponseEntity<Object> findById(@PathVariable String paymentGatewayConfigId) throws Exception {
+	public ResponseEntity<PaymentGatewayConfig> findById(@PathVariable String paymentGatewayConfigId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentGatewayConfigId", paymentGatewayConfigId);
 		try {
 
-			Object foundPaymentGatewayConfig = findPaymentGatewayConfigsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPaymentGatewayConfig);
+			List<PaymentGatewayConfig> foundPaymentGatewayConfig = findPaymentGatewayConfigsBy(requestParams).getBody();
+			if(foundPaymentGatewayConfig.size()==1){				return successful(foundPaymentGatewayConfig.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{paymentGatewayConfigId}")
-	public ResponseEntity<Object> deletePaymentGatewayConfigByIdUpdated(@PathVariable String paymentGatewayConfigId) throws Exception {
+	public ResponseEntity<String> deletePaymentGatewayConfigByIdUpdated(@PathVariable String paymentGatewayConfigId) throws Exception {
 		DeletePaymentGatewayConfig command = new DeletePaymentGatewayConfig(paymentGatewayConfigId);
 
 		try {
 			if (((PaymentGatewayConfigDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PaymentGatewayConfig could not be deleted");
+		return conflict();
 
 	}
 

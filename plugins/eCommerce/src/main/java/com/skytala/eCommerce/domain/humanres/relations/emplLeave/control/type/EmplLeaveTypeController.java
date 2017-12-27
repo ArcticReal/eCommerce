@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.humanres.relations.emplLeave.query.type.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/humanres/emplLeave/emplLeaveTypes")
 public class EmplLeaveTypeController {
@@ -52,7 +54,7 @@ public class EmplLeaveTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findEmplLeaveTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<EmplLeaveType>> findEmplLeaveTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindEmplLeaveTypesBy query = new FindEmplLeaveTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class EmplLeaveTypeController {
 		}
 
 		List<EmplLeaveType> emplLeaveTypes =((EmplLeaveTypeFound) Scheduler.execute(query).data()).getEmplLeaveTypes();
-
-		if (emplLeaveTypes.size() == 1) {
-			return ResponseEntity.ok().body(emplLeaveTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(emplLeaveTypes);
 
@@ -78,7 +76,7 @@ public class EmplLeaveTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createEmplLeaveType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<EmplLeaveType> createEmplLeaveType(HttpServletRequest request) throws Exception {
 
 		EmplLeaveType emplLeaveTypeToBeAdded = new EmplLeaveType();
 		try {
@@ -86,7 +84,7 @@ public class EmplLeaveTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createEmplLeaveType(emplLeaveTypeToBeAdded);
@@ -101,63 +99,15 @@ public class EmplLeaveTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createEmplLeaveType(@RequestBody EmplLeaveType emplLeaveTypeToBeAdded) throws Exception {
+	public ResponseEntity<EmplLeaveType> createEmplLeaveType(@RequestBody EmplLeaveType emplLeaveTypeToBeAdded) throws Exception {
 
 		AddEmplLeaveType command = new AddEmplLeaveType(emplLeaveTypeToBeAdded);
 		EmplLeaveType emplLeaveType = ((EmplLeaveTypeAdded) Scheduler.execute(command).data()).getAddedEmplLeaveType();
 		
 		if (emplLeaveType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(emplLeaveType);
+			return successful(emplLeaveType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("EmplLeaveType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateEmplLeaveType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		EmplLeaveType emplLeaveTypeToBeUpdated = new EmplLeaveType();
-
-		try {
-			emplLeaveTypeToBeUpdated = EmplLeaveTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateEmplLeaveType(emplLeaveTypeToBeUpdated, emplLeaveTypeToBeUpdated.getLeaveTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class EmplLeaveTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{leaveTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateEmplLeaveType(@RequestBody EmplLeaveType emplLeaveTypeToBeUpdated,
+	public ResponseEntity<String> updateEmplLeaveType(@RequestBody EmplLeaveType emplLeaveTypeToBeUpdated,
 			@PathVariable String leaveTypeId) throws Exception {
 
 		emplLeaveTypeToBeUpdated.setLeaveTypeId(leaveTypeId);
@@ -178,41 +128,44 @@ public class EmplLeaveTypeController {
 
 		try {
 			if(((EmplLeaveTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{emplLeaveTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String emplLeaveTypeId) throws Exception {
+	public ResponseEntity<EmplLeaveType> findById(@PathVariable String emplLeaveTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("emplLeaveTypeId", emplLeaveTypeId);
 		try {
 
-			Object foundEmplLeaveType = findEmplLeaveTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundEmplLeaveType);
+			List<EmplLeaveType> foundEmplLeaveType = findEmplLeaveTypesBy(requestParams).getBody();
+			if(foundEmplLeaveType.size()==1){				return successful(foundEmplLeaveType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{emplLeaveTypeId}")
-	public ResponseEntity<Object> deleteEmplLeaveTypeByIdUpdated(@PathVariable String emplLeaveTypeId) throws Exception {
+	public ResponseEntity<String> deleteEmplLeaveTypeByIdUpdated(@PathVariable String emplLeaveTypeId) throws Exception {
 		DeleteEmplLeaveType command = new DeleteEmplLeaveType(emplLeaveTypeId);
 
 		try {
 			if (((EmplLeaveTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("EmplLeaveType could not be deleted");
+		return conflict();
 
 	}
 

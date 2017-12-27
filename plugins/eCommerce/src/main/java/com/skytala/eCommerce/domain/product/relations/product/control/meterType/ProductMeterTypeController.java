@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.meterType.Fi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productMeterTypes")
 public class ProductMeterTypeController {
@@ -52,7 +54,7 @@ public class ProductMeterTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductMeterTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductMeterType>> findProductMeterTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductMeterTypesBy query = new FindProductMeterTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductMeterTypeController {
 		}
 
 		List<ProductMeterType> productMeterTypes =((ProductMeterTypeFound) Scheduler.execute(query).data()).getProductMeterTypes();
-
-		if (productMeterTypes.size() == 1) {
-			return ResponseEntity.ok().body(productMeterTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(productMeterTypes);
 
@@ -78,7 +76,7 @@ public class ProductMeterTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductMeterType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductMeterType> createProductMeterType(HttpServletRequest request) throws Exception {
 
 		ProductMeterType productMeterTypeToBeAdded = new ProductMeterType();
 		try {
@@ -86,7 +84,7 @@ public class ProductMeterTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductMeterType(productMeterTypeToBeAdded);
@@ -101,63 +99,15 @@ public class ProductMeterTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductMeterType(@RequestBody ProductMeterType productMeterTypeToBeAdded) throws Exception {
+	public ResponseEntity<ProductMeterType> createProductMeterType(@RequestBody ProductMeterType productMeterTypeToBeAdded) throws Exception {
 
 		AddProductMeterType command = new AddProductMeterType(productMeterTypeToBeAdded);
 		ProductMeterType productMeterType = ((ProductMeterTypeAdded) Scheduler.execute(command).data()).getAddedProductMeterType();
 		
 		if (productMeterType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productMeterType);
+			return successful(productMeterType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductMeterType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductMeterType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductMeterType productMeterTypeToBeUpdated = new ProductMeterType();
-
-		try {
-			productMeterTypeToBeUpdated = ProductMeterTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductMeterType(productMeterTypeToBeUpdated, productMeterTypeToBeUpdated.getProductMeterTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductMeterTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{productMeterTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductMeterType(@RequestBody ProductMeterType productMeterTypeToBeUpdated,
+	public ResponseEntity<String> updateProductMeterType(@RequestBody ProductMeterType productMeterTypeToBeUpdated,
 			@PathVariable String productMeterTypeId) throws Exception {
 
 		productMeterTypeToBeUpdated.setProductMeterTypeId(productMeterTypeId);
@@ -178,41 +128,44 @@ public class ProductMeterTypeController {
 
 		try {
 			if(((ProductMeterTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productMeterTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String productMeterTypeId) throws Exception {
+	public ResponseEntity<ProductMeterType> findById(@PathVariable String productMeterTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productMeterTypeId", productMeterTypeId);
 		try {
 
-			Object foundProductMeterType = findProductMeterTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductMeterType);
+			List<ProductMeterType> foundProductMeterType = findProductMeterTypesBy(requestParams).getBody();
+			if(foundProductMeterType.size()==1){				return successful(foundProductMeterType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productMeterTypeId}")
-	public ResponseEntity<Object> deleteProductMeterTypeByIdUpdated(@PathVariable String productMeterTypeId) throws Exception {
+	public ResponseEntity<String> deleteProductMeterTypeByIdUpdated(@PathVariable String productMeterTypeId) throws Exception {
 		DeleteProductMeterType command = new DeleteProductMeterType(productMeterTypeId);
 
 		try {
 			if (((ProductMeterTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductMeterType could not be deleted");
+		return conflict();
 
 	}
 

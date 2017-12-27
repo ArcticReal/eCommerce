@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.returnItem.query.FindReturnI
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/returnItems")
 public class ReturnItemController {
@@ -52,7 +54,7 @@ public class ReturnItemController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findReturnItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ReturnItem>> findReturnItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindReturnItemsBy query = new FindReturnItemsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ReturnItemController {
 		}
 
 		List<ReturnItem> returnItems =((ReturnItemFound) Scheduler.execute(query).data()).getReturnItems();
-
-		if (returnItems.size() == 1) {
-			return ResponseEntity.ok().body(returnItems.get(0));
-		}
 
 		return ResponseEntity.ok().body(returnItems);
 
@@ -78,7 +76,7 @@ public class ReturnItemController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createReturnItem(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ReturnItem> createReturnItem(HttpServletRequest request) throws Exception {
 
 		ReturnItem returnItemToBeAdded = new ReturnItem();
 		try {
@@ -86,7 +84,7 @@ public class ReturnItemController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createReturnItem(returnItemToBeAdded);
@@ -101,63 +99,15 @@ public class ReturnItemController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createReturnItem(@RequestBody ReturnItem returnItemToBeAdded) throws Exception {
+	public ResponseEntity<ReturnItem> createReturnItem(@RequestBody ReturnItem returnItemToBeAdded) throws Exception {
 
 		AddReturnItem command = new AddReturnItem(returnItemToBeAdded);
 		ReturnItem returnItem = ((ReturnItemAdded) Scheduler.execute(command).data()).getAddedReturnItem();
 		
 		if (returnItem != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(returnItem);
+			return successful(returnItem);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ReturnItem could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateReturnItem(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ReturnItem returnItemToBeUpdated = new ReturnItem();
-
-		try {
-			returnItemToBeUpdated = ReturnItemMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateReturnItem(returnItemToBeUpdated, returnItemToBeUpdated.getReturnItemSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ReturnItemController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{returnItemSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateReturnItem(@RequestBody ReturnItem returnItemToBeUpdated,
+	public ResponseEntity<String> updateReturnItem(@RequestBody ReturnItem returnItemToBeUpdated,
 			@PathVariable String returnItemSeqId) throws Exception {
 
 		returnItemToBeUpdated.setReturnItemSeqId(returnItemSeqId);
@@ -178,41 +128,44 @@ public class ReturnItemController {
 
 		try {
 			if(((ReturnItemUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{returnItemId}")
-	public ResponseEntity<Object> findById(@PathVariable String returnItemId) throws Exception {
+	public ResponseEntity<ReturnItem> findById(@PathVariable String returnItemId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("returnItemId", returnItemId);
 		try {
 
-			Object foundReturnItem = findReturnItemsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundReturnItem);
+			List<ReturnItem> foundReturnItem = findReturnItemsBy(requestParams).getBody();
+			if(foundReturnItem.size()==1){				return successful(foundReturnItem.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{returnItemId}")
-	public ResponseEntity<Object> deleteReturnItemByIdUpdated(@PathVariable String returnItemId) throws Exception {
+	public ResponseEntity<String> deleteReturnItemByIdUpdated(@PathVariable String returnItemId) throws Exception {
 		DeleteReturnItem command = new DeleteReturnItem(returnItemId);
 
 		try {
 			if (((ReturnItemDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ReturnItem could not be deleted");
+		return conflict();
 
 	}
 

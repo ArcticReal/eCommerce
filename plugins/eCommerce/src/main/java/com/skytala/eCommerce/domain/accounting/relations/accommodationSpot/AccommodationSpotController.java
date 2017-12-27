@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.accommodationSpot.query
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/accommodationSpots")
 public class AccommodationSpotController {
@@ -52,7 +54,7 @@ public class AccommodationSpotController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findAccommodationSpotsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<AccommodationSpot>> findAccommodationSpotsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAccommodationSpotsBy query = new FindAccommodationSpotsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class AccommodationSpotController {
 		}
 
 		List<AccommodationSpot> accommodationSpots =((AccommodationSpotFound) Scheduler.execute(query).data()).getAccommodationSpots();
-
-		if (accommodationSpots.size() == 1) {
-			return ResponseEntity.ok().body(accommodationSpots.get(0));
-		}
 
 		return ResponseEntity.ok().body(accommodationSpots);
 
@@ -78,7 +76,7 @@ public class AccommodationSpotController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createAccommodationSpot(HttpServletRequest request) throws Exception {
+	public ResponseEntity<AccommodationSpot> createAccommodationSpot(HttpServletRequest request) throws Exception {
 
 		AccommodationSpot accommodationSpotToBeAdded = new AccommodationSpot();
 		try {
@@ -86,7 +84,7 @@ public class AccommodationSpotController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createAccommodationSpot(accommodationSpotToBeAdded);
@@ -101,63 +99,15 @@ public class AccommodationSpotController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createAccommodationSpot(@RequestBody AccommodationSpot accommodationSpotToBeAdded) throws Exception {
+	public ResponseEntity<AccommodationSpot> createAccommodationSpot(@RequestBody AccommodationSpot accommodationSpotToBeAdded) throws Exception {
 
 		AddAccommodationSpot command = new AddAccommodationSpot(accommodationSpotToBeAdded);
 		AccommodationSpot accommodationSpot = ((AccommodationSpotAdded) Scheduler.execute(command).data()).getAddedAccommodationSpot();
 		
 		if (accommodationSpot != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(accommodationSpot);
+			return successful(accommodationSpot);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("AccommodationSpot could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateAccommodationSpot(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		AccommodationSpot accommodationSpotToBeUpdated = new AccommodationSpot();
-
-		try {
-			accommodationSpotToBeUpdated = AccommodationSpotMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateAccommodationSpot(accommodationSpotToBeUpdated, accommodationSpotToBeUpdated.getAccommodationSpotId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class AccommodationSpotController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{accommodationSpotId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateAccommodationSpot(@RequestBody AccommodationSpot accommodationSpotToBeUpdated,
+	public ResponseEntity<String> updateAccommodationSpot(@RequestBody AccommodationSpot accommodationSpotToBeUpdated,
 			@PathVariable String accommodationSpotId) throws Exception {
 
 		accommodationSpotToBeUpdated.setAccommodationSpotId(accommodationSpotId);
@@ -178,41 +128,44 @@ public class AccommodationSpotController {
 
 		try {
 			if(((AccommodationSpotUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{accommodationSpotId}")
-	public ResponseEntity<Object> findById(@PathVariable String accommodationSpotId) throws Exception {
+	public ResponseEntity<AccommodationSpot> findById(@PathVariable String accommodationSpotId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("accommodationSpotId", accommodationSpotId);
 		try {
 
-			Object foundAccommodationSpot = findAccommodationSpotsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundAccommodationSpot);
+			List<AccommodationSpot> foundAccommodationSpot = findAccommodationSpotsBy(requestParams).getBody();
+			if(foundAccommodationSpot.size()==1){				return successful(foundAccommodationSpot.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{accommodationSpotId}")
-	public ResponseEntity<Object> deleteAccommodationSpotByIdUpdated(@PathVariable String accommodationSpotId) throws Exception {
+	public ResponseEntity<String> deleteAccommodationSpotByIdUpdated(@PathVariable String accommodationSpotId) throws Exception {
 		DeleteAccommodationSpot command = new DeleteAccommodationSpot(accommodationSpotId);
 
 		try {
 			if (((AccommodationSpotDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("AccommodationSpot could not be deleted");
+		return conflict();
 
 	}
 

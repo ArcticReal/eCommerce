@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.orderItem.query.shipGrpInvRe
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/orderItem/orderItemShipGrpInvRess")
 public class OrderItemShipGrpInvResController {
@@ -52,7 +54,7 @@ public class OrderItemShipGrpInvResController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findOrderItemShipGrpInvRessBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OrderItemShipGrpInvRes>> findOrderItemShipGrpInvRessBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderItemShipGrpInvRessBy query = new FindOrderItemShipGrpInvRessBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class OrderItemShipGrpInvResController {
 		}
 
 		List<OrderItemShipGrpInvRes> orderItemShipGrpInvRess =((OrderItemShipGrpInvResFound) Scheduler.execute(query).data()).getOrderItemShipGrpInvRess();
-
-		if (orderItemShipGrpInvRess.size() == 1) {
-			return ResponseEntity.ok().body(orderItemShipGrpInvRess.get(0));
-		}
 
 		return ResponseEntity.ok().body(orderItemShipGrpInvRess);
 
@@ -78,7 +76,7 @@ public class OrderItemShipGrpInvResController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOrderItemShipGrpInvRes(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OrderItemShipGrpInvRes> createOrderItemShipGrpInvRes(HttpServletRequest request) throws Exception {
 
 		OrderItemShipGrpInvRes orderItemShipGrpInvResToBeAdded = new OrderItemShipGrpInvRes();
 		try {
@@ -86,7 +84,7 @@ public class OrderItemShipGrpInvResController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createOrderItemShipGrpInvRes(orderItemShipGrpInvResToBeAdded);
@@ -101,63 +99,15 @@ public class OrderItemShipGrpInvResController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOrderItemShipGrpInvRes(@RequestBody OrderItemShipGrpInvRes orderItemShipGrpInvResToBeAdded) throws Exception {
+	public ResponseEntity<OrderItemShipGrpInvRes> createOrderItemShipGrpInvRes(@RequestBody OrderItemShipGrpInvRes orderItemShipGrpInvResToBeAdded) throws Exception {
 
 		AddOrderItemShipGrpInvRes command = new AddOrderItemShipGrpInvRes(orderItemShipGrpInvResToBeAdded);
 		OrderItemShipGrpInvRes orderItemShipGrpInvRes = ((OrderItemShipGrpInvResAdded) Scheduler.execute(command).data()).getAddedOrderItemShipGrpInvRes();
 		
 		if (orderItemShipGrpInvRes != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(orderItemShipGrpInvRes);
+			return successful(orderItemShipGrpInvRes);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OrderItemShipGrpInvRes could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateOrderItemShipGrpInvRes(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OrderItemShipGrpInvRes orderItemShipGrpInvResToBeUpdated = new OrderItemShipGrpInvRes();
-
-		try {
-			orderItemShipGrpInvResToBeUpdated = OrderItemShipGrpInvResMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOrderItemShipGrpInvRes(orderItemShipGrpInvResToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class OrderItemShipGrpInvResController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOrderItemShipGrpInvRes(@RequestBody OrderItemShipGrpInvRes orderItemShipGrpInvResToBeUpdated,
+	public ResponseEntity<String> updateOrderItemShipGrpInvRes(@RequestBody OrderItemShipGrpInvRes orderItemShipGrpInvResToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		orderItemShipGrpInvResToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class OrderItemShipGrpInvResController {
 
 		try {
 			if(((OrderItemShipGrpInvResUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{orderItemShipGrpInvResId}")
-	public ResponseEntity<Object> findById(@PathVariable String orderItemShipGrpInvResId) throws Exception {
+	public ResponseEntity<OrderItemShipGrpInvRes> findById(@PathVariable String orderItemShipGrpInvResId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderItemShipGrpInvResId", orderItemShipGrpInvResId);
 		try {
 
-			Object foundOrderItemShipGrpInvRes = findOrderItemShipGrpInvRessBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOrderItemShipGrpInvRes);
+			List<OrderItemShipGrpInvRes> foundOrderItemShipGrpInvRes = findOrderItemShipGrpInvRessBy(requestParams).getBody();
+			if(foundOrderItemShipGrpInvRes.size()==1){				return successful(foundOrderItemShipGrpInvRes.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{orderItemShipGrpInvResId}")
-	public ResponseEntity<Object> deleteOrderItemShipGrpInvResByIdUpdated(@PathVariable String orderItemShipGrpInvResId) throws Exception {
+	public ResponseEntity<String> deleteOrderItemShipGrpInvResByIdUpdated(@PathVariable String orderItemShipGrpInvResId) throws Exception {
 		DeleteOrderItemShipGrpInvRes command = new DeleteOrderItemShipGrpInvRes(orderItemShipGrpInvResId);
 
 		try {
 			if (((OrderItemShipGrpInvResDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("OrderItemShipGrpInvRes could not be deleted");
+		return conflict();
 
 	}
 

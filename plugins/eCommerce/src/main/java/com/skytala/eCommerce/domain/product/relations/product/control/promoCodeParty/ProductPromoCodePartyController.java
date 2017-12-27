@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.promoCodePar
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productPromoCodePartys")
 public class ProductPromoCodePartyController {
@@ -52,7 +54,7 @@ public class ProductPromoCodePartyController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductPromoCodePartysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductPromoCodeParty>> findProductPromoCodePartysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductPromoCodePartysBy query = new FindProductPromoCodePartysBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductPromoCodePartyController {
 		}
 
 		List<ProductPromoCodeParty> productPromoCodePartys =((ProductPromoCodePartyFound) Scheduler.execute(query).data()).getProductPromoCodePartys();
-
-		if (productPromoCodePartys.size() == 1) {
-			return ResponseEntity.ok().body(productPromoCodePartys.get(0));
-		}
 
 		return ResponseEntity.ok().body(productPromoCodePartys);
 
@@ -78,7 +76,7 @@ public class ProductPromoCodePartyController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductPromoCodeParty(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductPromoCodeParty> createProductPromoCodeParty(HttpServletRequest request) throws Exception {
 
 		ProductPromoCodeParty productPromoCodePartyToBeAdded = new ProductPromoCodeParty();
 		try {
@@ -86,7 +84,7 @@ public class ProductPromoCodePartyController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductPromoCodeParty(productPromoCodePartyToBeAdded);
@@ -101,63 +99,15 @@ public class ProductPromoCodePartyController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductPromoCodeParty(@RequestBody ProductPromoCodeParty productPromoCodePartyToBeAdded) throws Exception {
+	public ResponseEntity<ProductPromoCodeParty> createProductPromoCodeParty(@RequestBody ProductPromoCodeParty productPromoCodePartyToBeAdded) throws Exception {
 
 		AddProductPromoCodeParty command = new AddProductPromoCodeParty(productPromoCodePartyToBeAdded);
 		ProductPromoCodeParty productPromoCodeParty = ((ProductPromoCodePartyAdded) Scheduler.execute(command).data()).getAddedProductPromoCodeParty();
 		
 		if (productPromoCodeParty != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productPromoCodeParty);
+			return successful(productPromoCodeParty);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductPromoCodeParty could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductPromoCodeParty(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductPromoCodeParty productPromoCodePartyToBeUpdated = new ProductPromoCodeParty();
-
-		try {
-			productPromoCodePartyToBeUpdated = ProductPromoCodePartyMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductPromoCodeParty(productPromoCodePartyToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductPromoCodePartyController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductPromoCodeParty(@RequestBody ProductPromoCodeParty productPromoCodePartyToBeUpdated,
+	public ResponseEntity<String> updateProductPromoCodeParty(@RequestBody ProductPromoCodeParty productPromoCodePartyToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		productPromoCodePartyToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ProductPromoCodePartyController {
 
 		try {
 			if(((ProductPromoCodePartyUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productPromoCodePartyId}")
-	public ResponseEntity<Object> findById(@PathVariable String productPromoCodePartyId) throws Exception {
+	public ResponseEntity<ProductPromoCodeParty> findById(@PathVariable String productPromoCodePartyId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productPromoCodePartyId", productPromoCodePartyId);
 		try {
 
-			Object foundProductPromoCodeParty = findProductPromoCodePartysBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductPromoCodeParty);
+			List<ProductPromoCodeParty> foundProductPromoCodeParty = findProductPromoCodePartysBy(requestParams).getBody();
+			if(foundProductPromoCodeParty.size()==1){				return successful(foundProductPromoCodeParty.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productPromoCodePartyId}")
-	public ResponseEntity<Object> deleteProductPromoCodePartyByIdUpdated(@PathVariable String productPromoCodePartyId) throws Exception {
+	public ResponseEntity<String> deleteProductPromoCodePartyByIdUpdated(@PathVariable String productPromoCodePartyId) throws Exception {
 		DeleteProductPromoCodeParty command = new DeleteProductPromoCodeParty(productPromoCodePartyId);
 
 		try {
 			if (((ProductPromoCodePartyDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductPromoCodeParty could not be deleted");
+		return conflict();
 
 	}
 

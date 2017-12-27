@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.party.query.need.FindPartyNe
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/party/partyNeeds")
 public class PartyNeedController {
@@ -52,7 +54,7 @@ public class PartyNeedController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPartyNeedsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PartyNeed>> findPartyNeedsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyNeedsBy query = new FindPartyNeedsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PartyNeedController {
 		}
 
 		List<PartyNeed> partyNeeds =((PartyNeedFound) Scheduler.execute(query).data()).getPartyNeeds();
-
-		if (partyNeeds.size() == 1) {
-			return ResponseEntity.ok().body(partyNeeds.get(0));
-		}
 
 		return ResponseEntity.ok().body(partyNeeds);
 
@@ -78,7 +76,7 @@ public class PartyNeedController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPartyNeed(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PartyNeed> createPartyNeed(HttpServletRequest request) throws Exception {
 
 		PartyNeed partyNeedToBeAdded = new PartyNeed();
 		try {
@@ -86,7 +84,7 @@ public class PartyNeedController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPartyNeed(partyNeedToBeAdded);
@@ -101,63 +99,15 @@ public class PartyNeedController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPartyNeed(@RequestBody PartyNeed partyNeedToBeAdded) throws Exception {
+	public ResponseEntity<PartyNeed> createPartyNeed(@RequestBody PartyNeed partyNeedToBeAdded) throws Exception {
 
 		AddPartyNeed command = new AddPartyNeed(partyNeedToBeAdded);
 		PartyNeed partyNeed = ((PartyNeedAdded) Scheduler.execute(command).data()).getAddedPartyNeed();
 		
 		if (partyNeed != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(partyNeed);
+			return successful(partyNeed);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PartyNeed could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePartyNeed(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PartyNeed partyNeedToBeUpdated = new PartyNeed();
-
-		try {
-			partyNeedToBeUpdated = PartyNeedMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePartyNeed(partyNeedToBeUpdated, partyNeedToBeUpdated.getPartyNeedId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PartyNeedController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{partyNeedId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePartyNeed(@RequestBody PartyNeed partyNeedToBeUpdated,
+	public ResponseEntity<String> updatePartyNeed(@RequestBody PartyNeed partyNeedToBeUpdated,
 			@PathVariable String partyNeedId) throws Exception {
 
 		partyNeedToBeUpdated.setPartyNeedId(partyNeedId);
@@ -178,41 +128,44 @@ public class PartyNeedController {
 
 		try {
 			if(((PartyNeedUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{partyNeedId}")
-	public ResponseEntity<Object> findById(@PathVariable String partyNeedId) throws Exception {
+	public ResponseEntity<PartyNeed> findById(@PathVariable String partyNeedId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyNeedId", partyNeedId);
 		try {
 
-			Object foundPartyNeed = findPartyNeedsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPartyNeed);
+			List<PartyNeed> foundPartyNeed = findPartyNeedsBy(requestParams).getBody();
+			if(foundPartyNeed.size()==1){				return successful(foundPartyNeed.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{partyNeedId}")
-	public ResponseEntity<Object> deletePartyNeedByIdUpdated(@PathVariable String partyNeedId) throws Exception {
+	public ResponseEntity<String> deletePartyNeedByIdUpdated(@PathVariable String partyNeedId) throws Exception {
 		DeletePartyNeed command = new DeletePartyNeed(partyNeedId);
 
 		try {
 			if (((PartyNeedDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PartyNeed could not be deleted");
+		return conflict();
 
 	}
 

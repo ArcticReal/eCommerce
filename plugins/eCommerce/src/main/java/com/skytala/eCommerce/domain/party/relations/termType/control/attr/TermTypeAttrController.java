@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.termType.query.attr.FindTerm
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/termType/termTypeAttrs")
 public class TermTypeAttrController {
@@ -52,7 +54,7 @@ public class TermTypeAttrController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findTermTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<TermTypeAttr>> findTermTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTermTypeAttrsBy query = new FindTermTypeAttrsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class TermTypeAttrController {
 		}
 
 		List<TermTypeAttr> termTypeAttrs =((TermTypeAttrFound) Scheduler.execute(query).data()).getTermTypeAttrs();
-
-		if (termTypeAttrs.size() == 1) {
-			return ResponseEntity.ok().body(termTypeAttrs.get(0));
-		}
 
 		return ResponseEntity.ok().body(termTypeAttrs);
 
@@ -78,7 +76,7 @@ public class TermTypeAttrController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createTermTypeAttr(HttpServletRequest request) throws Exception {
+	public ResponseEntity<TermTypeAttr> createTermTypeAttr(HttpServletRequest request) throws Exception {
 
 		TermTypeAttr termTypeAttrToBeAdded = new TermTypeAttr();
 		try {
@@ -86,7 +84,7 @@ public class TermTypeAttrController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createTermTypeAttr(termTypeAttrToBeAdded);
@@ -101,63 +99,15 @@ public class TermTypeAttrController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createTermTypeAttr(@RequestBody TermTypeAttr termTypeAttrToBeAdded) throws Exception {
+	public ResponseEntity<TermTypeAttr> createTermTypeAttr(@RequestBody TermTypeAttr termTypeAttrToBeAdded) throws Exception {
 
 		AddTermTypeAttr command = new AddTermTypeAttr(termTypeAttrToBeAdded);
 		TermTypeAttr termTypeAttr = ((TermTypeAttrAdded) Scheduler.execute(command).data()).getAddedTermTypeAttr();
 		
 		if (termTypeAttr != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(termTypeAttr);
+			return successful(termTypeAttr);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("TermTypeAttr could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateTermTypeAttr(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		TermTypeAttr termTypeAttrToBeUpdated = new TermTypeAttr();
-
-		try {
-			termTypeAttrToBeUpdated = TermTypeAttrMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateTermTypeAttr(termTypeAttrToBeUpdated, termTypeAttrToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class TermTypeAttrController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateTermTypeAttr(@RequestBody TermTypeAttr termTypeAttrToBeUpdated,
+	public ResponseEntity<String> updateTermTypeAttr(@RequestBody TermTypeAttr termTypeAttrToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		termTypeAttrToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class TermTypeAttrController {
 
 		try {
 			if(((TermTypeAttrUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{termTypeAttrId}")
-	public ResponseEntity<Object> findById(@PathVariable String termTypeAttrId) throws Exception {
+	public ResponseEntity<TermTypeAttr> findById(@PathVariable String termTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("termTypeAttrId", termTypeAttrId);
 		try {
 
-			Object foundTermTypeAttr = findTermTypeAttrsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundTermTypeAttr);
+			List<TermTypeAttr> foundTermTypeAttr = findTermTypeAttrsBy(requestParams).getBody();
+			if(foundTermTypeAttr.size()==1){				return successful(foundTermTypeAttr.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{termTypeAttrId}")
-	public ResponseEntity<Object> deleteTermTypeAttrByIdUpdated(@PathVariable String termTypeAttrId) throws Exception {
+	public ResponseEntity<String> deleteTermTypeAttrByIdUpdated(@PathVariable String termTypeAttrId) throws Exception {
 		DeleteTermTypeAttr command = new DeleteTermTypeAttr(termTypeAttrId);
 
 		try {
 			if (((TermTypeAttrDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("TermTypeAttr could not be deleted");
+		return conflict();
 
 	}
 

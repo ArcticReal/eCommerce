@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.humanres.relations.responsibilityType.query.
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/humanres/responsibilityTypes")
 public class ResponsibilityTypeController {
@@ -52,7 +54,7 @@ public class ResponsibilityTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findResponsibilityTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ResponsibilityType>> findResponsibilityTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindResponsibilityTypesBy query = new FindResponsibilityTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ResponsibilityTypeController {
 		}
 
 		List<ResponsibilityType> responsibilityTypes =((ResponsibilityTypeFound) Scheduler.execute(query).data()).getResponsibilityTypes();
-
-		if (responsibilityTypes.size() == 1) {
-			return ResponseEntity.ok().body(responsibilityTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(responsibilityTypes);
 
@@ -78,7 +76,7 @@ public class ResponsibilityTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createResponsibilityType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ResponsibilityType> createResponsibilityType(HttpServletRequest request) throws Exception {
 
 		ResponsibilityType responsibilityTypeToBeAdded = new ResponsibilityType();
 		try {
@@ -86,7 +84,7 @@ public class ResponsibilityTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createResponsibilityType(responsibilityTypeToBeAdded);
@@ -101,63 +99,15 @@ public class ResponsibilityTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createResponsibilityType(@RequestBody ResponsibilityType responsibilityTypeToBeAdded) throws Exception {
+	public ResponseEntity<ResponsibilityType> createResponsibilityType(@RequestBody ResponsibilityType responsibilityTypeToBeAdded) throws Exception {
 
 		AddResponsibilityType command = new AddResponsibilityType(responsibilityTypeToBeAdded);
 		ResponsibilityType responsibilityType = ((ResponsibilityTypeAdded) Scheduler.execute(command).data()).getAddedResponsibilityType();
 		
 		if (responsibilityType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(responsibilityType);
+			return successful(responsibilityType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ResponsibilityType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateResponsibilityType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ResponsibilityType responsibilityTypeToBeUpdated = new ResponsibilityType();
-
-		try {
-			responsibilityTypeToBeUpdated = ResponsibilityTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateResponsibilityType(responsibilityTypeToBeUpdated, responsibilityTypeToBeUpdated.getResponsibilityTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ResponsibilityTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{responsibilityTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateResponsibilityType(@RequestBody ResponsibilityType responsibilityTypeToBeUpdated,
+	public ResponseEntity<String> updateResponsibilityType(@RequestBody ResponsibilityType responsibilityTypeToBeUpdated,
 			@PathVariable String responsibilityTypeId) throws Exception {
 
 		responsibilityTypeToBeUpdated.setResponsibilityTypeId(responsibilityTypeId);
@@ -178,41 +128,44 @@ public class ResponsibilityTypeController {
 
 		try {
 			if(((ResponsibilityTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{responsibilityTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String responsibilityTypeId) throws Exception {
+	public ResponseEntity<ResponsibilityType> findById(@PathVariable String responsibilityTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("responsibilityTypeId", responsibilityTypeId);
 		try {
 
-			Object foundResponsibilityType = findResponsibilityTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundResponsibilityType);
+			List<ResponsibilityType> foundResponsibilityType = findResponsibilityTypesBy(requestParams).getBody();
+			if(foundResponsibilityType.size()==1){				return successful(foundResponsibilityType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{responsibilityTypeId}")
-	public ResponseEntity<Object> deleteResponsibilityTypeByIdUpdated(@PathVariable String responsibilityTypeId) throws Exception {
+	public ResponseEntity<String> deleteResponsibilityTypeByIdUpdated(@PathVariable String responsibilityTypeId) throws Exception {
 		DeleteResponsibilityType command = new DeleteResponsibilityType(responsibilityTypeId);
 
 		try {
 			if (((ResponsibilityTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ResponsibilityType could not be deleted");
+		return conflict();
 
 	}
 

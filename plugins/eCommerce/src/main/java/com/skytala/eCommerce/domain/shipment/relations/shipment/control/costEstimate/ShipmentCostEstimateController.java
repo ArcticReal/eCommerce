@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.shipment.relations.shipment.query.costEstima
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/shipment/shipment/shipmentCostEstimates")
 public class ShipmentCostEstimateController {
@@ -52,7 +54,7 @@ public class ShipmentCostEstimateController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findShipmentCostEstimatesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ShipmentCostEstimate>> findShipmentCostEstimatesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentCostEstimatesBy query = new FindShipmentCostEstimatesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ShipmentCostEstimateController {
 		}
 
 		List<ShipmentCostEstimate> shipmentCostEstimates =((ShipmentCostEstimateFound) Scheduler.execute(query).data()).getShipmentCostEstimates();
-
-		if (shipmentCostEstimates.size() == 1) {
-			return ResponseEntity.ok().body(shipmentCostEstimates.get(0));
-		}
 
 		return ResponseEntity.ok().body(shipmentCostEstimates);
 
@@ -78,7 +76,7 @@ public class ShipmentCostEstimateController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createShipmentCostEstimate(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ShipmentCostEstimate> createShipmentCostEstimate(HttpServletRequest request) throws Exception {
 
 		ShipmentCostEstimate shipmentCostEstimateToBeAdded = new ShipmentCostEstimate();
 		try {
@@ -86,7 +84,7 @@ public class ShipmentCostEstimateController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createShipmentCostEstimate(shipmentCostEstimateToBeAdded);
@@ -101,63 +99,15 @@ public class ShipmentCostEstimateController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createShipmentCostEstimate(@RequestBody ShipmentCostEstimate shipmentCostEstimateToBeAdded) throws Exception {
+	public ResponseEntity<ShipmentCostEstimate> createShipmentCostEstimate(@RequestBody ShipmentCostEstimate shipmentCostEstimateToBeAdded) throws Exception {
 
 		AddShipmentCostEstimate command = new AddShipmentCostEstimate(shipmentCostEstimateToBeAdded);
 		ShipmentCostEstimate shipmentCostEstimate = ((ShipmentCostEstimateAdded) Scheduler.execute(command).data()).getAddedShipmentCostEstimate();
 		
 		if (shipmentCostEstimate != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(shipmentCostEstimate);
+			return successful(shipmentCostEstimate);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ShipmentCostEstimate could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateShipmentCostEstimate(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ShipmentCostEstimate shipmentCostEstimateToBeUpdated = new ShipmentCostEstimate();
-
-		try {
-			shipmentCostEstimateToBeUpdated = ShipmentCostEstimateMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateShipmentCostEstimate(shipmentCostEstimateToBeUpdated, shipmentCostEstimateToBeUpdated.getShipmentCostEstimateId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ShipmentCostEstimateController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{shipmentCostEstimateId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateShipmentCostEstimate(@RequestBody ShipmentCostEstimate shipmentCostEstimateToBeUpdated,
+	public ResponseEntity<String> updateShipmentCostEstimate(@RequestBody ShipmentCostEstimate shipmentCostEstimateToBeUpdated,
 			@PathVariable String shipmentCostEstimateId) throws Exception {
 
 		shipmentCostEstimateToBeUpdated.setShipmentCostEstimateId(shipmentCostEstimateId);
@@ -178,41 +128,44 @@ public class ShipmentCostEstimateController {
 
 		try {
 			if(((ShipmentCostEstimateUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{shipmentCostEstimateId}")
-	public ResponseEntity<Object> findById(@PathVariable String shipmentCostEstimateId) throws Exception {
+	public ResponseEntity<ShipmentCostEstimate> findById(@PathVariable String shipmentCostEstimateId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentCostEstimateId", shipmentCostEstimateId);
 		try {
 
-			Object foundShipmentCostEstimate = findShipmentCostEstimatesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundShipmentCostEstimate);
+			List<ShipmentCostEstimate> foundShipmentCostEstimate = findShipmentCostEstimatesBy(requestParams).getBody();
+			if(foundShipmentCostEstimate.size()==1){				return successful(foundShipmentCostEstimate.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{shipmentCostEstimateId}")
-	public ResponseEntity<Object> deleteShipmentCostEstimateByIdUpdated(@PathVariable String shipmentCostEstimateId) throws Exception {
+	public ResponseEntity<String> deleteShipmentCostEstimateByIdUpdated(@PathVariable String shipmentCostEstimateId) throws Exception {
 		DeleteShipmentCostEstimate command = new DeleteShipmentCostEstimate(shipmentCostEstimateId);
 
 		try {
 			if (((ShipmentCostEstimateDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ShipmentCostEstimate could not be deleted");
+		return conflict();
 
 	}
 

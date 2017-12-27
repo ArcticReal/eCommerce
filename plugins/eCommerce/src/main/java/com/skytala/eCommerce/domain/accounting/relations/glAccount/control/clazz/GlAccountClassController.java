@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.glAccount.query.clazz.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/glAccount/glAccountClasss")
 public class GlAccountClassController {
@@ -52,7 +54,7 @@ public class GlAccountClassController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findGlAccountClasssBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<GlAccountClass>> findGlAccountClasssBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGlAccountClasssBy query = new FindGlAccountClasssBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class GlAccountClassController {
 		}
 
 		List<GlAccountClass> glAccountClasss =((GlAccountClassFound) Scheduler.execute(query).data()).getGlAccountClasss();
-
-		if (glAccountClasss.size() == 1) {
-			return ResponseEntity.ok().body(glAccountClasss.get(0));
-		}
 
 		return ResponseEntity.ok().body(glAccountClasss);
 
@@ -78,7 +76,7 @@ public class GlAccountClassController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createGlAccountClass(HttpServletRequest request) throws Exception {
+	public ResponseEntity<GlAccountClass> createGlAccountClass(HttpServletRequest request) throws Exception {
 
 		GlAccountClass glAccountClassToBeAdded = new GlAccountClass();
 		try {
@@ -86,7 +84,7 @@ public class GlAccountClassController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createGlAccountClass(glAccountClassToBeAdded);
@@ -101,63 +99,15 @@ public class GlAccountClassController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createGlAccountClass(@RequestBody GlAccountClass glAccountClassToBeAdded) throws Exception {
+	public ResponseEntity<GlAccountClass> createGlAccountClass(@RequestBody GlAccountClass glAccountClassToBeAdded) throws Exception {
 
 		AddGlAccountClass command = new AddGlAccountClass(glAccountClassToBeAdded);
 		GlAccountClass glAccountClass = ((GlAccountClassAdded) Scheduler.execute(command).data()).getAddedGlAccountClass();
 		
 		if (glAccountClass != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(glAccountClass);
+			return successful(glAccountClass);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("GlAccountClass could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateGlAccountClass(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		GlAccountClass glAccountClassToBeUpdated = new GlAccountClass();
-
-		try {
-			glAccountClassToBeUpdated = GlAccountClassMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateGlAccountClass(glAccountClassToBeUpdated, glAccountClassToBeUpdated.getGlAccountClassId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class GlAccountClassController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{glAccountClassId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateGlAccountClass(@RequestBody GlAccountClass glAccountClassToBeUpdated,
+	public ResponseEntity<String> updateGlAccountClass(@RequestBody GlAccountClass glAccountClassToBeUpdated,
 			@PathVariable String glAccountClassId) throws Exception {
 
 		glAccountClassToBeUpdated.setGlAccountClassId(glAccountClassId);
@@ -178,41 +128,44 @@ public class GlAccountClassController {
 
 		try {
 			if(((GlAccountClassUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{glAccountClassId}")
-	public ResponseEntity<Object> findById(@PathVariable String glAccountClassId) throws Exception {
+	public ResponseEntity<GlAccountClass> findById(@PathVariable String glAccountClassId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("glAccountClassId", glAccountClassId);
 		try {
 
-			Object foundGlAccountClass = findGlAccountClasssBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundGlAccountClass);
+			List<GlAccountClass> foundGlAccountClass = findGlAccountClasssBy(requestParams).getBody();
+			if(foundGlAccountClass.size()==1){				return successful(foundGlAccountClass.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{glAccountClassId}")
-	public ResponseEntity<Object> deleteGlAccountClassByIdUpdated(@PathVariable String glAccountClassId) throws Exception {
+	public ResponseEntity<String> deleteGlAccountClassByIdUpdated(@PathVariable String glAccountClassId) throws Exception {
 		DeleteGlAccountClass command = new DeleteGlAccountClass(glAccountClassId);
 
 		try {
 			if (((GlAccountClassDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("GlAccountClass could not be deleted");
+		return conflict();
 
 	}
 

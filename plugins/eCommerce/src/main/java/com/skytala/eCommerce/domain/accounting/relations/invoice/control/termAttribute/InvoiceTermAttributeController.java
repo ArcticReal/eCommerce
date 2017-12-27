@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.invoice.query.termAttri
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/invoice/invoiceTermAttributes")
 public class InvoiceTermAttributeController {
@@ -52,7 +54,7 @@ public class InvoiceTermAttributeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findInvoiceTermAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<InvoiceTermAttribute>> findInvoiceTermAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindInvoiceTermAttributesBy query = new FindInvoiceTermAttributesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class InvoiceTermAttributeController {
 		}
 
 		List<InvoiceTermAttribute> invoiceTermAttributes =((InvoiceTermAttributeFound) Scheduler.execute(query).data()).getInvoiceTermAttributes();
-
-		if (invoiceTermAttributes.size() == 1) {
-			return ResponseEntity.ok().body(invoiceTermAttributes.get(0));
-		}
 
 		return ResponseEntity.ok().body(invoiceTermAttributes);
 
@@ -78,7 +76,7 @@ public class InvoiceTermAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createInvoiceTermAttribute(HttpServletRequest request) throws Exception {
+	public ResponseEntity<InvoiceTermAttribute> createInvoiceTermAttribute(HttpServletRequest request) throws Exception {
 
 		InvoiceTermAttribute invoiceTermAttributeToBeAdded = new InvoiceTermAttribute();
 		try {
@@ -86,7 +84,7 @@ public class InvoiceTermAttributeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createInvoiceTermAttribute(invoiceTermAttributeToBeAdded);
@@ -101,63 +99,15 @@ public class InvoiceTermAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createInvoiceTermAttribute(@RequestBody InvoiceTermAttribute invoiceTermAttributeToBeAdded) throws Exception {
+	public ResponseEntity<InvoiceTermAttribute> createInvoiceTermAttribute(@RequestBody InvoiceTermAttribute invoiceTermAttributeToBeAdded) throws Exception {
 
 		AddInvoiceTermAttribute command = new AddInvoiceTermAttribute(invoiceTermAttributeToBeAdded);
 		InvoiceTermAttribute invoiceTermAttribute = ((InvoiceTermAttributeAdded) Scheduler.execute(command).data()).getAddedInvoiceTermAttribute();
 		
 		if (invoiceTermAttribute != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(invoiceTermAttribute);
+			return successful(invoiceTermAttribute);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("InvoiceTermAttribute could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateInvoiceTermAttribute(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		InvoiceTermAttribute invoiceTermAttributeToBeUpdated = new InvoiceTermAttribute();
-
-		try {
-			invoiceTermAttributeToBeUpdated = InvoiceTermAttributeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateInvoiceTermAttribute(invoiceTermAttributeToBeUpdated, invoiceTermAttributeToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class InvoiceTermAttributeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateInvoiceTermAttribute(@RequestBody InvoiceTermAttribute invoiceTermAttributeToBeUpdated,
+	public ResponseEntity<String> updateInvoiceTermAttribute(@RequestBody InvoiceTermAttribute invoiceTermAttributeToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		invoiceTermAttributeToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class InvoiceTermAttributeController {
 
 		try {
 			if(((InvoiceTermAttributeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{invoiceTermAttributeId}")
-	public ResponseEntity<Object> findById(@PathVariable String invoiceTermAttributeId) throws Exception {
+	public ResponseEntity<InvoiceTermAttribute> findById(@PathVariable String invoiceTermAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("invoiceTermAttributeId", invoiceTermAttributeId);
 		try {
 
-			Object foundInvoiceTermAttribute = findInvoiceTermAttributesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundInvoiceTermAttribute);
+			List<InvoiceTermAttribute> foundInvoiceTermAttribute = findInvoiceTermAttributesBy(requestParams).getBody();
+			if(foundInvoiceTermAttribute.size()==1){				return successful(foundInvoiceTermAttribute.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{invoiceTermAttributeId}")
-	public ResponseEntity<Object> deleteInvoiceTermAttributeByIdUpdated(@PathVariable String invoiceTermAttributeId) throws Exception {
+	public ResponseEntity<String> deleteInvoiceTermAttributeByIdUpdated(@PathVariable String invoiceTermAttributeId) throws Exception {
 		DeleteInvoiceTermAttribute command = new DeleteInvoiceTermAttribute(invoiceTermAttributeId);
 
 		try {
 			if (((InvoiceTermAttributeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("InvoiceTermAttribute could not be deleted");
+		return conflict();
 
 	}
 

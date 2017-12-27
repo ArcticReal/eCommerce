@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.searchConstr
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productSearchConstraints")
 public class ProductSearchConstraintController {
@@ -52,7 +54,7 @@ public class ProductSearchConstraintController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductSearchConstraintsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductSearchConstraint>> findProductSearchConstraintsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductSearchConstraintsBy query = new FindProductSearchConstraintsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductSearchConstraintController {
 		}
 
 		List<ProductSearchConstraint> productSearchConstraints =((ProductSearchConstraintFound) Scheduler.execute(query).data()).getProductSearchConstraints();
-
-		if (productSearchConstraints.size() == 1) {
-			return ResponseEntity.ok().body(productSearchConstraints.get(0));
-		}
 
 		return ResponseEntity.ok().body(productSearchConstraints);
 
@@ -78,7 +76,7 @@ public class ProductSearchConstraintController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductSearchConstraint(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductSearchConstraint> createProductSearchConstraint(HttpServletRequest request) throws Exception {
 
 		ProductSearchConstraint productSearchConstraintToBeAdded = new ProductSearchConstraint();
 		try {
@@ -86,7 +84,7 @@ public class ProductSearchConstraintController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductSearchConstraint(productSearchConstraintToBeAdded);
@@ -101,63 +99,15 @@ public class ProductSearchConstraintController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductSearchConstraint(@RequestBody ProductSearchConstraint productSearchConstraintToBeAdded) throws Exception {
+	public ResponseEntity<ProductSearchConstraint> createProductSearchConstraint(@RequestBody ProductSearchConstraint productSearchConstraintToBeAdded) throws Exception {
 
 		AddProductSearchConstraint command = new AddProductSearchConstraint(productSearchConstraintToBeAdded);
 		ProductSearchConstraint productSearchConstraint = ((ProductSearchConstraintAdded) Scheduler.execute(command).data()).getAddedProductSearchConstraint();
 		
 		if (productSearchConstraint != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productSearchConstraint);
+			return successful(productSearchConstraint);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductSearchConstraint could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductSearchConstraint(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductSearchConstraint productSearchConstraintToBeUpdated = new ProductSearchConstraint();
-
-		try {
-			productSearchConstraintToBeUpdated = ProductSearchConstraintMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductSearchConstraint(productSearchConstraintToBeUpdated, productSearchConstraintToBeUpdated.getConstraintSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductSearchConstraintController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{constraintSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductSearchConstraint(@RequestBody ProductSearchConstraint productSearchConstraintToBeUpdated,
+	public ResponseEntity<String> updateProductSearchConstraint(@RequestBody ProductSearchConstraint productSearchConstraintToBeUpdated,
 			@PathVariable String constraintSeqId) throws Exception {
 
 		productSearchConstraintToBeUpdated.setConstraintSeqId(constraintSeqId);
@@ -178,41 +128,44 @@ public class ProductSearchConstraintController {
 
 		try {
 			if(((ProductSearchConstraintUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productSearchConstraintId}")
-	public ResponseEntity<Object> findById(@PathVariable String productSearchConstraintId) throws Exception {
+	public ResponseEntity<ProductSearchConstraint> findById(@PathVariable String productSearchConstraintId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productSearchConstraintId", productSearchConstraintId);
 		try {
 
-			Object foundProductSearchConstraint = findProductSearchConstraintsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductSearchConstraint);
+			List<ProductSearchConstraint> foundProductSearchConstraint = findProductSearchConstraintsBy(requestParams).getBody();
+			if(foundProductSearchConstraint.size()==1){				return successful(foundProductSearchConstraint.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productSearchConstraintId}")
-	public ResponseEntity<Object> deleteProductSearchConstraintByIdUpdated(@PathVariable String productSearchConstraintId) throws Exception {
+	public ResponseEntity<String> deleteProductSearchConstraintByIdUpdated(@PathVariable String productSearchConstraintId) throws Exception {
 		DeleteProductSearchConstraint command = new DeleteProductSearchConstraint(productSearchConstraintId);
 
 		try {
 			if (((ProductSearchConstraintDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductSearchConstraint could not be deleted");
+		return conflict();
 
 	}
 

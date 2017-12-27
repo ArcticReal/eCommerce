@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/productRental")
 public class ProductRentalServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getProductFirstRelatedFixedAsset")
-	public ResponseEntity<Object> getProductFirstRelatedFixedAsset(HttpSession session, @RequestParam(value="productId") String productId) {
+	public ResponseEntity<Map<String, Object>> getProductFirstRelatedFixedAsset(HttpSession session, @RequestParam(value="productId") String productId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -39,23 +41,23 @@ public class ProductRentalServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFixedAssetAndLinkToProduct")
-	public ResponseEntity<Object> createFixedAssetAndLinkToProduct(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="dateNextService", required=false) Timestamp dateNextService, @RequestParam(value="purchaseCostUomId", required=false) String purchaseCostUomId, @RequestParam(value="productionCapacity", required=false) BigDecimal productionCapacity, @RequestParam(value="acquireOrderId", required=false) String acquireOrderId, @RequestParam(value="locatedAtLocationSeqId", required=false) String locatedAtLocationSeqId, @RequestParam(value="actualEndOfLife", required=false) Timestamp actualEndOfLife, @RequestParam(value="dateLastServiced", required=false) Timestamp dateLastServiced, @RequestParam(value="acquireOrderItemSeqId", required=false) String acquireOrderItemSeqId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="locatedAtFacilityId", required=false) String locatedAtFacilityId, @RequestParam(value="depreciation", required=false) BigDecimal depreciation, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="dateAcquired", required=false) Timestamp dateAcquired, @RequestParam(value="purchaseCost", required=false) BigDecimal purchaseCost, @RequestParam(value="serialNumber", required=false) String serialNumber, @RequestParam(value="fixedAssetTypeId", required=false) String fixedAssetTypeId, @RequestParam(value="classEnumId", required=false) String classEnumId, @RequestParam(value="fixedAssetName", required=false) String fixedAssetName, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="calendarId", required=false) String calendarId, @RequestParam(value="salvageValue", required=false) BigDecimal salvageValue, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="parentFixedAssetId", required=false) String parentFixedAssetId, @RequestParam(value="expectedEndOfLife", required=false) Timestamp expectedEndOfLife, @RequestParam(value="instanceOfProductId", required=false) String instanceOfProductId) {
+	public ResponseEntity<Map<String, Object>> createFixedAssetAndLinkToProduct(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="dateNextService", required=false) Timestamp dateNextService, @RequestParam(value="purchaseCostUomId", required=false) String purchaseCostUomId, @RequestParam(value="productionCapacity", required=false) BigDecimal productionCapacity, @RequestParam(value="acquireOrderId", required=false) String acquireOrderId, @RequestParam(value="locatedAtLocationSeqId", required=false) String locatedAtLocationSeqId, @RequestParam(value="actualEndOfLife", required=false) Timestamp actualEndOfLife, @RequestParam(value="dateLastServiced", required=false) Timestamp dateLastServiced, @RequestParam(value="acquireOrderItemSeqId", required=false) String acquireOrderItemSeqId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="locatedAtFacilityId", required=false) String locatedAtFacilityId, @RequestParam(value="depreciation", required=false) BigDecimal depreciation, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="dateAcquired", required=false) Timestamp dateAcquired, @RequestParam(value="purchaseCost", required=false) BigDecimal purchaseCost, @RequestParam(value="serialNumber", required=false) String serialNumber, @RequestParam(value="fixedAssetTypeId", required=false) String fixedAssetTypeId, @RequestParam(value="classEnumId", required=false) String classEnumId, @RequestParam(value="fixedAssetName", required=false) String fixedAssetName, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="calendarId", required=false) String calendarId, @RequestParam(value="salvageValue", required=false) BigDecimal salvageValue, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="parentFixedAssetId", required=false) String parentFixedAssetId, @RequestParam(value="expectedEndOfLife", required=false) Timestamp expectedEndOfLife, @RequestParam(value="instanceOfProductId", required=false) String instanceOfProductId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -93,19 +95,19 @@ public class ProductRentalServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

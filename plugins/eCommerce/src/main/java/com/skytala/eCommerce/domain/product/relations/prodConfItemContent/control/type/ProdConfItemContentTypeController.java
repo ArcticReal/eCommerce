@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.prodConfItemContent.query.
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/prodConfItemContent/prodConfItemContentTypes")
 public class ProdConfItemContentTypeController {
@@ -52,7 +54,7 @@ public class ProdConfItemContentTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProdConfItemContentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProdConfItemContentType>> findProdConfItemContentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProdConfItemContentTypesBy query = new FindProdConfItemContentTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProdConfItemContentTypeController {
 		}
 
 		List<ProdConfItemContentType> prodConfItemContentTypes =((ProdConfItemContentTypeFound) Scheduler.execute(query).data()).getProdConfItemContentTypes();
-
-		if (prodConfItemContentTypes.size() == 1) {
-			return ResponseEntity.ok().body(prodConfItemContentTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(prodConfItemContentTypes);
 
@@ -78,7 +76,7 @@ public class ProdConfItemContentTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProdConfItemContentType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProdConfItemContentType> createProdConfItemContentType(HttpServletRequest request) throws Exception {
 
 		ProdConfItemContentType prodConfItemContentTypeToBeAdded = new ProdConfItemContentType();
 		try {
@@ -86,7 +84,7 @@ public class ProdConfItemContentTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProdConfItemContentType(prodConfItemContentTypeToBeAdded);
@@ -101,63 +99,15 @@ public class ProdConfItemContentTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProdConfItemContentType(@RequestBody ProdConfItemContentType prodConfItemContentTypeToBeAdded) throws Exception {
+	public ResponseEntity<ProdConfItemContentType> createProdConfItemContentType(@RequestBody ProdConfItemContentType prodConfItemContentTypeToBeAdded) throws Exception {
 
 		AddProdConfItemContentType command = new AddProdConfItemContentType(prodConfItemContentTypeToBeAdded);
 		ProdConfItemContentType prodConfItemContentType = ((ProdConfItemContentTypeAdded) Scheduler.execute(command).data()).getAddedProdConfItemContentType();
 		
 		if (prodConfItemContentType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(prodConfItemContentType);
+			return successful(prodConfItemContentType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProdConfItemContentType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProdConfItemContentType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProdConfItemContentType prodConfItemContentTypeToBeUpdated = new ProdConfItemContentType();
-
-		try {
-			prodConfItemContentTypeToBeUpdated = ProdConfItemContentTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProdConfItemContentType(prodConfItemContentTypeToBeUpdated, prodConfItemContentTypeToBeUpdated.getConfItemContentTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProdConfItemContentTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{confItemContentTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProdConfItemContentType(@RequestBody ProdConfItemContentType prodConfItemContentTypeToBeUpdated,
+	public ResponseEntity<String> updateProdConfItemContentType(@RequestBody ProdConfItemContentType prodConfItemContentTypeToBeUpdated,
 			@PathVariable String confItemContentTypeId) throws Exception {
 
 		prodConfItemContentTypeToBeUpdated.setConfItemContentTypeId(confItemContentTypeId);
@@ -178,41 +128,44 @@ public class ProdConfItemContentTypeController {
 
 		try {
 			if(((ProdConfItemContentTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{prodConfItemContentTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String prodConfItemContentTypeId) throws Exception {
+	public ResponseEntity<ProdConfItemContentType> findById(@PathVariable String prodConfItemContentTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("prodConfItemContentTypeId", prodConfItemContentTypeId);
 		try {
 
-			Object foundProdConfItemContentType = findProdConfItemContentTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProdConfItemContentType);
+			List<ProdConfItemContentType> foundProdConfItemContentType = findProdConfItemContentTypesBy(requestParams).getBody();
+			if(foundProdConfItemContentType.size()==1){				return successful(foundProdConfItemContentType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{prodConfItemContentTypeId}")
-	public ResponseEntity<Object> deleteProdConfItemContentTypeByIdUpdated(@PathVariable String prodConfItemContentTypeId) throws Exception {
+	public ResponseEntity<String> deleteProdConfItemContentTypeByIdUpdated(@PathVariable String prodConfItemContentTypeId) throws Exception {
 		DeleteProdConfItemContentType command = new DeleteProdConfItemContentType(prodConfItemContentTypeId);
 
 		try {
 			if (((ProdConfItemContentTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProdConfItemContentType could not be deleted");
+		return conflict();
 
 	}
 

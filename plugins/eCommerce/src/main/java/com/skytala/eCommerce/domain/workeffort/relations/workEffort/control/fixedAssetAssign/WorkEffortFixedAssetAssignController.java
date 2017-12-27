@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.workeffort.relations.workEffort.query.fixedA
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/workeffort/workEffort/workEffortFixedAssetAssigns")
 public class WorkEffortFixedAssetAssignController {
@@ -52,7 +54,7 @@ public class WorkEffortFixedAssetAssignController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWorkEffortFixedAssetAssignsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WorkEffortFixedAssetAssign>> findWorkEffortFixedAssetAssignsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortFixedAssetAssignsBy query = new FindWorkEffortFixedAssetAssignsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WorkEffortFixedAssetAssignController {
 		}
 
 		List<WorkEffortFixedAssetAssign> workEffortFixedAssetAssigns =((WorkEffortFixedAssetAssignFound) Scheduler.execute(query).data()).getWorkEffortFixedAssetAssigns();
-
-		if (workEffortFixedAssetAssigns.size() == 1) {
-			return ResponseEntity.ok().body(workEffortFixedAssetAssigns.get(0));
-		}
 
 		return ResponseEntity.ok().body(workEffortFixedAssetAssigns);
 
@@ -78,7 +76,7 @@ public class WorkEffortFixedAssetAssignController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWorkEffortFixedAssetAssign(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WorkEffortFixedAssetAssign> createWorkEffortFixedAssetAssign(HttpServletRequest request) throws Exception {
 
 		WorkEffortFixedAssetAssign workEffortFixedAssetAssignToBeAdded = new WorkEffortFixedAssetAssign();
 		try {
@@ -86,7 +84,7 @@ public class WorkEffortFixedAssetAssignController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWorkEffortFixedAssetAssign(workEffortFixedAssetAssignToBeAdded);
@@ -101,63 +99,15 @@ public class WorkEffortFixedAssetAssignController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWorkEffortFixedAssetAssign(@RequestBody WorkEffortFixedAssetAssign workEffortFixedAssetAssignToBeAdded) throws Exception {
+	public ResponseEntity<WorkEffortFixedAssetAssign> createWorkEffortFixedAssetAssign(@RequestBody WorkEffortFixedAssetAssign workEffortFixedAssetAssignToBeAdded) throws Exception {
 
 		AddWorkEffortFixedAssetAssign command = new AddWorkEffortFixedAssetAssign(workEffortFixedAssetAssignToBeAdded);
 		WorkEffortFixedAssetAssign workEffortFixedAssetAssign = ((WorkEffortFixedAssetAssignAdded) Scheduler.execute(command).data()).getAddedWorkEffortFixedAssetAssign();
 		
 		if (workEffortFixedAssetAssign != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(workEffortFixedAssetAssign);
+			return successful(workEffortFixedAssetAssign);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WorkEffortFixedAssetAssign could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWorkEffortFixedAssetAssign(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WorkEffortFixedAssetAssign workEffortFixedAssetAssignToBeUpdated = new WorkEffortFixedAssetAssign();
-
-		try {
-			workEffortFixedAssetAssignToBeUpdated = WorkEffortFixedAssetAssignMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWorkEffortFixedAssetAssign(workEffortFixedAssetAssignToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WorkEffortFixedAssetAssignController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWorkEffortFixedAssetAssign(@RequestBody WorkEffortFixedAssetAssign workEffortFixedAssetAssignToBeUpdated,
+	public ResponseEntity<String> updateWorkEffortFixedAssetAssign(@RequestBody WorkEffortFixedAssetAssign workEffortFixedAssetAssignToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		workEffortFixedAssetAssignToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class WorkEffortFixedAssetAssignController {
 
 		try {
 			if(((WorkEffortFixedAssetAssignUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{workEffortFixedAssetAssignId}")
-	public ResponseEntity<Object> findById(@PathVariable String workEffortFixedAssetAssignId) throws Exception {
+	public ResponseEntity<WorkEffortFixedAssetAssign> findById(@PathVariable String workEffortFixedAssetAssignId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortFixedAssetAssignId", workEffortFixedAssetAssignId);
 		try {
 
-			Object foundWorkEffortFixedAssetAssign = findWorkEffortFixedAssetAssignsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWorkEffortFixedAssetAssign);
+			List<WorkEffortFixedAssetAssign> foundWorkEffortFixedAssetAssign = findWorkEffortFixedAssetAssignsBy(requestParams).getBody();
+			if(foundWorkEffortFixedAssetAssign.size()==1){				return successful(foundWorkEffortFixedAssetAssign.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{workEffortFixedAssetAssignId}")
-	public ResponseEntity<Object> deleteWorkEffortFixedAssetAssignByIdUpdated(@PathVariable String workEffortFixedAssetAssignId) throws Exception {
+	public ResponseEntity<String> deleteWorkEffortFixedAssetAssignByIdUpdated(@PathVariable String workEffortFixedAssetAssignId) throws Exception {
 		DeleteWorkEffortFixedAssetAssign command = new DeleteWorkEffortFixedAssetAssign(workEffortFixedAssetAssignId);
 
 		try {
 			if (((WorkEffortFixedAssetAssignDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WorkEffortFixedAssetAssign could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.marketing.relations.contactList.query.partyS
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/marketing/contactList/contactListPartyStatuss")
 public class ContactListPartyStatusController {
@@ -52,7 +54,7 @@ public class ContactListPartyStatusController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findContactListPartyStatussBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ContactListPartyStatus>> findContactListPartyStatussBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContactListPartyStatussBy query = new FindContactListPartyStatussBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ContactListPartyStatusController {
 		}
 
 		List<ContactListPartyStatus> contactListPartyStatuss =((ContactListPartyStatusFound) Scheduler.execute(query).data()).getContactListPartyStatuss();
-
-		if (contactListPartyStatuss.size() == 1) {
-			return ResponseEntity.ok().body(contactListPartyStatuss.get(0));
-		}
 
 		return ResponseEntity.ok().body(contactListPartyStatuss);
 
@@ -78,7 +76,7 @@ public class ContactListPartyStatusController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createContactListPartyStatus(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ContactListPartyStatus> createContactListPartyStatus(HttpServletRequest request) throws Exception {
 
 		ContactListPartyStatus contactListPartyStatusToBeAdded = new ContactListPartyStatus();
 		try {
@@ -86,7 +84,7 @@ public class ContactListPartyStatusController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createContactListPartyStatus(contactListPartyStatusToBeAdded);
@@ -101,63 +99,15 @@ public class ContactListPartyStatusController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createContactListPartyStatus(@RequestBody ContactListPartyStatus contactListPartyStatusToBeAdded) throws Exception {
+	public ResponseEntity<ContactListPartyStatus> createContactListPartyStatus(@RequestBody ContactListPartyStatus contactListPartyStatusToBeAdded) throws Exception {
 
 		AddContactListPartyStatus command = new AddContactListPartyStatus(contactListPartyStatusToBeAdded);
 		ContactListPartyStatus contactListPartyStatus = ((ContactListPartyStatusAdded) Scheduler.execute(command).data()).getAddedContactListPartyStatus();
 		
 		if (contactListPartyStatus != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(contactListPartyStatus);
+			return successful(contactListPartyStatus);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ContactListPartyStatus could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateContactListPartyStatus(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ContactListPartyStatus contactListPartyStatusToBeUpdated = new ContactListPartyStatus();
-
-		try {
-			contactListPartyStatusToBeUpdated = ContactListPartyStatusMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateContactListPartyStatus(contactListPartyStatusToBeUpdated, contactListPartyStatusToBeUpdated.getPartyId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ContactListPartyStatusController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{partyId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateContactListPartyStatus(@RequestBody ContactListPartyStatus contactListPartyStatusToBeUpdated,
+	public ResponseEntity<String> updateContactListPartyStatus(@RequestBody ContactListPartyStatus contactListPartyStatusToBeUpdated,
 			@PathVariable String partyId) throws Exception {
 
 		contactListPartyStatusToBeUpdated.setPartyId(partyId);
@@ -178,41 +128,44 @@ public class ContactListPartyStatusController {
 
 		try {
 			if(((ContactListPartyStatusUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{contactListPartyStatusId}")
-	public ResponseEntity<Object> findById(@PathVariable String contactListPartyStatusId) throws Exception {
+	public ResponseEntity<ContactListPartyStatus> findById(@PathVariable String contactListPartyStatusId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contactListPartyStatusId", contactListPartyStatusId);
 		try {
 
-			Object foundContactListPartyStatus = findContactListPartyStatussBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundContactListPartyStatus);
+			List<ContactListPartyStatus> foundContactListPartyStatus = findContactListPartyStatussBy(requestParams).getBody();
+			if(foundContactListPartyStatus.size()==1){				return successful(foundContactListPartyStatus.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{contactListPartyStatusId}")
-	public ResponseEntity<Object> deleteContactListPartyStatusByIdUpdated(@PathVariable String contactListPartyStatusId) throws Exception {
+	public ResponseEntity<String> deleteContactListPartyStatusByIdUpdated(@PathVariable String contactListPartyStatusId) throws Exception {
 		DeleteContactListPartyStatus command = new DeleteContactListPartyStatus(contactListPartyStatusId);
 
 		try {
 			if (((ContactListPartyStatusDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ContactListPartyStatus could not be deleted");
+		return conflict();
 
 	}
 

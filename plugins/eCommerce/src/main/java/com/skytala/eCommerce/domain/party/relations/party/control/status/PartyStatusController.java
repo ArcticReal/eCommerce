@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.party.query.status.FindParty
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/party/partyStatuss")
 public class PartyStatusController {
@@ -52,7 +54,7 @@ public class PartyStatusController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPartyStatussBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PartyStatus>> findPartyStatussBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyStatussBy query = new FindPartyStatussBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PartyStatusController {
 		}
 
 		List<PartyStatus> partyStatuss =((PartyStatusFound) Scheduler.execute(query).data()).getPartyStatuss();
-
-		if (partyStatuss.size() == 1) {
-			return ResponseEntity.ok().body(partyStatuss.get(0));
-		}
 
 		return ResponseEntity.ok().body(partyStatuss);
 
@@ -78,7 +76,7 @@ public class PartyStatusController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPartyStatus(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PartyStatus> createPartyStatus(HttpServletRequest request) throws Exception {
 
 		PartyStatus partyStatusToBeAdded = new PartyStatus();
 		try {
@@ -86,7 +84,7 @@ public class PartyStatusController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPartyStatus(partyStatusToBeAdded);
@@ -101,63 +99,15 @@ public class PartyStatusController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPartyStatus(@RequestBody PartyStatus partyStatusToBeAdded) throws Exception {
+	public ResponseEntity<PartyStatus> createPartyStatus(@RequestBody PartyStatus partyStatusToBeAdded) throws Exception {
 
 		AddPartyStatus command = new AddPartyStatus(partyStatusToBeAdded);
 		PartyStatus partyStatus = ((PartyStatusAdded) Scheduler.execute(command).data()).getAddedPartyStatus();
 		
 		if (partyStatus != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(partyStatus);
+			return successful(partyStatus);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PartyStatus could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePartyStatus(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PartyStatus partyStatusToBeUpdated = new PartyStatus();
-
-		try {
-			partyStatusToBeUpdated = PartyStatusMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePartyStatus(partyStatusToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PartyStatusController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePartyStatus(@RequestBody PartyStatus partyStatusToBeUpdated,
+	public ResponseEntity<String> updatePartyStatus(@RequestBody PartyStatus partyStatusToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		partyStatusToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class PartyStatusController {
 
 		try {
 			if(((PartyStatusUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{partyStatusId}")
-	public ResponseEntity<Object> findById(@PathVariable String partyStatusId) throws Exception {
+	public ResponseEntity<PartyStatus> findById(@PathVariable String partyStatusId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyStatusId", partyStatusId);
 		try {
 
-			Object foundPartyStatus = findPartyStatussBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPartyStatus);
+			List<PartyStatus> foundPartyStatus = findPartyStatussBy(requestParams).getBody();
+			if(foundPartyStatus.size()==1){				return successful(foundPartyStatus.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{partyStatusId}")
-	public ResponseEntity<Object> deletePartyStatusByIdUpdated(@PathVariable String partyStatusId) throws Exception {
+	public ResponseEntity<String> deletePartyStatusByIdUpdated(@PathVariable String partyStatusId) throws Exception {
 		DeletePartyStatus command = new DeletePartyStatus(partyStatusId);
 
 		try {
 			if (((PartyStatusDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PartyStatus could not be deleted");
+		return conflict();
 
 	}
 

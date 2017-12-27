@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.finAccount.query.attrib
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/finAccount/finAccountAttributes")
 public class FinAccountAttributeController {
@@ -52,7 +54,7 @@ public class FinAccountAttributeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findFinAccountAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<FinAccountAttribute>> findFinAccountAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFinAccountAttributesBy query = new FindFinAccountAttributesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class FinAccountAttributeController {
 		}
 
 		List<FinAccountAttribute> finAccountAttributes =((FinAccountAttributeFound) Scheduler.execute(query).data()).getFinAccountAttributes();
-
-		if (finAccountAttributes.size() == 1) {
-			return ResponseEntity.ok().body(finAccountAttributes.get(0));
-		}
 
 		return ResponseEntity.ok().body(finAccountAttributes);
 
@@ -78,7 +76,7 @@ public class FinAccountAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createFinAccountAttribute(HttpServletRequest request) throws Exception {
+	public ResponseEntity<FinAccountAttribute> createFinAccountAttribute(HttpServletRequest request) throws Exception {
 
 		FinAccountAttribute finAccountAttributeToBeAdded = new FinAccountAttribute();
 		try {
@@ -86,7 +84,7 @@ public class FinAccountAttributeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createFinAccountAttribute(finAccountAttributeToBeAdded);
@@ -101,63 +99,15 @@ public class FinAccountAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createFinAccountAttribute(@RequestBody FinAccountAttribute finAccountAttributeToBeAdded) throws Exception {
+	public ResponseEntity<FinAccountAttribute> createFinAccountAttribute(@RequestBody FinAccountAttribute finAccountAttributeToBeAdded) throws Exception {
 
 		AddFinAccountAttribute command = new AddFinAccountAttribute(finAccountAttributeToBeAdded);
 		FinAccountAttribute finAccountAttribute = ((FinAccountAttributeAdded) Scheduler.execute(command).data()).getAddedFinAccountAttribute();
 		
 		if (finAccountAttribute != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(finAccountAttribute);
+			return successful(finAccountAttribute);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("FinAccountAttribute could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateFinAccountAttribute(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		FinAccountAttribute finAccountAttributeToBeUpdated = new FinAccountAttribute();
-
-		try {
-			finAccountAttributeToBeUpdated = FinAccountAttributeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateFinAccountAttribute(finAccountAttributeToBeUpdated, finAccountAttributeToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class FinAccountAttributeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateFinAccountAttribute(@RequestBody FinAccountAttribute finAccountAttributeToBeUpdated,
+	public ResponseEntity<String> updateFinAccountAttribute(@RequestBody FinAccountAttribute finAccountAttributeToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		finAccountAttributeToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class FinAccountAttributeController {
 
 		try {
 			if(((FinAccountAttributeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{finAccountAttributeId}")
-	public ResponseEntity<Object> findById(@PathVariable String finAccountAttributeId) throws Exception {
+	public ResponseEntity<FinAccountAttribute> findById(@PathVariable String finAccountAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("finAccountAttributeId", finAccountAttributeId);
 		try {
 
-			Object foundFinAccountAttribute = findFinAccountAttributesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundFinAccountAttribute);
+			List<FinAccountAttribute> foundFinAccountAttribute = findFinAccountAttributesBy(requestParams).getBody();
+			if(foundFinAccountAttribute.size()==1){				return successful(foundFinAccountAttribute.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{finAccountAttributeId}")
-	public ResponseEntity<Object> deleteFinAccountAttributeByIdUpdated(@PathVariable String finAccountAttributeId) throws Exception {
+	public ResponseEntity<String> deleteFinAccountAttributeByIdUpdated(@PathVariable String finAccountAttributeId) throws Exception {
 		DeleteFinAccountAttribute command = new DeleteFinAccountAttribute(finAccountAttributeId);
 
 		try {
 			if (((FinAccountAttributeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("FinAccountAttribute could not be deleted");
+		return conflict();
 
 	}
 

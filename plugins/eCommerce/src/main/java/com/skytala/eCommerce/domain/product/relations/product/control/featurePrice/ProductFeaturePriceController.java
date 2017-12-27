@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.featurePrice
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productFeaturePrices")
 public class ProductFeaturePriceController {
@@ -52,7 +54,7 @@ public class ProductFeaturePriceController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductFeaturePricesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductFeaturePrice>> findProductFeaturePricesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductFeaturePricesBy query = new FindProductFeaturePricesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductFeaturePriceController {
 		}
 
 		List<ProductFeaturePrice> productFeaturePrices =((ProductFeaturePriceFound) Scheduler.execute(query).data()).getProductFeaturePrices();
-
-		if (productFeaturePrices.size() == 1) {
-			return ResponseEntity.ok().body(productFeaturePrices.get(0));
-		}
 
 		return ResponseEntity.ok().body(productFeaturePrices);
 
@@ -78,7 +76,7 @@ public class ProductFeaturePriceController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductFeaturePrice(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductFeaturePrice> createProductFeaturePrice(HttpServletRequest request) throws Exception {
 
 		ProductFeaturePrice productFeaturePriceToBeAdded = new ProductFeaturePrice();
 		try {
@@ -86,7 +84,7 @@ public class ProductFeaturePriceController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductFeaturePrice(productFeaturePriceToBeAdded);
@@ -101,63 +99,15 @@ public class ProductFeaturePriceController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductFeaturePrice(@RequestBody ProductFeaturePrice productFeaturePriceToBeAdded) throws Exception {
+	public ResponseEntity<ProductFeaturePrice> createProductFeaturePrice(@RequestBody ProductFeaturePrice productFeaturePriceToBeAdded) throws Exception {
 
 		AddProductFeaturePrice command = new AddProductFeaturePrice(productFeaturePriceToBeAdded);
 		ProductFeaturePrice productFeaturePrice = ((ProductFeaturePriceAdded) Scheduler.execute(command).data()).getAddedProductFeaturePrice();
 		
 		if (productFeaturePrice != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productFeaturePrice);
+			return successful(productFeaturePrice);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductFeaturePrice could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductFeaturePrice(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductFeaturePrice productFeaturePriceToBeUpdated = new ProductFeaturePrice();
-
-		try {
-			productFeaturePriceToBeUpdated = ProductFeaturePriceMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductFeaturePrice(productFeaturePriceToBeUpdated, productFeaturePriceToBeUpdated.getProductFeatureId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductFeaturePriceController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{productFeatureId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductFeaturePrice(@RequestBody ProductFeaturePrice productFeaturePriceToBeUpdated,
+	public ResponseEntity<String> updateProductFeaturePrice(@RequestBody ProductFeaturePrice productFeaturePriceToBeUpdated,
 			@PathVariable String productFeatureId) throws Exception {
 
 		productFeaturePriceToBeUpdated.setProductFeatureId(productFeatureId);
@@ -178,41 +128,44 @@ public class ProductFeaturePriceController {
 
 		try {
 			if(((ProductFeaturePriceUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productFeaturePriceId}")
-	public ResponseEntity<Object> findById(@PathVariable String productFeaturePriceId) throws Exception {
+	public ResponseEntity<ProductFeaturePrice> findById(@PathVariable String productFeaturePriceId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productFeaturePriceId", productFeaturePriceId);
 		try {
 
-			Object foundProductFeaturePrice = findProductFeaturePricesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductFeaturePrice);
+			List<ProductFeaturePrice> foundProductFeaturePrice = findProductFeaturePricesBy(requestParams).getBody();
+			if(foundProductFeaturePrice.size()==1){				return successful(foundProductFeaturePrice.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productFeaturePriceId}")
-	public ResponseEntity<Object> deleteProductFeaturePriceByIdUpdated(@PathVariable String productFeaturePriceId) throws Exception {
+	public ResponseEntity<String> deleteProductFeaturePriceByIdUpdated(@PathVariable String productFeaturePriceId) throws Exception {
 		DeleteProductFeaturePrice command = new DeleteProductFeaturePrice(productFeaturePriceId);
 
 		try {
 			if (((ProductFeaturePriceDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductFeaturePrice could not be deleted");
+		return conflict();
 
 	}
 

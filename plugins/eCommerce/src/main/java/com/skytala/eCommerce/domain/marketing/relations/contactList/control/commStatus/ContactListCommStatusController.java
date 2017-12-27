@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.marketing.relations.contactList.query.commSt
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/marketing/contactList/contactListCommStatuss")
 public class ContactListCommStatusController {
@@ -52,7 +54,7 @@ public class ContactListCommStatusController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findContactListCommStatussBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ContactListCommStatus>> findContactListCommStatussBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContactListCommStatussBy query = new FindContactListCommStatussBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ContactListCommStatusController {
 		}
 
 		List<ContactListCommStatus> contactListCommStatuss =((ContactListCommStatusFound) Scheduler.execute(query).data()).getContactListCommStatuss();
-
-		if (contactListCommStatuss.size() == 1) {
-			return ResponseEntity.ok().body(contactListCommStatuss.get(0));
-		}
 
 		return ResponseEntity.ok().body(contactListCommStatuss);
 
@@ -78,7 +76,7 @@ public class ContactListCommStatusController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createContactListCommStatus(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ContactListCommStatus> createContactListCommStatus(HttpServletRequest request) throws Exception {
 
 		ContactListCommStatus contactListCommStatusToBeAdded = new ContactListCommStatus();
 		try {
@@ -86,7 +84,7 @@ public class ContactListCommStatusController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createContactListCommStatus(contactListCommStatusToBeAdded);
@@ -101,63 +99,15 @@ public class ContactListCommStatusController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createContactListCommStatus(@RequestBody ContactListCommStatus contactListCommStatusToBeAdded) throws Exception {
+	public ResponseEntity<ContactListCommStatus> createContactListCommStatus(@RequestBody ContactListCommStatus contactListCommStatusToBeAdded) throws Exception {
 
 		AddContactListCommStatus command = new AddContactListCommStatus(contactListCommStatusToBeAdded);
 		ContactListCommStatus contactListCommStatus = ((ContactListCommStatusAdded) Scheduler.execute(command).data()).getAddedContactListCommStatus();
 		
 		if (contactListCommStatus != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(contactListCommStatus);
+			return successful(contactListCommStatus);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ContactListCommStatus could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateContactListCommStatus(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ContactListCommStatus contactListCommStatusToBeUpdated = new ContactListCommStatus();
-
-		try {
-			contactListCommStatusToBeUpdated = ContactListCommStatusMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateContactListCommStatus(contactListCommStatusToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ContactListCommStatusController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateContactListCommStatus(@RequestBody ContactListCommStatus contactListCommStatusToBeUpdated,
+	public ResponseEntity<String> updateContactListCommStatus(@RequestBody ContactListCommStatus contactListCommStatusToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		contactListCommStatusToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ContactListCommStatusController {
 
 		try {
 			if(((ContactListCommStatusUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{contactListCommStatusId}")
-	public ResponseEntity<Object> findById(@PathVariable String contactListCommStatusId) throws Exception {
+	public ResponseEntity<ContactListCommStatus> findById(@PathVariable String contactListCommStatusId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contactListCommStatusId", contactListCommStatusId);
 		try {
 
-			Object foundContactListCommStatus = findContactListCommStatussBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundContactListCommStatus);
+			List<ContactListCommStatus> foundContactListCommStatus = findContactListCommStatussBy(requestParams).getBody();
+			if(foundContactListCommStatus.size()==1){				return successful(foundContactListCommStatus.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{contactListCommStatusId}")
-	public ResponseEntity<Object> deleteContactListCommStatusByIdUpdated(@PathVariable String contactListCommStatusId) throws Exception {
+	public ResponseEntity<String> deleteContactListCommStatusByIdUpdated(@PathVariable String contactListCommStatusId) throws Exception {
 		DeleteContactListCommStatus command = new DeleteContactListCommStatus(contactListCommStatusId);
 
 		try {
 			if (((ContactListCommStatusDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ContactListCommStatus could not be deleted");
+		return conflict();
 
 	}
 

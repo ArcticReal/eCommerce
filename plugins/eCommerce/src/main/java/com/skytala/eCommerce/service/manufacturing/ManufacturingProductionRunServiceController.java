@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/manufacturingProductionRun")
 public class ManufacturingProductionRunServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/issueProductionRunTask")
-	public ResponseEntity<Object> issueProductionRunTask(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="failIfItemsAreNotOnHand", required=false) String failIfItemsAreNotOnHand, @RequestParam(value="reserveOrderEnumId", required=false) String reserveOrderEnumId, @RequestParam(value="failIfItemsAreNotAvailable", required=false) String failIfItemsAreNotAvailable) {
+	public ResponseEntity<Map<String, Object>> issueProductionRunTask(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="failIfItemsAreNotOnHand", required=false) String failIfItemsAreNotOnHand, @RequestParam(value="reserveOrderEnumId", required=false) String reserveOrderEnumId, @RequestParam(value="failIfItemsAreNotAvailable", required=false) String failIfItemsAreNotAvailable) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -42,23 +44,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductionRunPartyAssign")
-	public ResponseEntity<Object> createProductionRunPartyAssign(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="productionRunId") String productionRunId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) java.sql.Timestamp fromDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createProductionRunPartyAssign(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="productionRunId") String productionRunId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="fromDate", required=false) java.sql.Timestamp fromDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("roleTypeId",roleTypeId);
@@ -76,23 +78,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductionRunForMktgPkg")
-	public ResponseEntity<Object> createProductionRunForMktgPkg(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="orderId") String orderId) {
+	public ResponseEntity<Map<String, Object>> createProductionRunForMktgPkg(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="orderId") String orderId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderItemSeqId",orderItemSeqId);
@@ -107,23 +109,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductionRunTask")
-	public ResponseEntity<Object> updateProductionRunTask(HttpSession session, @RequestParam(value="productionRunTaskId") String productionRunTaskId, @RequestParam(value="productionRunId") String productionRunId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="addSetupTime", required=false) BigDecimal addSetupTime, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="issueRequiredComponents", required=false) Boolean issueRequiredComponents, @RequestParam(value="componentsLocationMap", required=false) Map componentsLocationMap, @RequestParam(value="addQuantityRejected", required=false) BigDecimal addQuantityRejected, @RequestParam(value="addTaskTime", required=false) BigDecimal addTaskTime, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="addQuantityProduced", required=false) BigDecimal addQuantityProduced, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateProductionRunTask(HttpSession session, @RequestParam(value="productionRunTaskId") String productionRunTaskId, @RequestParam(value="productionRunId") String productionRunId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="addSetupTime", required=false) BigDecimal addSetupTime, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="issueRequiredComponents", required=false) Boolean issueRequiredComponents, @RequestParam(value="componentsLocationMap", required=false) Map componentsLocationMap, @RequestParam(value="addQuantityRejected", required=false) BigDecimal addQuantityRejected, @RequestParam(value="addTaskTime", required=false) BigDecimal addTaskTime, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="addQuantityProduced", required=false) BigDecimal addQuantityProduced, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productionRunTaskId",productionRunTaskId);
@@ -147,23 +149,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/productionRunTaskProduce")
-	public ResponseEntity<Object> productionRunTaskProduce(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="productId") String productId, @RequestParam(value="isReturned", required=false) String isReturned, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="unitCost", required=false) BigDecimal unitCost, @RequestParam(value="lotId", required=false) String lotId, @RequestParam(value="locationSeqId", required=false) String locationSeqId, @RequestParam(value="inventoryItemTypeId", required=false) String inventoryItemTypeId) {
+	public ResponseEntity<Map<String, Object>> productionRunTaskProduce(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="productId") String productId, @RequestParam(value="isReturned", required=false) String isReturned, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="unitCost", required=false) BigDecimal unitCost, @RequestParam(value="lotId", required=false) String lotId, @RequestParam(value="locationSeqId", required=false) String locationSeqId, @RequestParam(value="inventoryItemTypeId", required=false) String inventoryItemTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -185,23 +187,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/productionRunProduce")
-	public ResponseEntity<Object> productionRunProduce(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="createLotIfNeeded", required=false) Boolean createLotIfNeeded, @RequestParam(value="quantityUomId", required=false) String quantityUomId, @RequestParam(value="lotId", required=false) String lotId, @RequestParam(value="autoCreateLot", required=false) Boolean autoCreateLot, @RequestParam(value="inventoryItemTypeId", required=false) String inventoryItemTypeId, @RequestParam(value="locationSeqId", required=false) String locationSeqId) {
+	public ResponseEntity<Map<String, Object>> productionRunProduce(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="createLotIfNeeded", required=false) Boolean createLotIfNeeded, @RequestParam(value="quantityUomId", required=false) String quantityUomId, @RequestParam(value="lotId", required=false) String lotId, @RequestParam(value="autoCreateLot", required=false) Boolean autoCreateLot, @RequestParam(value="inventoryItemTypeId", required=false) String inventoryItemTypeId, @RequestParam(value="locationSeqId", required=false) String locationSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -221,23 +223,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/productionRunTaskReturnMaterial")
-	public ResponseEntity<Object> productionRunTaskReturnMaterial(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="productId") String productId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="lotId", required=false) String lotId, @RequestParam(value="inventoryItemTypeId", required=false) String inventoryItemTypeId) {
+	public ResponseEntity<Map<String, Object>> productionRunTaskReturnMaterial(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="productId") String productId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="lotId", required=false) String lotId, @RequestParam(value="inventoryItemTypeId", required=false) String inventoryItemTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -254,23 +256,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductionRun")
-	public ResponseEntity<Object> updateProductionRun(HttpSession session, @RequestParam(value="productionRunId") String productionRunId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="estimatedStartDate", required=false) Timestamp estimatedStartDate, @RequestParam(value="description", required=false) String description, @RequestParam(value="workEffortName", required=false) String workEffortName) {
+	public ResponseEntity<Map<String, Object>> updateProductionRun(HttpSession session, @RequestParam(value="productionRunId") String productionRunId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="estimatedStartDate", required=false) Timestamp estimatedStartDate, @RequestParam(value="description", required=false) String description, @RequestParam(value="workEffortName", required=false) String workEffortName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productionRunId",productionRunId);
@@ -288,23 +290,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductionRunRoutingTask")
-	public ResponseEntity<Object> deleteProductionRunRoutingTask(HttpSession session, @RequestParam(value="routingTaskId") String routingTaskId, @RequestParam(value="productionRunId") String productionRunId) {
+	public ResponseEntity<Map<String, Object>> deleteProductionRunRoutingTask(HttpSession session, @RequestParam(value="routingTaskId") String routingTaskId, @RequestParam(value="productionRunId") String productionRunId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("routingTaskId",routingTaskId);
@@ -318,23 +320,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/quickStartAllProductionRunTasks")
-	public ResponseEntity<Object> quickStartAllProductionRunTasks(HttpSession session, @RequestParam(value="productionRunId") String productionRunId) {
+	public ResponseEntity<Map<String, Object>> quickStartAllProductionRunTasks(HttpSession session, @RequestParam(value="productionRunId") String productionRunId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productionRunId",productionRunId);
@@ -347,23 +349,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/issueProductionRunTaskComponent")
-	public ResponseEntity<Object> issueProductionRunTaskComponent(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="productId") String productId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="secondaryLocationSeqId", required=false) String secondaryLocationSeqId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="failIfItemsAreNotOnHand", required=false) String failIfItemsAreNotOnHand, @RequestParam(value="description", required=false) String description, @RequestParam(value="lotId", required=false) String lotId, @RequestParam(value="reserveOrderEnumId", required=false) String reserveOrderEnumId, @RequestParam(value="reasonEnumId", required=false) String reasonEnumId, @RequestParam(value="failIfItemsAreNotAvailable", required=false) String failIfItemsAreNotAvailable, @RequestParam(value="locationSeqId", required=false) String locationSeqId) {
+	public ResponseEntity<Map<String, Object>> issueProductionRunTaskComponent(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="productId") String productId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="secondaryLocationSeqId", required=false) String secondaryLocationSeqId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="failIfItemsAreNotOnHand", required=false) String failIfItemsAreNotOnHand, @RequestParam(value="description", required=false) String description, @RequestParam(value="lotId", required=false) String lotId, @RequestParam(value="reserveOrderEnumId", required=false) String reserveOrderEnumId, @RequestParam(value="reasonEnumId", required=false) String reasonEnumId, @RequestParam(value="failIfItemsAreNotAvailable", required=false) String failIfItemsAreNotAvailable, @RequestParam(value="locationSeqId", required=false) String locationSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -387,23 +389,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/checkDecomposeInventoryItem")
-	public ResponseEntity<Object> checkDecomposeInventoryItem(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="quantityAccepted", required=false) BigDecimal quantityAccepted) {
+	public ResponseEntity<Map<String, Object>> checkDecomposeInventoryItem(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="quantityAccepted", required=false) BigDecimal quantityAccepted) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("inventoryItemId",inventoryItemId);
@@ -417,23 +419,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/productionRunDeclareAndProduce")
-	public ResponseEntity<Object> productionRunDeclareAndProduce(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="componentsLocationMap", required=false) Map componentsLocationMap, @RequestParam(value="createLotIfNeeded", required=false) Boolean createLotIfNeeded, @RequestParam(value="quantityUomId", required=false) String quantityUomId, @RequestParam(value="lotId", required=false) String lotId, @RequestParam(value="autoCreateLot", required=false) Boolean autoCreateLot, @RequestParam(value="inventoryItemTypeId", required=false) String inventoryItemTypeId, @RequestParam(value="locationSeqId", required=false) String locationSeqId) {
+	public ResponseEntity<Map<String, Object>> productionRunDeclareAndProduce(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="componentsLocationMap", required=false) Map componentsLocationMap, @RequestParam(value="createLotIfNeeded", required=false) Boolean createLotIfNeeded, @RequestParam(value="quantityUomId", required=false) String quantityUomId, @RequestParam(value="lotId", required=false) String lotId, @RequestParam(value="autoCreateLot", required=false) Boolean autoCreateLot, @RequestParam(value="inventoryItemTypeId", required=false) String inventoryItemTypeId, @RequestParam(value="locationSeqId", required=false) String locationSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -454,23 +456,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductionRun")
-	public ResponseEntity<Object> createProductionRun(HttpSession session, @RequestParam(value="pRQuantity") BigDecimal pRQuantity, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="productId") String productId, @RequestParam(value="startDate") java.sql.Timestamp startDate, @RequestParam(value="routingId", required=false) String routingId, @RequestParam(value="description", required=false) String description, @RequestParam(value="workEffortName", required=false) String workEffortName) {
+	public ResponseEntity<Map<String, Object>> createProductionRun(HttpSession session, @RequestParam(value="pRQuantity") BigDecimal pRQuantity, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="productId") String productId, @RequestParam(value="startDate") java.sql.Timestamp startDate, @RequestParam(value="routingId", required=false) String routingId, @RequestParam(value="description", required=false) String description, @RequestParam(value="workEffortName", required=false) String workEffortName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("pRQuantity",pRQuantity);
@@ -489,23 +491,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/changeProductionRunStatus")
-	public ResponseEntity<Object> changeProductionRunStatus(HttpSession session, @RequestParam(value="productionRunId") String productionRunId, @RequestParam(value="statusId", required=false) String statusId) {
+	public ResponseEntity<Map<String, Object>> changeProductionRunStatus(HttpSession session, @RequestParam(value="productionRunId") String productionRunId, @RequestParam(value="statusId", required=false) String statusId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productionRunId",productionRunId);
@@ -519,23 +521,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/quickRunAllProductionRunTasks")
-	public ResponseEntity<Object> quickRunAllProductionRunTasks(HttpSession session, @RequestParam(value="productionRunId") String productionRunId) {
+	public ResponseEntity<Map<String, Object>> quickRunAllProductionRunTasks(HttpSession session, @RequestParam(value="productionRunId") String productionRunId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productionRunId",productionRunId);
@@ -548,23 +550,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/issueInventoryItemToWorkEffort")
-	public ResponseEntity<Object> issueInventoryItemToWorkEffort(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="inventoryItem") org.apache.ofbiz.entity.GenericValue inventoryItem, @RequestParam(value="quantity", required=false) BigDecimal quantity) {
+	public ResponseEntity<Map<String, Object>> issueInventoryItemToWorkEffort(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="inventoryItem") org.apache.ofbiz.entity.GenericValue inventoryItem, @RequestParam(value="quantity", required=false) BigDecimal quantity) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -579,23 +581,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getProductionRunTotResQty")
-	public ResponseEntity<Object> getProductionRunTotResQty(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="startDate", required=false) Timestamp startDate) {
+	public ResponseEntity<Map<String, Object>> getProductionRunTotResQty(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="startDate", required=false) Timestamp startDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -609,23 +611,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductionRunTaskCosts")
-	public ResponseEntity<Object> createProductionRunTaskCosts(HttpSession session, @RequestParam(value="productionRunTaskId") String productionRunTaskId) {
+	public ResponseEntity<Map<String, Object>> createProductionRunTaskCosts(HttpSession session, @RequestParam(value="productionRunTaskId") String productionRunTaskId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productionRunTaskId",productionRunTaskId);
@@ -638,23 +640,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addProductionRunComponent")
-	public ResponseEntity<Object> addProductionRunComponent(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="estimatedQuantity") BigDecimal estimatedQuantity, @RequestParam(value="productionRunId") String productionRunId, @RequestParam(value="workEffortId", required=false) String workEffortId) {
+	public ResponseEntity<Map<String, Object>> addProductionRunComponent(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="estimatedQuantity") BigDecimal estimatedQuantity, @RequestParam(value="productionRunId") String productionRunId, @RequestParam(value="workEffortId", required=false) String workEffortId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -670,23 +672,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getProductionRunCost")
-	public ResponseEntity<Object> getProductionRunCost(HttpSession session, @RequestParam(value="workEffortId") String workEffortId) {
+	public ResponseEntity<Map<String, Object>> getProductionRunCost(HttpSession session, @RequestParam(value="workEffortId") String workEffortId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -699,23 +701,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductionRunsForProductBom")
-	public ResponseEntity<Object> createProductionRunsForProductBom(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="productId") String productId, @RequestParam(value="startDate") java.sql.Timestamp startDate, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="routingId", required=false) String routingId, @RequestParam(value="description", required=false) String description, @RequestParam(value="workEffortName", required=false) String workEffortName) {
+	public ResponseEntity<Map<String, Object>> createProductionRunsForProductBom(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="productId") String productId, @RequestParam(value="startDate") java.sql.Timestamp startDate, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="routingId", required=false) String routingId, @RequestParam(value="description", required=false) String description, @RequestParam(value="workEffortName", required=false) String workEffortName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("facilityId",facilityId);
@@ -734,23 +736,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductionRunsForOrder")
-	public ResponseEntity<Object> createProductionRunsForOrder(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="fromDate", required=false) String fromDate, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId) {
+	public ResponseEntity<Map<String, Object>> createProductionRunsForOrder(HttpSession session, @RequestParam(value="orderId") String orderId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="fromDate", required=false) String fromDate, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="shipmentId", required=false) String shipmentId, @RequestParam(value="shipGroupSeqId", required=false) String shipGroupSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderId",orderId);
@@ -768,23 +770,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/quickRunProductionRunTask")
-	public ResponseEntity<Object> quickRunProductionRunTask(HttpSession session, @RequestParam(value="productionRunId") String productionRunId, @RequestParam(value="taskId") String taskId) {
+	public ResponseEntity<Map<String, Object>> quickRunProductionRunTask(HttpSession session, @RequestParam(value="productionRunId") String productionRunId, @RequestParam(value="taskId") String taskId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productionRunId",productionRunId);
@@ -798,23 +800,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/changeProductionRunTaskStatus")
-	public ResponseEntity<Object> changeProductionRunTaskStatus(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="productionRunId") String productionRunId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="issueAllComponents", required=false) Boolean issueAllComponents) {
+	public ResponseEntity<Map<String, Object>> changeProductionRunTaskStatus(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="productionRunId") String productionRunId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="issueAllComponents", required=false) Boolean issueAllComponents) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -830,23 +832,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/decomposeInventoryItem")
-	public ResponseEntity<Object> decomposeInventoryItem(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="quantity", required=false) BigDecimal quantity) {
+	public ResponseEntity<Map<String, Object>> decomposeInventoryItem(HttpSession session, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="quantity", required=false) BigDecimal quantity) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("inventoryItemId",inventoryItemId);
@@ -860,23 +862,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/checkUpdatePrunRoutingTask")
-	public ResponseEntity<Object> checkUpdatePrunRoutingTask(HttpSession session, @RequestParam(value="routingTaskId") String routingTaskId, @RequestParam(value="estimatedSetupMillis") BigDecimal estimatedSetupMillis, @RequestParam(value="estimatedStartDate") Timestamp estimatedStartDate, @RequestParam(value="priority") Long priority, @RequestParam(value="productionRunId") String productionRunId, @RequestParam(value="estimatedMilliSeconds") BigDecimal estimatedMilliSeconds) {
+	public ResponseEntity<Map<String, Object>> checkUpdatePrunRoutingTask(HttpSession session, @RequestParam(value="routingTaskId") String routingTaskId, @RequestParam(value="estimatedSetupMillis") BigDecimal estimatedSetupMillis, @RequestParam(value="estimatedStartDate") Timestamp estimatedStartDate, @RequestParam(value="priority") Long priority, @RequestParam(value="productionRunId") String productionRunId, @RequestParam(value="estimatedMilliSeconds") BigDecimal estimatedMilliSeconds) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("routingTaskId",routingTaskId);
@@ -894,23 +896,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductionRunFromConfiguration")
-	public ResponseEntity<Object> createProductionRunFromConfiguration(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="configId", required=false) String configId, @RequestParam(value="config", required=false) org.apache.ofbiz.product.config.ProductConfigWrapper config) {
+	public ResponseEntity<Map<String, Object>> createProductionRunFromConfiguration(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="orderItemSeqId", required=false) String orderItemSeqId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="configId", required=false) String configId, @RequestParam(value="config", required=false) org.apache.ofbiz.product.config.ProductConfigWrapper config) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("facilityId",facilityId);
@@ -928,23 +930,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addProductionRunRoutingTask")
-	public ResponseEntity<Object> addProductionRunRoutingTask(HttpSession session, @RequestParam(value="routingTaskId") String routingTaskId, @RequestParam(value="priority") Long priority, @RequestParam(value="productionRunId") String productionRunId, @RequestParam(value="estimatedSetupMillis", required=false) BigDecimal estimatedSetupMillis, @RequestParam(value="estimatedStartDate", required=false) Timestamp estimatedStartDate, @RequestParam(value="description", required=false) String description, @RequestParam(value="workEffortName", required=false) String workEffortName, @RequestParam(value="estimatedMilliSeconds", required=false) BigDecimal estimatedMilliSeconds, @RequestParam(value="estimatedCompletionDate", required=false) Timestamp estimatedCompletionDate) {
+	public ResponseEntity<Map<String, Object>> addProductionRunRoutingTask(HttpSession session, @RequestParam(value="routingTaskId") String routingTaskId, @RequestParam(value="priority") Long priority, @RequestParam(value="productionRunId") String productionRunId, @RequestParam(value="estimatedSetupMillis", required=false) BigDecimal estimatedSetupMillis, @RequestParam(value="estimatedStartDate", required=false) Timestamp estimatedStartDate, @RequestParam(value="description", required=false) String description, @RequestParam(value="workEffortName", required=false) String workEffortName, @RequestParam(value="estimatedMilliSeconds", required=false) BigDecimal estimatedMilliSeconds, @RequestParam(value="estimatedCompletionDate", required=false) Timestamp estimatedCompletionDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("routingTaskId",routingTaskId);
@@ -965,23 +967,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductionRunAssoc")
-	public ResponseEntity<Object> createProductionRunAssoc(HttpSession session, @RequestParam(value="productionRunIdTo") String productionRunIdTo, @RequestParam(value="workFlowSequenceTypeId") String workFlowSequenceTypeId, @RequestParam(value="productionRunId") String productionRunId) {
+	public ResponseEntity<Map<String, Object>> createProductionRunAssoc(HttpSession session, @RequestParam(value="productionRunIdTo") String productionRunIdTo, @RequestParam(value="workFlowSequenceTypeId") String workFlowSequenceTypeId, @RequestParam(value="productionRunId") String productionRunId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productionRunIdTo",productionRunIdTo);
@@ -996,23 +998,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductionRunFromRequirement")
-	public ResponseEntity<Object> createProductionRunFromRequirement(HttpSession session, @RequestParam(value="requirementId") String requirementId, @RequestParam(value="quantity", required=false) BigDecimal quantity) {
+	public ResponseEntity<Map<String, Object>> createProductionRunFromRequirement(HttpSession session, @RequestParam(value="requirementId") String requirementId, @RequestParam(value="quantity", required=false) BigDecimal quantity) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("requirementId",requirementId);
@@ -1026,23 +1028,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductionRunComponent")
-	public ResponseEntity<Object> updateProductionRunComponent(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productionRunId") String productionRunId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="estimatedQuantity", required=false) BigDecimal estimatedQuantity) {
+	public ResponseEntity<Map<String, Object>> updateProductionRunComponent(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productionRunId") String productionRunId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="estimatedQuantity", required=false) BigDecimal estimatedQuantity) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -1058,23 +1060,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/quickChangeProductionRunStatus")
-	public ResponseEntity<Object> quickChangeProductionRunStatus(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="productionRunId") String productionRunId) {
+	public ResponseEntity<Map<String, Object>> quickChangeProductionRunStatus(HttpSession session, @RequestParam(value="statusId") String statusId, @RequestParam(value="productionRunId") String productionRunId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("statusId",statusId);
@@ -1088,23 +1090,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductionRunComponent")
-	public ResponseEntity<Object> deleteProductionRunComponent(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productionRunId") String productionRunId) {
+	public ResponseEntity<Map<String, Object>> deleteProductionRunComponent(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productionRunId") String productionRunId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -1118,23 +1120,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/cancelProductionRun")
-	public ResponseEntity<Object> cancelProductionRun(HttpSession session, @RequestParam(value="productionRunId") String productionRunId) {
+	public ResponseEntity<Map<String, Object>> cancelProductionRun(HttpSession session, @RequestParam(value="productionRunId") String productionRunId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productionRunId",productionRunId);
@@ -1147,23 +1149,23 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getWorkEffortCosts")
-	public ResponseEntity<Object> getWorkEffortCosts(HttpSession session, @RequestParam(value="workEffortId") String workEffortId) {
+	public ResponseEntity<Map<String, Object>> getWorkEffortCosts(HttpSession session, @RequestParam(value="workEffortId") String workEffortId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -1176,19 +1178,19 @@ public class ManufacturingProductionRunServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

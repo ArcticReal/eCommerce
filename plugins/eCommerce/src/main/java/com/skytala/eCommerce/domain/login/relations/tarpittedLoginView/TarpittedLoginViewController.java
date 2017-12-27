@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.login.relations.tarpittedLoginView.query.Fin
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/login/tarpittedLoginViews")
 public class TarpittedLoginViewController {
@@ -52,7 +54,7 @@ public class TarpittedLoginViewController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findTarpittedLoginViewsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<TarpittedLoginView>> findTarpittedLoginViewsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTarpittedLoginViewsBy query = new FindTarpittedLoginViewsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class TarpittedLoginViewController {
 		}
 
 		List<TarpittedLoginView> tarpittedLoginViews =((TarpittedLoginViewFound) Scheduler.execute(query).data()).getTarpittedLoginViews();
-
-		if (tarpittedLoginViews.size() == 1) {
-			return ResponseEntity.ok().body(tarpittedLoginViews.get(0));
-		}
 
 		return ResponseEntity.ok().body(tarpittedLoginViews);
 
@@ -78,7 +76,7 @@ public class TarpittedLoginViewController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createTarpittedLoginView(HttpServletRequest request) throws Exception {
+	public ResponseEntity<TarpittedLoginView> createTarpittedLoginView(HttpServletRequest request) throws Exception {
 
 		TarpittedLoginView tarpittedLoginViewToBeAdded = new TarpittedLoginView();
 		try {
@@ -86,7 +84,7 @@ public class TarpittedLoginViewController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createTarpittedLoginView(tarpittedLoginViewToBeAdded);
@@ -101,63 +99,15 @@ public class TarpittedLoginViewController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createTarpittedLoginView(@RequestBody TarpittedLoginView tarpittedLoginViewToBeAdded) throws Exception {
+	public ResponseEntity<TarpittedLoginView> createTarpittedLoginView(@RequestBody TarpittedLoginView tarpittedLoginViewToBeAdded) throws Exception {
 
 		AddTarpittedLoginView command = new AddTarpittedLoginView(tarpittedLoginViewToBeAdded);
 		TarpittedLoginView tarpittedLoginView = ((TarpittedLoginViewAdded) Scheduler.execute(command).data()).getAddedTarpittedLoginView();
 		
 		if (tarpittedLoginView != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(tarpittedLoginView);
+			return successful(tarpittedLoginView);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("TarpittedLoginView could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateTarpittedLoginView(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		TarpittedLoginView tarpittedLoginViewToBeUpdated = new TarpittedLoginView();
-
-		try {
-			tarpittedLoginViewToBeUpdated = TarpittedLoginViewMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateTarpittedLoginView(tarpittedLoginViewToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class TarpittedLoginViewController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateTarpittedLoginView(@RequestBody TarpittedLoginView tarpittedLoginViewToBeUpdated,
+	public ResponseEntity<String> updateTarpittedLoginView(@RequestBody TarpittedLoginView tarpittedLoginViewToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		tarpittedLoginViewToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class TarpittedLoginViewController {
 
 		try {
 			if(((TarpittedLoginViewUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{tarpittedLoginViewId}")
-	public ResponseEntity<Object> findById(@PathVariable String tarpittedLoginViewId) throws Exception {
+	public ResponseEntity<TarpittedLoginView> findById(@PathVariable String tarpittedLoginViewId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("tarpittedLoginViewId", tarpittedLoginViewId);
 		try {
 
-			Object foundTarpittedLoginView = findTarpittedLoginViewsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundTarpittedLoginView);
+			List<TarpittedLoginView> foundTarpittedLoginView = findTarpittedLoginViewsBy(requestParams).getBody();
+			if(foundTarpittedLoginView.size()==1){				return successful(foundTarpittedLoginView.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{tarpittedLoginViewId}")
-	public ResponseEntity<Object> deleteTarpittedLoginViewByIdUpdated(@PathVariable String tarpittedLoginViewId) throws Exception {
+	public ResponseEntity<String> deleteTarpittedLoginViewByIdUpdated(@PathVariable String tarpittedLoginViewId) throws Exception {
 		DeleteTarpittedLoginView command = new DeleteTarpittedLoginView(tarpittedLoginViewId);
 
 		try {
 			if (((TarpittedLoginViewDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("TarpittedLoginView could not be deleted");
+		return conflict();
 
 	}
 

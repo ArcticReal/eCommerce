@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.zipSalesTaxLookup.query
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/zipSalesTaxLookups")
 public class ZipSalesTaxLookupController {
@@ -52,7 +54,7 @@ public class ZipSalesTaxLookupController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findZipSalesTaxLookupsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ZipSalesTaxLookup>> findZipSalesTaxLookupsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindZipSalesTaxLookupsBy query = new FindZipSalesTaxLookupsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ZipSalesTaxLookupController {
 		}
 
 		List<ZipSalesTaxLookup> zipSalesTaxLookups =((ZipSalesTaxLookupFound) Scheduler.execute(query).data()).getZipSalesTaxLookups();
-
-		if (zipSalesTaxLookups.size() == 1) {
-			return ResponseEntity.ok().body(zipSalesTaxLookups.get(0));
-		}
 
 		return ResponseEntity.ok().body(zipSalesTaxLookups);
 
@@ -78,7 +76,7 @@ public class ZipSalesTaxLookupController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createZipSalesTaxLookup(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ZipSalesTaxLookup> createZipSalesTaxLookup(HttpServletRequest request) throws Exception {
 
 		ZipSalesTaxLookup zipSalesTaxLookupToBeAdded = new ZipSalesTaxLookup();
 		try {
@@ -86,7 +84,7 @@ public class ZipSalesTaxLookupController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createZipSalesTaxLookup(zipSalesTaxLookupToBeAdded);
@@ -101,63 +99,15 @@ public class ZipSalesTaxLookupController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createZipSalesTaxLookup(@RequestBody ZipSalesTaxLookup zipSalesTaxLookupToBeAdded) throws Exception {
+	public ResponseEntity<ZipSalesTaxLookup> createZipSalesTaxLookup(@RequestBody ZipSalesTaxLookup zipSalesTaxLookupToBeAdded) throws Exception {
 
 		AddZipSalesTaxLookup command = new AddZipSalesTaxLookup(zipSalesTaxLookupToBeAdded);
 		ZipSalesTaxLookup zipSalesTaxLookup = ((ZipSalesTaxLookupAdded) Scheduler.execute(command).data()).getAddedZipSalesTaxLookup();
 		
 		if (zipSalesTaxLookup != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(zipSalesTaxLookup);
+			return successful(zipSalesTaxLookup);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ZipSalesTaxLookup could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateZipSalesTaxLookup(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ZipSalesTaxLookup zipSalesTaxLookupToBeUpdated = new ZipSalesTaxLookup();
-
-		try {
-			zipSalesTaxLookupToBeUpdated = ZipSalesTaxLookupMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateZipSalesTaxLookup(zipSalesTaxLookupToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ZipSalesTaxLookupController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateZipSalesTaxLookup(@RequestBody ZipSalesTaxLookup zipSalesTaxLookupToBeUpdated,
+	public ResponseEntity<String> updateZipSalesTaxLookup(@RequestBody ZipSalesTaxLookup zipSalesTaxLookupToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		zipSalesTaxLookupToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ZipSalesTaxLookupController {
 
 		try {
 			if(((ZipSalesTaxLookupUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{zipSalesTaxLookupId}")
-	public ResponseEntity<Object> findById(@PathVariable String zipSalesTaxLookupId) throws Exception {
+	public ResponseEntity<ZipSalesTaxLookup> findById(@PathVariable String zipSalesTaxLookupId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("zipSalesTaxLookupId", zipSalesTaxLookupId);
 		try {
 
-			Object foundZipSalesTaxLookup = findZipSalesTaxLookupsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundZipSalesTaxLookup);
+			List<ZipSalesTaxLookup> foundZipSalesTaxLookup = findZipSalesTaxLookupsBy(requestParams).getBody();
+			if(foundZipSalesTaxLookup.size()==1){				return successful(foundZipSalesTaxLookup.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{zipSalesTaxLookupId}")
-	public ResponseEntity<Object> deleteZipSalesTaxLookupByIdUpdated(@PathVariable String zipSalesTaxLookupId) throws Exception {
+	public ResponseEntity<String> deleteZipSalesTaxLookupByIdUpdated(@PathVariable String zipSalesTaxLookupId) throws Exception {
 		DeleteZipSalesTaxLookup command = new DeleteZipSalesTaxLookup(zipSalesTaxLookupId);
 
 		try {
 			if (((ZipSalesTaxLookupDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ZipSalesTaxLookup could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.mimeType.query.htmlTemplat
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/mimeType/mimeTypeHtmlTemplates")
 public class MimeTypeHtmlTemplateController {
@@ -52,7 +54,7 @@ public class MimeTypeHtmlTemplateController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findMimeTypeHtmlTemplatesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<MimeTypeHtmlTemplate>> findMimeTypeHtmlTemplatesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindMimeTypeHtmlTemplatesBy query = new FindMimeTypeHtmlTemplatesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class MimeTypeHtmlTemplateController {
 		}
 
 		List<MimeTypeHtmlTemplate> mimeTypeHtmlTemplates =((MimeTypeHtmlTemplateFound) Scheduler.execute(query).data()).getMimeTypeHtmlTemplates();
-
-		if (mimeTypeHtmlTemplates.size() == 1) {
-			return ResponseEntity.ok().body(mimeTypeHtmlTemplates.get(0));
-		}
 
 		return ResponseEntity.ok().body(mimeTypeHtmlTemplates);
 
@@ -78,7 +76,7 @@ public class MimeTypeHtmlTemplateController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createMimeTypeHtmlTemplate(HttpServletRequest request) throws Exception {
+	public ResponseEntity<MimeTypeHtmlTemplate> createMimeTypeHtmlTemplate(HttpServletRequest request) throws Exception {
 
 		MimeTypeHtmlTemplate mimeTypeHtmlTemplateToBeAdded = new MimeTypeHtmlTemplate();
 		try {
@@ -86,7 +84,7 @@ public class MimeTypeHtmlTemplateController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createMimeTypeHtmlTemplate(mimeTypeHtmlTemplateToBeAdded);
@@ -101,63 +99,15 @@ public class MimeTypeHtmlTemplateController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createMimeTypeHtmlTemplate(@RequestBody MimeTypeHtmlTemplate mimeTypeHtmlTemplateToBeAdded) throws Exception {
+	public ResponseEntity<MimeTypeHtmlTemplate> createMimeTypeHtmlTemplate(@RequestBody MimeTypeHtmlTemplate mimeTypeHtmlTemplateToBeAdded) throws Exception {
 
 		AddMimeTypeHtmlTemplate command = new AddMimeTypeHtmlTemplate(mimeTypeHtmlTemplateToBeAdded);
 		MimeTypeHtmlTemplate mimeTypeHtmlTemplate = ((MimeTypeHtmlTemplateAdded) Scheduler.execute(command).data()).getAddedMimeTypeHtmlTemplate();
 		
 		if (mimeTypeHtmlTemplate != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(mimeTypeHtmlTemplate);
+			return successful(mimeTypeHtmlTemplate);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("MimeTypeHtmlTemplate could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateMimeTypeHtmlTemplate(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		MimeTypeHtmlTemplate mimeTypeHtmlTemplateToBeUpdated = new MimeTypeHtmlTemplate();
-
-		try {
-			mimeTypeHtmlTemplateToBeUpdated = MimeTypeHtmlTemplateMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateMimeTypeHtmlTemplate(mimeTypeHtmlTemplateToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class MimeTypeHtmlTemplateController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateMimeTypeHtmlTemplate(@RequestBody MimeTypeHtmlTemplate mimeTypeHtmlTemplateToBeUpdated,
+	public ResponseEntity<String> updateMimeTypeHtmlTemplate(@RequestBody MimeTypeHtmlTemplate mimeTypeHtmlTemplateToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		mimeTypeHtmlTemplateToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class MimeTypeHtmlTemplateController {
 
 		try {
 			if(((MimeTypeHtmlTemplateUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{mimeTypeHtmlTemplateId}")
-	public ResponseEntity<Object> findById(@PathVariable String mimeTypeHtmlTemplateId) throws Exception {
+	public ResponseEntity<MimeTypeHtmlTemplate> findById(@PathVariable String mimeTypeHtmlTemplateId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("mimeTypeHtmlTemplateId", mimeTypeHtmlTemplateId);
 		try {
 
-			Object foundMimeTypeHtmlTemplate = findMimeTypeHtmlTemplatesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundMimeTypeHtmlTemplate);
+			List<MimeTypeHtmlTemplate> foundMimeTypeHtmlTemplate = findMimeTypeHtmlTemplatesBy(requestParams).getBody();
+			if(foundMimeTypeHtmlTemplate.size()==1){				return successful(foundMimeTypeHtmlTemplate.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{mimeTypeHtmlTemplateId}")
-	public ResponseEntity<Object> deleteMimeTypeHtmlTemplateByIdUpdated(@PathVariable String mimeTypeHtmlTemplateId) throws Exception {
+	public ResponseEntity<String> deleteMimeTypeHtmlTemplateByIdUpdated(@PathVariable String mimeTypeHtmlTemplateId) throws Exception {
 		DeleteMimeTypeHtmlTemplate command = new DeleteMimeTypeHtmlTemplate(mimeTypeHtmlTemplateId);
 
 		try {
 			if (((MimeTypeHtmlTemplateDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("MimeTypeHtmlTemplate could not be deleted");
+		return conflict();
 
 	}
 

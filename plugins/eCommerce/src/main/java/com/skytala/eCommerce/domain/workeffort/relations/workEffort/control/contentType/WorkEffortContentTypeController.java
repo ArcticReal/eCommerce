@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.workeffort.relations.workEffort.query.conten
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/workeffort/workEffort/workEffortContentTypes")
 public class WorkEffortContentTypeController {
@@ -52,7 +54,7 @@ public class WorkEffortContentTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWorkEffortContentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WorkEffortContentType>> findWorkEffortContentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWorkEffortContentTypesBy query = new FindWorkEffortContentTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WorkEffortContentTypeController {
 		}
 
 		List<WorkEffortContentType> workEffortContentTypes =((WorkEffortContentTypeFound) Scheduler.execute(query).data()).getWorkEffortContentTypes();
-
-		if (workEffortContentTypes.size() == 1) {
-			return ResponseEntity.ok().body(workEffortContentTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(workEffortContentTypes);
 
@@ -78,7 +76,7 @@ public class WorkEffortContentTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWorkEffortContentType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WorkEffortContentType> createWorkEffortContentType(HttpServletRequest request) throws Exception {
 
 		WorkEffortContentType workEffortContentTypeToBeAdded = new WorkEffortContentType();
 		try {
@@ -86,7 +84,7 @@ public class WorkEffortContentTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWorkEffortContentType(workEffortContentTypeToBeAdded);
@@ -101,63 +99,15 @@ public class WorkEffortContentTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWorkEffortContentType(@RequestBody WorkEffortContentType workEffortContentTypeToBeAdded) throws Exception {
+	public ResponseEntity<WorkEffortContentType> createWorkEffortContentType(@RequestBody WorkEffortContentType workEffortContentTypeToBeAdded) throws Exception {
 
 		AddWorkEffortContentType command = new AddWorkEffortContentType(workEffortContentTypeToBeAdded);
 		WorkEffortContentType workEffortContentType = ((WorkEffortContentTypeAdded) Scheduler.execute(command).data()).getAddedWorkEffortContentType();
 		
 		if (workEffortContentType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(workEffortContentType);
+			return successful(workEffortContentType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WorkEffortContentType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWorkEffortContentType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WorkEffortContentType workEffortContentTypeToBeUpdated = new WorkEffortContentType();
-
-		try {
-			workEffortContentTypeToBeUpdated = WorkEffortContentTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWorkEffortContentType(workEffortContentTypeToBeUpdated, workEffortContentTypeToBeUpdated.getWorkEffortContentTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WorkEffortContentTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{workEffortContentTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWorkEffortContentType(@RequestBody WorkEffortContentType workEffortContentTypeToBeUpdated,
+	public ResponseEntity<String> updateWorkEffortContentType(@RequestBody WorkEffortContentType workEffortContentTypeToBeUpdated,
 			@PathVariable String workEffortContentTypeId) throws Exception {
 
 		workEffortContentTypeToBeUpdated.setWorkEffortContentTypeId(workEffortContentTypeId);
@@ -178,41 +128,44 @@ public class WorkEffortContentTypeController {
 
 		try {
 			if(((WorkEffortContentTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{workEffortContentTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String workEffortContentTypeId) throws Exception {
+	public ResponseEntity<WorkEffortContentType> findById(@PathVariable String workEffortContentTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("workEffortContentTypeId", workEffortContentTypeId);
 		try {
 
-			Object foundWorkEffortContentType = findWorkEffortContentTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWorkEffortContentType);
+			List<WorkEffortContentType> foundWorkEffortContentType = findWorkEffortContentTypesBy(requestParams).getBody();
+			if(foundWorkEffortContentType.size()==1){				return successful(foundWorkEffortContentType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{workEffortContentTypeId}")
-	public ResponseEntity<Object> deleteWorkEffortContentTypeByIdUpdated(@PathVariable String workEffortContentTypeId) throws Exception {
+	public ResponseEntity<String> deleteWorkEffortContentTypeByIdUpdated(@PathVariable String workEffortContentTypeId) throws Exception {
 		DeleteWorkEffortContentType command = new DeleteWorkEffortContentType(workEffortContentTypeId);
 
 		try {
 			if (((WorkEffortContentTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WorkEffortContentType could not be deleted");
+		return conflict();
 
 	}
 

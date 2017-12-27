@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.payment.query.gatewayAu
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/payment/paymentGatewayAuthorizeNets")
 public class PaymentGatewayAuthorizeNetController {
@@ -52,7 +54,7 @@ public class PaymentGatewayAuthorizeNetController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPaymentGatewayAuthorizeNetsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PaymentGatewayAuthorizeNet>> findPaymentGatewayAuthorizeNetsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentGatewayAuthorizeNetsBy query = new FindPaymentGatewayAuthorizeNetsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PaymentGatewayAuthorizeNetController {
 		}
 
 		List<PaymentGatewayAuthorizeNet> paymentGatewayAuthorizeNets =((PaymentGatewayAuthorizeNetFound) Scheduler.execute(query).data()).getPaymentGatewayAuthorizeNets();
-
-		if (paymentGatewayAuthorizeNets.size() == 1) {
-			return ResponseEntity.ok().body(paymentGatewayAuthorizeNets.get(0));
-		}
 
 		return ResponseEntity.ok().body(paymentGatewayAuthorizeNets);
 
@@ -78,7 +76,7 @@ public class PaymentGatewayAuthorizeNetController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPaymentGatewayAuthorizeNet(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PaymentGatewayAuthorizeNet> createPaymentGatewayAuthorizeNet(HttpServletRequest request) throws Exception {
 
 		PaymentGatewayAuthorizeNet paymentGatewayAuthorizeNetToBeAdded = new PaymentGatewayAuthorizeNet();
 		try {
@@ -86,7 +84,7 @@ public class PaymentGatewayAuthorizeNetController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPaymentGatewayAuthorizeNet(paymentGatewayAuthorizeNetToBeAdded);
@@ -101,63 +99,15 @@ public class PaymentGatewayAuthorizeNetController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPaymentGatewayAuthorizeNet(@RequestBody PaymentGatewayAuthorizeNet paymentGatewayAuthorizeNetToBeAdded) throws Exception {
+	public ResponseEntity<PaymentGatewayAuthorizeNet> createPaymentGatewayAuthorizeNet(@RequestBody PaymentGatewayAuthorizeNet paymentGatewayAuthorizeNetToBeAdded) throws Exception {
 
 		AddPaymentGatewayAuthorizeNet command = new AddPaymentGatewayAuthorizeNet(paymentGatewayAuthorizeNetToBeAdded);
 		PaymentGatewayAuthorizeNet paymentGatewayAuthorizeNet = ((PaymentGatewayAuthorizeNetAdded) Scheduler.execute(command).data()).getAddedPaymentGatewayAuthorizeNet();
 		
 		if (paymentGatewayAuthorizeNet != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(paymentGatewayAuthorizeNet);
+			return successful(paymentGatewayAuthorizeNet);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PaymentGatewayAuthorizeNet could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePaymentGatewayAuthorizeNet(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PaymentGatewayAuthorizeNet paymentGatewayAuthorizeNetToBeUpdated = new PaymentGatewayAuthorizeNet();
-
-		try {
-			paymentGatewayAuthorizeNetToBeUpdated = PaymentGatewayAuthorizeNetMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePaymentGatewayAuthorizeNet(paymentGatewayAuthorizeNetToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PaymentGatewayAuthorizeNetController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePaymentGatewayAuthorizeNet(@RequestBody PaymentGatewayAuthorizeNet paymentGatewayAuthorizeNetToBeUpdated,
+	public ResponseEntity<String> updatePaymentGatewayAuthorizeNet(@RequestBody PaymentGatewayAuthorizeNet paymentGatewayAuthorizeNetToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		paymentGatewayAuthorizeNetToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class PaymentGatewayAuthorizeNetController {
 
 		try {
 			if(((PaymentGatewayAuthorizeNetUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{paymentGatewayAuthorizeNetId}")
-	public ResponseEntity<Object> findById(@PathVariable String paymentGatewayAuthorizeNetId) throws Exception {
+	public ResponseEntity<PaymentGatewayAuthorizeNet> findById(@PathVariable String paymentGatewayAuthorizeNetId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentGatewayAuthorizeNetId", paymentGatewayAuthorizeNetId);
 		try {
 
-			Object foundPaymentGatewayAuthorizeNet = findPaymentGatewayAuthorizeNetsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPaymentGatewayAuthorizeNet);
+			List<PaymentGatewayAuthorizeNet> foundPaymentGatewayAuthorizeNet = findPaymentGatewayAuthorizeNetsBy(requestParams).getBody();
+			if(foundPaymentGatewayAuthorizeNet.size()==1){				return successful(foundPaymentGatewayAuthorizeNet.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{paymentGatewayAuthorizeNetId}")
-	public ResponseEntity<Object> deletePaymentGatewayAuthorizeNetByIdUpdated(@PathVariable String paymentGatewayAuthorizeNetId) throws Exception {
+	public ResponseEntity<String> deletePaymentGatewayAuthorizeNetByIdUpdated(@PathVariable String paymentGatewayAuthorizeNetId) throws Exception {
 		DeletePaymentGatewayAuthorizeNet command = new DeletePaymentGatewayAuthorizeNet(paymentGatewayAuthorizeNetId);
 
 		try {
 			if (((PaymentGatewayAuthorizeNetDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PaymentGatewayAuthorizeNet could not be deleted");
+		return conflict();
 
 	}
 

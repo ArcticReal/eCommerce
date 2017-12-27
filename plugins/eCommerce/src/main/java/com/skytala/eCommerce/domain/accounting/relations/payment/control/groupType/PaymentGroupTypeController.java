@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.payment.query.groupType
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/payment/paymentGroupTypes")
 public class PaymentGroupTypeController {
@@ -52,7 +54,7 @@ public class PaymentGroupTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPaymentGroupTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PaymentGroupType>> findPaymentGroupTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentGroupTypesBy query = new FindPaymentGroupTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PaymentGroupTypeController {
 		}
 
 		List<PaymentGroupType> paymentGroupTypes =((PaymentGroupTypeFound) Scheduler.execute(query).data()).getPaymentGroupTypes();
-
-		if (paymentGroupTypes.size() == 1) {
-			return ResponseEntity.ok().body(paymentGroupTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(paymentGroupTypes);
 
@@ -78,7 +76,7 @@ public class PaymentGroupTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPaymentGroupType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PaymentGroupType> createPaymentGroupType(HttpServletRequest request) throws Exception {
 
 		PaymentGroupType paymentGroupTypeToBeAdded = new PaymentGroupType();
 		try {
@@ -86,7 +84,7 @@ public class PaymentGroupTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPaymentGroupType(paymentGroupTypeToBeAdded);
@@ -101,63 +99,15 @@ public class PaymentGroupTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPaymentGroupType(@RequestBody PaymentGroupType paymentGroupTypeToBeAdded) throws Exception {
+	public ResponseEntity<PaymentGroupType> createPaymentGroupType(@RequestBody PaymentGroupType paymentGroupTypeToBeAdded) throws Exception {
 
 		AddPaymentGroupType command = new AddPaymentGroupType(paymentGroupTypeToBeAdded);
 		PaymentGroupType paymentGroupType = ((PaymentGroupTypeAdded) Scheduler.execute(command).data()).getAddedPaymentGroupType();
 		
 		if (paymentGroupType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(paymentGroupType);
+			return successful(paymentGroupType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PaymentGroupType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePaymentGroupType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PaymentGroupType paymentGroupTypeToBeUpdated = new PaymentGroupType();
-
-		try {
-			paymentGroupTypeToBeUpdated = PaymentGroupTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePaymentGroupType(paymentGroupTypeToBeUpdated, paymentGroupTypeToBeUpdated.getPaymentGroupTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PaymentGroupTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{paymentGroupTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePaymentGroupType(@RequestBody PaymentGroupType paymentGroupTypeToBeUpdated,
+	public ResponseEntity<String> updatePaymentGroupType(@RequestBody PaymentGroupType paymentGroupTypeToBeUpdated,
 			@PathVariable String paymentGroupTypeId) throws Exception {
 
 		paymentGroupTypeToBeUpdated.setPaymentGroupTypeId(paymentGroupTypeId);
@@ -178,41 +128,44 @@ public class PaymentGroupTypeController {
 
 		try {
 			if(((PaymentGroupTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{paymentGroupTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String paymentGroupTypeId) throws Exception {
+	public ResponseEntity<PaymentGroupType> findById(@PathVariable String paymentGroupTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentGroupTypeId", paymentGroupTypeId);
 		try {
 
-			Object foundPaymentGroupType = findPaymentGroupTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPaymentGroupType);
+			List<PaymentGroupType> foundPaymentGroupType = findPaymentGroupTypesBy(requestParams).getBody();
+			if(foundPaymentGroupType.size()==1){				return successful(foundPaymentGroupType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{paymentGroupTypeId}")
-	public ResponseEntity<Object> deletePaymentGroupTypeByIdUpdated(@PathVariable String paymentGroupTypeId) throws Exception {
+	public ResponseEntity<String> deletePaymentGroupTypeByIdUpdated(@PathVariable String paymentGroupTypeId) throws Exception {
 		DeletePaymentGroupType command = new DeletePaymentGroupType(paymentGroupTypeId);
 
 		try {
 			if (((PaymentGroupTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PaymentGroupType could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.party.query.note.FindPartyNo
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/party/partyNotes")
 public class PartyNoteController {
@@ -52,7 +54,7 @@ public class PartyNoteController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPartyNotesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PartyNote>> findPartyNotesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyNotesBy query = new FindPartyNotesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PartyNoteController {
 		}
 
 		List<PartyNote> partyNotes =((PartyNoteFound) Scheduler.execute(query).data()).getPartyNotes();
-
-		if (partyNotes.size() == 1) {
-			return ResponseEntity.ok().body(partyNotes.get(0));
-		}
 
 		return ResponseEntity.ok().body(partyNotes);
 
@@ -78,7 +76,7 @@ public class PartyNoteController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPartyNote(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PartyNote> createPartyNote(HttpServletRequest request) throws Exception {
 
 		PartyNote partyNoteToBeAdded = new PartyNote();
 		try {
@@ -86,7 +84,7 @@ public class PartyNoteController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPartyNote(partyNoteToBeAdded);
@@ -101,63 +99,15 @@ public class PartyNoteController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPartyNote(@RequestBody PartyNote partyNoteToBeAdded) throws Exception {
+	public ResponseEntity<PartyNote> createPartyNote(@RequestBody PartyNote partyNoteToBeAdded) throws Exception {
 
 		AddPartyNote command = new AddPartyNote(partyNoteToBeAdded);
 		PartyNote partyNote = ((PartyNoteAdded) Scheduler.execute(command).data()).getAddedPartyNote();
 		
 		if (partyNote != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(partyNote);
+			return successful(partyNote);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PartyNote could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePartyNote(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PartyNote partyNoteToBeUpdated = new PartyNote();
-
-		try {
-			partyNoteToBeUpdated = PartyNoteMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePartyNote(partyNoteToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PartyNoteController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePartyNote(@RequestBody PartyNote partyNoteToBeUpdated,
+	public ResponseEntity<String> updatePartyNote(@RequestBody PartyNote partyNoteToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		partyNoteToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class PartyNoteController {
 
 		try {
 			if(((PartyNoteUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{partyNoteId}")
-	public ResponseEntity<Object> findById(@PathVariable String partyNoteId) throws Exception {
+	public ResponseEntity<PartyNote> findById(@PathVariable String partyNoteId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyNoteId", partyNoteId);
 		try {
 
-			Object foundPartyNote = findPartyNotesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPartyNote);
+			List<PartyNote> foundPartyNote = findPartyNotesBy(requestParams).getBody();
+			if(foundPartyNote.size()==1){				return successful(foundPartyNote.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{partyNoteId}")
-	public ResponseEntity<Object> deletePartyNoteByIdUpdated(@PathVariable String partyNoteId) throws Exception {
+	public ResponseEntity<String> deletePartyNoteByIdUpdated(@PathVariable String partyNoteId) throws Exception {
 		DeletePartyNote command = new DeletePartyNote(partyNoteId);
 
 		try {
 			if (((PartyNoteDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PartyNote could not be deleted");
+		return conflict();
 
 	}
 

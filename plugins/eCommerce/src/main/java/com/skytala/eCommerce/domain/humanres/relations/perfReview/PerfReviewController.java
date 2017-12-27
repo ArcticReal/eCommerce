@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.humanres.relations.perfReview.query.FindPerf
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/humanres/perfReviews")
 public class PerfReviewController {
@@ -52,7 +54,7 @@ public class PerfReviewController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPerfReviewsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PerfReview>> findPerfReviewsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPerfReviewsBy query = new FindPerfReviewsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PerfReviewController {
 		}
 
 		List<PerfReview> perfReviews =((PerfReviewFound) Scheduler.execute(query).data()).getPerfReviews();
-
-		if (perfReviews.size() == 1) {
-			return ResponseEntity.ok().body(perfReviews.get(0));
-		}
 
 		return ResponseEntity.ok().body(perfReviews);
 
@@ -78,7 +76,7 @@ public class PerfReviewController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPerfReview(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PerfReview> createPerfReview(HttpServletRequest request) throws Exception {
 
 		PerfReview perfReviewToBeAdded = new PerfReview();
 		try {
@@ -86,7 +84,7 @@ public class PerfReviewController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPerfReview(perfReviewToBeAdded);
@@ -101,63 +99,15 @@ public class PerfReviewController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPerfReview(@RequestBody PerfReview perfReviewToBeAdded) throws Exception {
+	public ResponseEntity<PerfReview> createPerfReview(@RequestBody PerfReview perfReviewToBeAdded) throws Exception {
 
 		AddPerfReview command = new AddPerfReview(perfReviewToBeAdded);
 		PerfReview perfReview = ((PerfReviewAdded) Scheduler.execute(command).data()).getAddedPerfReview();
 		
 		if (perfReview != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(perfReview);
+			return successful(perfReview);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PerfReview could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePerfReview(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PerfReview perfReviewToBeUpdated = new PerfReview();
-
-		try {
-			perfReviewToBeUpdated = PerfReviewMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePerfReview(perfReviewToBeUpdated, perfReviewToBeUpdated.getPerfReviewId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PerfReviewController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{perfReviewId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePerfReview(@RequestBody PerfReview perfReviewToBeUpdated,
+	public ResponseEntity<String> updatePerfReview(@RequestBody PerfReview perfReviewToBeUpdated,
 			@PathVariable String perfReviewId) throws Exception {
 
 		perfReviewToBeUpdated.setPerfReviewId(perfReviewId);
@@ -178,41 +128,44 @@ public class PerfReviewController {
 
 		try {
 			if(((PerfReviewUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{perfReviewId}")
-	public ResponseEntity<Object> findById(@PathVariable String perfReviewId) throws Exception {
+	public ResponseEntity<PerfReview> findById(@PathVariable String perfReviewId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("perfReviewId", perfReviewId);
 		try {
 
-			Object foundPerfReview = findPerfReviewsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPerfReview);
+			List<PerfReview> foundPerfReview = findPerfReviewsBy(requestParams).getBody();
+			if(foundPerfReview.size()==1){				return successful(foundPerfReview.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{perfReviewId}")
-	public ResponseEntity<Object> deletePerfReviewByIdUpdated(@PathVariable String perfReviewId) throws Exception {
+	public ResponseEntity<String> deletePerfReviewByIdUpdated(@PathVariable String perfReviewId) throws Exception {
 		DeletePerfReview command = new DeletePerfReview(perfReviewId);
 
 		try {
 			if (((PerfReviewDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PerfReview could not be deleted");
+		return conflict();
 
 	}
 

@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/productFeature")
 public class ProductFeatureServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeProductFeatureCatGrpAppl")
-	public ResponseEntity<Object> removeProductFeatureCatGrpAppl(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="productFeatureGroupId") String productFeatureGroupId) {
+	public ResponseEntity<Map<String, Object>> removeProductFeatureCatGrpAppl(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="productFeatureGroupId") String productFeatureGroupId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -41,23 +43,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductFeatureCategory")
-	public ResponseEntity<Object> updateProductFeatureCategory(HttpSession session, @RequestParam(value="productFeatureCategoryId") String productFeatureCategoryId, @RequestParam(value="description") String description, @RequestParam(value="parentCategoryId", required=false) String parentCategoryId) {
+	public ResponseEntity<Map<String, Object>> updateProductFeatureCategory(HttpSession session, @RequestParam(value="productFeatureCategoryId") String productFeatureCategoryId, @RequestParam(value="description") String description, @RequestParam(value="parentCategoryId", required=false) String parentCategoryId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productFeatureCategoryId",productFeatureCategoryId);
@@ -72,23 +74,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductFeature")
-	public ResponseEntity<Object> updateProductFeature(HttpSession session, @RequestParam(value="productFeatureTypeId") String productFeatureTypeId, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="description") String description, @RequestParam(value="defaultSequenceNum", required=false) Long defaultSequenceNum, @RequestParam(value="defaultAmount", required=false) BigDecimal defaultAmount, @RequestParam(value="idCode", required=false) String idCode, @RequestParam(value="numberSpecified", required=false) BigDecimal numberSpecified, @RequestParam(value="productFeatureCategoryId", required=false) String productFeatureCategoryId, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="abbrev", required=false) String abbrev) {
+	public ResponseEntity<Map<String, Object>> updateProductFeature(HttpSession session, @RequestParam(value="productFeatureTypeId") String productFeatureTypeId, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="description") String description, @RequestParam(value="defaultSequenceNum", required=false) Long defaultSequenceNum, @RequestParam(value="defaultAmount", required=false) BigDecimal defaultAmount, @RequestParam(value="idCode", required=false) String idCode, @RequestParam(value="numberSpecified", required=false) BigDecimal numberSpecified, @RequestParam(value="productFeatureCategoryId", required=false) String productFeatureCategoryId, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="abbrev", required=false) String abbrev) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productFeatureTypeId",productFeatureTypeId);
@@ -110,23 +112,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductFeatureIactn")
-	public ResponseEntity<Object> createProductFeatureIactn(HttpSession session, @RequestParam(value="productFeatureIactnTypeId") String productFeatureIactnTypeId, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="productFeatureIdTo") String productFeatureIdTo, @RequestParam(value="productId", required=false) String productId) {
+	public ResponseEntity<Map<String, Object>> createProductFeatureIactn(HttpSession session, @RequestParam(value="productFeatureIactnTypeId") String productFeatureIactnTypeId, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="productFeatureIdTo") String productFeatureIdTo, @RequestParam(value="productId", required=false) String productId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productFeatureIactnTypeId",productFeatureIactnTypeId);
@@ -142,23 +144,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeProductFeatureType")
-	public ResponseEntity<Object> removeProductFeatureType(HttpSession session, @RequestParam(value="productFeatureTypeId") String productFeatureTypeId) {
+	public ResponseEntity<Map<String, Object>> removeProductFeatureType(HttpSession session, @RequestParam(value="productFeatureTypeId") String productFeatureTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productFeatureTypeId",productFeatureTypeId);
@@ -171,23 +173,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateFeaturePrice")
-	public ResponseEntity<Object> updateFeaturePrice(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="currencyUomId") String currencyUomId, @RequestParam(value="price") BigDecimal price, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="productPriceTypeId") String productPriceTypeId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateFeaturePrice(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="currencyUomId") String currencyUomId, @RequestParam(value="price") BigDecimal price, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="productPriceTypeId") String productPriceTypeId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -205,23 +207,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductFeatureApplType")
-	public ResponseEntity<Object> deleteProductFeatureApplType(HttpSession session, @RequestParam(value="productFeatureApplTypeId") String productFeatureApplTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteProductFeatureApplType(HttpSession session, @RequestParam(value="productFeatureApplTypeId") String productFeatureApplTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productFeatureApplTypeId",productFeatureApplTypeId);
@@ -234,23 +236,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductFeatureGroup")
-	public ResponseEntity<Object> createProductFeatureGroup(HttpSession session, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createProductFeatureGroup(HttpSession session, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("description",description);
@@ -263,23 +265,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductFeatureGroupAppl")
-	public ResponseEntity<Object> updateProductFeatureGroupAppl(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="productFeatureGroupId") String productFeatureGroupId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateProductFeatureGroupAppl(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="productFeatureGroupId") String productFeatureGroupId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -296,23 +298,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductFeatureApplAttr")
-	public ResponseEntity<Object> updateProductFeatureApplAttr(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrValue", required=false) Long attrValue) {
+	public ResponseEntity<Map<String, Object>> updateProductFeatureApplAttr(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrValue", required=false) Long attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -329,23 +331,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductFeatureCategory")
-	public ResponseEntity<Object> createProductFeatureCategory(HttpSession session, @RequestParam(value="description") String description, @RequestParam(value="parentCategoryId", required=false) String parentCategoryId) {
+	public ResponseEntity<Map<String, Object>> createProductFeatureCategory(HttpSession session, @RequestParam(value="description") String description, @RequestParam(value="parentCategoryId", required=false) String parentCategoryId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("description",description);
@@ -359,23 +361,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductFeatureType")
-	public ResponseEntity<Object> updateProductFeatureType(HttpSession session, @RequestParam(value="productFeatureTypeId") String productFeatureTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateProductFeatureType(HttpSession session, @RequestParam(value="productFeatureTypeId") String productFeatureTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productFeatureTypeId",productFeatureTypeId);
@@ -391,23 +393,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeProductFeatureApplAttr")
-	public ResponseEntity<Object> removeProductFeatureApplAttr(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="attrName") String attrName) {
+	public ResponseEntity<Map<String, Object>> removeProductFeatureApplAttr(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="attrName") String attrName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -423,23 +425,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductFeature")
-	public ResponseEntity<Object> createProductFeature(HttpSession session, @RequestParam(value="productFeatureTypeId") String productFeatureTypeId, @RequestParam(value="description") String description, @RequestParam(value="defaultSequenceNum", required=false) Long defaultSequenceNum, @RequestParam(value="defaultAmount", required=false) BigDecimal defaultAmount, @RequestParam(value="idCode", required=false) String idCode, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="numberSpecified", required=false) BigDecimal numberSpecified, @RequestParam(value="productFeatureCategoryId", required=false) String productFeatureCategoryId, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="abbrev", required=false) String abbrev) {
+	public ResponseEntity<Map<String, Object>> createProductFeature(HttpSession session, @RequestParam(value="productFeatureTypeId") String productFeatureTypeId, @RequestParam(value="description") String description, @RequestParam(value="defaultSequenceNum", required=false) Long defaultSequenceNum, @RequestParam(value="defaultAmount", required=false) BigDecimal defaultAmount, @RequestParam(value="idCode", required=false) String idCode, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="numberSpecified", required=false) BigDecimal numberSpecified, @RequestParam(value="productFeatureCategoryId", required=false) String productFeatureCategoryId, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="abbrev", required=false) String abbrev) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productFeatureTypeId",productFeatureTypeId);
@@ -461,23 +463,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductFeatureApplType")
-	public ResponseEntity<Object> createProductFeatureApplType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="productFeatureApplTypeId", required=false) String productFeatureApplTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createProductFeatureApplType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="productFeatureApplTypeId", required=false) String productFeatureApplTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("parentTypeId",parentTypeId);
@@ -493,23 +495,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductFeatureApplType")
-	public ResponseEntity<Object> updateProductFeatureApplType(HttpSession session, @RequestParam(value="productFeatureApplTypeId") String productFeatureApplTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateProductFeatureApplType(HttpSession session, @RequestParam(value="productFeatureApplTypeId") String productFeatureApplTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productFeatureApplTypeId",productFeatureApplTypeId);
@@ -525,23 +527,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductFeatureType")
-	public ResponseEntity<Object> createProductFeatureType(HttpSession session, @RequestParam(value="productFeatureTypeId", required=false) String productFeatureTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createProductFeatureType(HttpSession session, @RequestParam(value="productFeatureTypeId", required=false) String productFeatureTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productFeatureTypeId",productFeatureTypeId);
@@ -557,23 +559,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteFeaturePrice")
-	public ResponseEntity<Object> deleteFeaturePrice(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="currencyUomId") String currencyUomId, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="productPriceTypeId") String productPriceTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteFeaturePrice(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="currencyUomId") String currencyUomId, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="productPriceTypeId") String productPriceTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -589,23 +591,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductFeatureGroup")
-	public ResponseEntity<Object> updateProductFeatureGroup(HttpSession session, @RequestParam(value="productFeatureGroupId") String productFeatureGroupId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateProductFeatureGroup(HttpSession session, @RequestParam(value="productFeatureGroupId") String productFeatureGroupId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productFeatureGroupId",productFeatureGroupId);
@@ -619,23 +621,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeProductFeatureIactn")
-	public ResponseEntity<Object> removeProductFeatureIactn(HttpSession session, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="productFeatureIdTo") String productFeatureIdTo) {
+	public ResponseEntity<Map<String, Object>> removeProductFeatureIactn(HttpSession session, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="productFeatureIdTo") String productFeatureIdTo) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productFeatureId",productFeatureId);
@@ -649,23 +651,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductFeatureGroupAppl")
-	public ResponseEntity<Object> createProductFeatureGroupAppl(HttpSession session, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="productFeatureGroupId") String productFeatureGroupId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createProductFeatureGroupAppl(HttpSession session, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="productFeatureGroupId") String productFeatureGroupId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productFeatureId",productFeatureId);
@@ -682,23 +684,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductFeatureIactnType")
-	public ResponseEntity<Object> createProductFeatureIactnType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="productFeatureIactnTypeId", required=false) String productFeatureIactnTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createProductFeatureIactnType(HttpSession session, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="productFeatureIactnTypeId", required=false) String productFeatureIactnTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("parentTypeId",parentTypeId);
@@ -714,23 +716,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/applyFeatureToProduct")
-	public ResponseEntity<Object> applyFeatureToProduct(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="productFeatureApplTypeId") String productFeatureApplTypeId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="recurringAmount", required=false) BigDecimal recurringAmount, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> applyFeatureToProduct(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="productFeatureApplTypeId") String productFeatureApplTypeId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="recurringAmount", required=false) BigDecimal recurringAmount, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -750,23 +752,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductFeatureCategoryAppl")
-	public ResponseEntity<Object> createProductFeatureCategoryAppl(HttpSession session, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="productFeatureCategoryId") String productFeatureCategoryId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createProductFeatureCategoryAppl(HttpSession session, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="productFeatureCategoryId") String productFeatureCategoryId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productCategoryId",productCategoryId);
@@ -782,23 +784,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeProductFeatureCategoryAppl")
-	public ResponseEntity<Object> removeProductFeatureCategoryAppl(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="productFeatureCategoryId") String productFeatureCategoryId) {
+	public ResponseEntity<Map<String, Object>> removeProductFeatureCategoryAppl(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="productFeatureCategoryId") String productFeatureCategoryId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -813,23 +815,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductFeatureApplAttr")
-	public ResponseEntity<Object> createProductFeatureApplAttr(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="attrName") String attrName, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="attrValue", required=false) Long attrValue) {
+	public ResponseEntity<Map<String, Object>> createProductFeatureApplAttr(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="attrName") String attrName, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="attrValue", required=false) Long attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -846,23 +848,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductFeatureCatGrpAppl")
-	public ResponseEntity<Object> updateProductFeatureCatGrpAppl(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="productFeatureGroupId") String productFeatureGroupId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateProductFeatureCatGrpAppl(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="productFeatureGroupId") String productFeatureGroupId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -878,23 +880,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createFeaturePrice")
-	public ResponseEntity<Object> createFeaturePrice(HttpSession session, @RequestParam(value="currencyUomId") String currencyUomId, @RequestParam(value="price") BigDecimal price, @RequestParam(value="productPriceTypeId") String productPriceTypeId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createFeaturePrice(HttpSession session, @RequestParam(value="currencyUomId") String currencyUomId, @RequestParam(value="price") BigDecimal price, @RequestParam(value="productPriceTypeId") String productPriceTypeId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("currencyUomId",currencyUomId);
@@ -912,23 +914,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductFeatureIactnType")
-	public ResponseEntity<Object> deleteProductFeatureIactnType(HttpSession session, @RequestParam(value="productFeatureIactnTypeId") String productFeatureIactnTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteProductFeatureIactnType(HttpSession session, @RequestParam(value="productFeatureIactnTypeId") String productFeatureIactnTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productFeatureIactnTypeId",productFeatureIactnTypeId);
@@ -941,23 +943,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createProductFeatureCatGrpAppl")
-	public ResponseEntity<Object> createProductFeatureCatGrpAppl(HttpSession session, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="productFeatureGroupId") String productFeatureGroupId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createProductFeatureCatGrpAppl(HttpSession session, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="productFeatureGroupId") String productFeatureGroupId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productCategoryId",productCategoryId);
@@ -973,23 +975,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeProductFeatureGroupAppl")
-	public ResponseEntity<Object> removeProductFeatureGroupAppl(HttpSession session, @RequestParam(value="fromDate") java.sql.Timestamp fromDate, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="productFeatureGroupId") String productFeatureGroupId) {
+	public ResponseEntity<Map<String, Object>> removeProductFeatureGroupAppl(HttpSession session, @RequestParam(value="fromDate") java.sql.Timestamp fromDate, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="productFeatureGroupId") String productFeatureGroupId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -1004,23 +1006,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductFeatureIactnType")
-	public ResponseEntity<Object> updateProductFeatureIactnType(HttpSession session, @RequestParam(value="productFeatureIactnTypeId") String productFeatureIactnTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateProductFeatureIactnType(HttpSession session, @RequestParam(value="productFeatureIactnTypeId") String productFeatureIactnTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productFeatureIactnTypeId",productFeatureIactnTypeId);
@@ -1036,23 +1038,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateProductFeatureCategoryAppl")
-	public ResponseEntity<Object> updateProductFeatureCategoryAppl(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="productFeatureCategoryId") String productFeatureCategoryId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateProductFeatureCategoryAppl(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productCategoryId") String productCategoryId, @RequestParam(value="productFeatureCategoryId") String productFeatureCategoryId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -1068,23 +1070,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateFeatureToProductApplication")
-	public ResponseEntity<Object> updateFeatureToProductApplication(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="productFeatureApplTypeId") String productFeatureApplTypeId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="recurringAmount", required=false) BigDecimal recurringAmount, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateFeatureToProductApplication(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="productFeatureId") String productFeatureId, @RequestParam(value="productFeatureApplTypeId") String productFeatureApplTypeId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="recurringAmount", required=false) BigDecimal recurringAmount, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -1104,23 +1106,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeFeatureFromProduct")
-	public ResponseEntity<Object> removeFeatureFromProduct(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="productFeatureId") String productFeatureId) {
+	public ResponseEntity<Map<String, Object>> removeFeatureFromProduct(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="productId") String productId, @RequestParam(value="productFeatureId") String productFeatureId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -1135,23 +1137,23 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/applyFeatureToProductFromTypeAndCode")
-	public ResponseEntity<Object> applyFeatureToProductFromTypeAndCode(HttpSession session, @RequestParam(value="productFeatureTypeId") String productFeatureTypeId, @RequestParam(value="productId") String productId, @RequestParam(value="idCode") String idCode, @RequestParam(value="productFeatureApplTypeId") String productFeatureApplTypeId, @RequestParam(value="fromDate", required=false) java.sql.Timestamp fromDate, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="thruDate", required=false) java.sql.Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> applyFeatureToProductFromTypeAndCode(HttpSession session, @RequestParam(value="productFeatureTypeId") String productFeatureTypeId, @RequestParam(value="productId") String productId, @RequestParam(value="idCode") String idCode, @RequestParam(value="productFeatureApplTypeId") String productFeatureApplTypeId, @RequestParam(value="fromDate", required=false) java.sql.Timestamp fromDate, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="thruDate", required=false) java.sql.Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productFeatureTypeId",productFeatureTypeId);
@@ -1170,19 +1172,19 @@ public class ProductFeatureServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

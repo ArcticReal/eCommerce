@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.vendor.query.FindVendorsBy;
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/vendors")
 public class VendorController {
@@ -52,7 +54,7 @@ public class VendorController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findVendorsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<Vendor>> findVendorsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindVendorsBy query = new FindVendorsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class VendorController {
 		}
 
 		List<Vendor> vendors =((VendorFound) Scheduler.execute(query).data()).getVendors();
-
-		if (vendors.size() == 1) {
-			return ResponseEntity.ok().body(vendors.get(0));
-		}
 
 		return ResponseEntity.ok().body(vendors);
 
@@ -78,7 +76,7 @@ public class VendorController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createVendor(HttpServletRequest request) throws Exception {
+	public ResponseEntity<Vendor> createVendor(HttpServletRequest request) throws Exception {
 
 		Vendor vendorToBeAdded = new Vendor();
 		try {
@@ -86,7 +84,7 @@ public class VendorController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createVendor(vendorToBeAdded);
@@ -101,63 +99,15 @@ public class VendorController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createVendor(@RequestBody Vendor vendorToBeAdded) throws Exception {
+	public ResponseEntity<Vendor> createVendor(@RequestBody Vendor vendorToBeAdded) throws Exception {
 
 		AddVendor command = new AddVendor(vendorToBeAdded);
 		Vendor vendor = ((VendorAdded) Scheduler.execute(command).data()).getAddedVendor();
 		
 		if (vendor != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(vendor);
+			return successful(vendor);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("Vendor could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateVendor(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		Vendor vendorToBeUpdated = new Vendor();
-
-		try {
-			vendorToBeUpdated = VendorMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateVendor(vendorToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class VendorController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateVendor(@RequestBody Vendor vendorToBeUpdated,
+	public ResponseEntity<String> updateVendor(@RequestBody Vendor vendorToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		vendorToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class VendorController {
 
 		try {
 			if(((VendorUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{vendorId}")
-	public ResponseEntity<Object> findById(@PathVariable String vendorId) throws Exception {
+	public ResponseEntity<Vendor> findById(@PathVariable String vendorId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("vendorId", vendorId);
 		try {
 
-			Object foundVendor = findVendorsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundVendor);
+			List<Vendor> foundVendor = findVendorsBy(requestParams).getBody();
+			if(foundVendor.size()==1){				return successful(foundVendor.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{vendorId}")
-	public ResponseEntity<Object> deleteVendorByIdUpdated(@PathVariable String vendorId) throws Exception {
+	public ResponseEntity<String> deleteVendorByIdUpdated(@PathVariable String vendorId) throws Exception {
 		DeleteVendor command = new DeleteVendor(vendorId);
 
 		try {
 			if (((VendorDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("Vendor could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.party.query.nameHistory.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/party/partyNameHistorys")
 public class PartyNameHistoryController {
@@ -52,7 +54,7 @@ public class PartyNameHistoryController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPartyNameHistorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PartyNameHistory>> findPartyNameHistorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyNameHistorysBy query = new FindPartyNameHistorysBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PartyNameHistoryController {
 		}
 
 		List<PartyNameHistory> partyNameHistorys =((PartyNameHistoryFound) Scheduler.execute(query).data()).getPartyNameHistorys();
-
-		if (partyNameHistorys.size() == 1) {
-			return ResponseEntity.ok().body(partyNameHistorys.get(0));
-		}
 
 		return ResponseEntity.ok().body(partyNameHistorys);
 
@@ -78,7 +76,7 @@ public class PartyNameHistoryController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPartyNameHistory(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PartyNameHistory> createPartyNameHistory(HttpServletRequest request) throws Exception {
 
 		PartyNameHistory partyNameHistoryToBeAdded = new PartyNameHistory();
 		try {
@@ -86,7 +84,7 @@ public class PartyNameHistoryController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPartyNameHistory(partyNameHistoryToBeAdded);
@@ -101,63 +99,15 @@ public class PartyNameHistoryController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPartyNameHistory(@RequestBody PartyNameHistory partyNameHistoryToBeAdded) throws Exception {
+	public ResponseEntity<PartyNameHistory> createPartyNameHistory(@RequestBody PartyNameHistory partyNameHistoryToBeAdded) throws Exception {
 
 		AddPartyNameHistory command = new AddPartyNameHistory(partyNameHistoryToBeAdded);
 		PartyNameHistory partyNameHistory = ((PartyNameHistoryAdded) Scheduler.execute(command).data()).getAddedPartyNameHistory();
 		
 		if (partyNameHistory != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(partyNameHistory);
+			return successful(partyNameHistory);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PartyNameHistory could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePartyNameHistory(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PartyNameHistory partyNameHistoryToBeUpdated = new PartyNameHistory();
-
-		try {
-			partyNameHistoryToBeUpdated = PartyNameHistoryMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePartyNameHistory(partyNameHistoryToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PartyNameHistoryController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePartyNameHistory(@RequestBody PartyNameHistory partyNameHistoryToBeUpdated,
+	public ResponseEntity<String> updatePartyNameHistory(@RequestBody PartyNameHistory partyNameHistoryToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		partyNameHistoryToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class PartyNameHistoryController {
 
 		try {
 			if(((PartyNameHistoryUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{partyNameHistoryId}")
-	public ResponseEntity<Object> findById(@PathVariable String partyNameHistoryId) throws Exception {
+	public ResponseEntity<PartyNameHistory> findById(@PathVariable String partyNameHistoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyNameHistoryId", partyNameHistoryId);
 		try {
 
-			Object foundPartyNameHistory = findPartyNameHistorysBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPartyNameHistory);
+			List<PartyNameHistory> foundPartyNameHistory = findPartyNameHistorysBy(requestParams).getBody();
+			if(foundPartyNameHistory.size()==1){				return successful(foundPartyNameHistory.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{partyNameHistoryId}")
-	public ResponseEntity<Object> deletePartyNameHistoryByIdUpdated(@PathVariable String partyNameHistoryId) throws Exception {
+	public ResponseEntity<String> deletePartyNameHistoryByIdUpdated(@PathVariable String partyNameHistoryId) throws Exception {
 		DeletePartyNameHistory command = new DeletePartyNameHistory(partyNameHistoryId);
 
 		try {
 			if (((PartyNameHistoryDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PartyNameHistory could not be deleted");
+		return conflict();
 
 	}
 

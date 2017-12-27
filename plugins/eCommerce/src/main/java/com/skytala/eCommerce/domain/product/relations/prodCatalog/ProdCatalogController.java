@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.prodCatalog.query.FindProd
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/prodCatalogs")
 public class ProdCatalogController {
@@ -52,7 +54,7 @@ public class ProdCatalogController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProdCatalogsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProdCatalog>> findProdCatalogsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProdCatalogsBy query = new FindProdCatalogsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProdCatalogController {
 		}
 
 		List<ProdCatalog> prodCatalogs =((ProdCatalogFound) Scheduler.execute(query).data()).getProdCatalogs();
-
-		if (prodCatalogs.size() == 1) {
-			return ResponseEntity.ok().body(prodCatalogs.get(0));
-		}
 
 		return ResponseEntity.ok().body(prodCatalogs);
 
@@ -78,7 +76,7 @@ public class ProdCatalogController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProdCatalog(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProdCatalog> createProdCatalog(HttpServletRequest request) throws Exception {
 
 		ProdCatalog prodCatalogToBeAdded = new ProdCatalog();
 		try {
@@ -86,7 +84,7 @@ public class ProdCatalogController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProdCatalog(prodCatalogToBeAdded);
@@ -101,63 +99,15 @@ public class ProdCatalogController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProdCatalog(@RequestBody ProdCatalog prodCatalogToBeAdded) throws Exception {
+	public ResponseEntity<ProdCatalog> createProdCatalog(@RequestBody ProdCatalog prodCatalogToBeAdded) throws Exception {
 
 		AddProdCatalog command = new AddProdCatalog(prodCatalogToBeAdded);
 		ProdCatalog prodCatalog = ((ProdCatalogAdded) Scheduler.execute(command).data()).getAddedProdCatalog();
 		
 		if (prodCatalog != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(prodCatalog);
+			return successful(prodCatalog);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProdCatalog could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProdCatalog(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProdCatalog prodCatalogToBeUpdated = new ProdCatalog();
-
-		try {
-			prodCatalogToBeUpdated = ProdCatalogMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProdCatalog(prodCatalogToBeUpdated, prodCatalogToBeUpdated.getProdCatalogId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProdCatalogController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{prodCatalogId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProdCatalog(@RequestBody ProdCatalog prodCatalogToBeUpdated,
+	public ResponseEntity<String> updateProdCatalog(@RequestBody ProdCatalog prodCatalogToBeUpdated,
 			@PathVariable String prodCatalogId) throws Exception {
 
 		prodCatalogToBeUpdated.setProdCatalogId(prodCatalogId);
@@ -178,41 +128,44 @@ public class ProdCatalogController {
 
 		try {
 			if(((ProdCatalogUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{prodCatalogId}")
-	public ResponseEntity<Object> findById(@PathVariable String prodCatalogId) throws Exception {
+	public ResponseEntity<ProdCatalog> findById(@PathVariable String prodCatalogId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("prodCatalogId", prodCatalogId);
 		try {
 
-			Object foundProdCatalog = findProdCatalogsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProdCatalog);
+			List<ProdCatalog> foundProdCatalog = findProdCatalogsBy(requestParams).getBody();
+			if(foundProdCatalog.size()==1){				return successful(foundProdCatalog.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{prodCatalogId}")
-	public ResponseEntity<Object> deleteProdCatalogByIdUpdated(@PathVariable String prodCatalogId) throws Exception {
+	public ResponseEntity<String> deleteProdCatalogByIdUpdated(@PathVariable String prodCatalogId) throws Exception {
 		DeleteProdCatalog command = new DeleteProdCatalog(prodCatalogId);
 
 		try {
 			if (((ProdCatalogDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProdCatalog could not be deleted");
+		return conflict();
 
 	}
 

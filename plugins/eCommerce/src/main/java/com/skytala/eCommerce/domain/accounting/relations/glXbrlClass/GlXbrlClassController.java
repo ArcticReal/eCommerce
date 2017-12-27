@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.glXbrlClass.query.FindG
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/glXbrlClasss")
 public class GlXbrlClassController {
@@ -52,7 +54,7 @@ public class GlXbrlClassController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findGlXbrlClasssBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<GlXbrlClass>> findGlXbrlClasssBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGlXbrlClasssBy query = new FindGlXbrlClasssBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class GlXbrlClassController {
 		}
 
 		List<GlXbrlClass> glXbrlClasss =((GlXbrlClassFound) Scheduler.execute(query).data()).getGlXbrlClasss();
-
-		if (glXbrlClasss.size() == 1) {
-			return ResponseEntity.ok().body(glXbrlClasss.get(0));
-		}
 
 		return ResponseEntity.ok().body(glXbrlClasss);
 
@@ -78,7 +76,7 @@ public class GlXbrlClassController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createGlXbrlClass(HttpServletRequest request) throws Exception {
+	public ResponseEntity<GlXbrlClass> createGlXbrlClass(HttpServletRequest request) throws Exception {
 
 		GlXbrlClass glXbrlClassToBeAdded = new GlXbrlClass();
 		try {
@@ -86,7 +84,7 @@ public class GlXbrlClassController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createGlXbrlClass(glXbrlClassToBeAdded);
@@ -101,63 +99,15 @@ public class GlXbrlClassController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createGlXbrlClass(@RequestBody GlXbrlClass glXbrlClassToBeAdded) throws Exception {
+	public ResponseEntity<GlXbrlClass> createGlXbrlClass(@RequestBody GlXbrlClass glXbrlClassToBeAdded) throws Exception {
 
 		AddGlXbrlClass command = new AddGlXbrlClass(glXbrlClassToBeAdded);
 		GlXbrlClass glXbrlClass = ((GlXbrlClassAdded) Scheduler.execute(command).data()).getAddedGlXbrlClass();
 		
 		if (glXbrlClass != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(glXbrlClass);
+			return successful(glXbrlClass);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("GlXbrlClass could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateGlXbrlClass(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		GlXbrlClass glXbrlClassToBeUpdated = new GlXbrlClass();
-
-		try {
-			glXbrlClassToBeUpdated = GlXbrlClassMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateGlXbrlClass(glXbrlClassToBeUpdated, glXbrlClassToBeUpdated.getGlXbrlClassId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class GlXbrlClassController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{glXbrlClassId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateGlXbrlClass(@RequestBody GlXbrlClass glXbrlClassToBeUpdated,
+	public ResponseEntity<String> updateGlXbrlClass(@RequestBody GlXbrlClass glXbrlClassToBeUpdated,
 			@PathVariable String glXbrlClassId) throws Exception {
 
 		glXbrlClassToBeUpdated.setGlXbrlClassId(glXbrlClassId);
@@ -178,41 +128,44 @@ public class GlXbrlClassController {
 
 		try {
 			if(((GlXbrlClassUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{glXbrlClassId}")
-	public ResponseEntity<Object> findById(@PathVariable String glXbrlClassId) throws Exception {
+	public ResponseEntity<GlXbrlClass> findById(@PathVariable String glXbrlClassId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("glXbrlClassId", glXbrlClassId);
 		try {
 
-			Object foundGlXbrlClass = findGlXbrlClasssBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundGlXbrlClass);
+			List<GlXbrlClass> foundGlXbrlClass = findGlXbrlClasssBy(requestParams).getBody();
+			if(foundGlXbrlClass.size()==1){				return successful(foundGlXbrlClass.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{glXbrlClassId}")
-	public ResponseEntity<Object> deleteGlXbrlClassByIdUpdated(@PathVariable String glXbrlClassId) throws Exception {
+	public ResponseEntity<String> deleteGlXbrlClassByIdUpdated(@PathVariable String glXbrlClassId) throws Exception {
 		DeleteGlXbrlClass command = new DeleteGlXbrlClass(glXbrlClassId);
 
 		try {
 			if (((GlXbrlClassDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("GlXbrlClass could not be deleted");
+		return conflict();
 
 	}
 

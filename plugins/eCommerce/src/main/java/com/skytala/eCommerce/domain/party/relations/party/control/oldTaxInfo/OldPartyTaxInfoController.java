@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.party.query.oldTaxInfo.FindO
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/party/oldPartyTaxInfos")
 public class OldPartyTaxInfoController {
@@ -52,7 +54,7 @@ public class OldPartyTaxInfoController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findOldPartyTaxInfosBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OldPartyTaxInfo>> findOldPartyTaxInfosBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOldPartyTaxInfosBy query = new FindOldPartyTaxInfosBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class OldPartyTaxInfoController {
 		}
 
 		List<OldPartyTaxInfo> oldPartyTaxInfos =((OldPartyTaxInfoFound) Scheduler.execute(query).data()).getOldPartyTaxInfos();
-
-		if (oldPartyTaxInfos.size() == 1) {
-			return ResponseEntity.ok().body(oldPartyTaxInfos.get(0));
-		}
 
 		return ResponseEntity.ok().body(oldPartyTaxInfos);
 
@@ -78,7 +76,7 @@ public class OldPartyTaxInfoController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOldPartyTaxInfo(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OldPartyTaxInfo> createOldPartyTaxInfo(HttpServletRequest request) throws Exception {
 
 		OldPartyTaxInfo oldPartyTaxInfoToBeAdded = new OldPartyTaxInfo();
 		try {
@@ -86,7 +84,7 @@ public class OldPartyTaxInfoController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createOldPartyTaxInfo(oldPartyTaxInfoToBeAdded);
@@ -101,63 +99,15 @@ public class OldPartyTaxInfoController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOldPartyTaxInfo(@RequestBody OldPartyTaxInfo oldPartyTaxInfoToBeAdded) throws Exception {
+	public ResponseEntity<OldPartyTaxInfo> createOldPartyTaxInfo(@RequestBody OldPartyTaxInfo oldPartyTaxInfoToBeAdded) throws Exception {
 
 		AddOldPartyTaxInfo command = new AddOldPartyTaxInfo(oldPartyTaxInfoToBeAdded);
 		OldPartyTaxInfo oldPartyTaxInfo = ((OldPartyTaxInfoAdded) Scheduler.execute(command).data()).getAddedOldPartyTaxInfo();
 		
 		if (oldPartyTaxInfo != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(oldPartyTaxInfo);
+			return successful(oldPartyTaxInfo);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OldPartyTaxInfo could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateOldPartyTaxInfo(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OldPartyTaxInfo oldPartyTaxInfoToBeUpdated = new OldPartyTaxInfo();
-
-		try {
-			oldPartyTaxInfoToBeUpdated = OldPartyTaxInfoMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOldPartyTaxInfo(oldPartyTaxInfoToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class OldPartyTaxInfoController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOldPartyTaxInfo(@RequestBody OldPartyTaxInfo oldPartyTaxInfoToBeUpdated,
+	public ResponseEntity<String> updateOldPartyTaxInfo(@RequestBody OldPartyTaxInfo oldPartyTaxInfoToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		oldPartyTaxInfoToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class OldPartyTaxInfoController {
 
 		try {
 			if(((OldPartyTaxInfoUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{oldPartyTaxInfoId}")
-	public ResponseEntity<Object> findById(@PathVariable String oldPartyTaxInfoId) throws Exception {
+	public ResponseEntity<OldPartyTaxInfo> findById(@PathVariable String oldPartyTaxInfoId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("oldPartyTaxInfoId", oldPartyTaxInfoId);
 		try {
 
-			Object foundOldPartyTaxInfo = findOldPartyTaxInfosBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOldPartyTaxInfo);
+			List<OldPartyTaxInfo> foundOldPartyTaxInfo = findOldPartyTaxInfosBy(requestParams).getBody();
+			if(foundOldPartyTaxInfo.size()==1){				return successful(foundOldPartyTaxInfo.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{oldPartyTaxInfoId}")
-	public ResponseEntity<Object> deleteOldPartyTaxInfoByIdUpdated(@PathVariable String oldPartyTaxInfoId) throws Exception {
+	public ResponseEntity<String> deleteOldPartyTaxInfoByIdUpdated(@PathVariable String oldPartyTaxInfoId) throws Exception {
 		DeleteOldPartyTaxInfo command = new DeleteOldPartyTaxInfo(oldPartyTaxInfoId);
 
 		try {
 			if (((OldPartyTaxInfoDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("OldPartyTaxInfo could not be deleted");
+		return conflict();
 
 	}
 

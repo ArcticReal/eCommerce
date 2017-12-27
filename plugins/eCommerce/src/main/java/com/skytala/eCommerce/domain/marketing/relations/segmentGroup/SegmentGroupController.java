@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.marketing.relations.segmentGroup.query.FindS
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/marketing/segmentGroups")
 public class SegmentGroupController {
@@ -52,7 +54,7 @@ public class SegmentGroupController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findSegmentGroupsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<SegmentGroup>> findSegmentGroupsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSegmentGroupsBy query = new FindSegmentGroupsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class SegmentGroupController {
 		}
 
 		List<SegmentGroup> segmentGroups =((SegmentGroupFound) Scheduler.execute(query).data()).getSegmentGroups();
-
-		if (segmentGroups.size() == 1) {
-			return ResponseEntity.ok().body(segmentGroups.get(0));
-		}
 
 		return ResponseEntity.ok().body(segmentGroups);
 
@@ -78,7 +76,7 @@ public class SegmentGroupController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createSegmentGroup(HttpServletRequest request) throws Exception {
+	public ResponseEntity<SegmentGroup> createSegmentGroup(HttpServletRequest request) throws Exception {
 
 		SegmentGroup segmentGroupToBeAdded = new SegmentGroup();
 		try {
@@ -86,7 +84,7 @@ public class SegmentGroupController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createSegmentGroup(segmentGroupToBeAdded);
@@ -101,63 +99,15 @@ public class SegmentGroupController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createSegmentGroup(@RequestBody SegmentGroup segmentGroupToBeAdded) throws Exception {
+	public ResponseEntity<SegmentGroup> createSegmentGroup(@RequestBody SegmentGroup segmentGroupToBeAdded) throws Exception {
 
 		AddSegmentGroup command = new AddSegmentGroup(segmentGroupToBeAdded);
 		SegmentGroup segmentGroup = ((SegmentGroupAdded) Scheduler.execute(command).data()).getAddedSegmentGroup();
 		
 		if (segmentGroup != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(segmentGroup);
+			return successful(segmentGroup);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("SegmentGroup could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateSegmentGroup(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		SegmentGroup segmentGroupToBeUpdated = new SegmentGroup();
-
-		try {
-			segmentGroupToBeUpdated = SegmentGroupMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateSegmentGroup(segmentGroupToBeUpdated, segmentGroupToBeUpdated.getSegmentGroupId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class SegmentGroupController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{segmentGroupId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateSegmentGroup(@RequestBody SegmentGroup segmentGroupToBeUpdated,
+	public ResponseEntity<String> updateSegmentGroup(@RequestBody SegmentGroup segmentGroupToBeUpdated,
 			@PathVariable String segmentGroupId) throws Exception {
 
 		segmentGroupToBeUpdated.setSegmentGroupId(segmentGroupId);
@@ -178,41 +128,44 @@ public class SegmentGroupController {
 
 		try {
 			if(((SegmentGroupUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{segmentGroupId}")
-	public ResponseEntity<Object> findById(@PathVariable String segmentGroupId) throws Exception {
+	public ResponseEntity<SegmentGroup> findById(@PathVariable String segmentGroupId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("segmentGroupId", segmentGroupId);
 		try {
 
-			Object foundSegmentGroup = findSegmentGroupsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundSegmentGroup);
+			List<SegmentGroup> foundSegmentGroup = findSegmentGroupsBy(requestParams).getBody();
+			if(foundSegmentGroup.size()==1){				return successful(foundSegmentGroup.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{segmentGroupId}")
-	public ResponseEntity<Object> deleteSegmentGroupByIdUpdated(@PathVariable String segmentGroupId) throws Exception {
+	public ResponseEntity<String> deleteSegmentGroupByIdUpdated(@PathVariable String segmentGroupId) throws Exception {
 		DeleteSegmentGroup command = new DeleteSegmentGroup(segmentGroupId);
 
 		try {
 			if (((SegmentGroupDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("SegmentGroup could not be deleted");
+		return conflict();
 
 	}
 

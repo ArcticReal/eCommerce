@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.humanres.relations.salaryStep.query.FindSala
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/humanres/salarySteps")
 public class SalaryStepController {
@@ -52,7 +54,7 @@ public class SalaryStepController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findSalaryStepsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<SalaryStep>> findSalaryStepsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSalaryStepsBy query = new FindSalaryStepsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class SalaryStepController {
 		}
 
 		List<SalaryStep> salarySteps =((SalaryStepFound) Scheduler.execute(query).data()).getSalarySteps();
-
-		if (salarySteps.size() == 1) {
-			return ResponseEntity.ok().body(salarySteps.get(0));
-		}
 
 		return ResponseEntity.ok().body(salarySteps);
 
@@ -78,7 +76,7 @@ public class SalaryStepController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createSalaryStep(HttpServletRequest request) throws Exception {
+	public ResponseEntity<SalaryStep> createSalaryStep(HttpServletRequest request) throws Exception {
 
 		SalaryStep salaryStepToBeAdded = new SalaryStep();
 		try {
@@ -86,7 +84,7 @@ public class SalaryStepController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createSalaryStep(salaryStepToBeAdded);
@@ -101,63 +99,15 @@ public class SalaryStepController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createSalaryStep(@RequestBody SalaryStep salaryStepToBeAdded) throws Exception {
+	public ResponseEntity<SalaryStep> createSalaryStep(@RequestBody SalaryStep salaryStepToBeAdded) throws Exception {
 
 		AddSalaryStep command = new AddSalaryStep(salaryStepToBeAdded);
 		SalaryStep salaryStep = ((SalaryStepAdded) Scheduler.execute(command).data()).getAddedSalaryStep();
 		
 		if (salaryStep != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(salaryStep);
+			return successful(salaryStep);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("SalaryStep could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateSalaryStep(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		SalaryStep salaryStepToBeUpdated = new SalaryStep();
-
-		try {
-			salaryStepToBeUpdated = SalaryStepMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateSalaryStep(salaryStepToBeUpdated, salaryStepToBeUpdated.getSalaryStepSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class SalaryStepController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{salaryStepSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateSalaryStep(@RequestBody SalaryStep salaryStepToBeUpdated,
+	public ResponseEntity<String> updateSalaryStep(@RequestBody SalaryStep salaryStepToBeUpdated,
 			@PathVariable String salaryStepSeqId) throws Exception {
 
 		salaryStepToBeUpdated.setSalaryStepSeqId(salaryStepSeqId);
@@ -178,41 +128,44 @@ public class SalaryStepController {
 
 		try {
 			if(((SalaryStepUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{salaryStepId}")
-	public ResponseEntity<Object> findById(@PathVariable String salaryStepId) throws Exception {
+	public ResponseEntity<SalaryStep> findById(@PathVariable String salaryStepId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("salaryStepId", salaryStepId);
 		try {
 
-			Object foundSalaryStep = findSalaryStepsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundSalaryStep);
+			List<SalaryStep> foundSalaryStep = findSalaryStepsBy(requestParams).getBody();
+			if(foundSalaryStep.size()==1){				return successful(foundSalaryStep.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{salaryStepId}")
-	public ResponseEntity<Object> deleteSalaryStepByIdUpdated(@PathVariable String salaryStepId) throws Exception {
+	public ResponseEntity<String> deleteSalaryStepByIdUpdated(@PathVariable String salaryStepId) throws Exception {
 		DeleteSalaryStep command = new DeleteSalaryStep(salaryStepId);
 
 		try {
 			if (((SalaryStepDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("SalaryStep could not be deleted");
+		return conflict();
 
 	}
 

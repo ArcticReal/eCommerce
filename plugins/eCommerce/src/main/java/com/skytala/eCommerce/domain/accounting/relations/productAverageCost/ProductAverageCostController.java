@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.productAverageCost.quer
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/productAverageCosts")
 public class ProductAverageCostController {
@@ -52,7 +54,7 @@ public class ProductAverageCostController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductAverageCostsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductAverageCost>> findProductAverageCostsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductAverageCostsBy query = new FindProductAverageCostsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductAverageCostController {
 		}
 
 		List<ProductAverageCost> productAverageCosts =((ProductAverageCostFound) Scheduler.execute(query).data()).getProductAverageCosts();
-
-		if (productAverageCosts.size() == 1) {
-			return ResponseEntity.ok().body(productAverageCosts.get(0));
-		}
 
 		return ResponseEntity.ok().body(productAverageCosts);
 
@@ -78,7 +76,7 @@ public class ProductAverageCostController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductAverageCost(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductAverageCost> createProductAverageCost(HttpServletRequest request) throws Exception {
 
 		ProductAverageCost productAverageCostToBeAdded = new ProductAverageCost();
 		try {
@@ -86,7 +84,7 @@ public class ProductAverageCostController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductAverageCost(productAverageCostToBeAdded);
@@ -101,63 +99,15 @@ public class ProductAverageCostController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductAverageCost(@RequestBody ProductAverageCost productAverageCostToBeAdded) throws Exception {
+	public ResponseEntity<ProductAverageCost> createProductAverageCost(@RequestBody ProductAverageCost productAverageCostToBeAdded) throws Exception {
 
 		AddProductAverageCost command = new AddProductAverageCost(productAverageCostToBeAdded);
 		ProductAverageCost productAverageCost = ((ProductAverageCostAdded) Scheduler.execute(command).data()).getAddedProductAverageCost();
 		
 		if (productAverageCost != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productAverageCost);
+			return successful(productAverageCost);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductAverageCost could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductAverageCost(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductAverageCost productAverageCostToBeUpdated = new ProductAverageCost();
-
-		try {
-			productAverageCostToBeUpdated = ProductAverageCostMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductAverageCost(productAverageCostToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductAverageCostController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductAverageCost(@RequestBody ProductAverageCost productAverageCostToBeUpdated,
+	public ResponseEntity<String> updateProductAverageCost(@RequestBody ProductAverageCost productAverageCostToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		productAverageCostToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ProductAverageCostController {
 
 		try {
 			if(((ProductAverageCostUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productAverageCostId}")
-	public ResponseEntity<Object> findById(@PathVariable String productAverageCostId) throws Exception {
+	public ResponseEntity<ProductAverageCost> findById(@PathVariable String productAverageCostId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productAverageCostId", productAverageCostId);
 		try {
 
-			Object foundProductAverageCost = findProductAverageCostsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductAverageCost);
+			List<ProductAverageCost> foundProductAverageCost = findProductAverageCostsBy(requestParams).getBody();
+			if(foundProductAverageCost.size()==1){				return successful(foundProductAverageCost.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productAverageCostId}")
-	public ResponseEntity<Object> deleteProductAverageCostByIdUpdated(@PathVariable String productAverageCostId) throws Exception {
+	public ResponseEntity<String> deleteProductAverageCostByIdUpdated(@PathVariable String productAverageCostId) throws Exception {
 		DeleteProductAverageCost command = new DeleteProductAverageCost(productAverageCostId);
 
 		try {
 			if (((ProductAverageCostDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductAverageCost could not be deleted");
+		return conflict();
 
 	}
 

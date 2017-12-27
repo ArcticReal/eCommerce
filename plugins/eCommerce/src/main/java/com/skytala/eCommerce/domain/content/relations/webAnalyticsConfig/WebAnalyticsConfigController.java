@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.webAnalyticsConfig.query.F
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/webAnalyticsConfigs")
 public class WebAnalyticsConfigController {
@@ -52,7 +54,7 @@ public class WebAnalyticsConfigController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findWebAnalyticsConfigsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<WebAnalyticsConfig>> findWebAnalyticsConfigsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindWebAnalyticsConfigsBy query = new FindWebAnalyticsConfigsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class WebAnalyticsConfigController {
 		}
 
 		List<WebAnalyticsConfig> webAnalyticsConfigs =((WebAnalyticsConfigFound) Scheduler.execute(query).data()).getWebAnalyticsConfigs();
-
-		if (webAnalyticsConfigs.size() == 1) {
-			return ResponseEntity.ok().body(webAnalyticsConfigs.get(0));
-		}
 
 		return ResponseEntity.ok().body(webAnalyticsConfigs);
 
@@ -78,7 +76,7 @@ public class WebAnalyticsConfigController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createWebAnalyticsConfig(HttpServletRequest request) throws Exception {
+	public ResponseEntity<WebAnalyticsConfig> createWebAnalyticsConfig(HttpServletRequest request) throws Exception {
 
 		WebAnalyticsConfig webAnalyticsConfigToBeAdded = new WebAnalyticsConfig();
 		try {
@@ -86,7 +84,7 @@ public class WebAnalyticsConfigController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createWebAnalyticsConfig(webAnalyticsConfigToBeAdded);
@@ -101,63 +99,15 @@ public class WebAnalyticsConfigController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createWebAnalyticsConfig(@RequestBody WebAnalyticsConfig webAnalyticsConfigToBeAdded) throws Exception {
+	public ResponseEntity<WebAnalyticsConfig> createWebAnalyticsConfig(@RequestBody WebAnalyticsConfig webAnalyticsConfigToBeAdded) throws Exception {
 
 		AddWebAnalyticsConfig command = new AddWebAnalyticsConfig(webAnalyticsConfigToBeAdded);
 		WebAnalyticsConfig webAnalyticsConfig = ((WebAnalyticsConfigAdded) Scheduler.execute(command).data()).getAddedWebAnalyticsConfig();
 		
 		if (webAnalyticsConfig != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(webAnalyticsConfig);
+			return successful(webAnalyticsConfig);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("WebAnalyticsConfig could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateWebAnalyticsConfig(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		WebAnalyticsConfig webAnalyticsConfigToBeUpdated = new WebAnalyticsConfig();
-
-		try {
-			webAnalyticsConfigToBeUpdated = WebAnalyticsConfigMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateWebAnalyticsConfig(webAnalyticsConfigToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class WebAnalyticsConfigController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateWebAnalyticsConfig(@RequestBody WebAnalyticsConfig webAnalyticsConfigToBeUpdated,
+	public ResponseEntity<String> updateWebAnalyticsConfig(@RequestBody WebAnalyticsConfig webAnalyticsConfigToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		webAnalyticsConfigToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class WebAnalyticsConfigController {
 
 		try {
 			if(((WebAnalyticsConfigUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{webAnalyticsConfigId}")
-	public ResponseEntity<Object> findById(@PathVariable String webAnalyticsConfigId) throws Exception {
+	public ResponseEntity<WebAnalyticsConfig> findById(@PathVariable String webAnalyticsConfigId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("webAnalyticsConfigId", webAnalyticsConfigId);
 		try {
 
-			Object foundWebAnalyticsConfig = findWebAnalyticsConfigsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundWebAnalyticsConfig);
+			List<WebAnalyticsConfig> foundWebAnalyticsConfig = findWebAnalyticsConfigsBy(requestParams).getBody();
+			if(foundWebAnalyticsConfig.size()==1){				return successful(foundWebAnalyticsConfig.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{webAnalyticsConfigId}")
-	public ResponseEntity<Object> deleteWebAnalyticsConfigByIdUpdated(@PathVariable String webAnalyticsConfigId) throws Exception {
+	public ResponseEntity<String> deleteWebAnalyticsConfigByIdUpdated(@PathVariable String webAnalyticsConfigId) throws Exception {
 		DeleteWebAnalyticsConfig command = new DeleteWebAnalyticsConfig(webAnalyticsConfigId);
 
 		try {
 			if (((WebAnalyticsConfigDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("WebAnalyticsConfig could not be deleted");
+		return conflict();
 
 	}
 

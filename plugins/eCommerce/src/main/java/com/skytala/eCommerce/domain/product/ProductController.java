@@ -135,7 +135,7 @@ public class ProductController {
 	 */
 	@PutMapping("/{productId}")
 	@PreAuthorize(HAS_ADMIN_AUTHORITY)
-	public ResponseEntity<Object> updateProduct(@RequestBody Product productToBeUpdated,
+	public ResponseEntity<String> updateProduct(@RequestBody Product productToBeUpdated,
 			@PathVariable String productId) throws Exception {
 
 		productToBeUpdated.setProductId(productId);
@@ -319,12 +319,12 @@ public class ProductController {
 
 	@PostMapping("/addDetailed")
 	@PreAuthorize(HAS_ADMIN_AUTHORITY)
-	public ResponseEntity addProductWithDetails(@RequestBody ProductDetailsDTO dto) throws Exception {
+	public ResponseEntity<ProductDetailsDTO> addProductWithDetails(@RequestBody ProductDetailsDTO dto) throws Exception {
 
 
 		String valid = validate(dto);
 		if(!valid.equals(ProductDTOValidation.VALID))
-			return badRequest(valid);
+			throw new IllegalArgumentException(valid);
 
 		ResponseEntity<Product> productResponse;
 		ResponseEntity<ProductPrice> priceResponse;
@@ -334,15 +334,15 @@ public class ProductController {
 			dto.setProductId(productResponse.getBody().getProductId());
 
 			if(!(priceResponse = priceController.createProductPrice(dto.extractProductPrice())).getStatusCode().equals(CREATED))
-				return priceResponse;
+				return badRequest();
 
 			for(ProductAttribute attribute : dto.extractAllAttributes()){
 				if(!(attributeResponse = attributeController.createProductAttribute(attribute)).getStatusCode().equals(CREATED))
-					return attributeResponse;
+					return badRequest();
 			}
 
 		}else
-			return productResponse;
+			return badRequest();
 
 		return created(dto);
 
@@ -418,7 +418,7 @@ public class ProductController {
 
 	@PutMapping("/{productId}/details")
 	@PreAuthorize(HAS_ADMIN_AUTHORITY)
-	public ResponseEntity updateProductWithDetails(@PathVariable String productId, @RequestBody ProductDetailsDTO dto) throws Exception {
+	public ResponseEntity<String> updateProductWithDetails(@PathVariable String productId, @RequestBody ProductDetailsDTO dto) throws Exception {
 
 		dto.setProductId(productId);
 		if(dto.getProductId()==null)
@@ -437,12 +437,12 @@ public class ProductController {
 
 		if(dto.getPrice()!=null)
 			if(!(response = priceController.updateProductPrice(dto.extractProductPrice(), productId)).getStatusCode().equals(HttpStatus.NO_CONTENT))
-				return response;
+				return badRequest();
 
 
 		for(ProductAttribute attribute : dto.extractAllAttributes()){
 			if(!(response = attributeController.updateProductAttribute(attribute, productId)).getStatusCode().equals(HttpStatus.NO_CONTENT))
-				return response;
+				return badRequest();
 		}
 
 		return successful();
@@ -450,7 +450,7 @@ public class ProductController {
 
 	@PutMapping("/{productId}/updateCategories")
 	@PreAuthorize(HAS_ADMIN_AUTHORITY)
-	public ResponseEntity updateCategories(HttpSession session,
+	public ResponseEntity<String> updateCategories(HttpSession session,
 										   @PathVariable("productId") String productId,
 										   @RequestBody List<String> newCategoryIds) throws Exception {
 

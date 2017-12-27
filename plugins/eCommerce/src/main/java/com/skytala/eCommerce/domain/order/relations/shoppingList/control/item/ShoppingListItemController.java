@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.shoppingList.query.item.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/shoppingList/shoppingListItems")
 public class ShoppingListItemController {
@@ -52,7 +54,7 @@ public class ShoppingListItemController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findShoppingListItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ShoppingListItem>> findShoppingListItemsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShoppingListItemsBy query = new FindShoppingListItemsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ShoppingListItemController {
 		}
 
 		List<ShoppingListItem> shoppingListItems =((ShoppingListItemFound) Scheduler.execute(query).data()).getShoppingListItems();
-
-		if (shoppingListItems.size() == 1) {
-			return ResponseEntity.ok().body(shoppingListItems.get(0));
-		}
 
 		return ResponseEntity.ok().body(shoppingListItems);
 
@@ -78,7 +76,7 @@ public class ShoppingListItemController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createShoppingListItem(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ShoppingListItem> createShoppingListItem(HttpServletRequest request) throws Exception {
 
 		ShoppingListItem shoppingListItemToBeAdded = new ShoppingListItem();
 		try {
@@ -86,7 +84,7 @@ public class ShoppingListItemController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createShoppingListItem(shoppingListItemToBeAdded);
@@ -101,63 +99,15 @@ public class ShoppingListItemController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createShoppingListItem(@RequestBody ShoppingListItem shoppingListItemToBeAdded) throws Exception {
+	public ResponseEntity<ShoppingListItem> createShoppingListItem(@RequestBody ShoppingListItem shoppingListItemToBeAdded) throws Exception {
 
 		AddShoppingListItem command = new AddShoppingListItem(shoppingListItemToBeAdded);
 		ShoppingListItem shoppingListItem = ((ShoppingListItemAdded) Scheduler.execute(command).data()).getAddedShoppingListItem();
 		
 		if (shoppingListItem != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(shoppingListItem);
+			return successful(shoppingListItem);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ShoppingListItem could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateShoppingListItem(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ShoppingListItem shoppingListItemToBeUpdated = new ShoppingListItem();
-
-		try {
-			shoppingListItemToBeUpdated = ShoppingListItemMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateShoppingListItem(shoppingListItemToBeUpdated, shoppingListItemToBeUpdated.getShoppingListItemSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ShoppingListItemController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{shoppingListItemSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateShoppingListItem(@RequestBody ShoppingListItem shoppingListItemToBeUpdated,
+	public ResponseEntity<String> updateShoppingListItem(@RequestBody ShoppingListItem shoppingListItemToBeUpdated,
 			@PathVariable String shoppingListItemSeqId) throws Exception {
 
 		shoppingListItemToBeUpdated.setShoppingListItemSeqId(shoppingListItemSeqId);
@@ -178,41 +128,44 @@ public class ShoppingListItemController {
 
 		try {
 			if(((ShoppingListItemUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{shoppingListItemId}")
-	public ResponseEntity<Object> findById(@PathVariable String shoppingListItemId) throws Exception {
+	public ResponseEntity<ShoppingListItem> findById(@PathVariable String shoppingListItemId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shoppingListItemId", shoppingListItemId);
 		try {
 
-			Object foundShoppingListItem = findShoppingListItemsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundShoppingListItem);
+			List<ShoppingListItem> foundShoppingListItem = findShoppingListItemsBy(requestParams).getBody();
+			if(foundShoppingListItem.size()==1){				return successful(foundShoppingListItem.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{shoppingListItemId}")
-	public ResponseEntity<Object> deleteShoppingListItemByIdUpdated(@PathVariable String shoppingListItemId) throws Exception {
+	public ResponseEntity<String> deleteShoppingListItemByIdUpdated(@PathVariable String shoppingListItemId) throws Exception {
 		DeleteShoppingListItem command = new DeleteShoppingListItem(shoppingListItemId);
 
 		try {
 			if (((ShoppingListItemDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ShoppingListItem could not be deleted");
+		return conflict();
 
 	}
 

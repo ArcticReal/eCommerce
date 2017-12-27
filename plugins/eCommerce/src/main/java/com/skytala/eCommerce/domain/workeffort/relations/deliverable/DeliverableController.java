@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.workeffort.relations.deliverable.query.FindD
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/workeffort/deliverables")
 public class DeliverableController {
@@ -52,7 +54,7 @@ public class DeliverableController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findDeliverablesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<Deliverable>> findDeliverablesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDeliverablesBy query = new FindDeliverablesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class DeliverableController {
 		}
 
 		List<Deliverable> deliverables =((DeliverableFound) Scheduler.execute(query).data()).getDeliverables();
-
-		if (deliverables.size() == 1) {
-			return ResponseEntity.ok().body(deliverables.get(0));
-		}
 
 		return ResponseEntity.ok().body(deliverables);
 
@@ -78,7 +76,7 @@ public class DeliverableController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createDeliverable(HttpServletRequest request) throws Exception {
+	public ResponseEntity<Deliverable> createDeliverable(HttpServletRequest request) throws Exception {
 
 		Deliverable deliverableToBeAdded = new Deliverable();
 		try {
@@ -86,7 +84,7 @@ public class DeliverableController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createDeliverable(deliverableToBeAdded);
@@ -101,63 +99,15 @@ public class DeliverableController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createDeliverable(@RequestBody Deliverable deliverableToBeAdded) throws Exception {
+	public ResponseEntity<Deliverable> createDeliverable(@RequestBody Deliverable deliverableToBeAdded) throws Exception {
 
 		AddDeliverable command = new AddDeliverable(deliverableToBeAdded);
 		Deliverable deliverable = ((DeliverableAdded) Scheduler.execute(command).data()).getAddedDeliverable();
 		
 		if (deliverable != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(deliverable);
+			return successful(deliverable);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("Deliverable could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateDeliverable(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		Deliverable deliverableToBeUpdated = new Deliverable();
-
-		try {
-			deliverableToBeUpdated = DeliverableMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateDeliverable(deliverableToBeUpdated, deliverableToBeUpdated.getDeliverableId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class DeliverableController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{deliverableId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateDeliverable(@RequestBody Deliverable deliverableToBeUpdated,
+	public ResponseEntity<String> updateDeliverable(@RequestBody Deliverable deliverableToBeUpdated,
 			@PathVariable String deliverableId) throws Exception {
 
 		deliverableToBeUpdated.setDeliverableId(deliverableId);
@@ -178,41 +128,44 @@ public class DeliverableController {
 
 		try {
 			if(((DeliverableUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{deliverableId}")
-	public ResponseEntity<Object> findById(@PathVariable String deliverableId) throws Exception {
+	public ResponseEntity<Deliverable> findById(@PathVariable String deliverableId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("deliverableId", deliverableId);
 		try {
 
-			Object foundDeliverable = findDeliverablesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundDeliverable);
+			List<Deliverable> foundDeliverable = findDeliverablesBy(requestParams).getBody();
+			if(foundDeliverable.size()==1){				return successful(foundDeliverable.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{deliverableId}")
-	public ResponseEntity<Object> deleteDeliverableByIdUpdated(@PathVariable String deliverableId) throws Exception {
+	public ResponseEntity<String> deleteDeliverableByIdUpdated(@PathVariable String deliverableId) throws Exception {
 		DeleteDeliverable command = new DeleteDeliverable(deliverableId);
 
 		try {
 			if (((DeliverableDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("Deliverable could not be deleted");
+		return conflict();
 
 	}
 

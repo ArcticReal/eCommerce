@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/manufacturingMrp")
 public class ManufacturingMrpServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/executeMrp")
-	public ResponseEntity<Object> executeMrp(HttpSession session, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="defaultYearsOffset", required=false) Integer defaultYearsOffset, @RequestParam(value="facilityGroupId", required=false) String facilityGroupId, @RequestParam(value="mrpName", required=false) String mrpName) {
+	public ResponseEntity<Map<String, Object>> executeMrp(HttpSession session, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="defaultYearsOffset", required=false) Integer defaultYearsOffset, @RequestParam(value="facilityGroupId", required=false) String facilityGroupId, @RequestParam(value="mrpName", required=false) String mrpName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("facilityId",facilityId);
@@ -42,23 +44,23 @@ public class ManufacturingMrpServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/setEstimatedDeliveryDates")
-	public ResponseEntity<Object> setEstimatedDeliveryDates(HttpSession session) {
+	public ResponseEntity<Map<String, Object>> setEstimatedDeliveryDates(HttpSession session) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userLogin", session.getAttribute("userLogin"));
@@ -70,23 +72,23 @@ public class ManufacturingMrpServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteMrpEventType")
-	public ResponseEntity<Object> deleteMrpEventType(HttpSession session, @RequestParam(value="mrpEventTypeId") String mrpEventTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteMrpEventType(HttpSession session, @RequestParam(value="mrpEventTypeId") String mrpEventTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("mrpEventTypeId",mrpEventTypeId);
@@ -99,23 +101,23 @@ public class ManufacturingMrpServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/findProductMrpQoh")
-	public ResponseEntity<Object> findProductMrpQoh(HttpSession session, @RequestParam(value="productId") String productId) {
+	public ResponseEntity<Map<String, Object>> findProductMrpQoh(HttpSession session, @RequestParam(value="productId") String productId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("productId",productId);
@@ -128,23 +130,23 @@ public class ManufacturingMrpServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateMrpEventType")
-	public ResponseEntity<Object> updateMrpEventType(HttpSession session, @RequestParam(value="mrpEventTypeId") String mrpEventTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateMrpEventType(HttpSession session, @RequestParam(value="mrpEventTypeId") String mrpEventTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("mrpEventTypeId",mrpEventTypeId);
@@ -158,23 +160,23 @@ public class ManufacturingMrpServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createMrpEventType")
-	public ResponseEntity<Object> createMrpEventType(HttpSession session, @RequestParam(value="mrpEventTypeId", required=false) String mrpEventTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createMrpEventType(HttpSession session, @RequestParam(value="mrpEventTypeId", required=false) String mrpEventTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("mrpEventTypeId",mrpEventTypeId);
@@ -188,23 +190,23 @@ public class ManufacturingMrpServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/initMrpEvents")
-	public ResponseEntity<Object> initMrpEvents(HttpSession session, @RequestParam(value="reInitialize") Boolean reInitialize, @RequestParam(value="manufacturingFacilityId") String manufacturingFacilityId, @RequestParam(value="mrpId") String mrpId, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="defaultYearsOffset", required=false) Integer defaultYearsOffset) {
+	public ResponseEntity<Map<String, Object>> initMrpEvents(HttpSession session, @RequestParam(value="reInitialize") Boolean reInitialize, @RequestParam(value="manufacturingFacilityId") String manufacturingFacilityId, @RequestParam(value="mrpId") String mrpId, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="defaultYearsOffset", required=false) Integer defaultYearsOffset) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("reInitialize",reInitialize);
@@ -221,23 +223,23 @@ public class ManufacturingMrpServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createMrpEvent")
-	public ResponseEntity<Object> createMrpEvent(HttpSession session, @RequestParam(value="mrpEventTypeId") String mrpEventTypeId, @RequestParam(value="mrpId") String mrpId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="productId") String productId, @RequestParam(value="eventDate") Timestamp eventDate, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="eventName", required=false) String eventName) {
+	public ResponseEntity<Map<String, Object>> createMrpEvent(HttpSession session, @RequestParam(value="mrpEventTypeId") String mrpEventTypeId, @RequestParam(value="mrpId") String mrpId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="productId") String productId, @RequestParam(value="eventDate") Timestamp eventDate, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="eventName", required=false) String eventName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("mrpEventTypeId",mrpEventTypeId);
@@ -256,19 +258,19 @@ public class ManufacturingMrpServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

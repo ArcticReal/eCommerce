@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.workeffort.relations.timeEntry.query.FindTim
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/workeffort/timeEntrys")
 public class TimeEntryController {
@@ -52,7 +54,7 @@ public class TimeEntryController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findTimeEntrysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<TimeEntry>> findTimeEntrysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTimeEntrysBy query = new FindTimeEntrysBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class TimeEntryController {
 		}
 
 		List<TimeEntry> timeEntrys =((TimeEntryFound) Scheduler.execute(query).data()).getTimeEntrys();
-
-		if (timeEntrys.size() == 1) {
-			return ResponseEntity.ok().body(timeEntrys.get(0));
-		}
 
 		return ResponseEntity.ok().body(timeEntrys);
 
@@ -78,7 +76,7 @@ public class TimeEntryController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createTimeEntry(HttpServletRequest request) throws Exception {
+	public ResponseEntity<TimeEntry> createTimeEntry(HttpServletRequest request) throws Exception {
 
 		TimeEntry timeEntryToBeAdded = new TimeEntry();
 		try {
@@ -86,7 +84,7 @@ public class TimeEntryController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createTimeEntry(timeEntryToBeAdded);
@@ -101,63 +99,15 @@ public class TimeEntryController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createTimeEntry(@RequestBody TimeEntry timeEntryToBeAdded) throws Exception {
+	public ResponseEntity<TimeEntry> createTimeEntry(@RequestBody TimeEntry timeEntryToBeAdded) throws Exception {
 
 		AddTimeEntry command = new AddTimeEntry(timeEntryToBeAdded);
 		TimeEntry timeEntry = ((TimeEntryAdded) Scheduler.execute(command).data()).getAddedTimeEntry();
 		
 		if (timeEntry != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(timeEntry);
+			return successful(timeEntry);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("TimeEntry could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateTimeEntry(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		TimeEntry timeEntryToBeUpdated = new TimeEntry();
-
-		try {
-			timeEntryToBeUpdated = TimeEntryMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateTimeEntry(timeEntryToBeUpdated, timeEntryToBeUpdated.getTimeEntryId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class TimeEntryController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{timeEntryId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateTimeEntry(@RequestBody TimeEntry timeEntryToBeUpdated,
+	public ResponseEntity<String> updateTimeEntry(@RequestBody TimeEntry timeEntryToBeUpdated,
 			@PathVariable String timeEntryId) throws Exception {
 
 		timeEntryToBeUpdated.setTimeEntryId(timeEntryId);
@@ -178,41 +128,44 @@ public class TimeEntryController {
 
 		try {
 			if(((TimeEntryUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{timeEntryId}")
-	public ResponseEntity<Object> findById(@PathVariable String timeEntryId) throws Exception {
+	public ResponseEntity<TimeEntry> findById(@PathVariable String timeEntryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("timeEntryId", timeEntryId);
 		try {
 
-			Object foundTimeEntry = findTimeEntrysBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundTimeEntry);
+			List<TimeEntry> foundTimeEntry = findTimeEntrysBy(requestParams).getBody();
+			if(foundTimeEntry.size()==1){				return successful(foundTimeEntry.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{timeEntryId}")
-	public ResponseEntity<Object> deleteTimeEntryByIdUpdated(@PathVariable String timeEntryId) throws Exception {
+	public ResponseEntity<String> deleteTimeEntryByIdUpdated(@PathVariable String timeEntryId) throws Exception {
 		DeleteTimeEntry command = new DeleteTimeEntry(timeEntryId);
 
 		try {
 			if (((TimeEntryDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("TimeEntry could not be deleted");
+		return conflict();
 
 	}
 

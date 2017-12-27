@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.requirement.query.orderCommi
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/requirement/orderRequirementCommitments")
 public class OrderRequirementCommitmentController {
@@ -52,7 +54,7 @@ public class OrderRequirementCommitmentController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findOrderRequirementCommitmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OrderRequirementCommitment>> findOrderRequirementCommitmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderRequirementCommitmentsBy query = new FindOrderRequirementCommitmentsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class OrderRequirementCommitmentController {
 		}
 
 		List<OrderRequirementCommitment> orderRequirementCommitments =((OrderRequirementCommitmentFound) Scheduler.execute(query).data()).getOrderRequirementCommitments();
-
-		if (orderRequirementCommitments.size() == 1) {
-			return ResponseEntity.ok().body(orderRequirementCommitments.get(0));
-		}
 
 		return ResponseEntity.ok().body(orderRequirementCommitments);
 
@@ -78,7 +76,7 @@ public class OrderRequirementCommitmentController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOrderRequirementCommitment(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OrderRequirementCommitment> createOrderRequirementCommitment(HttpServletRequest request) throws Exception {
 
 		OrderRequirementCommitment orderRequirementCommitmentToBeAdded = new OrderRequirementCommitment();
 		try {
@@ -86,7 +84,7 @@ public class OrderRequirementCommitmentController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createOrderRequirementCommitment(orderRequirementCommitmentToBeAdded);
@@ -101,63 +99,15 @@ public class OrderRequirementCommitmentController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOrderRequirementCommitment(@RequestBody OrderRequirementCommitment orderRequirementCommitmentToBeAdded) throws Exception {
+	public ResponseEntity<OrderRequirementCommitment> createOrderRequirementCommitment(@RequestBody OrderRequirementCommitment orderRequirementCommitmentToBeAdded) throws Exception {
 
 		AddOrderRequirementCommitment command = new AddOrderRequirementCommitment(orderRequirementCommitmentToBeAdded);
 		OrderRequirementCommitment orderRequirementCommitment = ((OrderRequirementCommitmentAdded) Scheduler.execute(command).data()).getAddedOrderRequirementCommitment();
 		
 		if (orderRequirementCommitment != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(orderRequirementCommitment);
+			return successful(orderRequirementCommitment);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OrderRequirementCommitment could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateOrderRequirementCommitment(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OrderRequirementCommitment orderRequirementCommitmentToBeUpdated = new OrderRequirementCommitment();
-
-		try {
-			orderRequirementCommitmentToBeUpdated = OrderRequirementCommitmentMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOrderRequirementCommitment(orderRequirementCommitmentToBeUpdated, orderRequirementCommitmentToBeUpdated.getOrderItemSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class OrderRequirementCommitmentController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{orderItemSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOrderRequirementCommitment(@RequestBody OrderRequirementCommitment orderRequirementCommitmentToBeUpdated,
+	public ResponseEntity<String> updateOrderRequirementCommitment(@RequestBody OrderRequirementCommitment orderRequirementCommitmentToBeUpdated,
 			@PathVariable String orderItemSeqId) throws Exception {
 
 		orderRequirementCommitmentToBeUpdated.setOrderItemSeqId(orderItemSeqId);
@@ -178,41 +128,44 @@ public class OrderRequirementCommitmentController {
 
 		try {
 			if(((OrderRequirementCommitmentUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{orderRequirementCommitmentId}")
-	public ResponseEntity<Object> findById(@PathVariable String orderRequirementCommitmentId) throws Exception {
+	public ResponseEntity<OrderRequirementCommitment> findById(@PathVariable String orderRequirementCommitmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderRequirementCommitmentId", orderRequirementCommitmentId);
 		try {
 
-			Object foundOrderRequirementCommitment = findOrderRequirementCommitmentsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOrderRequirementCommitment);
+			List<OrderRequirementCommitment> foundOrderRequirementCommitment = findOrderRequirementCommitmentsBy(requestParams).getBody();
+			if(foundOrderRequirementCommitment.size()==1){				return successful(foundOrderRequirementCommitment.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{orderRequirementCommitmentId}")
-	public ResponseEntity<Object> deleteOrderRequirementCommitmentByIdUpdated(@PathVariable String orderRequirementCommitmentId) throws Exception {
+	public ResponseEntity<String> deleteOrderRequirementCommitmentByIdUpdated(@PathVariable String orderRequirementCommitmentId) throws Exception {
 		DeleteOrderRequirementCommitment command = new DeleteOrderRequirementCommitment(orderRequirementCommitmentId);
 
 		try {
 			if (((OrderRequirementCommitmentDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("OrderRequirementCommitment could not be deleted");
+		return conflict();
 
 	}
 

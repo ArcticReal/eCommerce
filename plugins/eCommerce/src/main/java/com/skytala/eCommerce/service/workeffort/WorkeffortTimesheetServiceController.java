@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/workeffortTimesheet")
 public class WorkeffortTimesheetServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createTimeEntry")
-	public ResponseEntity<Object> createTimeEntry(HttpSession session, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="timesheetId", required=false) String timesheetId, @RequestParam(value="rateTypeId", required=false) String rateTypeId, @RequestParam(value="hours", required=false) BigDecimal hours, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="invoiceId", required=false) String invoiceId, @RequestParam(value="invoiceItemSeqId", required=false) String invoiceItemSeqId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createTimeEntry(HttpSession session, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="timesheetId", required=false) String timesheetId, @RequestParam(value="rateTypeId", required=false) String rateTypeId, @RequestParam(value="hours", required=false) BigDecimal hours, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="invoiceId", required=false) String invoiceId, @RequestParam(value="invoiceItemSeqId", required=false) String invoiceItemSeqId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -48,23 +50,23 @@ public class WorkeffortTimesheetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteTimesheet")
-	public ResponseEntity<Object> deleteTimesheet(HttpSession session, @RequestParam(value="timesheetId") String timesheetId) {
+	public ResponseEntity<Map<String, Object>> deleteTimesheet(HttpSession session, @RequestParam(value="timesheetId") String timesheetId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("timesheetId",timesheetId);
@@ -77,23 +79,23 @@ public class WorkeffortTimesheetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteTimeEntry")
-	public ResponseEntity<Object> deleteTimeEntry(HttpSession session, @RequestParam(value="timeEntryId") String timeEntryId) {
+	public ResponseEntity<Map<String, Object>> deleteTimeEntry(HttpSession session, @RequestParam(value="timeEntryId") String timeEntryId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("timeEntryId",timeEntryId);
@@ -106,23 +108,23 @@ public class WorkeffortTimesheetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateTimeEntry")
-	public ResponseEntity<Object> updateTimeEntry(HttpSession session, @RequestParam(value="timeEntryId") String timeEntryId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="timesheetId", required=false) String timesheetId, @RequestParam(value="rateTypeId", required=false) String rateTypeId, @RequestParam(value="hours", required=false) BigDecimal hours, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="invoiceId", required=false) String invoiceId, @RequestParam(value="invoiceItemSeqId", required=false) String invoiceItemSeqId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateTimeEntry(HttpSession session, @RequestParam(value="timeEntryId") String timeEntryId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="timesheetId", required=false) String timesheetId, @RequestParam(value="rateTypeId", required=false) String rateTypeId, @RequestParam(value="hours", required=false) BigDecimal hours, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="invoiceId", required=false) String invoiceId, @RequestParam(value="invoiceItemSeqId", required=false) String invoiceItemSeqId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("timeEntryId",timeEntryId);
@@ -145,23 +147,23 @@ public class WorkeffortTimesheetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addTimesheetToInvoice")
-	public ResponseEntity<Object> addTimesheetToInvoice(HttpSession session, @RequestParam(value="timesheetId") String timesheetId, @RequestParam(value="invoiceId") String invoiceId) {
+	public ResponseEntity<Map<String, Object>> addTimesheetToInvoice(HttpSession session, @RequestParam(value="timesheetId") String timesheetId, @RequestParam(value="invoiceId") String invoiceId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("timesheetId",timesheetId);
@@ -175,23 +177,23 @@ public class WorkeffortTimesheetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addWorkEffortTimeToNewInvoice")
-	public ResponseEntity<Object> addWorkEffortTimeToNewInvoice(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="partyIdFrom") String partyIdFrom, @RequestParam(value="partyId") String partyId, @RequestParam(value="combineInvoiceItem", required=false) String combineInvoiceItem, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> addWorkEffortTimeToNewInvoice(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="partyIdFrom") String partyIdFrom, @RequestParam(value="partyId") String partyId, @RequestParam(value="combineInvoiceItem", required=false) String combineInvoiceItem, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -208,23 +210,23 @@ public class WorkeffortTimesheetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addWorkEffortTimeToInvoice")
-	public ResponseEntity<Object> addWorkEffortTimeToInvoice(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="invoiceId") String invoiceId, @RequestParam(value="combineInvoiceItem", required=false) String combineInvoiceItem, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> addWorkEffortTimeToInvoice(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="invoiceId") String invoiceId, @RequestParam(value="combineInvoiceItem", required=false) String combineInvoiceItem, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -240,23 +242,23 @@ public class WorkeffortTimesheetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateTimesheetToInProcess")
-	public ResponseEntity<Object> updateTimesheetToInProcess(HttpSession session, @RequestParam(value="timesheetId") String timesheetId) {
+	public ResponseEntity<Map<String, Object>> updateTimesheetToInProcess(HttpSession session, @RequestParam(value="timesheetId") String timesheetId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("timesheetId",timesheetId);
@@ -269,23 +271,23 @@ public class WorkeffortTimesheetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createTimesheetForThisWeek")
-	public ResponseEntity<Object> createTimesheetForThisWeek(HttpSession session, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="approvedByUserLoginId", required=false) String approvedByUserLoginId, @RequestParam(value="requiredDate", required=false) Timestamp requiredDate, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="clientPartyId", required=false) String clientPartyId) {
+	public ResponseEntity<Map<String, Object>> createTimesheetForThisWeek(HttpSession session, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="approvedByUserLoginId", required=false) String approvedByUserLoginId, @RequestParam(value="requiredDate", required=false) Timestamp requiredDate, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="clientPartyId", required=false) String clientPartyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("comments",comments);
@@ -303,23 +305,23 @@ public class WorkeffortTimesheetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addTimesheetToNewInvoice")
-	public ResponseEntity<Object> addTimesheetToNewInvoice(HttpSession session, @RequestParam(value="timesheetId") String timesheetId, @RequestParam(value="partyIdFrom") String partyIdFrom, @RequestParam(value="partyId") String partyId) {
+	public ResponseEntity<Map<String, Object>> addTimesheetToNewInvoice(HttpSession session, @RequestParam(value="timesheetId") String timesheetId, @RequestParam(value="partyIdFrom") String partyIdFrom, @RequestParam(value="partyId") String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("timesheetId",timesheetId);
@@ -334,23 +336,23 @@ public class WorkeffortTimesheetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/unlinkInvoiceFromTimeEntry")
-	public ResponseEntity<Object> unlinkInvoiceFromTimeEntry(HttpSession session, @RequestParam(value="timeEntryId") String timeEntryId, @RequestParam(value="invoiceId") String invoiceId) {
+	public ResponseEntity<Map<String, Object>> unlinkInvoiceFromTimeEntry(HttpSession session, @RequestParam(value="timeEntryId") String timeEntryId, @RequestParam(value="invoiceId") String invoiceId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("timeEntryId",timeEntryId);
@@ -364,23 +366,23 @@ public class WorkeffortTimesheetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateTimesheet")
-	public ResponseEntity<Object> updateTimesheet(HttpSession session, @RequestParam(value="timesheetId") String timesheetId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="approvedByUserLoginId", required=false) String approvedByUserLoginId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="clientPartyId", required=false) String clientPartyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateTimesheet(HttpSession session, @RequestParam(value="timesheetId") String timesheetId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="approvedByUserLoginId", required=false) String approvedByUserLoginId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="clientPartyId", required=false) String clientPartyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("timesheetId",timesheetId);
@@ -400,23 +402,23 @@ public class WorkeffortTimesheetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createTimesheet")
-	public ResponseEntity<Object> createTimesheet(HttpSession session, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="approvedByUserLoginId", required=false) String approvedByUserLoginId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="clientPartyId", required=false) String clientPartyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createTimesheet(HttpSession session, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="approvedByUserLoginId", required=false) String approvedByUserLoginId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="clientPartyId", required=false) String clientPartyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -435,23 +437,23 @@ public class WorkeffortTimesheetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createTimesheets")
-	public ResponseEntity<Object> createTimesheets(HttpSession session, @RequestParam(value="fromDate", required=false) String fromDate, @RequestParam(value="partyIdList", required=false) List partyIdList, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="clientPartyId", required=false) String clientPartyId, @RequestParam(value="thruDate", required=false) String thruDate) {
+	public ResponseEntity<Map<String, Object>> createTimesheets(HttpSession session, @RequestParam(value="fromDate", required=false) String fromDate, @RequestParam(value="partyIdList", required=false) List partyIdList, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="clientPartyId", required=false) String clientPartyId, @RequestParam(value="thruDate", required=false) String thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -468,23 +470,23 @@ public class WorkeffortTimesheetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteTimesheetRole")
-	public ResponseEntity<Object> deleteTimesheetRole(HttpSession session, @RequestParam(value="timesheetId") String timesheetId, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId) {
+	public ResponseEntity<Map<String, Object>> deleteTimesheetRole(HttpSession session, @RequestParam(value="timesheetId") String timesheetId, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("timesheetId",timesheetId);
@@ -499,23 +501,23 @@ public class WorkeffortTimesheetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createTimesheetRole")
-	public ResponseEntity<Object> createTimesheetRole(HttpSession session, @RequestParam(value="timesheetId") String timesheetId, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId) {
+	public ResponseEntity<Map<String, Object>> createTimesheetRole(HttpSession session, @RequestParam(value="timesheetId") String timesheetId, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("timesheetId",timesheetId);
@@ -530,23 +532,23 @@ public class WorkeffortTimesheetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getTimeEntryRate")
-	public ResponseEntity<Object> getTimeEntryRate(HttpSession session, @RequestParam(value="timeEntryId") String timeEntryId, @RequestParam(value="currencyUomId", required=false) String currencyUomId) {
+	public ResponseEntity<Map<String, Object>> getTimeEntryRate(HttpSession session, @RequestParam(value="timeEntryId") String timeEntryId, @RequestParam(value="currencyUomId", required=false) String currencyUomId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("timeEntryId",timeEntryId);
@@ -560,19 +562,19 @@ public class WorkeffortTimesheetServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

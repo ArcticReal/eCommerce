@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.orderAdjustment.query.billin
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/orderAdjustment/orderAdjustmentBillings")
 public class OrderAdjustmentBillingController {
@@ -52,7 +54,7 @@ public class OrderAdjustmentBillingController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findOrderAdjustmentBillingsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OrderAdjustmentBilling>> findOrderAdjustmentBillingsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderAdjustmentBillingsBy query = new FindOrderAdjustmentBillingsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class OrderAdjustmentBillingController {
 		}
 
 		List<OrderAdjustmentBilling> orderAdjustmentBillings =((OrderAdjustmentBillingFound) Scheduler.execute(query).data()).getOrderAdjustmentBillings();
-
-		if (orderAdjustmentBillings.size() == 1) {
-			return ResponseEntity.ok().body(orderAdjustmentBillings.get(0));
-		}
 
 		return ResponseEntity.ok().body(orderAdjustmentBillings);
 
@@ -78,7 +76,7 @@ public class OrderAdjustmentBillingController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOrderAdjustmentBilling(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OrderAdjustmentBilling> createOrderAdjustmentBilling(HttpServletRequest request) throws Exception {
 
 		OrderAdjustmentBilling orderAdjustmentBillingToBeAdded = new OrderAdjustmentBilling();
 		try {
@@ -86,7 +84,7 @@ public class OrderAdjustmentBillingController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createOrderAdjustmentBilling(orderAdjustmentBillingToBeAdded);
@@ -101,63 +99,15 @@ public class OrderAdjustmentBillingController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOrderAdjustmentBilling(@RequestBody OrderAdjustmentBilling orderAdjustmentBillingToBeAdded) throws Exception {
+	public ResponseEntity<OrderAdjustmentBilling> createOrderAdjustmentBilling(@RequestBody OrderAdjustmentBilling orderAdjustmentBillingToBeAdded) throws Exception {
 
 		AddOrderAdjustmentBilling command = new AddOrderAdjustmentBilling(orderAdjustmentBillingToBeAdded);
 		OrderAdjustmentBilling orderAdjustmentBilling = ((OrderAdjustmentBillingAdded) Scheduler.execute(command).data()).getAddedOrderAdjustmentBilling();
 		
 		if (orderAdjustmentBilling != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(orderAdjustmentBilling);
+			return successful(orderAdjustmentBilling);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OrderAdjustmentBilling could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateOrderAdjustmentBilling(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OrderAdjustmentBilling orderAdjustmentBillingToBeUpdated = new OrderAdjustmentBilling();
-
-		try {
-			orderAdjustmentBillingToBeUpdated = OrderAdjustmentBillingMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOrderAdjustmentBilling(orderAdjustmentBillingToBeUpdated, orderAdjustmentBillingToBeUpdated.getInvoiceItemSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class OrderAdjustmentBillingController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{invoiceItemSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOrderAdjustmentBilling(@RequestBody OrderAdjustmentBilling orderAdjustmentBillingToBeUpdated,
+	public ResponseEntity<String> updateOrderAdjustmentBilling(@RequestBody OrderAdjustmentBilling orderAdjustmentBillingToBeUpdated,
 			@PathVariable String invoiceItemSeqId) throws Exception {
 
 		orderAdjustmentBillingToBeUpdated.setInvoiceItemSeqId(invoiceItemSeqId);
@@ -178,41 +128,44 @@ public class OrderAdjustmentBillingController {
 
 		try {
 			if(((OrderAdjustmentBillingUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{orderAdjustmentBillingId}")
-	public ResponseEntity<Object> findById(@PathVariable String orderAdjustmentBillingId) throws Exception {
+	public ResponseEntity<OrderAdjustmentBilling> findById(@PathVariable String orderAdjustmentBillingId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderAdjustmentBillingId", orderAdjustmentBillingId);
 		try {
 
-			Object foundOrderAdjustmentBilling = findOrderAdjustmentBillingsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOrderAdjustmentBilling);
+			List<OrderAdjustmentBilling> foundOrderAdjustmentBilling = findOrderAdjustmentBillingsBy(requestParams).getBody();
+			if(foundOrderAdjustmentBilling.size()==1){				return successful(foundOrderAdjustmentBilling.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{orderAdjustmentBillingId}")
-	public ResponseEntity<Object> deleteOrderAdjustmentBillingByIdUpdated(@PathVariable String orderAdjustmentBillingId) throws Exception {
+	public ResponseEntity<String> deleteOrderAdjustmentBillingByIdUpdated(@PathVariable String orderAdjustmentBillingId) throws Exception {
 		DeleteOrderAdjustmentBilling command = new DeleteOrderAdjustmentBilling(orderAdjustmentBillingId);
 
 		try {
 			if (((OrderAdjustmentBillingDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("OrderAdjustmentBilling could not be deleted");
+		return conflict();
 
 	}
 

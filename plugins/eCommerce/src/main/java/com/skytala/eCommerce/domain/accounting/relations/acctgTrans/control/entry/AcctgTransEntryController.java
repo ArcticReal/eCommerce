@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.acctgTrans.query.entry.
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/acctgTrans/acctgTransEntrys")
 public class AcctgTransEntryController {
@@ -52,7 +54,7 @@ public class AcctgTransEntryController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findAcctgTransEntrysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<AcctgTransEntry>> findAcctgTransEntrysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAcctgTransEntrysBy query = new FindAcctgTransEntrysBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class AcctgTransEntryController {
 		}
 
 		List<AcctgTransEntry> acctgTransEntrys =((AcctgTransEntryFound) Scheduler.execute(query).data()).getAcctgTransEntrys();
-
-		if (acctgTransEntrys.size() == 1) {
-			return ResponseEntity.ok().body(acctgTransEntrys.get(0));
-		}
 
 		return ResponseEntity.ok().body(acctgTransEntrys);
 
@@ -78,7 +76,7 @@ public class AcctgTransEntryController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createAcctgTransEntry(HttpServletRequest request) throws Exception {
+	public ResponseEntity<AcctgTransEntry> createAcctgTransEntry(HttpServletRequest request) throws Exception {
 
 		AcctgTransEntry acctgTransEntryToBeAdded = new AcctgTransEntry();
 		try {
@@ -86,7 +84,7 @@ public class AcctgTransEntryController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createAcctgTransEntry(acctgTransEntryToBeAdded);
@@ -101,63 +99,15 @@ public class AcctgTransEntryController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createAcctgTransEntry(@RequestBody AcctgTransEntry acctgTransEntryToBeAdded) throws Exception {
+	public ResponseEntity<AcctgTransEntry> createAcctgTransEntry(@RequestBody AcctgTransEntry acctgTransEntryToBeAdded) throws Exception {
 
 		AddAcctgTransEntry command = new AddAcctgTransEntry(acctgTransEntryToBeAdded);
 		AcctgTransEntry acctgTransEntry = ((AcctgTransEntryAdded) Scheduler.execute(command).data()).getAddedAcctgTransEntry();
 		
 		if (acctgTransEntry != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(acctgTransEntry);
+			return successful(acctgTransEntry);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("AcctgTransEntry could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateAcctgTransEntry(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		AcctgTransEntry acctgTransEntryToBeUpdated = new AcctgTransEntry();
-
-		try {
-			acctgTransEntryToBeUpdated = AcctgTransEntryMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateAcctgTransEntry(acctgTransEntryToBeUpdated, acctgTransEntryToBeUpdated.getAcctgTransEntrySeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class AcctgTransEntryController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{acctgTransEntrySeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateAcctgTransEntry(@RequestBody AcctgTransEntry acctgTransEntryToBeUpdated,
+	public ResponseEntity<String> updateAcctgTransEntry(@RequestBody AcctgTransEntry acctgTransEntryToBeUpdated,
 			@PathVariable String acctgTransEntrySeqId) throws Exception {
 
 		acctgTransEntryToBeUpdated.setAcctgTransEntrySeqId(acctgTransEntrySeqId);
@@ -178,41 +128,44 @@ public class AcctgTransEntryController {
 
 		try {
 			if(((AcctgTransEntryUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{acctgTransEntryId}")
-	public ResponseEntity<Object> findById(@PathVariable String acctgTransEntryId) throws Exception {
+	public ResponseEntity<AcctgTransEntry> findById(@PathVariable String acctgTransEntryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("acctgTransEntryId", acctgTransEntryId);
 		try {
 
-			Object foundAcctgTransEntry = findAcctgTransEntrysBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundAcctgTransEntry);
+			List<AcctgTransEntry> foundAcctgTransEntry = findAcctgTransEntrysBy(requestParams).getBody();
+			if(foundAcctgTransEntry.size()==1){				return successful(foundAcctgTransEntry.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{acctgTransEntryId}")
-	public ResponseEntity<Object> deleteAcctgTransEntryByIdUpdated(@PathVariable String acctgTransEntryId) throws Exception {
+	public ResponseEntity<String> deleteAcctgTransEntryByIdUpdated(@PathVariable String acctgTransEntryId) throws Exception {
 		DeleteAcctgTransEntry command = new DeleteAcctgTransEntry(acctgTransEntryId);
 
 		try {
 			if (((AcctgTransEntryDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("AcctgTransEntry could not be deleted");
+		return conflict();
 
 	}
 

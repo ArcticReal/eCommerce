@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.survey.query.questionCateg
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/survey/surveyQuestionCategorys")
 public class SurveyQuestionCategoryController {
@@ -52,7 +54,7 @@ public class SurveyQuestionCategoryController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findSurveyQuestionCategorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<SurveyQuestionCategory>> findSurveyQuestionCategorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindSurveyQuestionCategorysBy query = new FindSurveyQuestionCategorysBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class SurveyQuestionCategoryController {
 		}
 
 		List<SurveyQuestionCategory> surveyQuestionCategorys =((SurveyQuestionCategoryFound) Scheduler.execute(query).data()).getSurveyQuestionCategorys();
-
-		if (surveyQuestionCategorys.size() == 1) {
-			return ResponseEntity.ok().body(surveyQuestionCategorys.get(0));
-		}
 
 		return ResponseEntity.ok().body(surveyQuestionCategorys);
 
@@ -78,7 +76,7 @@ public class SurveyQuestionCategoryController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createSurveyQuestionCategory(HttpServletRequest request) throws Exception {
+	public ResponseEntity<SurveyQuestionCategory> createSurveyQuestionCategory(HttpServletRequest request) throws Exception {
 
 		SurveyQuestionCategory surveyQuestionCategoryToBeAdded = new SurveyQuestionCategory();
 		try {
@@ -86,7 +84,7 @@ public class SurveyQuestionCategoryController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createSurveyQuestionCategory(surveyQuestionCategoryToBeAdded);
@@ -101,63 +99,15 @@ public class SurveyQuestionCategoryController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createSurveyQuestionCategory(@RequestBody SurveyQuestionCategory surveyQuestionCategoryToBeAdded) throws Exception {
+	public ResponseEntity<SurveyQuestionCategory> createSurveyQuestionCategory(@RequestBody SurveyQuestionCategory surveyQuestionCategoryToBeAdded) throws Exception {
 
 		AddSurveyQuestionCategory command = new AddSurveyQuestionCategory(surveyQuestionCategoryToBeAdded);
 		SurveyQuestionCategory surveyQuestionCategory = ((SurveyQuestionCategoryAdded) Scheduler.execute(command).data()).getAddedSurveyQuestionCategory();
 		
 		if (surveyQuestionCategory != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(surveyQuestionCategory);
+			return successful(surveyQuestionCategory);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("SurveyQuestionCategory could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateSurveyQuestionCategory(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		SurveyQuestionCategory surveyQuestionCategoryToBeUpdated = new SurveyQuestionCategory();
-
-		try {
-			surveyQuestionCategoryToBeUpdated = SurveyQuestionCategoryMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateSurveyQuestionCategory(surveyQuestionCategoryToBeUpdated, surveyQuestionCategoryToBeUpdated.getSurveyQuestionCategoryId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class SurveyQuestionCategoryController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{surveyQuestionCategoryId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateSurveyQuestionCategory(@RequestBody SurveyQuestionCategory surveyQuestionCategoryToBeUpdated,
+	public ResponseEntity<String> updateSurveyQuestionCategory(@RequestBody SurveyQuestionCategory surveyQuestionCategoryToBeUpdated,
 			@PathVariable String surveyQuestionCategoryId) throws Exception {
 
 		surveyQuestionCategoryToBeUpdated.setSurveyQuestionCategoryId(surveyQuestionCategoryId);
@@ -178,41 +128,44 @@ public class SurveyQuestionCategoryController {
 
 		try {
 			if(((SurveyQuestionCategoryUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{surveyQuestionCategoryId}")
-	public ResponseEntity<Object> findById(@PathVariable String surveyQuestionCategoryId) throws Exception {
+	public ResponseEntity<SurveyQuestionCategory> findById(@PathVariable String surveyQuestionCategoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("surveyQuestionCategoryId", surveyQuestionCategoryId);
 		try {
 
-			Object foundSurveyQuestionCategory = findSurveyQuestionCategorysBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundSurveyQuestionCategory);
+			List<SurveyQuestionCategory> foundSurveyQuestionCategory = findSurveyQuestionCategorysBy(requestParams).getBody();
+			if(foundSurveyQuestionCategory.size()==1){				return successful(foundSurveyQuestionCategory.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{surveyQuestionCategoryId}")
-	public ResponseEntity<Object> deleteSurveyQuestionCategoryByIdUpdated(@PathVariable String surveyQuestionCategoryId) throws Exception {
+	public ResponseEntity<String> deleteSurveyQuestionCategoryByIdUpdated(@PathVariable String surveyQuestionCategoryId) throws Exception {
 		DeleteSurveyQuestionCategory command = new DeleteSurveyQuestionCategory(surveyQuestionCategoryId);
 
 		try {
 			if (((SurveyQuestionCategoryDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("SurveyQuestionCategory could not be deleted");
+		return conflict();
 
 	}
 

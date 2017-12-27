@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.budget.query.FindBudget
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/budgets")
 public class BudgetController {
@@ -52,7 +54,7 @@ public class BudgetController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findBudgetsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<Budget>> findBudgetsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindBudgetsBy query = new FindBudgetsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class BudgetController {
 		}
 
 		List<Budget> budgets =((BudgetFound) Scheduler.execute(query).data()).getBudgets();
-
-		if (budgets.size() == 1) {
-			return ResponseEntity.ok().body(budgets.get(0));
-		}
 
 		return ResponseEntity.ok().body(budgets);
 
@@ -78,7 +76,7 @@ public class BudgetController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createBudget(HttpServletRequest request) throws Exception {
+	public ResponseEntity<Budget> createBudget(HttpServletRequest request) throws Exception {
 
 		Budget budgetToBeAdded = new Budget();
 		try {
@@ -86,7 +84,7 @@ public class BudgetController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createBudget(budgetToBeAdded);
@@ -101,63 +99,15 @@ public class BudgetController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createBudget(@RequestBody Budget budgetToBeAdded) throws Exception {
+	public ResponseEntity<Budget> createBudget(@RequestBody Budget budgetToBeAdded) throws Exception {
 
 		AddBudget command = new AddBudget(budgetToBeAdded);
 		Budget budget = ((BudgetAdded) Scheduler.execute(command).data()).getAddedBudget();
 		
 		if (budget != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(budget);
+			return successful(budget);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("Budget could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateBudget(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		Budget budgetToBeUpdated = new Budget();
-
-		try {
-			budgetToBeUpdated = BudgetMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateBudget(budgetToBeUpdated, budgetToBeUpdated.getBudgetId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class BudgetController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{budgetId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateBudget(@RequestBody Budget budgetToBeUpdated,
+	public ResponseEntity<String> updateBudget(@RequestBody Budget budgetToBeUpdated,
 			@PathVariable String budgetId) throws Exception {
 
 		budgetToBeUpdated.setBudgetId(budgetId);
@@ -178,41 +128,44 @@ public class BudgetController {
 
 		try {
 			if(((BudgetUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{budgetId}")
-	public ResponseEntity<Object> findById(@PathVariable String budgetId) throws Exception {
+	public ResponseEntity<Budget> findById(@PathVariable String budgetId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("budgetId", budgetId);
 		try {
 
-			Object foundBudget = findBudgetsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundBudget);
+			List<Budget> foundBudget = findBudgetsBy(requestParams).getBody();
+			if(foundBudget.size()==1){				return successful(foundBudget.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{budgetId}")
-	public ResponseEntity<Object> deleteBudgetByIdUpdated(@PathVariable String budgetId) throws Exception {
+	public ResponseEntity<String> deleteBudgetByIdUpdated(@PathVariable String budgetId) throws Exception {
 		DeleteBudget command = new DeleteBudget(budgetId);
 
 		try {
 			if (((BudgetDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("Budget could not be deleted");
+		return conflict();
 
 	}
 

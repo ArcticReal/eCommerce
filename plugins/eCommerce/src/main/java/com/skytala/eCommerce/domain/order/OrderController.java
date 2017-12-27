@@ -327,7 +327,7 @@ public class OrderController {
 
     @PutMapping("/{orderId}/cancel")
     @PreAuthorize(HAS_USER_AUTHORITY)
-    public ResponseEntity cancelOrder(Principal principal, @PathVariable("orderId") String orderId) throws Exception {
+    public ResponseEntity<OrderHeader> cancelOrder(Principal principal, @PathVariable("orderId") String orderId) throws Exception {
 
 
         // check if the order is made by current user
@@ -353,7 +353,7 @@ public class OrderController {
 
     @PutMapping("/{orderId}/approve")
     @PreAuthorize(HAS_ADMIN_AUTHORITY)
-    public ResponseEntity approveOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
+    public ResponseEntity<OrderHeader> approveOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
 
 
         OrderHeader header = orderHeaderController.findById(orderId, principal).getBody();
@@ -372,7 +372,7 @@ public class OrderController {
 
     @PutMapping("/{orderId}/reject")
     @PreAuthorize(HAS_ADMIN_AUTHORITY)
-    public ResponseEntity rejectOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
+    public ResponseEntity<OrderHeader> rejectOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
 
         OrderHeader header = orderHeaderController.findById(orderId, principal).getBody();
 
@@ -389,7 +389,7 @@ public class OrderController {
 
     @PutMapping("/{orderId}/hold")
     @PreAuthorize(HAS_ADMIN_AUTHORITY)
-    public ResponseEntity holdOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
+    public ResponseEntity<OrderHeader> holdOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
 
         OrderHeader header = orderHeaderController.findById(orderId, principal).getBody();
 
@@ -406,7 +406,7 @@ public class OrderController {
 
     @PutMapping("/{orderId}/create")
     @PreAuthorize(HAS_ADMIN_AUTHORITY)
-    public ResponseEntity createOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
+    public ResponseEntity<OrderHeader> createOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
 
 
         OrderHeader header = orderHeaderController.findById(orderId, principal).getBody();
@@ -424,7 +424,7 @@ public class OrderController {
 
     @PutMapping("/{orderId}/send")
     @PreAuthorize(HAS_ADMIN_AUTHORITY)
-    public ResponseEntity sendOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
+    public ResponseEntity<OrderHeader> sendOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
 
 
         OrderHeader header = orderHeaderController.findById(orderId, principal).getBody();
@@ -442,7 +442,7 @@ public class OrderController {
 
     @PutMapping("/{orderId}/complete")
     @PreAuthorize(HAS_ADMIN_AUTHORITY + " or " + HAS_USER_AUTHORITY)
-    public ResponseEntity completeOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
+    public ResponseEntity<OrderHeader> completeOrder(Principal principal , @PathVariable("orderId") String orderId) throws Exception {
 
 
         OrderHeader header = orderHeaderController.findById(orderId, principal).getBody();

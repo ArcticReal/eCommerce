@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.manufacturing.relations.techDataCalendar.que
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/manufacturing/techDataCalendar/techDataCalendarExcDays")
 public class TechDataCalendarExcDayController {
@@ -52,7 +54,7 @@ public class TechDataCalendarExcDayController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findTechDataCalendarExcDaysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<TechDataCalendarExcDay>> findTechDataCalendarExcDaysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTechDataCalendarExcDaysBy query = new FindTechDataCalendarExcDaysBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class TechDataCalendarExcDayController {
 		}
 
 		List<TechDataCalendarExcDay> techDataCalendarExcDays =((TechDataCalendarExcDayFound) Scheduler.execute(query).data()).getTechDataCalendarExcDays();
-
-		if (techDataCalendarExcDays.size() == 1) {
-			return ResponseEntity.ok().body(techDataCalendarExcDays.get(0));
-		}
 
 		return ResponseEntity.ok().body(techDataCalendarExcDays);
 
@@ -78,7 +76,7 @@ public class TechDataCalendarExcDayController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createTechDataCalendarExcDay(HttpServletRequest request) throws Exception {
+	public ResponseEntity<TechDataCalendarExcDay> createTechDataCalendarExcDay(HttpServletRequest request) throws Exception {
 
 		TechDataCalendarExcDay techDataCalendarExcDayToBeAdded = new TechDataCalendarExcDay();
 		try {
@@ -86,7 +84,7 @@ public class TechDataCalendarExcDayController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createTechDataCalendarExcDay(techDataCalendarExcDayToBeAdded);
@@ -101,63 +99,15 @@ public class TechDataCalendarExcDayController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createTechDataCalendarExcDay(@RequestBody TechDataCalendarExcDay techDataCalendarExcDayToBeAdded) throws Exception {
+	public ResponseEntity<TechDataCalendarExcDay> createTechDataCalendarExcDay(@RequestBody TechDataCalendarExcDay techDataCalendarExcDayToBeAdded) throws Exception {
 
 		AddTechDataCalendarExcDay command = new AddTechDataCalendarExcDay(techDataCalendarExcDayToBeAdded);
 		TechDataCalendarExcDay techDataCalendarExcDay = ((TechDataCalendarExcDayAdded) Scheduler.execute(command).data()).getAddedTechDataCalendarExcDay();
 		
 		if (techDataCalendarExcDay != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(techDataCalendarExcDay);
+			return successful(techDataCalendarExcDay);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("TechDataCalendarExcDay could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateTechDataCalendarExcDay(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		TechDataCalendarExcDay techDataCalendarExcDayToBeUpdated = new TechDataCalendarExcDay();
-
-		try {
-			techDataCalendarExcDayToBeUpdated = TechDataCalendarExcDayMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateTechDataCalendarExcDay(techDataCalendarExcDayToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class TechDataCalendarExcDayController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateTechDataCalendarExcDay(@RequestBody TechDataCalendarExcDay techDataCalendarExcDayToBeUpdated,
+	public ResponseEntity<String> updateTechDataCalendarExcDay(@RequestBody TechDataCalendarExcDay techDataCalendarExcDayToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		techDataCalendarExcDayToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class TechDataCalendarExcDayController {
 
 		try {
 			if(((TechDataCalendarExcDayUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{techDataCalendarExcDayId}")
-	public ResponseEntity<Object> findById(@PathVariable String techDataCalendarExcDayId) throws Exception {
+	public ResponseEntity<TechDataCalendarExcDay> findById(@PathVariable String techDataCalendarExcDayId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("techDataCalendarExcDayId", techDataCalendarExcDayId);
 		try {
 
-			Object foundTechDataCalendarExcDay = findTechDataCalendarExcDaysBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundTechDataCalendarExcDay);
+			List<TechDataCalendarExcDay> foundTechDataCalendarExcDay = findTechDataCalendarExcDaysBy(requestParams).getBody();
+			if(foundTechDataCalendarExcDay.size()==1){				return successful(foundTechDataCalendarExcDay.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{techDataCalendarExcDayId}")
-	public ResponseEntity<Object> deleteTechDataCalendarExcDayByIdUpdated(@PathVariable String techDataCalendarExcDayId) throws Exception {
+	public ResponseEntity<String> deleteTechDataCalendarExcDayByIdUpdated(@PathVariable String techDataCalendarExcDayId) throws Exception {
 		DeleteTechDataCalendarExcDay command = new DeleteTechDataCalendarExcDay(techDataCalendarExcDayId);
 
 		try {
 			if (((TechDataCalendarExcDayDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("TechDataCalendarExcDay could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.party.query.group.FindPartyG
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/party/partyGroups")
 public class PartyGroupController {
@@ -52,7 +54,7 @@ public class PartyGroupController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPartyGroupsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PartyGroup>> findPartyGroupsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyGroupsBy query = new FindPartyGroupsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PartyGroupController {
 		}
 
 		List<PartyGroup> partyGroups =((PartyGroupFound) Scheduler.execute(query).data()).getPartyGroups();
-
-		if (partyGroups.size() == 1) {
-			return ResponseEntity.ok().body(partyGroups.get(0));
-		}
 
 		return ResponseEntity.ok().body(partyGroups);
 
@@ -78,7 +76,7 @@ public class PartyGroupController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPartyGroup(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PartyGroup> createPartyGroup(HttpServletRequest request) throws Exception {
 
 		PartyGroup partyGroupToBeAdded = new PartyGroup();
 		try {
@@ -86,7 +84,7 @@ public class PartyGroupController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPartyGroup(partyGroupToBeAdded);
@@ -101,63 +99,15 @@ public class PartyGroupController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPartyGroup(@RequestBody PartyGroup partyGroupToBeAdded) throws Exception {
+	public ResponseEntity<PartyGroup> createPartyGroup(@RequestBody PartyGroup partyGroupToBeAdded) throws Exception {
 
 		AddPartyGroup command = new AddPartyGroup(partyGroupToBeAdded);
 		PartyGroup partyGroup = ((PartyGroupAdded) Scheduler.execute(command).data()).getAddedPartyGroup();
 		
 		if (partyGroup != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(partyGroup);
+			return successful(partyGroup);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PartyGroup could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePartyGroup(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PartyGroup partyGroupToBeUpdated = new PartyGroup();
-
-		try {
-			partyGroupToBeUpdated = PartyGroupMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePartyGroup(partyGroupToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PartyGroupController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePartyGroup(@RequestBody PartyGroup partyGroupToBeUpdated,
+	public ResponseEntity<String> updatePartyGroup(@RequestBody PartyGroup partyGroupToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		partyGroupToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class PartyGroupController {
 
 		try {
 			if(((PartyGroupUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{partyGroupId}")
-	public ResponseEntity<Object> findById(@PathVariable String partyGroupId) throws Exception {
+	public ResponseEntity<PartyGroup> findById(@PathVariable String partyGroupId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyGroupId", partyGroupId);
 		try {
 
-			Object foundPartyGroup = findPartyGroupsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPartyGroup);
+			List<PartyGroup> foundPartyGroup = findPartyGroupsBy(requestParams).getBody();
+			if(foundPartyGroup.size()==1){				return successful(foundPartyGroup.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{partyGroupId}")
-	public ResponseEntity<Object> deletePartyGroupByIdUpdated(@PathVariable String partyGroupId) throws Exception {
+	public ResponseEntity<String> deletePartyGroupByIdUpdated(@PathVariable String partyGroupId) throws Exception {
 		DeletePartyGroup command = new DeletePartyGroup(partyGroupId);
 
 		try {
 			if (((PartyGroupDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PartyGroup could not be deleted");
+		return conflict();
 
 	}
 

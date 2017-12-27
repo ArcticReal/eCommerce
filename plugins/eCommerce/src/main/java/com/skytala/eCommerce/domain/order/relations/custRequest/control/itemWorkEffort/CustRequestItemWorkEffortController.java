@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.custRequest.query.itemWorkEf
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/custRequest/custRequestItemWorkEfforts")
 public class CustRequestItemWorkEffortController {
@@ -52,7 +54,7 @@ public class CustRequestItemWorkEffortController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findCustRequestItemWorkEffortsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<CustRequestItemWorkEffort>> findCustRequestItemWorkEffortsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCustRequestItemWorkEffortsBy query = new FindCustRequestItemWorkEffortsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class CustRequestItemWorkEffortController {
 		}
 
 		List<CustRequestItemWorkEffort> custRequestItemWorkEfforts =((CustRequestItemWorkEffortFound) Scheduler.execute(query).data()).getCustRequestItemWorkEfforts();
-
-		if (custRequestItemWorkEfforts.size() == 1) {
-			return ResponseEntity.ok().body(custRequestItemWorkEfforts.get(0));
-		}
 
 		return ResponseEntity.ok().body(custRequestItemWorkEfforts);
 
@@ -78,7 +76,7 @@ public class CustRequestItemWorkEffortController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createCustRequestItemWorkEffort(HttpServletRequest request) throws Exception {
+	public ResponseEntity<CustRequestItemWorkEffort> createCustRequestItemWorkEffort(HttpServletRequest request) throws Exception {
 
 		CustRequestItemWorkEffort custRequestItemWorkEffortToBeAdded = new CustRequestItemWorkEffort();
 		try {
@@ -86,7 +84,7 @@ public class CustRequestItemWorkEffortController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createCustRequestItemWorkEffort(custRequestItemWorkEffortToBeAdded);
@@ -101,63 +99,15 @@ public class CustRequestItemWorkEffortController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createCustRequestItemWorkEffort(@RequestBody CustRequestItemWorkEffort custRequestItemWorkEffortToBeAdded) throws Exception {
+	public ResponseEntity<CustRequestItemWorkEffort> createCustRequestItemWorkEffort(@RequestBody CustRequestItemWorkEffort custRequestItemWorkEffortToBeAdded) throws Exception {
 
 		AddCustRequestItemWorkEffort command = new AddCustRequestItemWorkEffort(custRequestItemWorkEffortToBeAdded);
 		CustRequestItemWorkEffort custRequestItemWorkEffort = ((CustRequestItemWorkEffortAdded) Scheduler.execute(command).data()).getAddedCustRequestItemWorkEffort();
 		
 		if (custRequestItemWorkEffort != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(custRequestItemWorkEffort);
+			return successful(custRequestItemWorkEffort);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("CustRequestItemWorkEffort could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateCustRequestItemWorkEffort(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		CustRequestItemWorkEffort custRequestItemWorkEffortToBeUpdated = new CustRequestItemWorkEffort();
-
-		try {
-			custRequestItemWorkEffortToBeUpdated = CustRequestItemWorkEffortMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateCustRequestItemWorkEffort(custRequestItemWorkEffortToBeUpdated, custRequestItemWorkEffortToBeUpdated.getCustRequestItemSeqId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class CustRequestItemWorkEffortController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{custRequestItemSeqId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateCustRequestItemWorkEffort(@RequestBody CustRequestItemWorkEffort custRequestItemWorkEffortToBeUpdated,
+	public ResponseEntity<String> updateCustRequestItemWorkEffort(@RequestBody CustRequestItemWorkEffort custRequestItemWorkEffortToBeUpdated,
 			@PathVariable String custRequestItemSeqId) throws Exception {
 
 		custRequestItemWorkEffortToBeUpdated.setCustRequestItemSeqId(custRequestItemSeqId);
@@ -178,41 +128,44 @@ public class CustRequestItemWorkEffortController {
 
 		try {
 			if(((CustRequestItemWorkEffortUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{custRequestItemWorkEffortId}")
-	public ResponseEntity<Object> findById(@PathVariable String custRequestItemWorkEffortId) throws Exception {
+	public ResponseEntity<CustRequestItemWorkEffort> findById(@PathVariable String custRequestItemWorkEffortId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("custRequestItemWorkEffortId", custRequestItemWorkEffortId);
 		try {
 
-			Object foundCustRequestItemWorkEffort = findCustRequestItemWorkEffortsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundCustRequestItemWorkEffort);
+			List<CustRequestItemWorkEffort> foundCustRequestItemWorkEffort = findCustRequestItemWorkEffortsBy(requestParams).getBody();
+			if(foundCustRequestItemWorkEffort.size()==1){				return successful(foundCustRequestItemWorkEffort.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{custRequestItemWorkEffortId}")
-	public ResponseEntity<Object> deleteCustRequestItemWorkEffortByIdUpdated(@PathVariable String custRequestItemWorkEffortId) throws Exception {
+	public ResponseEntity<String> deleteCustRequestItemWorkEffortByIdUpdated(@PathVariable String custRequestItemWorkEffortId) throws Exception {
 		DeleteCustRequestItemWorkEffort command = new DeleteCustRequestItemWorkEffort(custRequestItemWorkEffortId);
 
 		try {
 			if (((CustRequestItemWorkEffortDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("CustRequestItemWorkEffort could not be deleted");
+		return conflict();
 
 	}
 

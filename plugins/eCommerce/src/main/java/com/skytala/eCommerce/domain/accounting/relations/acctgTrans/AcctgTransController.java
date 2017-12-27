@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.acctgTrans.query.FindAc
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/acctgTranss")
 public class AcctgTransController {
@@ -52,7 +54,7 @@ public class AcctgTransController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findAcctgTranssBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<AcctgTrans>> findAcctgTranssBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindAcctgTranssBy query = new FindAcctgTranssBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class AcctgTransController {
 		}
 
 		List<AcctgTrans> acctgTranss =((AcctgTransFound) Scheduler.execute(query).data()).getAcctgTranss();
-
-		if (acctgTranss.size() == 1) {
-			return ResponseEntity.ok().body(acctgTranss.get(0));
-		}
 
 		return ResponseEntity.ok().body(acctgTranss);
 
@@ -78,7 +76,7 @@ public class AcctgTransController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createAcctgTrans(HttpServletRequest request) throws Exception {
+	public ResponseEntity<AcctgTrans> createAcctgTrans(HttpServletRequest request) throws Exception {
 
 		AcctgTrans acctgTransToBeAdded = new AcctgTrans();
 		try {
@@ -86,7 +84,7 @@ public class AcctgTransController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createAcctgTrans(acctgTransToBeAdded);
@@ -101,63 +99,15 @@ public class AcctgTransController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createAcctgTrans(@RequestBody AcctgTrans acctgTransToBeAdded) throws Exception {
+	public ResponseEntity<AcctgTrans> createAcctgTrans(@RequestBody AcctgTrans acctgTransToBeAdded) throws Exception {
 
 		AddAcctgTrans command = new AddAcctgTrans(acctgTransToBeAdded);
 		AcctgTrans acctgTrans = ((AcctgTransAdded) Scheduler.execute(command).data()).getAddedAcctgTrans();
 		
 		if (acctgTrans != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(acctgTrans);
+			return successful(acctgTrans);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("AcctgTrans could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateAcctgTrans(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		AcctgTrans acctgTransToBeUpdated = new AcctgTrans();
-
-		try {
-			acctgTransToBeUpdated = AcctgTransMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateAcctgTrans(acctgTransToBeUpdated, acctgTransToBeUpdated.getAcctgTransId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class AcctgTransController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{acctgTransId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateAcctgTrans(@RequestBody AcctgTrans acctgTransToBeUpdated,
+	public ResponseEntity<String> updateAcctgTrans(@RequestBody AcctgTrans acctgTransToBeUpdated,
 			@PathVariable String acctgTransId) throws Exception {
 
 		acctgTransToBeUpdated.setAcctgTransId(acctgTransId);
@@ -178,41 +128,44 @@ public class AcctgTransController {
 
 		try {
 			if(((AcctgTransUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{acctgTransId}")
-	public ResponseEntity<Object> findById(@PathVariable String acctgTransId) throws Exception {
+	public ResponseEntity<AcctgTrans> findById(@PathVariable String acctgTransId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("acctgTransId", acctgTransId);
 		try {
 
-			Object foundAcctgTrans = findAcctgTranssBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundAcctgTrans);
+			List<AcctgTrans> foundAcctgTrans = findAcctgTranssBy(requestParams).getBody();
+			if(foundAcctgTrans.size()==1){				return successful(foundAcctgTrans.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{acctgTransId}")
-	public ResponseEntity<Object> deleteAcctgTransByIdUpdated(@PathVariable String acctgTransId) throws Exception {
+	public ResponseEntity<String> deleteAcctgTransByIdUpdated(@PathVariable String acctgTransId) throws Exception {
 		DeleteAcctgTrans command = new DeleteAcctgTrans(acctgTransId);
 
 		try {
 			if (((AcctgTransDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("AcctgTrans could not be deleted");
+		return conflict();
 
 	}
 

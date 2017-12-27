@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.humanres.relations.employment.query.appSourc
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/humanres/employment/employmentAppSourceTypes")
 public class EmploymentAppSourceTypeController {
@@ -52,7 +54,7 @@ public class EmploymentAppSourceTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findEmploymentAppSourceTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<EmploymentAppSourceType>> findEmploymentAppSourceTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindEmploymentAppSourceTypesBy query = new FindEmploymentAppSourceTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class EmploymentAppSourceTypeController {
 		}
 
 		List<EmploymentAppSourceType> employmentAppSourceTypes =((EmploymentAppSourceTypeFound) Scheduler.execute(query).data()).getEmploymentAppSourceTypes();
-
-		if (employmentAppSourceTypes.size() == 1) {
-			return ResponseEntity.ok().body(employmentAppSourceTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(employmentAppSourceTypes);
 
@@ -78,7 +76,7 @@ public class EmploymentAppSourceTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createEmploymentAppSourceType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<EmploymentAppSourceType> createEmploymentAppSourceType(HttpServletRequest request) throws Exception {
 
 		EmploymentAppSourceType employmentAppSourceTypeToBeAdded = new EmploymentAppSourceType();
 		try {
@@ -86,7 +84,7 @@ public class EmploymentAppSourceTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createEmploymentAppSourceType(employmentAppSourceTypeToBeAdded);
@@ -101,63 +99,15 @@ public class EmploymentAppSourceTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createEmploymentAppSourceType(@RequestBody EmploymentAppSourceType employmentAppSourceTypeToBeAdded) throws Exception {
+	public ResponseEntity<EmploymentAppSourceType> createEmploymentAppSourceType(@RequestBody EmploymentAppSourceType employmentAppSourceTypeToBeAdded) throws Exception {
 
 		AddEmploymentAppSourceType command = new AddEmploymentAppSourceType(employmentAppSourceTypeToBeAdded);
 		EmploymentAppSourceType employmentAppSourceType = ((EmploymentAppSourceTypeAdded) Scheduler.execute(command).data()).getAddedEmploymentAppSourceType();
 		
 		if (employmentAppSourceType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(employmentAppSourceType);
+			return successful(employmentAppSourceType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("EmploymentAppSourceType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateEmploymentAppSourceType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		EmploymentAppSourceType employmentAppSourceTypeToBeUpdated = new EmploymentAppSourceType();
-
-		try {
-			employmentAppSourceTypeToBeUpdated = EmploymentAppSourceTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateEmploymentAppSourceType(employmentAppSourceTypeToBeUpdated, employmentAppSourceTypeToBeUpdated.getEmploymentAppSourceTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class EmploymentAppSourceTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{employmentAppSourceTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateEmploymentAppSourceType(@RequestBody EmploymentAppSourceType employmentAppSourceTypeToBeUpdated,
+	public ResponseEntity<String> updateEmploymentAppSourceType(@RequestBody EmploymentAppSourceType employmentAppSourceTypeToBeUpdated,
 			@PathVariable String employmentAppSourceTypeId) throws Exception {
 
 		employmentAppSourceTypeToBeUpdated.setEmploymentAppSourceTypeId(employmentAppSourceTypeId);
@@ -178,41 +128,44 @@ public class EmploymentAppSourceTypeController {
 
 		try {
 			if(((EmploymentAppSourceTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{employmentAppSourceTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String employmentAppSourceTypeId) throws Exception {
+	public ResponseEntity<EmploymentAppSourceType> findById(@PathVariable String employmentAppSourceTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("employmentAppSourceTypeId", employmentAppSourceTypeId);
 		try {
 
-			Object foundEmploymentAppSourceType = findEmploymentAppSourceTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundEmploymentAppSourceType);
+			List<EmploymentAppSourceType> foundEmploymentAppSourceType = findEmploymentAppSourceTypesBy(requestParams).getBody();
+			if(foundEmploymentAppSourceType.size()==1){				return successful(foundEmploymentAppSourceType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{employmentAppSourceTypeId}")
-	public ResponseEntity<Object> deleteEmploymentAppSourceTypeByIdUpdated(@PathVariable String employmentAppSourceTypeId) throws Exception {
+	public ResponseEntity<String> deleteEmploymentAppSourceTypeByIdUpdated(@PathVariable String employmentAppSourceTypeId) throws Exception {
 		DeleteEmploymentAppSourceType command = new DeleteEmploymentAppSourceType(employmentAppSourceTypeId);
 
 		try {
 			if (((EmploymentAppSourceTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("EmploymentAppSourceType could not be deleted");
+		return conflict();
 
 	}
 

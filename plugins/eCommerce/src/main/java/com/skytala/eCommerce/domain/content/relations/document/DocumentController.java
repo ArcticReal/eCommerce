@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.document.query.FindDocumen
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/documents")
 public class DocumentController {
@@ -52,7 +54,7 @@ public class DocumentController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findDocumentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<Document>> findDocumentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindDocumentsBy query = new FindDocumentsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class DocumentController {
 		}
 
 		List<Document> documents =((DocumentFound) Scheduler.execute(query).data()).getDocuments();
-
-		if (documents.size() == 1) {
-			return ResponseEntity.ok().body(documents.get(0));
-		}
 
 		return ResponseEntity.ok().body(documents);
 
@@ -78,7 +76,7 @@ public class DocumentController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createDocument(HttpServletRequest request) throws Exception {
+	public ResponseEntity<Document> createDocument(HttpServletRequest request) throws Exception {
 
 		Document documentToBeAdded = new Document();
 		try {
@@ -86,7 +84,7 @@ public class DocumentController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createDocument(documentToBeAdded);
@@ -101,63 +99,15 @@ public class DocumentController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createDocument(@RequestBody Document documentToBeAdded) throws Exception {
+	public ResponseEntity<Document> createDocument(@RequestBody Document documentToBeAdded) throws Exception {
 
 		AddDocument command = new AddDocument(documentToBeAdded);
 		Document document = ((DocumentAdded) Scheduler.execute(command).data()).getAddedDocument();
 		
 		if (document != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(document);
+			return successful(document);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("Document could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateDocument(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		Document documentToBeUpdated = new Document();
-
-		try {
-			documentToBeUpdated = DocumentMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateDocument(documentToBeUpdated, documentToBeUpdated.getDocumentId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class DocumentController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{documentId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateDocument(@RequestBody Document documentToBeUpdated,
+	public ResponseEntity<String> updateDocument(@RequestBody Document documentToBeUpdated,
 			@PathVariable String documentId) throws Exception {
 
 		documentToBeUpdated.setDocumentId(documentId);
@@ -178,41 +128,44 @@ public class DocumentController {
 
 		try {
 			if(((DocumentUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{documentId}")
-	public ResponseEntity<Object> findById(@PathVariable String documentId) throws Exception {
+	public ResponseEntity<Document> findById(@PathVariable String documentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("documentId", documentId);
 		try {
 
-			Object foundDocument = findDocumentsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundDocument);
+			List<Document> foundDocument = findDocumentsBy(requestParams).getBody();
+			if(foundDocument.size()==1){				return successful(foundDocument.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{documentId}")
-	public ResponseEntity<Object> deleteDocumentByIdUpdated(@PathVariable String documentId) throws Exception {
+	public ResponseEntity<String> deleteDocumentByIdUpdated(@PathVariable String documentId) throws Exception {
 		DeleteDocument command = new DeleteDocument(documentId);
 
 		try {
 			if (((DocumentDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("Document could not be deleted");
+		return conflict();
 
 	}
 

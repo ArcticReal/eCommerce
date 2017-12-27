@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.storeVendorP
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productStoreVendorPayments")
 public class ProductStoreVendorPaymentController {
@@ -52,7 +54,7 @@ public class ProductStoreVendorPaymentController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductStoreVendorPaymentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductStoreVendorPayment>> findProductStoreVendorPaymentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductStoreVendorPaymentsBy query = new FindProductStoreVendorPaymentsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductStoreVendorPaymentController {
 		}
 
 		List<ProductStoreVendorPayment> productStoreVendorPayments =((ProductStoreVendorPaymentFound) Scheduler.execute(query).data()).getProductStoreVendorPayments();
-
-		if (productStoreVendorPayments.size() == 1) {
-			return ResponseEntity.ok().body(productStoreVendorPayments.get(0));
-		}
 
 		return ResponseEntity.ok().body(productStoreVendorPayments);
 
@@ -78,7 +76,7 @@ public class ProductStoreVendorPaymentController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductStoreVendorPayment(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductStoreVendorPayment> createProductStoreVendorPayment(HttpServletRequest request) throws Exception {
 
 		ProductStoreVendorPayment productStoreVendorPaymentToBeAdded = new ProductStoreVendorPayment();
 		try {
@@ -86,7 +84,7 @@ public class ProductStoreVendorPaymentController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductStoreVendorPayment(productStoreVendorPaymentToBeAdded);
@@ -101,63 +99,15 @@ public class ProductStoreVendorPaymentController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductStoreVendorPayment(@RequestBody ProductStoreVendorPayment productStoreVendorPaymentToBeAdded) throws Exception {
+	public ResponseEntity<ProductStoreVendorPayment> createProductStoreVendorPayment(@RequestBody ProductStoreVendorPayment productStoreVendorPaymentToBeAdded) throws Exception {
 
 		AddProductStoreVendorPayment command = new AddProductStoreVendorPayment(productStoreVendorPaymentToBeAdded);
 		ProductStoreVendorPayment productStoreVendorPayment = ((ProductStoreVendorPaymentAdded) Scheduler.execute(command).data()).getAddedProductStoreVendorPayment();
 		
 		if (productStoreVendorPayment != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productStoreVendorPayment);
+			return successful(productStoreVendorPayment);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductStoreVendorPayment could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductStoreVendorPayment(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductStoreVendorPayment productStoreVendorPaymentToBeUpdated = new ProductStoreVendorPayment();
-
-		try {
-			productStoreVendorPaymentToBeUpdated = ProductStoreVendorPaymentMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductStoreVendorPayment(productStoreVendorPaymentToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductStoreVendorPaymentController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductStoreVendorPayment(@RequestBody ProductStoreVendorPayment productStoreVendorPaymentToBeUpdated,
+	public ResponseEntity<String> updateProductStoreVendorPayment(@RequestBody ProductStoreVendorPayment productStoreVendorPaymentToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		productStoreVendorPaymentToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ProductStoreVendorPaymentController {
 
 		try {
 			if(((ProductStoreVendorPaymentUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productStoreVendorPaymentId}")
-	public ResponseEntity<Object> findById(@PathVariable String productStoreVendorPaymentId) throws Exception {
+	public ResponseEntity<ProductStoreVendorPayment> findById(@PathVariable String productStoreVendorPaymentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productStoreVendorPaymentId", productStoreVendorPaymentId);
 		try {
 
-			Object foundProductStoreVendorPayment = findProductStoreVendorPaymentsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductStoreVendorPayment);
+			List<ProductStoreVendorPayment> foundProductStoreVendorPayment = findProductStoreVendorPaymentsBy(requestParams).getBody();
+			if(foundProductStoreVendorPayment.size()==1){				return successful(foundProductStoreVendorPayment.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productStoreVendorPaymentId}")
-	public ResponseEntity<Object> deleteProductStoreVendorPaymentByIdUpdated(@PathVariable String productStoreVendorPaymentId) throws Exception {
+	public ResponseEntity<String> deleteProductStoreVendorPaymentByIdUpdated(@PathVariable String productStoreVendorPaymentId) throws Exception {
 		DeleteProductStoreVendorPayment command = new DeleteProductStoreVendorPayment(productStoreVendorPaymentId);
 
 		try {
 			if (((ProductStoreVendorPaymentDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductStoreVendorPayment could not be deleted");
+		return conflict();
 
 	}
 

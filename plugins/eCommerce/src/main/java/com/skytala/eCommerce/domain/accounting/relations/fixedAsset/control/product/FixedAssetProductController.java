@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.fixedAsset.query.produc
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/fixedAsset/fixedAssetProducts")
 public class FixedAssetProductController {
@@ -52,7 +54,7 @@ public class FixedAssetProductController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findFixedAssetProductsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<FixedAssetProduct>> findFixedAssetProductsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindFixedAssetProductsBy query = new FindFixedAssetProductsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class FixedAssetProductController {
 		}
 
 		List<FixedAssetProduct> fixedAssetProducts =((FixedAssetProductFound) Scheduler.execute(query).data()).getFixedAssetProducts();
-
-		if (fixedAssetProducts.size() == 1) {
-			return ResponseEntity.ok().body(fixedAssetProducts.get(0));
-		}
 
 		return ResponseEntity.ok().body(fixedAssetProducts);
 
@@ -78,7 +76,7 @@ public class FixedAssetProductController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createFixedAssetProduct(HttpServletRequest request) throws Exception {
+	public ResponseEntity<FixedAssetProduct> createFixedAssetProduct(HttpServletRequest request) throws Exception {
 
 		FixedAssetProduct fixedAssetProductToBeAdded = new FixedAssetProduct();
 		try {
@@ -86,7 +84,7 @@ public class FixedAssetProductController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createFixedAssetProduct(fixedAssetProductToBeAdded);
@@ -101,63 +99,15 @@ public class FixedAssetProductController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createFixedAssetProduct(@RequestBody FixedAssetProduct fixedAssetProductToBeAdded) throws Exception {
+	public ResponseEntity<FixedAssetProduct> createFixedAssetProduct(@RequestBody FixedAssetProduct fixedAssetProductToBeAdded) throws Exception {
 
 		AddFixedAssetProduct command = new AddFixedAssetProduct(fixedAssetProductToBeAdded);
 		FixedAssetProduct fixedAssetProduct = ((FixedAssetProductAdded) Scheduler.execute(command).data()).getAddedFixedAssetProduct();
 		
 		if (fixedAssetProduct != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(fixedAssetProduct);
+			return successful(fixedAssetProduct);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("FixedAssetProduct could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateFixedAssetProduct(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		FixedAssetProduct fixedAssetProductToBeUpdated = new FixedAssetProduct();
-
-		try {
-			fixedAssetProductToBeUpdated = FixedAssetProductMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateFixedAssetProduct(fixedAssetProductToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class FixedAssetProductController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateFixedAssetProduct(@RequestBody FixedAssetProduct fixedAssetProductToBeUpdated,
+	public ResponseEntity<String> updateFixedAssetProduct(@RequestBody FixedAssetProduct fixedAssetProductToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		fixedAssetProductToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class FixedAssetProductController {
 
 		try {
 			if(((FixedAssetProductUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{fixedAssetProductId}")
-	public ResponseEntity<Object> findById(@PathVariable String fixedAssetProductId) throws Exception {
+	public ResponseEntity<FixedAssetProduct> findById(@PathVariable String fixedAssetProductId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("fixedAssetProductId", fixedAssetProductId);
 		try {
 
-			Object foundFixedAssetProduct = findFixedAssetProductsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundFixedAssetProduct);
+			List<FixedAssetProduct> foundFixedAssetProduct = findFixedAssetProductsBy(requestParams).getBody();
+			if(foundFixedAssetProduct.size()==1){				return successful(foundFixedAssetProduct.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{fixedAssetProductId}")
-	public ResponseEntity<Object> deleteFixedAssetProductByIdUpdated(@PathVariable String fixedAssetProductId) throws Exception {
+	public ResponseEntity<String> deleteFixedAssetProductByIdUpdated(@PathVariable String fixedAssetProductId) throws Exception {
 		DeleteFixedAssetProduct command = new DeleteFixedAssetProduct(fixedAssetProductId);
 
 		try {
 			if (((FixedAssetProductDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("FixedAssetProduct could not be deleted");
+		return conflict();
 
 	}
 

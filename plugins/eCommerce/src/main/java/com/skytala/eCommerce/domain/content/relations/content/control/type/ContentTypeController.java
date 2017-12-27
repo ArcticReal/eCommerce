@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.content.query.type.FindCon
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/content/contentTypes")
 public class ContentTypeController {
@@ -52,7 +54,7 @@ public class ContentTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findContentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ContentType>> findContentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContentTypesBy query = new FindContentTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ContentTypeController {
 		}
 
 		List<ContentType> contentTypes =((ContentTypeFound) Scheduler.execute(query).data()).getContentTypes();
-
-		if (contentTypes.size() == 1) {
-			return ResponseEntity.ok().body(contentTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(contentTypes);
 
@@ -78,7 +76,7 @@ public class ContentTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createContentType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ContentType> createContentType(HttpServletRequest request) throws Exception {
 
 		ContentType contentTypeToBeAdded = new ContentType();
 		try {
@@ -86,7 +84,7 @@ public class ContentTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createContentType(contentTypeToBeAdded);
@@ -101,63 +99,15 @@ public class ContentTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createContentType(@RequestBody ContentType contentTypeToBeAdded) throws Exception {
+	public ResponseEntity<ContentType> createContentType(@RequestBody ContentType contentTypeToBeAdded) throws Exception {
 
 		AddContentType command = new AddContentType(contentTypeToBeAdded);
 		ContentType contentType = ((ContentTypeAdded) Scheduler.execute(command).data()).getAddedContentType();
 		
 		if (contentType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(contentType);
+			return successful(contentType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ContentType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateContentType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ContentType contentTypeToBeUpdated = new ContentType();
-
-		try {
-			contentTypeToBeUpdated = ContentTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateContentType(contentTypeToBeUpdated, contentTypeToBeUpdated.getContentTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ContentTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{contentTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateContentType(@RequestBody ContentType contentTypeToBeUpdated,
+	public ResponseEntity<String> updateContentType(@RequestBody ContentType contentTypeToBeUpdated,
 			@PathVariable String contentTypeId) throws Exception {
 
 		contentTypeToBeUpdated.setContentTypeId(contentTypeId);
@@ -178,41 +128,44 @@ public class ContentTypeController {
 
 		try {
 			if(((ContentTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{contentTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String contentTypeId) throws Exception {
+	public ResponseEntity<ContentType> findById(@PathVariable String contentTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contentTypeId", contentTypeId);
 		try {
 
-			Object foundContentType = findContentTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundContentType);
+			List<ContentType> foundContentType = findContentTypesBy(requestParams).getBody();
+			if(foundContentType.size()==1){				return successful(foundContentType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{contentTypeId}")
-	public ResponseEntity<Object> deleteContentTypeByIdUpdated(@PathVariable String contentTypeId) throws Exception {
+	public ResponseEntity<String> deleteContentTypeByIdUpdated(@PathVariable String contentTypeId) throws Exception {
 		DeleteContentType command = new DeleteContentType(contentTypeId);
 
 		try {
 			if (((ContentTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ContentType could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.glAccount.query.history
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/glAccount/glAccountHistorys")
 public class GlAccountHistoryController {
@@ -52,7 +54,7 @@ public class GlAccountHistoryController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findGlAccountHistorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<GlAccountHistory>> findGlAccountHistorysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindGlAccountHistorysBy query = new FindGlAccountHistorysBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class GlAccountHistoryController {
 		}
 
 		List<GlAccountHistory> glAccountHistorys =((GlAccountHistoryFound) Scheduler.execute(query).data()).getGlAccountHistorys();
-
-		if (glAccountHistorys.size() == 1) {
-			return ResponseEntity.ok().body(glAccountHistorys.get(0));
-		}
 
 		return ResponseEntity.ok().body(glAccountHistorys);
 
@@ -78,7 +76,7 @@ public class GlAccountHistoryController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createGlAccountHistory(HttpServletRequest request) throws Exception {
+	public ResponseEntity<GlAccountHistory> createGlAccountHistory(HttpServletRequest request) throws Exception {
 
 		GlAccountHistory glAccountHistoryToBeAdded = new GlAccountHistory();
 		try {
@@ -86,7 +84,7 @@ public class GlAccountHistoryController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createGlAccountHistory(glAccountHistoryToBeAdded);
@@ -101,63 +99,15 @@ public class GlAccountHistoryController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createGlAccountHistory(@RequestBody GlAccountHistory glAccountHistoryToBeAdded) throws Exception {
+	public ResponseEntity<GlAccountHistory> createGlAccountHistory(@RequestBody GlAccountHistory glAccountHistoryToBeAdded) throws Exception {
 
 		AddGlAccountHistory command = new AddGlAccountHistory(glAccountHistoryToBeAdded);
 		GlAccountHistory glAccountHistory = ((GlAccountHistoryAdded) Scheduler.execute(command).data()).getAddedGlAccountHistory();
 		
 		if (glAccountHistory != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(glAccountHistory);
+			return successful(glAccountHistory);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("GlAccountHistory could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateGlAccountHistory(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		GlAccountHistory glAccountHistoryToBeUpdated = new GlAccountHistory();
-
-		try {
-			glAccountHistoryToBeUpdated = GlAccountHistoryMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateGlAccountHistory(glAccountHistoryToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class GlAccountHistoryController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateGlAccountHistory(@RequestBody GlAccountHistory glAccountHistoryToBeUpdated,
+	public ResponseEntity<String> updateGlAccountHistory(@RequestBody GlAccountHistory glAccountHistoryToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		glAccountHistoryToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class GlAccountHistoryController {
 
 		try {
 			if(((GlAccountHistoryUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{glAccountHistoryId}")
-	public ResponseEntity<Object> findById(@PathVariable String glAccountHistoryId) throws Exception {
+	public ResponseEntity<GlAccountHistory> findById(@PathVariable String glAccountHistoryId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("glAccountHistoryId", glAccountHistoryId);
 		try {
 
-			Object foundGlAccountHistory = findGlAccountHistorysBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundGlAccountHistory);
+			List<GlAccountHistory> foundGlAccountHistory = findGlAccountHistorysBy(requestParams).getBody();
+			if(foundGlAccountHistory.size()==1){				return successful(foundGlAccountHistory.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{glAccountHistoryId}")
-	public ResponseEntity<Object> deleteGlAccountHistoryByIdUpdated(@PathVariable String glAccountHistoryId) throws Exception {
+	public ResponseEntity<String> deleteGlAccountHistoryByIdUpdated(@PathVariable String glAccountHistoryId) throws Exception {
 		DeleteGlAccountHistory command = new DeleteGlAccountHistory(glAccountHistoryId);
 
 		try {
 			if (((GlAccountHistoryDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("GlAccountHistory could not be deleted");
+		return conflict();
 
 	}
 

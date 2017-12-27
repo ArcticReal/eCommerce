@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/contentCommevent")
 public class ContentCommeventServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCommContentDataResource")
-	public ResponseEntity<Object> createCommContentDataResource(HttpSession session, @RequestParam(value="contentId") String contentId, @RequestParam(value="communicationEventId") String communicationEventId, @RequestParam(value="caFromDate", required=false) Timestamp caFromDate, @RequestParam(value="surveyId", required=false) String surveyId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="caContentId", required=false) String caContentId, @RequestParam(value="ownerContentId", required=false) String ownerContentId, @RequestParam(value="imageData", required=false) java.nio.ByteBuffer imageData, @RequestParam(value="upperCoordinate", required=false) Long upperCoordinate, @RequestParam(value="leftCoordinate", required=false) Long leftCoordinate, @RequestParam(value="mimeTypeId", required=false) String mimeTypeId, @RequestParam(value="rootDir", required=false) String rootDir, @RequestParam(value="roleTypeList", required=false) List roleTypeList, @RequestParam(value="dataCategoryId", required=false) String dataCategoryId, @RequestParam(value="surveyResponseId", required=false) String surveyResponseId, @RequestParam(value="textData", required=false) String textData, @RequestParam(value="dataSourceId", required=false) String dataSourceId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="contentAssocPredicateId", required=false) String contentAssocPredicateId, @RequestParam(value="relatedDetailId", required=false) String relatedDetailId, @RequestParam(value="isPublic", required=false) String isPublic, @RequestParam(value="objectInfo", required=false) String objectInfo, @RequestParam(value="dataResourceTypeId", required=false) String dataResourceTypeId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="deactivateExisting", required=false) String deactivateExisting, @RequestParam(value="dataResourceName", required=false) Long dataResourceName, @RequestParam(value="targetOperationString", required=false) String targetOperationString, @RequestParam(value="caContentAssocTypeId", required=false) String caContentAssocTypeId, @RequestParam(value="caSequenceNum", required=false) Long caSequenceNum, @RequestParam(value="contentPurposeList", required=false) List contentPurposeList, @RequestParam(value="dataTemplateTypeId", required=false) String dataTemplateTypeId, @RequestParam(value="targetOperationList", required=false) List targetOperationList, @RequestParam(value="forceElectronicText", required=false) String forceElectronicText, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="contentPurposeString", required=false) String contentPurposeString, @RequestParam(value="mapKey", required=false) String mapKey, @RequestParam(value="DataResource", required=false) String DataResource, @RequestParam(value="characterSetId", required=false) String characterSetId, @RequestParam(value="_imageData_fileName", required=false) String _imageData_fileName, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="userLogin", required=false) org.apache.ofbiz.entity.GenericValue userLogin, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="displayFailCond", required=false) Boolean displayFailCond, @RequestParam(value="localeString", required=false) String localeString, @RequestParam(value="Content", required=false) String Content, @RequestParam(value="_imageData_contentType", required=false) String _imageData_contentType, @RequestParam(value="caContentIdTo", required=false) String caContentIdTo) {
+	public ResponseEntity<Map<String, Object>> createCommContentDataResource(HttpSession session, @RequestParam(value="contentId") String contentId, @RequestParam(value="communicationEventId") String communicationEventId, @RequestParam(value="caFromDate", required=false) Timestamp caFromDate, @RequestParam(value="surveyId", required=false) String surveyId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="caContentId", required=false) String caContentId, @RequestParam(value="ownerContentId", required=false) String ownerContentId, @RequestParam(value="imageData", required=false) java.nio.ByteBuffer imageData, @RequestParam(value="upperCoordinate", required=false) Long upperCoordinate, @RequestParam(value="leftCoordinate", required=false) Long leftCoordinate, @RequestParam(value="mimeTypeId", required=false) String mimeTypeId, @RequestParam(value="rootDir", required=false) String rootDir, @RequestParam(value="roleTypeList", required=false) List roleTypeList, @RequestParam(value="dataCategoryId", required=false) String dataCategoryId, @RequestParam(value="surveyResponseId", required=false) String surveyResponseId, @RequestParam(value="textData", required=false) String textData, @RequestParam(value="dataSourceId", required=false) String dataSourceId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="contentAssocPredicateId", required=false) String contentAssocPredicateId, @RequestParam(value="relatedDetailId", required=false) String relatedDetailId, @RequestParam(value="isPublic", required=false) String isPublic, @RequestParam(value="objectInfo", required=false) String objectInfo, @RequestParam(value="dataResourceTypeId", required=false) String dataResourceTypeId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="deactivateExisting", required=false) String deactivateExisting, @RequestParam(value="dataResourceName", required=false) Long dataResourceName, @RequestParam(value="targetOperationString", required=false) String targetOperationString, @RequestParam(value="caContentAssocTypeId", required=false) String caContentAssocTypeId, @RequestParam(value="caSequenceNum", required=false) Long caSequenceNum, @RequestParam(value="contentPurposeList", required=false) List contentPurposeList, @RequestParam(value="dataTemplateTypeId", required=false) String dataTemplateTypeId, @RequestParam(value="targetOperationList", required=false) List targetOperationList, @RequestParam(value="forceElectronicText", required=false) String forceElectronicText, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="contentPurposeString", required=false) String contentPurposeString, @RequestParam(value="mapKey", required=false) String mapKey, @RequestParam(value="DataResource", required=false) String DataResource, @RequestParam(value="characterSetId", required=false) String characterSetId, @RequestParam(value="_imageData_fileName", required=false) String _imageData_fileName, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="userLogin", required=false) org.apache.ofbiz.entity.GenericValue userLogin, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="displayFailCond", required=false) Boolean displayFailCond, @RequestParam(value="localeString", required=false) String localeString, @RequestParam(value="Content", required=false) String Content, @RequestParam(value="_imageData_contentType", required=false) String _imageData_contentType, @RequestParam(value="caContentIdTo", required=false) String caContentIdTo) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("contentId",contentId);
@@ -85,23 +87,23 @@ public class ContentCommeventServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCommContentAssocType")
-	public ResponseEntity<Object> createCommContentAssocType(HttpSession session, @RequestParam(value="commContentAssocTypeId", required=false) String commContentAssocTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createCommContentAssocType(HttpSession session, @RequestParam(value="commContentAssocTypeId", required=false) String commContentAssocTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("commContentAssocTypeId",commContentAssocTypeId);
@@ -115,23 +117,23 @@ public class ContentCommeventServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCommEventContentAssoc")
-	public ResponseEntity<Object> createCommEventContentAssoc(HttpSession session, @RequestParam(value="contentId") String contentId, @RequestParam(value="communicationEventId") String communicationEventId, @RequestParam(value="fromDate", required=false) java.sql.Timestamp fromDate, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="thruDate", required=false) java.sql.Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createCommEventContentAssoc(HttpSession session, @RequestParam(value="contentId") String contentId, @RequestParam(value="communicationEventId") String communicationEventId, @RequestParam(value="fromDate", required=false) java.sql.Timestamp fromDate, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="thruDate", required=false) java.sql.Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("contentId",contentId);
@@ -148,23 +150,23 @@ public class ContentCommeventServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCommContentDataResource")
-	public ResponseEntity<Object> updateCommContentDataResource(HttpSession session, @RequestParam(value="fromDate") java.sql.Timestamp fromDate, @RequestParam(value="communicationEventId") String communicationEventId, @RequestParam(value="caFromDate", required=false) Timestamp caFromDate, @RequestParam(value="surveyId", required=false) String surveyId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="caContentId", required=false) String caContentId, @RequestParam(value="ownerContentId", required=false) String ownerContentId, @RequestParam(value="imageData", required=false) java.nio.ByteBuffer imageData, @RequestParam(value="upperCoordinate", required=false) Long upperCoordinate, @RequestParam(value="leftCoordinate", required=false) Long leftCoordinate, @RequestParam(value="mimeTypeId", required=false) String mimeTypeId, @RequestParam(value="rootDir", required=false) String rootDir, @RequestParam(value="roleTypeList", required=false) List roleTypeList, @RequestParam(value="dataCategoryId", required=false) String dataCategoryId, @RequestParam(value="surveyResponseId", required=false) String surveyResponseId, @RequestParam(value="textData", required=false) String textData, @RequestParam(value="dataSourceId", required=false) String dataSourceId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="contentAssocPredicateId", required=false) String contentAssocPredicateId, @RequestParam(value="relatedDetailId", required=false) String relatedDetailId, @RequestParam(value="isPublic", required=false) String isPublic, @RequestParam(value="objectInfo", required=false) String objectInfo, @RequestParam(value="dataResourceTypeId", required=false) String dataResourceTypeId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="deactivateExisting", required=false) String deactivateExisting, @RequestParam(value="dataResourceName", required=false) Long dataResourceName, @RequestParam(value="targetOperationString", required=false) String targetOperationString, @RequestParam(value="caContentAssocTypeId", required=false) String caContentAssocTypeId, @RequestParam(value="caSequenceNum", required=false) Long caSequenceNum, @RequestParam(value="contentPurposeList", required=false) List contentPurposeList, @RequestParam(value="dataTemplateTypeId", required=false) String dataTemplateTypeId, @RequestParam(value="targetOperationList", required=false) List targetOperationList, @RequestParam(value="forceElectronicText", required=false) String forceElectronicText, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="contentPurposeString", required=false) String contentPurposeString, @RequestParam(value="mapKey", required=false) String mapKey, @RequestParam(value="DataResource", required=false) String DataResource, @RequestParam(value="characterSetId", required=false) String characterSetId, @RequestParam(value="_imageData_fileName", required=false) String _imageData_fileName, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="userLogin", required=false) org.apache.ofbiz.entity.GenericValue userLogin, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="displayFailCond", required=false) Boolean displayFailCond, @RequestParam(value="localeString", required=false) String localeString, @RequestParam(value="Content", required=false) String Content, @RequestParam(value="_imageData_contentType", required=false) String _imageData_contentType, @RequestParam(value="caContentIdTo", required=false) String caContentIdTo) {
+	public ResponseEntity<Map<String, Object>> updateCommContentDataResource(HttpSession session, @RequestParam(value="fromDate") java.sql.Timestamp fromDate, @RequestParam(value="communicationEventId") String communicationEventId, @RequestParam(value="caFromDate", required=false) Timestamp caFromDate, @RequestParam(value="surveyId", required=false) String surveyId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="caContentId", required=false) String caContentId, @RequestParam(value="ownerContentId", required=false) String ownerContentId, @RequestParam(value="imageData", required=false) java.nio.ByteBuffer imageData, @RequestParam(value="upperCoordinate", required=false) Long upperCoordinate, @RequestParam(value="leftCoordinate", required=false) Long leftCoordinate, @RequestParam(value="mimeTypeId", required=false) String mimeTypeId, @RequestParam(value="rootDir", required=false) String rootDir, @RequestParam(value="roleTypeList", required=false) List roleTypeList, @RequestParam(value="dataCategoryId", required=false) String dataCategoryId, @RequestParam(value="surveyResponseId", required=false) String surveyResponseId, @RequestParam(value="textData", required=false) String textData, @RequestParam(value="dataSourceId", required=false) String dataSourceId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="contentAssocPredicateId", required=false) String contentAssocPredicateId, @RequestParam(value="relatedDetailId", required=false) String relatedDetailId, @RequestParam(value="isPublic", required=false) String isPublic, @RequestParam(value="objectInfo", required=false) String objectInfo, @RequestParam(value="dataResourceTypeId", required=false) String dataResourceTypeId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="deactivateExisting", required=false) String deactivateExisting, @RequestParam(value="dataResourceName", required=false) Long dataResourceName, @RequestParam(value="targetOperationString", required=false) String targetOperationString, @RequestParam(value="caContentAssocTypeId", required=false) String caContentAssocTypeId, @RequestParam(value="caSequenceNum", required=false) Long caSequenceNum, @RequestParam(value="contentPurposeList", required=false) List contentPurposeList, @RequestParam(value="dataTemplateTypeId", required=false) String dataTemplateTypeId, @RequestParam(value="targetOperationList", required=false) List targetOperationList, @RequestParam(value="forceElectronicText", required=false) String forceElectronicText, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="contentPurposeString", required=false) String contentPurposeString, @RequestParam(value="mapKey", required=false) String mapKey, @RequestParam(value="DataResource", required=false) String DataResource, @RequestParam(value="characterSetId", required=false) String characterSetId, @RequestParam(value="_imageData_fileName", required=false) String _imageData_fileName, @RequestParam(value="thruDate", required=false) Timestamp thruDate, @RequestParam(value="userLogin", required=false) org.apache.ofbiz.entity.GenericValue userLogin, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="displayFailCond", required=false) Boolean displayFailCond, @RequestParam(value="localeString", required=false) String localeString, @RequestParam(value="Content", required=false) String Content, @RequestParam(value="_imageData_contentType", required=false) String _imageData_contentType, @RequestParam(value="caContentIdTo", required=false) String caContentIdTo) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -223,23 +225,23 @@ public class ContentCommeventServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCommEventContentAssoc")
-	public ResponseEntity<Object> updateCommEventContentAssoc(HttpSession session, @RequestParam(value="fromDate") java.sql.Timestamp fromDate, @RequestParam(value="contentId") String contentId, @RequestParam(value="communicationEventId") String communicationEventId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="thruDate", required=false) java.sql.Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateCommEventContentAssoc(HttpSession session, @RequestParam(value="fromDate") java.sql.Timestamp fromDate, @RequestParam(value="contentId") String contentId, @RequestParam(value="communicationEventId") String communicationEventId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="thruDate", required=false) java.sql.Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -256,23 +258,23 @@ public class ContentCommeventServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCommContentAssocType")
-	public ResponseEntity<Object> updateCommContentAssocType(HttpSession session, @RequestParam(value="commContentAssocTypeId") String commContentAssocTypeId, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateCommContentAssocType(HttpSession session, @RequestParam(value="commContentAssocTypeId") String commContentAssocTypeId, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("commContentAssocTypeId",commContentAssocTypeId);
@@ -286,23 +288,23 @@ public class ContentCommeventServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteCommContentAssocType")
-	public ResponseEntity<Object> deleteCommContentAssocType(HttpSession session, @RequestParam(value="commContentAssocTypeId") String commContentAssocTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteCommContentAssocType(HttpSession session, @RequestParam(value="commContentAssocTypeId") String commContentAssocTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("commContentAssocTypeId",commContentAssocTypeId);
@@ -315,23 +317,23 @@ public class ContentCommeventServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeCommEventContentAssoc")
-	public ResponseEntity<Object> removeCommEventContentAssoc(HttpSession session, @RequestParam(value="fromDate") java.sql.Timestamp fromDate, @RequestParam(value="contentId") String contentId, @RequestParam(value="communicationEventId") String communicationEventId) {
+	public ResponseEntity<Map<String, Object>> removeCommEventContentAssoc(HttpSession session, @RequestParam(value="fromDate") java.sql.Timestamp fromDate, @RequestParam(value="contentId") String contentId, @RequestParam(value="communicationEventId") String communicationEventId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -346,19 +348,19 @@ public class ContentCommeventServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

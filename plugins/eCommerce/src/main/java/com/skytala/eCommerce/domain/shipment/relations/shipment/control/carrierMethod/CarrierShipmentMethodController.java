@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.shipment.relations.shipment.query.carrierMet
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/shipment/shipment/carrierShipmentMethods")
 public class CarrierShipmentMethodController {
@@ -52,7 +54,7 @@ public class CarrierShipmentMethodController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findCarrierShipmentMethodsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<CarrierShipmentMethod>> findCarrierShipmentMethodsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCarrierShipmentMethodsBy query = new FindCarrierShipmentMethodsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class CarrierShipmentMethodController {
 		}
 
 		List<CarrierShipmentMethod> carrierShipmentMethods =((CarrierShipmentMethodFound) Scheduler.execute(query).data()).getCarrierShipmentMethods();
-
-		if (carrierShipmentMethods.size() == 1) {
-			return ResponseEntity.ok().body(carrierShipmentMethods.get(0));
-		}
 
 		return ResponseEntity.ok().body(carrierShipmentMethods);
 
@@ -78,7 +76,7 @@ public class CarrierShipmentMethodController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createCarrierShipmentMethod(HttpServletRequest request) throws Exception {
+	public ResponseEntity<CarrierShipmentMethod> createCarrierShipmentMethod(HttpServletRequest request) throws Exception {
 
 		CarrierShipmentMethod carrierShipmentMethodToBeAdded = new CarrierShipmentMethod();
 		try {
@@ -86,7 +84,7 @@ public class CarrierShipmentMethodController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createCarrierShipmentMethod(carrierShipmentMethodToBeAdded);
@@ -101,63 +99,15 @@ public class CarrierShipmentMethodController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createCarrierShipmentMethod(@RequestBody CarrierShipmentMethod carrierShipmentMethodToBeAdded) throws Exception {
+	public ResponseEntity<CarrierShipmentMethod> createCarrierShipmentMethod(@RequestBody CarrierShipmentMethod carrierShipmentMethodToBeAdded) throws Exception {
 
 		AddCarrierShipmentMethod command = new AddCarrierShipmentMethod(carrierShipmentMethodToBeAdded);
 		CarrierShipmentMethod carrierShipmentMethod = ((CarrierShipmentMethodAdded) Scheduler.execute(command).data()).getAddedCarrierShipmentMethod();
 		
 		if (carrierShipmentMethod != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(carrierShipmentMethod);
+			return successful(carrierShipmentMethod);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("CarrierShipmentMethod could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateCarrierShipmentMethod(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		CarrierShipmentMethod carrierShipmentMethodToBeUpdated = new CarrierShipmentMethod();
-
-		try {
-			carrierShipmentMethodToBeUpdated = CarrierShipmentMethodMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateCarrierShipmentMethod(carrierShipmentMethodToBeUpdated, carrierShipmentMethodToBeUpdated.getRoleTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class CarrierShipmentMethodController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{roleTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateCarrierShipmentMethod(@RequestBody CarrierShipmentMethod carrierShipmentMethodToBeUpdated,
+	public ResponseEntity<String> updateCarrierShipmentMethod(@RequestBody CarrierShipmentMethod carrierShipmentMethodToBeUpdated,
 			@PathVariable String roleTypeId) throws Exception {
 
 		carrierShipmentMethodToBeUpdated.setRoleTypeId(roleTypeId);
@@ -178,41 +128,44 @@ public class CarrierShipmentMethodController {
 
 		try {
 			if(((CarrierShipmentMethodUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{carrierShipmentMethodId}")
-	public ResponseEntity<Object> findById(@PathVariable String carrierShipmentMethodId) throws Exception {
+	public ResponseEntity<CarrierShipmentMethod> findById(@PathVariable String carrierShipmentMethodId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("carrierShipmentMethodId", carrierShipmentMethodId);
 		try {
 
-			Object foundCarrierShipmentMethod = findCarrierShipmentMethodsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundCarrierShipmentMethod);
+			List<CarrierShipmentMethod> foundCarrierShipmentMethod = findCarrierShipmentMethodsBy(requestParams).getBody();
+			if(foundCarrierShipmentMethod.size()==1){				return successful(foundCarrierShipmentMethod.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{carrierShipmentMethodId}")
-	public ResponseEntity<Object> deleteCarrierShipmentMethodByIdUpdated(@PathVariable String carrierShipmentMethodId) throws Exception {
+	public ResponseEntity<String> deleteCarrierShipmentMethodByIdUpdated(@PathVariable String carrierShipmentMethodId) throws Exception {
 		DeleteCarrierShipmentMethod command = new DeleteCarrierShipmentMethod(carrierShipmentMethodId);
 
 		try {
 			if (((CarrierShipmentMethodDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("CarrierShipmentMethod could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.content.relations.content.query.typeAttr.Fin
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/content/content/contentTypeAttrs")
 public class ContentTypeAttrController {
@@ -52,7 +54,7 @@ public class ContentTypeAttrController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findContentTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ContentTypeAttr>> findContentTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindContentTypeAttrsBy query = new FindContentTypeAttrsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ContentTypeAttrController {
 		}
 
 		List<ContentTypeAttr> contentTypeAttrs =((ContentTypeAttrFound) Scheduler.execute(query).data()).getContentTypeAttrs();
-
-		if (contentTypeAttrs.size() == 1) {
-			return ResponseEntity.ok().body(contentTypeAttrs.get(0));
-		}
 
 		return ResponseEntity.ok().body(contentTypeAttrs);
 
@@ -78,7 +76,7 @@ public class ContentTypeAttrController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createContentTypeAttr(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ContentTypeAttr> createContentTypeAttr(HttpServletRequest request) throws Exception {
 
 		ContentTypeAttr contentTypeAttrToBeAdded = new ContentTypeAttr();
 		try {
@@ -86,7 +84,7 @@ public class ContentTypeAttrController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createContentTypeAttr(contentTypeAttrToBeAdded);
@@ -101,63 +99,15 @@ public class ContentTypeAttrController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createContentTypeAttr(@RequestBody ContentTypeAttr contentTypeAttrToBeAdded) throws Exception {
+	public ResponseEntity<ContentTypeAttr> createContentTypeAttr(@RequestBody ContentTypeAttr contentTypeAttrToBeAdded) throws Exception {
 
 		AddContentTypeAttr command = new AddContentTypeAttr(contentTypeAttrToBeAdded);
 		ContentTypeAttr contentTypeAttr = ((ContentTypeAttrAdded) Scheduler.execute(command).data()).getAddedContentTypeAttr();
 		
 		if (contentTypeAttr != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(contentTypeAttr);
+			return successful(contentTypeAttr);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ContentTypeAttr could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateContentTypeAttr(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ContentTypeAttr contentTypeAttrToBeUpdated = new ContentTypeAttr();
-
-		try {
-			contentTypeAttrToBeUpdated = ContentTypeAttrMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateContentTypeAttr(contentTypeAttrToBeUpdated, contentTypeAttrToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ContentTypeAttrController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateContentTypeAttr(@RequestBody ContentTypeAttr contentTypeAttrToBeUpdated,
+	public ResponseEntity<String> updateContentTypeAttr(@RequestBody ContentTypeAttr contentTypeAttrToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		contentTypeAttrToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class ContentTypeAttrController {
 
 		try {
 			if(((ContentTypeAttrUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{contentTypeAttrId}")
-	public ResponseEntity<Object> findById(@PathVariable String contentTypeAttrId) throws Exception {
+	public ResponseEntity<ContentTypeAttr> findById(@PathVariable String contentTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("contentTypeAttrId", contentTypeAttrId);
 		try {
 
-			Object foundContentTypeAttr = findContentTypeAttrsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundContentTypeAttr);
+			List<ContentTypeAttr> foundContentTypeAttr = findContentTypeAttrsBy(requestParams).getBody();
+			if(foundContentTypeAttr.size()==1){				return successful(foundContentTypeAttr.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{contentTypeAttrId}")
-	public ResponseEntity<Object> deleteContentTypeAttrByIdUpdated(@PathVariable String contentTypeAttrId) throws Exception {
+	public ResponseEntity<String> deleteContentTypeAttrByIdUpdated(@PathVariable String contentTypeAttrId) throws Exception {
 		DeleteContentTypeAttr command = new DeleteContentTypeAttr(contentTypeAttrId);
 
 		try {
 			if (((ContentTypeAttrDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ContentTypeAttr could not be deleted");
+		return conflict();
 
 	}
 

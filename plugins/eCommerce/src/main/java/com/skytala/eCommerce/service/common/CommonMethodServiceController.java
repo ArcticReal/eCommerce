@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/commonMethod")
 public class CommonMethodServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCustomMethodType")
-	public ResponseEntity<Object> updateCustomMethodType(HttpSession session, @RequestParam(value="customMethodTypeId") String customMethodTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateCustomMethodType(HttpSession session, @RequestParam(value="customMethodTypeId") String customMethodTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("customMethodTypeId",customMethodTypeId);
@@ -42,23 +44,23 @@ public class CommonMethodServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCustomMethod")
-	public ResponseEntity<Object> createCustomMethod(HttpSession session, @RequestParam(value="customMethodTypeId", required=false) String customMethodTypeId, @RequestParam(value="customMethodName", required=false) String customMethodName, @RequestParam(value="description", required=false) String description, @RequestParam(value="customMethodId", required=false) String customMethodId) {
+	public ResponseEntity<Map<String, Object>> createCustomMethod(HttpSession session, @RequestParam(value="customMethodTypeId", required=false) String customMethodTypeId, @RequestParam(value="customMethodName", required=false) String customMethodName, @RequestParam(value="description", required=false) String description, @RequestParam(value="customMethodId", required=false) String customMethodId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("customMethodTypeId",customMethodTypeId);
@@ -74,23 +76,23 @@ public class CommonMethodServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteCustomMethod")
-	public ResponseEntity<Object> deleteCustomMethod(HttpSession session, @RequestParam(value="customMethodId") String customMethodId) {
+	public ResponseEntity<Map<String, Object>> deleteCustomMethod(HttpSession session, @RequestParam(value="customMethodId") String customMethodId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("customMethodId",customMethodId);
@@ -103,23 +105,23 @@ public class CommonMethodServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createCustomMethodType")
-	public ResponseEntity<Object> createCustomMethodType(HttpSession session, @RequestParam(value="customMethodTypeId", required=false) String customMethodTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createCustomMethodType(HttpSession session, @RequestParam(value="customMethodTypeId", required=false) String customMethodTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("customMethodTypeId",customMethodTypeId);
@@ -135,23 +137,23 @@ public class CommonMethodServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteCustomMethodType")
-	public ResponseEntity<Object> deleteCustomMethodType(HttpSession session, @RequestParam(value="customMethodTypeId") String customMethodTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteCustomMethodType(HttpSession session, @RequestParam(value="customMethodTypeId") String customMethodTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("customMethodTypeId",customMethodTypeId);
@@ -164,23 +166,23 @@ public class CommonMethodServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateCustomMethod")
-	public ResponseEntity<Object> updateCustomMethod(HttpSession session, @RequestParam(value="customMethodId") String customMethodId, @RequestParam(value="customMethodTypeId", required=false) String customMethodTypeId, @RequestParam(value="customMethodName", required=false) String customMethodName, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateCustomMethod(HttpSession session, @RequestParam(value="customMethodId") String customMethodId, @RequestParam(value="customMethodTypeId", required=false) String customMethodTypeId, @RequestParam(value="customMethodName", required=false) String customMethodName, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("customMethodId",customMethodId);
@@ -196,19 +198,19 @@ public class CommonMethodServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.taxAuthority.query.rate
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/taxAuthority/taxAuthorityRateTypes")
 public class TaxAuthorityRateTypeController {
@@ -52,7 +54,7 @@ public class TaxAuthorityRateTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findTaxAuthorityRateTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<TaxAuthorityRateType>> findTaxAuthorityRateTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTaxAuthorityRateTypesBy query = new FindTaxAuthorityRateTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class TaxAuthorityRateTypeController {
 		}
 
 		List<TaxAuthorityRateType> taxAuthorityRateTypes =((TaxAuthorityRateTypeFound) Scheduler.execute(query).data()).getTaxAuthorityRateTypes();
-
-		if (taxAuthorityRateTypes.size() == 1) {
-			return ResponseEntity.ok().body(taxAuthorityRateTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(taxAuthorityRateTypes);
 
@@ -78,7 +76,7 @@ public class TaxAuthorityRateTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createTaxAuthorityRateType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<TaxAuthorityRateType> createTaxAuthorityRateType(HttpServletRequest request) throws Exception {
 
 		TaxAuthorityRateType taxAuthorityRateTypeToBeAdded = new TaxAuthorityRateType();
 		try {
@@ -86,7 +84,7 @@ public class TaxAuthorityRateTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createTaxAuthorityRateType(taxAuthorityRateTypeToBeAdded);
@@ -101,63 +99,15 @@ public class TaxAuthorityRateTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createTaxAuthorityRateType(@RequestBody TaxAuthorityRateType taxAuthorityRateTypeToBeAdded) throws Exception {
+	public ResponseEntity<TaxAuthorityRateType> createTaxAuthorityRateType(@RequestBody TaxAuthorityRateType taxAuthorityRateTypeToBeAdded) throws Exception {
 
 		AddTaxAuthorityRateType command = new AddTaxAuthorityRateType(taxAuthorityRateTypeToBeAdded);
 		TaxAuthorityRateType taxAuthorityRateType = ((TaxAuthorityRateTypeAdded) Scheduler.execute(command).data()).getAddedTaxAuthorityRateType();
 		
 		if (taxAuthorityRateType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(taxAuthorityRateType);
+			return successful(taxAuthorityRateType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("TaxAuthorityRateType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateTaxAuthorityRateType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		TaxAuthorityRateType taxAuthorityRateTypeToBeUpdated = new TaxAuthorityRateType();
-
-		try {
-			taxAuthorityRateTypeToBeUpdated = TaxAuthorityRateTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateTaxAuthorityRateType(taxAuthorityRateTypeToBeUpdated, taxAuthorityRateTypeToBeUpdated.getTaxAuthorityRateTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class TaxAuthorityRateTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{taxAuthorityRateTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateTaxAuthorityRateType(@RequestBody TaxAuthorityRateType taxAuthorityRateTypeToBeUpdated,
+	public ResponseEntity<String> updateTaxAuthorityRateType(@RequestBody TaxAuthorityRateType taxAuthorityRateTypeToBeUpdated,
 			@PathVariable String taxAuthorityRateTypeId) throws Exception {
 
 		taxAuthorityRateTypeToBeUpdated.setTaxAuthorityRateTypeId(taxAuthorityRateTypeId);
@@ -178,41 +128,44 @@ public class TaxAuthorityRateTypeController {
 
 		try {
 			if(((TaxAuthorityRateTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{taxAuthorityRateTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String taxAuthorityRateTypeId) throws Exception {
+	public ResponseEntity<TaxAuthorityRateType> findById(@PathVariable String taxAuthorityRateTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("taxAuthorityRateTypeId", taxAuthorityRateTypeId);
 		try {
 
-			Object foundTaxAuthorityRateType = findTaxAuthorityRateTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundTaxAuthorityRateType);
+			List<TaxAuthorityRateType> foundTaxAuthorityRateType = findTaxAuthorityRateTypesBy(requestParams).getBody();
+			if(foundTaxAuthorityRateType.size()==1){				return successful(foundTaxAuthorityRateType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{taxAuthorityRateTypeId}")
-	public ResponseEntity<Object> deleteTaxAuthorityRateTypeByIdUpdated(@PathVariable String taxAuthorityRateTypeId) throws Exception {
+	public ResponseEntity<String> deleteTaxAuthorityRateTypeByIdUpdated(@PathVariable String taxAuthorityRateTypeId) throws Exception {
 		DeleteTaxAuthorityRateType command = new DeleteTaxAuthorityRateType(taxAuthorityRateTypeId);
 
 		try {
 			if (((TaxAuthorityRateTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("TaxAuthorityRateType could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.workeffort.relations.applicationSandbox.quer
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/workeffort/applicationSandboxs")
 public class ApplicationSandboxController {
@@ -52,7 +54,7 @@ public class ApplicationSandboxController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findApplicationSandboxsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ApplicationSandbox>> findApplicationSandboxsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindApplicationSandboxsBy query = new FindApplicationSandboxsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ApplicationSandboxController {
 		}
 
 		List<ApplicationSandbox> applicationSandboxs =((ApplicationSandboxFound) Scheduler.execute(query).data()).getApplicationSandboxs();
-
-		if (applicationSandboxs.size() == 1) {
-			return ResponseEntity.ok().body(applicationSandboxs.get(0));
-		}
 
 		return ResponseEntity.ok().body(applicationSandboxs);
 
@@ -78,7 +76,7 @@ public class ApplicationSandboxController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createApplicationSandbox(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ApplicationSandbox> createApplicationSandbox(HttpServletRequest request) throws Exception {
 
 		ApplicationSandbox applicationSandboxToBeAdded = new ApplicationSandbox();
 		try {
@@ -86,7 +84,7 @@ public class ApplicationSandboxController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createApplicationSandbox(applicationSandboxToBeAdded);
@@ -101,63 +99,15 @@ public class ApplicationSandboxController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createApplicationSandbox(@RequestBody ApplicationSandbox applicationSandboxToBeAdded) throws Exception {
+	public ResponseEntity<ApplicationSandbox> createApplicationSandbox(@RequestBody ApplicationSandbox applicationSandboxToBeAdded) throws Exception {
 
 		AddApplicationSandbox command = new AddApplicationSandbox(applicationSandboxToBeAdded);
 		ApplicationSandbox applicationSandbox = ((ApplicationSandboxAdded) Scheduler.execute(command).data()).getAddedApplicationSandbox();
 		
 		if (applicationSandbox != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(applicationSandbox);
+			return successful(applicationSandbox);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ApplicationSandbox could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateApplicationSandbox(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ApplicationSandbox applicationSandboxToBeUpdated = new ApplicationSandbox();
-
-		try {
-			applicationSandboxToBeUpdated = ApplicationSandboxMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateApplicationSandbox(applicationSandboxToBeUpdated, applicationSandboxToBeUpdated.getApplicationId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ApplicationSandboxController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{applicationId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateApplicationSandbox(@RequestBody ApplicationSandbox applicationSandboxToBeUpdated,
+	public ResponseEntity<String> updateApplicationSandbox(@RequestBody ApplicationSandbox applicationSandboxToBeUpdated,
 			@PathVariable String applicationId) throws Exception {
 
 		applicationSandboxToBeUpdated.setApplicationId(applicationId);
@@ -178,41 +128,44 @@ public class ApplicationSandboxController {
 
 		try {
 			if(((ApplicationSandboxUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{applicationSandboxId}")
-	public ResponseEntity<Object> findById(@PathVariable String applicationSandboxId) throws Exception {
+	public ResponseEntity<ApplicationSandbox> findById(@PathVariable String applicationSandboxId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("applicationSandboxId", applicationSandboxId);
 		try {
 
-			Object foundApplicationSandbox = findApplicationSandboxsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundApplicationSandbox);
+			List<ApplicationSandbox> foundApplicationSandbox = findApplicationSandboxsBy(requestParams).getBody();
+			if(foundApplicationSandbox.size()==1){				return successful(foundApplicationSandbox.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{applicationSandboxId}")
-	public ResponseEntity<Object> deleteApplicationSandboxByIdUpdated(@PathVariable String applicationSandboxId) throws Exception {
+	public ResponseEntity<String> deleteApplicationSandboxByIdUpdated(@PathVariable String applicationSandboxId) throws Exception {
 		DeleteApplicationSandbox command = new DeleteApplicationSandbox(applicationSandboxId);
 
 		try {
 			if (((ApplicationSandboxDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ApplicationSandbox could not be deleted");
+		return conflict();
 
 	}
 

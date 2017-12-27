@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.shipment.relations.shipment.query.gatewayCon
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/shipment/shipment/shipmentGatewayConfigs")
 public class ShipmentGatewayConfigController {
@@ -52,7 +54,7 @@ public class ShipmentGatewayConfigController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findShipmentGatewayConfigsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ShipmentGatewayConfig>> findShipmentGatewayConfigsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindShipmentGatewayConfigsBy query = new FindShipmentGatewayConfigsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ShipmentGatewayConfigController {
 		}
 
 		List<ShipmentGatewayConfig> shipmentGatewayConfigs =((ShipmentGatewayConfigFound) Scheduler.execute(query).data()).getShipmentGatewayConfigs();
-
-		if (shipmentGatewayConfigs.size() == 1) {
-			return ResponseEntity.ok().body(shipmentGatewayConfigs.get(0));
-		}
 
 		return ResponseEntity.ok().body(shipmentGatewayConfigs);
 
@@ -78,7 +76,7 @@ public class ShipmentGatewayConfigController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createShipmentGatewayConfig(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ShipmentGatewayConfig> createShipmentGatewayConfig(HttpServletRequest request) throws Exception {
 
 		ShipmentGatewayConfig shipmentGatewayConfigToBeAdded = new ShipmentGatewayConfig();
 		try {
@@ -86,7 +84,7 @@ public class ShipmentGatewayConfigController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createShipmentGatewayConfig(shipmentGatewayConfigToBeAdded);
@@ -101,63 +99,15 @@ public class ShipmentGatewayConfigController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createShipmentGatewayConfig(@RequestBody ShipmentGatewayConfig shipmentGatewayConfigToBeAdded) throws Exception {
+	public ResponseEntity<ShipmentGatewayConfig> createShipmentGatewayConfig(@RequestBody ShipmentGatewayConfig shipmentGatewayConfigToBeAdded) throws Exception {
 
 		AddShipmentGatewayConfig command = new AddShipmentGatewayConfig(shipmentGatewayConfigToBeAdded);
 		ShipmentGatewayConfig shipmentGatewayConfig = ((ShipmentGatewayConfigAdded) Scheduler.execute(command).data()).getAddedShipmentGatewayConfig();
 		
 		if (shipmentGatewayConfig != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(shipmentGatewayConfig);
+			return successful(shipmentGatewayConfig);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ShipmentGatewayConfig could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateShipmentGatewayConfig(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ShipmentGatewayConfig shipmentGatewayConfigToBeUpdated = new ShipmentGatewayConfig();
-
-		try {
-			shipmentGatewayConfigToBeUpdated = ShipmentGatewayConfigMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateShipmentGatewayConfig(shipmentGatewayConfigToBeUpdated, shipmentGatewayConfigToBeUpdated.getShipmentGatewayConfigId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ShipmentGatewayConfigController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{shipmentGatewayConfigId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateShipmentGatewayConfig(@RequestBody ShipmentGatewayConfig shipmentGatewayConfigToBeUpdated,
+	public ResponseEntity<String> updateShipmentGatewayConfig(@RequestBody ShipmentGatewayConfig shipmentGatewayConfigToBeUpdated,
 			@PathVariable String shipmentGatewayConfigId) throws Exception {
 
 		shipmentGatewayConfigToBeUpdated.setShipmentGatewayConfigId(shipmentGatewayConfigId);
@@ -178,41 +128,44 @@ public class ShipmentGatewayConfigController {
 
 		try {
 			if(((ShipmentGatewayConfigUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{shipmentGatewayConfigId}")
-	public ResponseEntity<Object> findById(@PathVariable String shipmentGatewayConfigId) throws Exception {
+	public ResponseEntity<ShipmentGatewayConfig> findById(@PathVariable String shipmentGatewayConfigId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("shipmentGatewayConfigId", shipmentGatewayConfigId);
 		try {
 
-			Object foundShipmentGatewayConfig = findShipmentGatewayConfigsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundShipmentGatewayConfig);
+			List<ShipmentGatewayConfig> foundShipmentGatewayConfig = findShipmentGatewayConfigsBy(requestParams).getBody();
+			if(foundShipmentGatewayConfig.size()==1){				return successful(foundShipmentGatewayConfig.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{shipmentGatewayConfigId}")
-	public ResponseEntity<Object> deleteShipmentGatewayConfigByIdUpdated(@PathVariable String shipmentGatewayConfigId) throws Exception {
+	public ResponseEntity<String> deleteShipmentGatewayConfigByIdUpdated(@PathVariable String shipmentGatewayConfigId) throws Exception {
 		DeleteShipmentGatewayConfig command = new DeleteShipmentGatewayConfig(shipmentGatewayConfigId);
 
 		try {
 			if (((ShipmentGatewayConfigDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ShipmentGatewayConfig could not be deleted");
+		return conflict();
 
 	}
 

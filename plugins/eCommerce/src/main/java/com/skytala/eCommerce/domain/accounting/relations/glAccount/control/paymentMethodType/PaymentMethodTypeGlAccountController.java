@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.glAccount.query.payment
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/glAccount/paymentMethodTypeGlAccounts")
 public class PaymentMethodTypeGlAccountController {
@@ -52,7 +54,7 @@ public class PaymentMethodTypeGlAccountController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPaymentMethodTypeGlAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PaymentMethodTypeGlAccount>> findPaymentMethodTypeGlAccountsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPaymentMethodTypeGlAccountsBy query = new FindPaymentMethodTypeGlAccountsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PaymentMethodTypeGlAccountController {
 		}
 
 		List<PaymentMethodTypeGlAccount> paymentMethodTypeGlAccounts =((PaymentMethodTypeGlAccountFound) Scheduler.execute(query).data()).getPaymentMethodTypeGlAccounts();
-
-		if (paymentMethodTypeGlAccounts.size() == 1) {
-			return ResponseEntity.ok().body(paymentMethodTypeGlAccounts.get(0));
-		}
 
 		return ResponseEntity.ok().body(paymentMethodTypeGlAccounts);
 
@@ -78,7 +76,7 @@ public class PaymentMethodTypeGlAccountController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPaymentMethodTypeGlAccount(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PaymentMethodTypeGlAccount> createPaymentMethodTypeGlAccount(HttpServletRequest request) throws Exception {
 
 		PaymentMethodTypeGlAccount paymentMethodTypeGlAccountToBeAdded = new PaymentMethodTypeGlAccount();
 		try {
@@ -86,7 +84,7 @@ public class PaymentMethodTypeGlAccountController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPaymentMethodTypeGlAccount(paymentMethodTypeGlAccountToBeAdded);
@@ -101,63 +99,15 @@ public class PaymentMethodTypeGlAccountController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPaymentMethodTypeGlAccount(@RequestBody PaymentMethodTypeGlAccount paymentMethodTypeGlAccountToBeAdded) throws Exception {
+	public ResponseEntity<PaymentMethodTypeGlAccount> createPaymentMethodTypeGlAccount(@RequestBody PaymentMethodTypeGlAccount paymentMethodTypeGlAccountToBeAdded) throws Exception {
 
 		AddPaymentMethodTypeGlAccount command = new AddPaymentMethodTypeGlAccount(paymentMethodTypeGlAccountToBeAdded);
 		PaymentMethodTypeGlAccount paymentMethodTypeGlAccount = ((PaymentMethodTypeGlAccountAdded) Scheduler.execute(command).data()).getAddedPaymentMethodTypeGlAccount();
 		
 		if (paymentMethodTypeGlAccount != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(paymentMethodTypeGlAccount);
+			return successful(paymentMethodTypeGlAccount);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PaymentMethodTypeGlAccount could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePaymentMethodTypeGlAccount(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PaymentMethodTypeGlAccount paymentMethodTypeGlAccountToBeUpdated = new PaymentMethodTypeGlAccount();
-
-		try {
-			paymentMethodTypeGlAccountToBeUpdated = PaymentMethodTypeGlAccountMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePaymentMethodTypeGlAccount(paymentMethodTypeGlAccountToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PaymentMethodTypeGlAccountController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePaymentMethodTypeGlAccount(@RequestBody PaymentMethodTypeGlAccount paymentMethodTypeGlAccountToBeUpdated,
+	public ResponseEntity<String> updatePaymentMethodTypeGlAccount(@RequestBody PaymentMethodTypeGlAccount paymentMethodTypeGlAccountToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		paymentMethodTypeGlAccountToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class PaymentMethodTypeGlAccountController {
 
 		try {
 			if(((PaymentMethodTypeGlAccountUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{paymentMethodTypeGlAccountId}")
-	public ResponseEntity<Object> findById(@PathVariable String paymentMethodTypeGlAccountId) throws Exception {
+	public ResponseEntity<PaymentMethodTypeGlAccount> findById(@PathVariable String paymentMethodTypeGlAccountId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("paymentMethodTypeGlAccountId", paymentMethodTypeGlAccountId);
 		try {
 
-			Object foundPaymentMethodTypeGlAccount = findPaymentMethodTypeGlAccountsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPaymentMethodTypeGlAccount);
+			List<PaymentMethodTypeGlAccount> foundPaymentMethodTypeGlAccount = findPaymentMethodTypeGlAccountsBy(requestParams).getBody();
+			if(foundPaymentMethodTypeGlAccount.size()==1){				return successful(foundPaymentMethodTypeGlAccount.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{paymentMethodTypeGlAccountId}")
-	public ResponseEntity<Object> deletePaymentMethodTypeGlAccountByIdUpdated(@PathVariable String paymentMethodTypeGlAccountId) throws Exception {
+	public ResponseEntity<String> deletePaymentMethodTypeGlAccountByIdUpdated(@PathVariable String paymentMethodTypeGlAccountId) throws Exception {
 		DeletePaymentMethodTypeGlAccount command = new DeletePaymentMethodTypeGlAccount(paymentMethodTypeGlAccountId);
 
 		try {
 			if (((PaymentMethodTypeGlAccountDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PaymentMethodTypeGlAccount could not be deleted");
+		return conflict();
 
 	}
 

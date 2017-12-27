@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.orderBlacklist.query.FindOrd
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/orderBlacklists")
 public class OrderBlacklistController {
@@ -52,7 +54,7 @@ public class OrderBlacklistController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findOrderBlacklistsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OrderBlacklist>> findOrderBlacklistsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderBlacklistsBy query = new FindOrderBlacklistsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class OrderBlacklistController {
 		}
 
 		List<OrderBlacklist> orderBlacklists =((OrderBlacklistFound) Scheduler.execute(query).data()).getOrderBlacklists();
-
-		if (orderBlacklists.size() == 1) {
-			return ResponseEntity.ok().body(orderBlacklists.get(0));
-		}
 
 		return ResponseEntity.ok().body(orderBlacklists);
 
@@ -78,7 +76,7 @@ public class OrderBlacklistController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOrderBlacklist(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OrderBlacklist> createOrderBlacklist(HttpServletRequest request) throws Exception {
 
 		OrderBlacklist orderBlacklistToBeAdded = new OrderBlacklist();
 		try {
@@ -86,7 +84,7 @@ public class OrderBlacklistController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createOrderBlacklist(orderBlacklistToBeAdded);
@@ -101,63 +99,15 @@ public class OrderBlacklistController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOrderBlacklist(@RequestBody OrderBlacklist orderBlacklistToBeAdded) throws Exception {
+	public ResponseEntity<OrderBlacklist> createOrderBlacklist(@RequestBody OrderBlacklist orderBlacklistToBeAdded) throws Exception {
 
 		AddOrderBlacklist command = new AddOrderBlacklist(orderBlacklistToBeAdded);
 		OrderBlacklist orderBlacklist = ((OrderBlacklistAdded) Scheduler.execute(command).data()).getAddedOrderBlacklist();
 		
 		if (orderBlacklist != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(orderBlacklist);
+			return successful(orderBlacklist);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OrderBlacklist could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateOrderBlacklist(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OrderBlacklist orderBlacklistToBeUpdated = new OrderBlacklist();
-
-		try {
-			orderBlacklistToBeUpdated = OrderBlacklistMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOrderBlacklist(orderBlacklistToBeUpdated, orderBlacklistToBeUpdated.getBlacklistString()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class OrderBlacklistController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{blacklistString}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOrderBlacklist(@RequestBody OrderBlacklist orderBlacklistToBeUpdated,
+	public ResponseEntity<String> updateOrderBlacklist(@RequestBody OrderBlacklist orderBlacklistToBeUpdated,
 			@PathVariable String blacklistString) throws Exception {
 
 		orderBlacklistToBeUpdated.setBlacklistString(blacklistString);
@@ -178,41 +128,44 @@ public class OrderBlacklistController {
 
 		try {
 			if(((OrderBlacklistUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{orderBlacklistId}")
-	public ResponseEntity<Object> findById(@PathVariable String orderBlacklistId) throws Exception {
+	public ResponseEntity<OrderBlacklist> findById(@PathVariable String orderBlacklistId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderBlacklistId", orderBlacklistId);
 		try {
 
-			Object foundOrderBlacklist = findOrderBlacklistsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOrderBlacklist);
+			List<OrderBlacklist> foundOrderBlacklist = findOrderBlacklistsBy(requestParams).getBody();
+			if(foundOrderBlacklist.size()==1){				return successful(foundOrderBlacklist.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{orderBlacklistId}")
-	public ResponseEntity<Object> deleteOrderBlacklistByIdUpdated(@PathVariable String orderBlacklistId) throws Exception {
+	public ResponseEntity<String> deleteOrderBlacklistByIdUpdated(@PathVariable String orderBlacklistId) throws Exception {
 		DeleteOrderBlacklist command = new DeleteOrderBlacklist(orderBlacklistId);
 
 		try {
 			if (((OrderBlacklistDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("OrderBlacklist could not be deleted");
+		return conflict();
 
 	}
 

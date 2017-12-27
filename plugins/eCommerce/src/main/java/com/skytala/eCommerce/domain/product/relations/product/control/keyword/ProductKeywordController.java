@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.keyword.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productKeywords")
 public class ProductKeywordController {
@@ -52,7 +54,7 @@ public class ProductKeywordController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductKeywordsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductKeyword>> findProductKeywordsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductKeywordsBy query = new FindProductKeywordsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductKeywordController {
 		}
 
 		List<ProductKeyword> productKeywords =((ProductKeywordFound) Scheduler.execute(query).data()).getProductKeywords();
-
-		if (productKeywords.size() == 1) {
-			return ResponseEntity.ok().body(productKeywords.get(0));
-		}
 
 		return ResponseEntity.ok().body(productKeywords);
 
@@ -78,7 +76,7 @@ public class ProductKeywordController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductKeyword(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductKeyword> createProductKeyword(HttpServletRequest request) throws Exception {
 
 		ProductKeyword productKeywordToBeAdded = new ProductKeyword();
 		try {
@@ -86,7 +84,7 @@ public class ProductKeywordController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductKeyword(productKeywordToBeAdded);
@@ -101,63 +99,15 @@ public class ProductKeywordController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductKeyword(@RequestBody ProductKeyword productKeywordToBeAdded) throws Exception {
+	public ResponseEntity<ProductKeyword> createProductKeyword(@RequestBody ProductKeyword productKeywordToBeAdded) throws Exception {
 
 		AddProductKeyword command = new AddProductKeyword(productKeywordToBeAdded);
 		ProductKeyword productKeyword = ((ProductKeywordAdded) Scheduler.execute(command).data()).getAddedProductKeyword();
 		
 		if (productKeyword != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productKeyword);
+			return successful(productKeyword);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductKeyword could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductKeyword(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductKeyword productKeywordToBeUpdated = new ProductKeyword();
-
-		try {
-			productKeywordToBeUpdated = ProductKeywordMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductKeyword(productKeywordToBeUpdated, productKeywordToBeUpdated.getKeyword()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductKeywordController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{keyword}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductKeyword(@RequestBody ProductKeyword productKeywordToBeUpdated,
+	public ResponseEntity<String> updateProductKeyword(@RequestBody ProductKeyword productKeywordToBeUpdated,
 			@PathVariable String keyword) throws Exception {
 
 		productKeywordToBeUpdated.setKeyword(keyword);
@@ -178,41 +128,44 @@ public class ProductKeywordController {
 
 		try {
 			if(((ProductKeywordUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productKeywordId}")
-	public ResponseEntity<Object> findById(@PathVariable String productKeywordId) throws Exception {
+	public ResponseEntity<ProductKeyword> findById(@PathVariable String productKeywordId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productKeywordId", productKeywordId);
 		try {
 
-			Object foundProductKeyword = findProductKeywordsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductKeyword);
+			List<ProductKeyword> foundProductKeyword = findProductKeywordsBy(requestParams).getBody();
+			if(foundProductKeyword.size()==1){				return successful(foundProductKeyword.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productKeywordId}")
-	public ResponseEntity<Object> deleteProductKeywordByIdUpdated(@PathVariable String productKeywordId) throws Exception {
+	public ResponseEntity<String> deleteProductKeywordByIdUpdated(@PathVariable String productKeywordId) throws Exception {
 		DeleteProductKeyword command = new DeleteProductKeyword(productKeywordId);
 
 		try {
 			if (((ProductKeywordDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductKeyword could not be deleted");
+		return conflict();
 
 	}
 

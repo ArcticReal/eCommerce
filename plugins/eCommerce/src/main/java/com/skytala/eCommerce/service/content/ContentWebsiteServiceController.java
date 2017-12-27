@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/contentWebsite")
 public class ContentWebsiteServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeWebSitePathAlias")
-	public ResponseEntity<Object> removeWebSitePathAlias(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="pathAlias") String pathAlias) {
+	public ResponseEntity<Map<String, Object>> removeWebSitePathAlias(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="pathAlias") String pathAlias) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -41,23 +43,23 @@ public class ContentWebsiteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateWebSiteContentType")
-	public ResponseEntity<Object> updateWebSiteContentType(HttpSession session, @RequestParam(value="webSiteContentTypeId") String webSiteContentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateWebSiteContentType(HttpSession session, @RequestParam(value="webSiteContentTypeId") String webSiteContentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("webSiteContentTypeId",webSiteContentTypeId);
@@ -73,23 +75,23 @@ public class ContentWebsiteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateWebSiteContent")
-	public ResponseEntity<Object> updateWebSiteContent(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="webSiteContentTypeId") String webSiteContentTypeId, @RequestParam(value="contentId") String contentId, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateWebSiteContent(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="webSiteContentTypeId") String webSiteContentTypeId, @RequestParam(value="contentId") String contentId, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -106,23 +108,23 @@ public class ContentWebsiteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/generateMissingSeoUrlForWebsite")
-	public ResponseEntity<Object> generateMissingSeoUrlForWebsite(HttpSession session, @RequestParam(value="typeGenerate") List typeGenerate, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="prodCatalogId") String prodCatalogId) {
+	public ResponseEntity<Map<String, Object>> generateMissingSeoUrlForWebsite(HttpSession session, @RequestParam(value="typeGenerate") List typeGenerate, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="prodCatalogId") String prodCatalogId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("typeGenerate",typeGenerate);
@@ -137,23 +139,23 @@ public class ContentWebsiteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createWebSiteRole")
-	public ResponseEntity<Object> createWebSiteRole(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="sequenceNum") Long sequenceNum, @RequestParam(value="partyId") String partyId, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="thruDate") Timestamp thruDate, @RequestParam(value="fromDate", required=false) Timestamp fromDate) {
+	public ResponseEntity<Map<String, Object>> createWebSiteRole(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="sequenceNum") Long sequenceNum, @RequestParam(value="partyId") String partyId, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="thruDate") Timestamp thruDate, @RequestParam(value="fromDate", required=false) Timestamp fromDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("roleTypeId",roleTypeId);
@@ -171,23 +173,23 @@ public class ContentWebsiteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/addWebSiteRole")
-	public ResponseEntity<Object> addWebSiteRole(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="sequenceNum") Long sequenceNum, @RequestParam(value="partyId") String partyId, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="thruDate") Timestamp thruDate, @RequestParam(value="fromDate", required=false) Timestamp fromDate) {
+	public ResponseEntity<Map<String, Object>> addWebSiteRole(HttpSession session, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="sequenceNum") Long sequenceNum, @RequestParam(value="partyId") String partyId, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="thruDate") Timestamp thruDate, @RequestParam(value="fromDate", required=false) Timestamp fromDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("roleTypeId",roleTypeId);
@@ -205,23 +207,23 @@ public class ContentWebsiteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateWebSitePathAlias")
-	public ResponseEntity<Object> updateWebSitePathAlias(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="pathAlias") String pathAlias, @RequestParam(value="aliasTo", required=false) String aliasTo, @RequestParam(value="contentId", required=false) String contentId, @RequestParam(value="mapKey", required=false) String mapKey, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateWebSitePathAlias(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="pathAlias") String pathAlias, @RequestParam(value="aliasTo", required=false) String aliasTo, @RequestParam(value="contentId", required=false) String contentId, @RequestParam(value="mapKey", required=false) String mapKey, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -240,23 +242,23 @@ public class ContentWebsiteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateWebSiteRole")
-	public ResponseEntity<Object> updateWebSiteRole(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="sequenceNum") Long sequenceNum, @RequestParam(value="partyId") String partyId, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="thruDate") Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updateWebSiteRole(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="sequenceNum") Long sequenceNum, @RequestParam(value="partyId") String partyId, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="thruDate") Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -274,23 +276,23 @@ public class ContentWebsiteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createWebSite")
-	public ResponseEntity<Object> createWebSite(HttpSession session, @RequestParam(value="siteName") String siteName, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="secureContentPrefix", required=false) String secureContentPrefix, @RequestParam(value="cookieDomain", required=false) String cookieDomain, @RequestParam(value="standardContentPrefix", required=false) String standardContentPrefix, @RequestParam(value="httpPort", required=false) String httpPort, @RequestParam(value="enableHttps", required=false) String enableHttps, @RequestParam(value="httpHost", required=false) String httpHost, @RequestParam(value="visualThemeSetId", required=false) String visualThemeSetId, @RequestParam(value="httpsHost", required=false) String httpsHost, @RequestParam(value="httpsPort", required=false) String httpsPort) {
+	public ResponseEntity<Map<String, Object>> createWebSite(HttpSession session, @RequestParam(value="siteName") String siteName, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="secureContentPrefix", required=false) String secureContentPrefix, @RequestParam(value="cookieDomain", required=false) String cookieDomain, @RequestParam(value="standardContentPrefix", required=false) String standardContentPrefix, @RequestParam(value="httpPort", required=false) String httpPort, @RequestParam(value="enableHttps", required=false) String enableHttps, @RequestParam(value="httpHost", required=false) String httpHost, @RequestParam(value="visualThemeSetId", required=false) String visualThemeSetId, @RequestParam(value="httpsHost", required=false) String httpsHost, @RequestParam(value="httpsPort", required=false) String httpsPort) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("siteName",siteName);
@@ -313,23 +315,23 @@ public class ContentWebsiteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeWebSiteRole")
-	public ResponseEntity<Object> removeWebSiteRole(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="webSiteId") String webSiteId) {
+	public ResponseEntity<Map<String, Object>> removeWebSiteRole(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="webSiteId") String webSiteId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -345,23 +347,23 @@ public class ContentWebsiteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createWebSiteContent")
-	public ResponseEntity<Object> createWebSiteContent(HttpSession session, @RequestParam(value="webSiteContentTypeId") String webSiteContentTypeId, @RequestParam(value="contentId") String contentId, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createWebSiteContent(HttpSession session, @RequestParam(value="webSiteContentTypeId") String webSiteContentTypeId, @RequestParam(value="contentId") String contentId, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("webSiteContentTypeId",webSiteContentTypeId);
@@ -378,23 +380,23 @@ public class ContentWebsiteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getWebSitePathAlias")
-	public ResponseEntity<Object> getWebSitePathAlias(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="pathAlias") String pathAlias) {
+	public ResponseEntity<Map<String, Object>> getWebSitePathAlias(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="pathAlias") String pathAlias) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -409,23 +411,23 @@ public class ContentWebsiteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateWebSite")
-	public ResponseEntity<Object> updateWebSite(HttpSession session, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="secureContentPrefix", required=false) String secureContentPrefix, @RequestParam(value="cookieDomain", required=false) String cookieDomain, @RequestParam(value="standardContentPrefix", required=false) String standardContentPrefix, @RequestParam(value="httpPort", required=false) String httpPort, @RequestParam(value="siteName", required=false) String siteName, @RequestParam(value="enableHttps", required=false) String enableHttps, @RequestParam(value="httpHost", required=false) String httpHost, @RequestParam(value="visualThemeSetId", required=false) String visualThemeSetId, @RequestParam(value="httpsHost", required=false) String httpsHost, @RequestParam(value="httpsPort", required=false) String httpsPort) {
+	public ResponseEntity<Map<String, Object>> updateWebSite(HttpSession session, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="secureContentPrefix", required=false) String secureContentPrefix, @RequestParam(value="cookieDomain", required=false) String cookieDomain, @RequestParam(value="standardContentPrefix", required=false) String standardContentPrefix, @RequestParam(value="httpPort", required=false) String httpPort, @RequestParam(value="siteName", required=false) String siteName, @RequestParam(value="enableHttps", required=false) String enableHttps, @RequestParam(value="httpHost", required=false) String httpHost, @RequestParam(value="visualThemeSetId", required=false) String visualThemeSetId, @RequestParam(value="httpsHost", required=false) String httpsHost, @RequestParam(value="httpsPort", required=false) String httpsPort) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("webSiteId",webSiteId);
@@ -448,23 +450,23 @@ public class ContentWebsiteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/webSiteRoleInterface")
-	public ResponseEntity<Object> webSiteRoleInterface(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> webSiteRoleInterface(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="sequenceNum", required=false) Long sequenceNum, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -482,23 +484,23 @@ public class ContentWebsiteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeWebSiteContentType")
-	public ResponseEntity<Object> removeWebSiteContentType(HttpSession session, @RequestParam(value="webSiteContentTypeId") String webSiteContentTypeId) {
+	public ResponseEntity<Map<String, Object>> removeWebSiteContentType(HttpSession session, @RequestParam(value="webSiteContentTypeId") String webSiteContentTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("webSiteContentTypeId",webSiteContentTypeId);
@@ -511,23 +513,23 @@ public class ContentWebsiteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createWebSitePathAlias")
-	public ResponseEntity<Object> createWebSitePathAlias(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="pathAlias") String pathAlias, @RequestParam(value="aliasTo", required=false) String aliasTo, @RequestParam(value="contentId", required=false) String contentId, @RequestParam(value="mapKey", required=false) String mapKey, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createWebSitePathAlias(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="webSiteId") String webSiteId, @RequestParam(value="pathAlias") String pathAlias, @RequestParam(value="aliasTo", required=false) String aliasTo, @RequestParam(value="contentId", required=false) String contentId, @RequestParam(value="mapKey", required=false) String mapKey, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -546,23 +548,23 @@ public class ContentWebsiteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/autoCreateWebSiteContent")
-	public ResponseEntity<Object> autoCreateWebSiteContent(HttpSession session, @RequestParam(value="webSiteContentTypeId") List webSiteContentTypeId, @RequestParam(value="webSiteId") String webSiteId) {
+	public ResponseEntity<Map<String, Object>> autoCreateWebSiteContent(HttpSession session, @RequestParam(value="webSiteContentTypeId") List webSiteContentTypeId, @RequestParam(value="webSiteId") String webSiteId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("webSiteContentTypeId",webSiteContentTypeId);
@@ -576,23 +578,23 @@ public class ContentWebsiteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createWebSiteContentType")
-	public ResponseEntity<Object> createWebSiteContentType(HttpSession session, @RequestParam(value="webSiteContentTypeId") String webSiteContentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createWebSiteContentType(HttpSession session, @RequestParam(value="webSiteContentTypeId") String webSiteContentTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("webSiteContentTypeId",webSiteContentTypeId);
@@ -608,23 +610,23 @@ public class ContentWebsiteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeWebSiteContent")
-	public ResponseEntity<Object> removeWebSiteContent(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="webSiteContentTypeId") String webSiteContentTypeId, @RequestParam(value="contentId") String contentId, @RequestParam(value="webSiteId") String webSiteId) {
+	public ResponseEntity<Map<String, Object>> removeWebSiteContent(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="webSiteContentTypeId") String webSiteContentTypeId, @RequestParam(value="contentId") String contentId, @RequestParam(value="webSiteId") String webSiteId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -640,19 +642,19 @@ public class ContentWebsiteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

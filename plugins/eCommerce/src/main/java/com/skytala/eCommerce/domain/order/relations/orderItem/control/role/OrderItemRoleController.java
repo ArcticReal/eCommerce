@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.orderItem.query.role.FindOrd
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/orderItem/orderItemRoles")
 public class OrderItemRoleController {
@@ -52,7 +54,7 @@ public class OrderItemRoleController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findOrderItemRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<OrderItemRole>> findOrderItemRolesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindOrderItemRolesBy query = new FindOrderItemRolesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class OrderItemRoleController {
 		}
 
 		List<OrderItemRole> orderItemRoles =((OrderItemRoleFound) Scheduler.execute(query).data()).getOrderItemRoles();
-
-		if (orderItemRoles.size() == 1) {
-			return ResponseEntity.ok().body(orderItemRoles.get(0));
-		}
 
 		return ResponseEntity.ok().body(orderItemRoles);
 
@@ -78,7 +76,7 @@ public class OrderItemRoleController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createOrderItemRole(HttpServletRequest request) throws Exception {
+	public ResponseEntity<OrderItemRole> createOrderItemRole(HttpServletRequest request) throws Exception {
 
 		OrderItemRole orderItemRoleToBeAdded = new OrderItemRole();
 		try {
@@ -86,7 +84,7 @@ public class OrderItemRoleController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createOrderItemRole(orderItemRoleToBeAdded);
@@ -101,63 +99,15 @@ public class OrderItemRoleController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createOrderItemRole(@RequestBody OrderItemRole orderItemRoleToBeAdded) throws Exception {
+	public ResponseEntity<OrderItemRole> createOrderItemRole(@RequestBody OrderItemRole orderItemRoleToBeAdded) throws Exception {
 
 		AddOrderItemRole command = new AddOrderItemRole(orderItemRoleToBeAdded);
 		OrderItemRole orderItemRole = ((OrderItemRoleAdded) Scheduler.execute(command).data()).getAddedOrderItemRole();
 		
 		if (orderItemRole != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(orderItemRole);
+			return successful(orderItemRole);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("OrderItemRole could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateOrderItemRole(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		OrderItemRole orderItemRoleToBeUpdated = new OrderItemRole();
-
-		try {
-			orderItemRoleToBeUpdated = OrderItemRoleMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateOrderItemRole(orderItemRoleToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class OrderItemRoleController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateOrderItemRole(@RequestBody OrderItemRole orderItemRoleToBeUpdated,
+	public ResponseEntity<String> updateOrderItemRole(@RequestBody OrderItemRole orderItemRoleToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		orderItemRoleToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class OrderItemRoleController {
 
 		try {
 			if(((OrderItemRoleUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{orderItemRoleId}")
-	public ResponseEntity<Object> findById(@PathVariable String orderItemRoleId) throws Exception {
+	public ResponseEntity<OrderItemRole> findById(@PathVariable String orderItemRoleId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("orderItemRoleId", orderItemRoleId);
 		try {
 
-			Object foundOrderItemRole = findOrderItemRolesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundOrderItemRole);
+			List<OrderItemRole> foundOrderItemRole = findOrderItemRolesBy(requestParams).getBody();
+			if(foundOrderItemRole.size()==1){				return successful(foundOrderItemRole.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{orderItemRoleId}")
-	public ResponseEntity<Object> deleteOrderItemRoleByIdUpdated(@PathVariable String orderItemRoleId) throws Exception {
+	public ResponseEntity<String> deleteOrderItemRoleByIdUpdated(@PathVariable String orderItemRoleId) throws Exception {
 		DeleteOrderItemRole command = new DeleteOrderItemRole(orderItemRoleId);
 
 		try {
 			if (((OrderItemRoleDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("OrderItemRole could not be deleted");
+		return conflict();
 
 	}
 

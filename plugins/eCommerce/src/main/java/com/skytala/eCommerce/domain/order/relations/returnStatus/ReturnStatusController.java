@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.returnStatus.query.FindRetur
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/returnStatuss")
 public class ReturnStatusController {
@@ -52,7 +54,7 @@ public class ReturnStatusController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findReturnStatussBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ReturnStatus>> findReturnStatussBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindReturnStatussBy query = new FindReturnStatussBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ReturnStatusController {
 		}
 
 		List<ReturnStatus> returnStatuss =((ReturnStatusFound) Scheduler.execute(query).data()).getReturnStatuss();
-
-		if (returnStatuss.size() == 1) {
-			return ResponseEntity.ok().body(returnStatuss.get(0));
-		}
 
 		return ResponseEntity.ok().body(returnStatuss);
 
@@ -78,7 +76,7 @@ public class ReturnStatusController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createReturnStatus(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ReturnStatus> createReturnStatus(HttpServletRequest request) throws Exception {
 
 		ReturnStatus returnStatusToBeAdded = new ReturnStatus();
 		try {
@@ -86,7 +84,7 @@ public class ReturnStatusController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createReturnStatus(returnStatusToBeAdded);
@@ -101,63 +99,15 @@ public class ReturnStatusController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createReturnStatus(@RequestBody ReturnStatus returnStatusToBeAdded) throws Exception {
+	public ResponseEntity<ReturnStatus> createReturnStatus(@RequestBody ReturnStatus returnStatusToBeAdded) throws Exception {
 
 		AddReturnStatus command = new AddReturnStatus(returnStatusToBeAdded);
 		ReturnStatus returnStatus = ((ReturnStatusAdded) Scheduler.execute(command).data()).getAddedReturnStatus();
 		
 		if (returnStatus != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(returnStatus);
+			return successful(returnStatus);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ReturnStatus could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateReturnStatus(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ReturnStatus returnStatusToBeUpdated = new ReturnStatus();
-
-		try {
-			returnStatusToBeUpdated = ReturnStatusMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateReturnStatus(returnStatusToBeUpdated, returnStatusToBeUpdated.getReturnStatusId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ReturnStatusController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{returnStatusId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateReturnStatus(@RequestBody ReturnStatus returnStatusToBeUpdated,
+	public ResponseEntity<String> updateReturnStatus(@RequestBody ReturnStatus returnStatusToBeUpdated,
 			@PathVariable String returnStatusId) throws Exception {
 
 		returnStatusToBeUpdated.setReturnStatusId(returnStatusId);
@@ -178,41 +128,44 @@ public class ReturnStatusController {
 
 		try {
 			if(((ReturnStatusUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{returnStatusId}")
-	public ResponseEntity<Object> findById(@PathVariable String returnStatusId) throws Exception {
+	public ResponseEntity<ReturnStatus> findById(@PathVariable String returnStatusId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("returnStatusId", returnStatusId);
 		try {
 
-			Object foundReturnStatus = findReturnStatussBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundReturnStatus);
+			List<ReturnStatus> foundReturnStatus = findReturnStatussBy(requestParams).getBody();
+			if(foundReturnStatus.size()==1){				return successful(foundReturnStatus.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{returnStatusId}")
-	public ResponseEntity<Object> deleteReturnStatusByIdUpdated(@PathVariable String returnStatusId) throws Exception {
+	public ResponseEntity<String> deleteReturnStatusByIdUpdated(@PathVariable String returnStatusId) throws Exception {
 		DeleteReturnStatus command = new DeleteReturnStatus(returnStatusId);
 
 		try {
 			if (((ReturnStatusDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ReturnStatus could not be deleted");
+		return conflict();
 
 	}
 

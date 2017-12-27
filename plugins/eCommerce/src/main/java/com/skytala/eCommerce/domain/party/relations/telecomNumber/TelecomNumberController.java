@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.party.relations.telecomNumber.query.FindTele
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/party/telecomNumbers")
 public class TelecomNumberController {
@@ -52,7 +54,7 @@ public class TelecomNumberController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findTelecomNumbersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<TelecomNumber>> findTelecomNumbersBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindTelecomNumbersBy query = new FindTelecomNumbersBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class TelecomNumberController {
 		}
 
 		List<TelecomNumber> telecomNumbers =((TelecomNumberFound) Scheduler.execute(query).data()).getTelecomNumbers();
-
-		if (telecomNumbers.size() == 1) {
-			return ResponseEntity.ok().body(telecomNumbers.get(0));
-		}
 
 		return ResponseEntity.ok().body(telecomNumbers);
 
@@ -78,7 +76,7 @@ public class TelecomNumberController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createTelecomNumber(HttpServletRequest request) throws Exception {
+	public ResponseEntity<TelecomNumber> createTelecomNumber(HttpServletRequest request) throws Exception {
 
 		TelecomNumber telecomNumberToBeAdded = new TelecomNumber();
 		try {
@@ -86,7 +84,7 @@ public class TelecomNumberController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createTelecomNumber(telecomNumberToBeAdded);
@@ -101,63 +99,15 @@ public class TelecomNumberController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createTelecomNumber(@RequestBody TelecomNumber telecomNumberToBeAdded) throws Exception {
+	public ResponseEntity<TelecomNumber> createTelecomNumber(@RequestBody TelecomNumber telecomNumberToBeAdded) throws Exception {
 
 		AddTelecomNumber command = new AddTelecomNumber(telecomNumberToBeAdded);
 		TelecomNumber telecomNumber = ((TelecomNumberAdded) Scheduler.execute(command).data()).getAddedTelecomNumber();
 		
 		if (telecomNumber != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(telecomNumber);
+			return successful(telecomNumber);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("TelecomNumber could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateTelecomNumber(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		TelecomNumber telecomNumberToBeUpdated = new TelecomNumber();
-
-		try {
-			telecomNumberToBeUpdated = TelecomNumberMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateTelecomNumber(telecomNumberToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class TelecomNumberController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateTelecomNumber(@RequestBody TelecomNumber telecomNumberToBeUpdated,
+	public ResponseEntity<String> updateTelecomNumber(@RequestBody TelecomNumber telecomNumberToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		telecomNumberToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class TelecomNumberController {
 
 		try {
 			if(((TelecomNumberUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{telecomNumberId}")
-	public ResponseEntity<Object> findById(@PathVariable String telecomNumberId) throws Exception {
+	public ResponseEntity<TelecomNumber> findById(@PathVariable String telecomNumberId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("telecomNumberId", telecomNumberId);
 		try {
 
-			Object foundTelecomNumber = findTelecomNumbersBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundTelecomNumber);
+			List<TelecomNumber> foundTelecomNumber = findTelecomNumbersBy(requestParams).getBody();
+			if(foundTelecomNumber.size()==1){				return successful(foundTelecomNumber.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{telecomNumberId}")
-	public ResponseEntity<Object> deleteTelecomNumberByIdUpdated(@PathVariable String telecomNumberId) throws Exception {
+	public ResponseEntity<String> deleteTelecomNumberByIdUpdated(@PathVariable String telecomNumberId) throws Exception {
 		DeleteTelecomNumber command = new DeleteTelecomNumber(telecomNumberId);
 
 		try {
 			if (((TelecomNumberDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("TelecomNumber could not be deleted");
+		return conflict();
 
 	}
 

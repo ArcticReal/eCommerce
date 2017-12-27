@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.rateType.query.FindRate
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/rateTypes")
 public class RateTypeController {
@@ -52,7 +54,7 @@ public class RateTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findRateTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<RateType>> findRateTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindRateTypesBy query = new FindRateTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class RateTypeController {
 		}
 
 		List<RateType> rateTypes =((RateTypeFound) Scheduler.execute(query).data()).getRateTypes();
-
-		if (rateTypes.size() == 1) {
-			return ResponseEntity.ok().body(rateTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(rateTypes);
 
@@ -78,7 +76,7 @@ public class RateTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createRateType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<RateType> createRateType(HttpServletRequest request) throws Exception {
 
 		RateType rateTypeToBeAdded = new RateType();
 		try {
@@ -86,7 +84,7 @@ public class RateTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createRateType(rateTypeToBeAdded);
@@ -101,63 +99,15 @@ public class RateTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createRateType(@RequestBody RateType rateTypeToBeAdded) throws Exception {
+	public ResponseEntity<RateType> createRateType(@RequestBody RateType rateTypeToBeAdded) throws Exception {
 
 		AddRateType command = new AddRateType(rateTypeToBeAdded);
 		RateType rateType = ((RateTypeAdded) Scheduler.execute(command).data()).getAddedRateType();
 		
 		if (rateType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(rateType);
+			return successful(rateType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("RateType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateRateType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		RateType rateTypeToBeUpdated = new RateType();
-
-		try {
-			rateTypeToBeUpdated = RateTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateRateType(rateTypeToBeUpdated, rateTypeToBeUpdated.getRateTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class RateTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{rateTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateRateType(@RequestBody RateType rateTypeToBeUpdated,
+	public ResponseEntity<String> updateRateType(@RequestBody RateType rateTypeToBeUpdated,
 			@PathVariable String rateTypeId) throws Exception {
 
 		rateTypeToBeUpdated.setRateTypeId(rateTypeId);
@@ -178,41 +128,44 @@ public class RateTypeController {
 
 		try {
 			if(((RateTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{rateTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String rateTypeId) throws Exception {
+	public ResponseEntity<RateType> findById(@PathVariable String rateTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("rateTypeId", rateTypeId);
 		try {
 
-			Object foundRateType = findRateTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundRateType);
+			List<RateType> foundRateType = findRateTypesBy(requestParams).getBody();
+			if(foundRateType.size()==1){				return successful(foundRateType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{rateTypeId}")
-	public ResponseEntity<Object> deleteRateTypeByIdUpdated(@PathVariable String rateTypeId) throws Exception {
+	public ResponseEntity<String> deleteRateTypeByIdUpdated(@PathVariable String rateTypeId) throws Exception {
 		DeleteRateType command = new DeleteRateType(rateTypeId);
 
 		try {
 			if (((RateTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("RateType could not be deleted");
+		return conflict();
 
 	}
 

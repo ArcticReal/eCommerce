@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/productShipmentFedex")
 public class ProductShipmentFedexServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/fedexSubscriptionRequest")
-	public ResponseEntity<Object> fedexSubscriptionRequest(HttpSession session, @RequestParam(value="companyPartyId") String companyPartyId, @RequestParam(value="replaceMeterNumber") Boolean replaceMeterNumber, @RequestParam(value="shipmentGatewayConfigId") String shipmentGatewayConfigId, @RequestParam(value="configProps") String configProps, @RequestParam(value="contactPartyName") String contactPartyName) {
+	public ResponseEntity<Map<String, Object>> fedexSubscriptionRequest(HttpSession session, @RequestParam(value="companyPartyId") String companyPartyId, @RequestParam(value="replaceMeterNumber") Boolean replaceMeterNumber, @RequestParam(value="shipmentGatewayConfigId") String shipmentGatewayConfigId, @RequestParam(value="configProps") String configProps, @RequestParam(value="contactPartyName") String contactPartyName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("companyPartyId",companyPartyId);
@@ -43,23 +45,23 @@ public class ProductShipmentFedexServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/fedexShipRequest")
-	public ResponseEntity<Object> fedexShipRequest(HttpSession session, @RequestParam(value="shipmentRouteSegmentId") String shipmentRouteSegmentId, @RequestParam(value="shipmentId") String shipmentId) {
+	public ResponseEntity<Map<String, Object>> fedexShipRequest(HttpSession session, @RequestParam(value="shipmentRouteSegmentId") String shipmentRouteSegmentId, @RequestParam(value="shipmentId") String shipmentId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shipmentRouteSegmentId",shipmentRouteSegmentId);
@@ -73,19 +75,19 @@ public class ProductShipmentFedexServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

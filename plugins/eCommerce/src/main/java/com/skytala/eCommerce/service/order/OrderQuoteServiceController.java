@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/orderQuote")
 public class OrderQuoteServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteQuoteWorkEffort")
-	public ResponseEntity<Object> deleteQuoteWorkEffort(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="quoteId") String quoteId) {
+	public ResponseEntity<Map<String, Object>> deleteQuoteWorkEffort(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="quoteId") String quoteId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -40,23 +42,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createQuoteFromCustRequest")
-	public ResponseEntity<Object> createQuoteFromCustRequest(HttpSession session, @RequestParam(value="custRequestId") String custRequestId, @RequestParam(value="quoteTypeId", required=false) String quoteTypeId) {
+	public ResponseEntity<Map<String, Object>> createQuoteFromCustRequest(HttpSession session, @RequestParam(value="custRequestId") String custRequestId, @RequestParam(value="quoteTypeId", required=false) String quoteTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("custRequestId",custRequestId);
@@ -70,23 +72,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/copyQuoteItem")
-	public ResponseEntity<Object> copyQuoteItem(HttpSession session, @RequestParam(value="quoteItemSeqId") String quoteItemSeqId, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="reservLength", required=false) BigDecimal reservLength, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="reservPersons", required=false) BigDecimal reservPersons, @RequestParam(value="quoteIdTo", required=false) String quoteIdTo, @RequestParam(value="deliverableTypeId", required=false) String deliverableTypeId, @RequestParam(value="quoteItemSeqIdTo", required=false) String quoteItemSeqIdTo, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="quoteUnitPrice", required=false) BigDecimal quoteUnitPrice, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="estimatedDeliveryDate", required=false) Timestamp estimatedDeliveryDate, @RequestParam(value="isPromo", required=false) String isPromo, @RequestParam(value="custRequestItemSeqId", required=false) String custRequestItemSeqId, @RequestParam(value="copyQuoteAdjustments", required=false) String copyQuoteAdjustments, @RequestParam(value="skillTypeId", required=false) String skillTypeId, @RequestParam(value="reservStart", required=false) Timestamp reservStart, @RequestParam(value="configId", required=false) String configId, @RequestParam(value="custRequestId", required=false) String custRequestId, @RequestParam(value="leadTimeDays", required=false) Long leadTimeDays, @RequestParam(value="selectedAmount", required=false) BigDecimal selectedAmount) {
+	public ResponseEntity<Map<String, Object>> copyQuoteItem(HttpSession session, @RequestParam(value="quoteItemSeqId") String quoteItemSeqId, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="reservLength", required=false) BigDecimal reservLength, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="reservPersons", required=false) BigDecimal reservPersons, @RequestParam(value="quoteIdTo", required=false) String quoteIdTo, @RequestParam(value="deliverableTypeId", required=false) String deliverableTypeId, @RequestParam(value="quoteItemSeqIdTo", required=false) String quoteItemSeqIdTo, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="quoteUnitPrice", required=false) BigDecimal quoteUnitPrice, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="estimatedDeliveryDate", required=false) Timestamp estimatedDeliveryDate, @RequestParam(value="isPromo", required=false) String isPromo, @RequestParam(value="custRequestItemSeqId", required=false) String custRequestItemSeqId, @RequestParam(value="copyQuoteAdjustments", required=false) String copyQuoteAdjustments, @RequestParam(value="skillTypeId", required=false) String skillTypeId, @RequestParam(value="reservStart", required=false) Timestamp reservStart, @RequestParam(value="configId", required=false) String configId, @RequestParam(value="custRequestId", required=false) String custRequestId, @RequestParam(value="leadTimeDays", required=false) Long leadTimeDays, @RequestParam(value="selectedAmount", required=false) BigDecimal selectedAmount) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quoteItemSeqId",quoteItemSeqId);
@@ -122,23 +124,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createQuoteAndQuoteItemForRequest")
-	public ResponseEntity<Object> createQuoteAndQuoteItemForRequest(HttpSession session, @RequestParam(value="custRequestId") String custRequestId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="reservLength", required=false) BigDecimal reservLength, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="reservPersons", required=false) BigDecimal reservPersons, @RequestParam(value="deliverableTypeId", required=false) String deliverableTypeId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="quoteUnitPrice", required=false) BigDecimal quoteUnitPrice, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="estimatedDeliveryDate", required=false) Timestamp estimatedDeliveryDate, @RequestParam(value="isPromo", required=false) String isPromo, @RequestParam(value="custRequestItemSeqId", required=false) String custRequestItemSeqId, @RequestParam(value="skillTypeId", required=false) String skillTypeId, @RequestParam(value="reservStart", required=false) Timestamp reservStart, @RequestParam(value="configId", required=false) String configId, @RequestParam(value="leadTimeDays", required=false) Long leadTimeDays, @RequestParam(value="selectedAmount", required=false) BigDecimal selectedAmount) {
+	public ResponseEntity<Map<String, Object>> createQuoteAndQuoteItemForRequest(HttpSession session, @RequestParam(value="custRequestId") String custRequestId, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="reservLength", required=false) BigDecimal reservLength, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="reservPersons", required=false) BigDecimal reservPersons, @RequestParam(value="deliverableTypeId", required=false) String deliverableTypeId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="quoteUnitPrice", required=false) BigDecimal quoteUnitPrice, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="estimatedDeliveryDate", required=false) Timestamp estimatedDeliveryDate, @RequestParam(value="isPromo", required=false) String isPromo, @RequestParam(value="custRequestItemSeqId", required=false) String custRequestItemSeqId, @RequestParam(value="skillTypeId", required=false) String skillTypeId, @RequestParam(value="reservStart", required=false) Timestamp reservStart, @RequestParam(value="configId", required=false) String configId, @RequestParam(value="leadTimeDays", required=false) Long leadTimeDays, @RequestParam(value="selectedAmount", required=false) BigDecimal selectedAmount) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("custRequestId",custRequestId);
@@ -169,23 +171,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateQuoteAttribute")
-	public ResponseEntity<Object> updateQuoteAttribute(HttpSession session, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue, @RequestParam(value="quoteId", required=false) String quoteId, @RequestParam(value="attrName", required=false) String attrName) {
+	public ResponseEntity<Map<String, Object>> updateQuoteAttribute(HttpSession session, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue, @RequestParam(value="quoteId", required=false) String quoteId, @RequestParam(value="attrName", required=false) String attrName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("attrDescription",attrDescription);
@@ -201,23 +203,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createQuoteTermAttribute")
-	public ResponseEntity<Object> createQuoteTermAttribute(HttpSession session, @RequestParam(value="quoteItemSeqId") String quoteItemSeqId, @RequestParam(value="termTypeId") String termTypeId, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
+	public ResponseEntity<Map<String, Object>> createQuoteTermAttribute(HttpSession session, @RequestParam(value="quoteItemSeqId") String quoteItemSeqId, @RequestParam(value="termTypeId") String termTypeId, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quoteItemSeqId",quoteItemSeqId);
@@ -235,23 +237,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateQuoteTypeAttr")
-	public ResponseEntity<Object> updateQuoteTypeAttr(HttpSession session, @RequestParam(value="quoteTypeId") String quoteTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateQuoteTypeAttr(HttpSession session, @RequestParam(value="quoteTypeId") String quoteTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quoteTypeId",quoteTypeId);
@@ -266,23 +268,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeQuoteCoefficient")
-	public ResponseEntity<Object> removeQuoteCoefficient(HttpSession session, @RequestParam(value="coeffValue", required=false) BigDecimal coeffValue, @RequestParam(value="coeffName", required=false) String coeffName, @RequestParam(value="quoteId", required=false) String quoteId) {
+	public ResponseEntity<Map<String, Object>> removeQuoteCoefficient(HttpSession session, @RequestParam(value="coeffValue", required=false) BigDecimal coeffValue, @RequestParam(value="coeffName", required=false) String coeffName, @RequestParam(value="quoteId", required=false) String quoteId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("coeffValue",coeffValue);
@@ -297,23 +299,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateQuoteAdjustment")
-	public ResponseEntity<Object> updateQuoteAdjustment(HttpSession session, @RequestParam(value="customerReferenceId", required=false) String customerReferenceId, @RequestParam(value="correspondingProductId", required=false) String correspondingProductId, @RequestParam(value="includeInShipping", required=false) String includeInShipping, @RequestParam(value="description", required=false) String description, @RequestParam(value="exemptAmount", required=false) BigDecimal exemptAmount, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="quoteAdjustmentId", required=false) String quoteAdjustmentId, @RequestParam(value="primaryGeoId", required=false) String primaryGeoId, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="secondaryGeoId", required=false) String secondaryGeoId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="sourceReferenceId", required=false) String sourceReferenceId, @RequestParam(value="quoteItemSeqId", required=false) String quoteItemSeqId, @RequestParam(value="productPromoRuleId", required=false) String productPromoRuleId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="overrideGlAccountId", required=false) String overrideGlAccountId, @RequestParam(value="quoteId", required=false) String quoteId, @RequestParam(value="includeInTax", required=false) String includeInTax, @RequestParam(value="quoteAdjustmentTypeId", required=false) String quoteAdjustmentTypeId, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="productPromoActionSeqId", required=false) String productPromoActionSeqId, @RequestParam(value="sourcePercentage", required=false) BigDecimal sourcePercentage) {
+	public ResponseEntity<Map<String, Object>> updateQuoteAdjustment(HttpSession session, @RequestParam(value="customerReferenceId", required=false) String customerReferenceId, @RequestParam(value="correspondingProductId", required=false) String correspondingProductId, @RequestParam(value="includeInShipping", required=false) String includeInShipping, @RequestParam(value="description", required=false) String description, @RequestParam(value="exemptAmount", required=false) BigDecimal exemptAmount, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="quoteAdjustmentId", required=false) String quoteAdjustmentId, @RequestParam(value="primaryGeoId", required=false) String primaryGeoId, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="secondaryGeoId", required=false) String secondaryGeoId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="sourceReferenceId", required=false) String sourceReferenceId, @RequestParam(value="quoteItemSeqId", required=false) String quoteItemSeqId, @RequestParam(value="productPromoRuleId", required=false) String productPromoRuleId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="overrideGlAccountId", required=false) String overrideGlAccountId, @RequestParam(value="quoteId", required=false) String quoteId, @RequestParam(value="includeInTax", required=false) String includeInTax, @RequestParam(value="quoteAdjustmentTypeId", required=false) String quoteAdjustmentTypeId, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="productPromoActionSeqId", required=false) String productPromoActionSeqId, @RequestParam(value="sourcePercentage", required=false) BigDecimal sourcePercentage) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("customerReferenceId",customerReferenceId);
@@ -352,23 +354,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getNextQuoteId")
-	public ResponseEntity<Object> getNextQuoteId(HttpSession session, @RequestParam(value="quoteTypeId", required=false) String quoteTypeId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="salesChannelEnumId", required=false) String salesChannelEnumId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="validFromDate", required=false) Timestamp validFromDate, @RequestParam(value="description", required=false) String description, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="issueDate", required=false) Timestamp issueDate, @RequestParam(value="validThruDate", required=false) Timestamp validThruDate, @RequestParam(value="quoteName", required=false) String quoteName) {
+	public ResponseEntity<Map<String, Object>> getNextQuoteId(HttpSession session, @RequestParam(value="quoteTypeId", required=false) String quoteTypeId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="salesChannelEnumId", required=false) String salesChannelEnumId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="validFromDate", required=false) Timestamp validFromDate, @RequestParam(value="description", required=false) String description, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="issueDate", required=false) Timestamp issueDate, @RequestParam(value="validThruDate", required=false) Timestamp validThruDate, @RequestParam(value="quoteName", required=false) String quoteName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quoteTypeId",quoteTypeId);
@@ -391,23 +393,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteQuoteType")
-	public ResponseEntity<Object> deleteQuoteType(HttpSession session, @RequestParam(value="quoteTypeId") String quoteTypeId) {
+	public ResponseEntity<Map<String, Object>> deleteQuoteType(HttpSession session, @RequestParam(value="quoteTypeId") String quoteTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quoteTypeId",quoteTypeId);
@@ -420,23 +422,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createQuoteItem")
-	public ResponseEntity<Object> createQuoteItem(HttpSession session, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="reservLength", required=false) BigDecimal reservLength, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="reservPersons", required=false) BigDecimal reservPersons, @RequestParam(value="deliverableTypeId", required=false) String deliverableTypeId, @RequestParam(value="quoteItemSeqId", required=false) String quoteItemSeqId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="quoteUnitPrice", required=false) BigDecimal quoteUnitPrice, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="estimatedDeliveryDate", required=false) Timestamp estimatedDeliveryDate, @RequestParam(value="isPromo", required=false) String isPromo, @RequestParam(value="quoteId", required=false) String quoteId, @RequestParam(value="custRequestItemSeqId", required=false) String custRequestItemSeqId, @RequestParam(value="skillTypeId", required=false) String skillTypeId, @RequestParam(value="reservStart", required=false) Timestamp reservStart, @RequestParam(value="configId", required=false) String configId, @RequestParam(value="custRequestId", required=false) String custRequestId, @RequestParam(value="leadTimeDays", required=false) Long leadTimeDays, @RequestParam(value="selectedAmount", required=false) BigDecimal selectedAmount) {
+	public ResponseEntity<Map<String, Object>> createQuoteItem(HttpSession session, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="reservLength", required=false) BigDecimal reservLength, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="reservPersons", required=false) BigDecimal reservPersons, @RequestParam(value="deliverableTypeId", required=false) String deliverableTypeId, @RequestParam(value="quoteItemSeqId", required=false) String quoteItemSeqId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="quoteUnitPrice", required=false) BigDecimal quoteUnitPrice, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="estimatedDeliveryDate", required=false) Timestamp estimatedDeliveryDate, @RequestParam(value="isPromo", required=false) String isPromo, @RequestParam(value="quoteId", required=false) String quoteId, @RequestParam(value="custRequestItemSeqId", required=false) String custRequestItemSeqId, @RequestParam(value="skillTypeId", required=false) String skillTypeId, @RequestParam(value="reservStart", required=false) Timestamp reservStart, @RequestParam(value="configId", required=false) String configId, @RequestParam(value="custRequestId", required=false) String custRequestId, @RequestParam(value="leadTimeDays", required=false) Long leadTimeDays, @RequestParam(value="selectedAmount", required=false) BigDecimal selectedAmount) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -469,23 +471,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/autoCreateQuoteAdjustments")
-	public ResponseEntity<Object> autoCreateQuoteAdjustments(HttpSession session, @RequestParam(value="quoteId") String quoteId) {
+	public ResponseEntity<Map<String, Object>> autoCreateQuoteAdjustments(HttpSession session, @RequestParam(value="quoteId") String quoteId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quoteId",quoteId);
@@ -498,23 +500,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createQuoteCoefficient")
-	public ResponseEntity<Object> createQuoteCoefficient(HttpSession session, @RequestParam(value="coeffName") String coeffName, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="coeffValue", required=false) BigDecimal coeffValue) {
+	public ResponseEntity<Map<String, Object>> createQuoteCoefficient(HttpSession session, @RequestParam(value="coeffName") String coeffName, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="coeffValue", required=false) BigDecimal coeffValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("coeffName",coeffName);
@@ -529,23 +531,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createQuoteAdjustment")
-	public ResponseEntity<Object> createQuoteAdjustment(HttpSession session, @RequestParam(value="quoteAdjustmentTypeId") String quoteAdjustmentTypeId, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="customerReferenceId", required=false) String customerReferenceId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="correspondingProductId", required=false) String correspondingProductId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="sourceReferenceId", required=false) String sourceReferenceId, @RequestParam(value="quoteItemSeqId", required=false) String quoteItemSeqId, @RequestParam(value="productPromoRuleId", required=false) String productPromoRuleId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="includeInShipping", required=false) String includeInShipping, @RequestParam(value="description", required=false) String description, @RequestParam(value="overrideGlAccountId", required=false) String overrideGlAccountId, @RequestParam(value="exemptAmount", required=false) BigDecimal exemptAmount, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="includeInTax", required=false) String includeInTax, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="productPromoActionSeqId", required=false) String productPromoActionSeqId, @RequestParam(value="primaryGeoId", required=false) String primaryGeoId, @RequestParam(value="sourcePercentage", required=false) BigDecimal sourcePercentage, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="secondaryGeoId", required=false) String secondaryGeoId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin) {
+	public ResponseEntity<Map<String, Object>> createQuoteAdjustment(HttpSession session, @RequestParam(value="quoteAdjustmentTypeId") String quoteAdjustmentTypeId, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="customerReferenceId", required=false) String customerReferenceId, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="correspondingProductId", required=false) String correspondingProductId, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="sourceReferenceId", required=false) String sourceReferenceId, @RequestParam(value="quoteItemSeqId", required=false) String quoteItemSeqId, @RequestParam(value="productPromoRuleId", required=false) String productPromoRuleId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="includeInShipping", required=false) String includeInShipping, @RequestParam(value="description", required=false) String description, @RequestParam(value="overrideGlAccountId", required=false) String overrideGlAccountId, @RequestParam(value="exemptAmount", required=false) BigDecimal exemptAmount, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="includeInTax", required=false) String includeInTax, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="productPromoActionSeqId", required=false) String productPromoActionSeqId, @RequestParam(value="primaryGeoId", required=false) String primaryGeoId, @RequestParam(value="sourcePercentage", required=false) BigDecimal sourcePercentage, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="secondaryGeoId", required=false) String secondaryGeoId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quoteAdjustmentTypeId",quoteAdjustmentTypeId);
@@ -583,23 +585,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateQuoteItem")
-	public ResponseEntity<Object> updateQuoteItem(HttpSession session, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="reservLength", required=false) BigDecimal reservLength, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="reservPersons", required=false) BigDecimal reservPersons, @RequestParam(value="deliverableTypeId", required=false) String deliverableTypeId, @RequestParam(value="quoteItemSeqId", required=false) String quoteItemSeqId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="quoteUnitPrice", required=false) BigDecimal quoteUnitPrice, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="estimatedDeliveryDate", required=false) Timestamp estimatedDeliveryDate, @RequestParam(value="isPromo", required=false) String isPromo, @RequestParam(value="quoteId", required=false) String quoteId, @RequestParam(value="custRequestItemSeqId", required=false) String custRequestItemSeqId, @RequestParam(value="skillTypeId", required=false) String skillTypeId, @RequestParam(value="reservStart", required=false) Timestamp reservStart, @RequestParam(value="configId", required=false) String configId, @RequestParam(value="custRequestId", required=false) String custRequestId, @RequestParam(value="leadTimeDays", required=false) Long leadTimeDays, @RequestParam(value="selectedAmount", required=false) BigDecimal selectedAmount) {
+	public ResponseEntity<Map<String, Object>> updateQuoteItem(HttpSession session, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="reservLength", required=false) BigDecimal reservLength, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="reservPersons", required=false) BigDecimal reservPersons, @RequestParam(value="deliverableTypeId", required=false) String deliverableTypeId, @RequestParam(value="quoteItemSeqId", required=false) String quoteItemSeqId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="quoteUnitPrice", required=false) BigDecimal quoteUnitPrice, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="estimatedDeliveryDate", required=false) Timestamp estimatedDeliveryDate, @RequestParam(value="isPromo", required=false) String isPromo, @RequestParam(value="quoteId", required=false) String quoteId, @RequestParam(value="custRequestItemSeqId", required=false) String custRequestItemSeqId, @RequestParam(value="skillTypeId", required=false) String skillTypeId, @RequestParam(value="reservStart", required=false) Timestamp reservStart, @RequestParam(value="configId", required=false) String configId, @RequestParam(value="custRequestId", required=false) String custRequestId, @RequestParam(value="leadTimeDays", required=false) Long leadTimeDays, @RequestParam(value="selectedAmount", required=false) BigDecimal selectedAmount) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -632,23 +634,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateQuoteTermAttribute")
-	public ResponseEntity<Object> updateQuoteTermAttribute(HttpSession session, @RequestParam(value="quoteItemSeqId") String quoteItemSeqId, @RequestParam(value="termTypeId") String termTypeId, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
+	public ResponseEntity<Map<String, Object>> updateQuoteTermAttribute(HttpSession session, @RequestParam(value="quoteItemSeqId") String quoteItemSeqId, @RequestParam(value="termTypeId") String termTypeId, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quoteItemSeqId",quoteItemSeqId);
@@ -666,23 +668,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeQuoteRole")
-	public ResponseEntity<Object> removeQuoteRole(HttpSession session, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="quoteId", required=false) String quoteId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> removeQuoteRole(HttpSession session, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="quoteId", required=false) String quoteId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -699,23 +701,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createQuoteFromShoppingList")
-	public ResponseEntity<Object> createQuoteFromShoppingList(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId, @RequestParam(value="applyStorePromotions", required=false) String applyStorePromotions) {
+	public ResponseEntity<Map<String, Object>> createQuoteFromShoppingList(HttpSession session, @RequestParam(value="shoppingListId") String shoppingListId, @RequestParam(value="applyStorePromotions", required=false) String applyStorePromotions) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("shoppingListId",shoppingListId);
@@ -729,23 +731,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteQuoteTermAttribute")
-	public ResponseEntity<Object> deleteQuoteTermAttribute(HttpSession session, @RequestParam(value="quoteItemSeqId") String quoteItemSeqId, @RequestParam(value="termTypeId") String termTypeId, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="attrName") String attrName) {
+	public ResponseEntity<Map<String, Object>> deleteQuoteTermAttribute(HttpSession session, @RequestParam(value="quoteItemSeqId") String quoteItemSeqId, @RequestParam(value="termTypeId") String termTypeId, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="attrName") String attrName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quoteItemSeqId",quoteItemSeqId);
@@ -761,23 +763,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createQuoteWorkEffort")
-	public ResponseEntity<Object> createQuoteWorkEffort(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="recurrenceInfoId", required=false) String recurrenceInfoId, @RequestParam(value="workEffortTypeId", required=false) String workEffortTypeId, @RequestParam(value="reservPersons", required=false) BigDecimal reservPersons, @RequestParam(value="revisionNumber", required=false) Long revisionNumber, @RequestParam(value="tempExprId", required=false) String tempExprId, @RequestParam(value="showAsEnumId", required=false) String showAsEnumId, @RequestParam(value="infoUrl", required=false) String infoUrl, @RequestParam(value="universalId", required=false) String universalId, @RequestParam(value="locationDesc", required=false) String locationDesc, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="actualMilliSeconds", required=false) BigDecimal actualMilliSeconds, @RequestParam(value="quantityToProduce", required=false) BigDecimal quantityToProduce, @RequestParam(value="workEffortPurposeTypeId", required=false) String workEffortPurposeTypeId, @RequestParam(value="serviceLoaderName", required=false) String serviceLoaderName, @RequestParam(value="accommodationSpotId", required=false) String accommodationSpotId, @RequestParam(value="estimatedStartDate", required=false) Timestamp estimatedStartDate, @RequestParam(value="sendNotificationEmail", required=false) String sendNotificationEmail, @RequestParam(value="noteId", required=false) String noteId, @RequestParam(value="quantityRejected", required=false) BigDecimal quantityRejected, @RequestParam(value="priority", required=false) Long priority, @RequestParam(value="currentStatusId", required=false) String currentStatusId, @RequestParam(value="runtimeDataId", required=false) String runtimeDataId, @RequestParam(value="estimatedMilliSeconds", required=false) BigDecimal estimatedMilliSeconds, @RequestParam(value="specialTerms", required=false) String specialTerms, @RequestParam(value="timeTransparency", required=false) Long timeTransparency, @RequestParam(value="actualCompletionDate", required=false) Timestamp actualCompletionDate, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="reserv2ndPPPerc", required=false) BigDecimal reserv2ndPPPerc, @RequestParam(value="totalMoneyAllowed", required=false) BigDecimal totalMoneyAllowed, @RequestParam(value="estimateCalcMethod", required=false) String estimateCalcMethod, @RequestParam(value="workEffortParentId", required=false) String workEffortParentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="moneyUomId", required=false) String moneyUomId, @RequestParam(value="reservNthPPPerc", required=false) BigDecimal reservNthPPPerc, @RequestParam(value="workEffortName", required=false) String workEffortName, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="accommodationMapId", required=false) String accommodationMapId, @RequestParam(value="actualStartDate", required=false) Timestamp actualStartDate, @RequestParam(value="scopeEnumId", required=false) String scopeEnumId, @RequestParam(value="quantityProduced", required=false) BigDecimal quantityProduced, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="estimatedSetupMillis", required=false) BigDecimal estimatedSetupMillis, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="sourceReferenceId", required=false) String sourceReferenceId, @RequestParam(value="lastStatusUpdate", required=false) Timestamp lastStatusUpdate, @RequestParam(value="percentComplete", required=false) Long percentComplete, @RequestParam(value="totalMilliSecondsAllowed", required=false) BigDecimal totalMilliSecondsAllowed, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="actualSetupMillis", required=false) BigDecimal actualSetupMillis, @RequestParam(value="estimatedCompletionDate", required=false) Timestamp estimatedCompletionDate) {
+	public ResponseEntity<Map<String, Object>> createQuoteWorkEffort(HttpSession session, @RequestParam(value="workEffortId") String workEffortId, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="recurrenceInfoId", required=false) String recurrenceInfoId, @RequestParam(value="workEffortTypeId", required=false) String workEffortTypeId, @RequestParam(value="reservPersons", required=false) BigDecimal reservPersons, @RequestParam(value="revisionNumber", required=false) Long revisionNumber, @RequestParam(value="tempExprId", required=false) String tempExprId, @RequestParam(value="showAsEnumId", required=false) String showAsEnumId, @RequestParam(value="infoUrl", required=false) String infoUrl, @RequestParam(value="universalId", required=false) String universalId, @RequestParam(value="locationDesc", required=false) String locationDesc, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="actualMilliSeconds", required=false) BigDecimal actualMilliSeconds, @RequestParam(value="quantityToProduce", required=false) BigDecimal quantityToProduce, @RequestParam(value="workEffortPurposeTypeId", required=false) String workEffortPurposeTypeId, @RequestParam(value="serviceLoaderName", required=false) String serviceLoaderName, @RequestParam(value="accommodationSpotId", required=false) String accommodationSpotId, @RequestParam(value="estimatedStartDate", required=false) Timestamp estimatedStartDate, @RequestParam(value="sendNotificationEmail", required=false) String sendNotificationEmail, @RequestParam(value="noteId", required=false) String noteId, @RequestParam(value="quantityRejected", required=false) BigDecimal quantityRejected, @RequestParam(value="priority", required=false) Long priority, @RequestParam(value="currentStatusId", required=false) String currentStatusId, @RequestParam(value="runtimeDataId", required=false) String runtimeDataId, @RequestParam(value="estimatedMilliSeconds", required=false) BigDecimal estimatedMilliSeconds, @RequestParam(value="specialTerms", required=false) String specialTerms, @RequestParam(value="timeTransparency", required=false) Long timeTransparency, @RequestParam(value="actualCompletionDate", required=false) Timestamp actualCompletionDate, @RequestParam(value="fixedAssetId", required=false) String fixedAssetId, @RequestParam(value="reserv2ndPPPerc", required=false) BigDecimal reserv2ndPPPerc, @RequestParam(value="totalMoneyAllowed", required=false) BigDecimal totalMoneyAllowed, @RequestParam(value="estimateCalcMethod", required=false) String estimateCalcMethod, @RequestParam(value="workEffortParentId", required=false) String workEffortParentId, @RequestParam(value="description", required=false) String description, @RequestParam(value="moneyUomId", required=false) String moneyUomId, @RequestParam(value="reservNthPPPerc", required=false) BigDecimal reservNthPPPerc, @RequestParam(value="workEffortName", required=false) String workEffortName, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="accommodationMapId", required=false) String accommodationMapId, @RequestParam(value="actualStartDate", required=false) Timestamp actualStartDate, @RequestParam(value="scopeEnumId", required=false) String scopeEnumId, @RequestParam(value="quantityProduced", required=false) BigDecimal quantityProduced, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="estimatedSetupMillis", required=false) BigDecimal estimatedSetupMillis, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="sourceReferenceId", required=false) String sourceReferenceId, @RequestParam(value="lastStatusUpdate", required=false) Timestamp lastStatusUpdate, @RequestParam(value="percentComplete", required=false) Long percentComplete, @RequestParam(value="totalMilliSecondsAllowed", required=false) BigDecimal totalMilliSecondsAllowed, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="actualSetupMillis", required=false) BigDecimal actualSetupMillis, @RequestParam(value="estimatedCompletionDate", required=false) Timestamp estimatedCompletionDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -841,23 +843,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/quoteSequenceEnforced")
-	public ResponseEntity<Object> quoteSequenceEnforced(HttpSession session, @RequestParam(value="partyAcctgPreference") org.apache.ofbiz.entity.GenericValue partyAcctgPreference, @RequestParam(value="quoteTypeId", required=false) String quoteTypeId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="salesChannelEnumId", required=false) String salesChannelEnumId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="validFromDate", required=false) Timestamp validFromDate, @RequestParam(value="description", required=false) String description, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="issueDate", required=false) Timestamp issueDate, @RequestParam(value="validThruDate", required=false) Timestamp validThruDate, @RequestParam(value="quoteName", required=false) String quoteName) {
+	public ResponseEntity<Map<String, Object>> quoteSequenceEnforced(HttpSession session, @RequestParam(value="partyAcctgPreference") org.apache.ofbiz.entity.GenericValue partyAcctgPreference, @RequestParam(value="quoteTypeId", required=false) String quoteTypeId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="salesChannelEnumId", required=false) String salesChannelEnumId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="validFromDate", required=false) Timestamp validFromDate, @RequestParam(value="description", required=false) String description, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="issueDate", required=false) Timestamp issueDate, @RequestParam(value="validThruDate", required=false) Timestamp validThruDate, @RequestParam(value="quoteName", required=false) String quoteName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("partyAcctgPreference",partyAcctgPreference);
@@ -881,23 +883,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeQuoteAttribute")
-	public ResponseEntity<Object> removeQuoteAttribute(HttpSession session, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue, @RequestParam(value="quoteId", required=false) String quoteId, @RequestParam(value="attrName", required=false) String attrName) {
+	public ResponseEntity<Map<String, Object>> removeQuoteAttribute(HttpSession session, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue, @RequestParam(value="quoteId", required=false) String quoteId, @RequestParam(value="attrName", required=false) String attrName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("attrDescription",attrDescription);
@@ -913,23 +915,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createQuoteTypeAttr")
-	public ResponseEntity<Object> createQuoteTypeAttr(HttpSession session, @RequestParam(value="quoteTypeId") String quoteTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createQuoteTypeAttr(HttpSession session, @RequestParam(value="quoteTypeId") String quoteTypeId, @RequestParam(value="attrName") String attrName, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quoteTypeId",quoteTypeId);
@@ -944,23 +946,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createQuoteFromCart")
-	public ResponseEntity<Object> createQuoteFromCart(HttpSession session, @RequestParam(value="cart") org.apache.ofbiz.order.shoppingcart.ShoppingCart cart, @RequestParam(value="applyStorePromotions", required=false) String applyStorePromotions) {
+	public ResponseEntity<Map<String, Object>> createQuoteFromCart(HttpSession session, @RequestParam(value="cart") org.apache.ofbiz.order.shoppingcart.ShoppingCart cart, @RequestParam(value="applyStorePromotions", required=false) String applyStorePromotions) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("cart",cart);
@@ -974,23 +976,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createQuoteAttribute")
-	public ResponseEntity<Object> createQuoteAttribute(HttpSession session, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
+	public ResponseEntity<Map<String, Object>> createQuoteAttribute(HttpSession session, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="attrName") String attrName, @RequestParam(value="attrDescription", required=false) String attrDescription, @RequestParam(value="attrValue", required=false) Long attrValue) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quoteId",quoteId);
@@ -1006,23 +1008,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteQuoteTypeAttr")
-	public ResponseEntity<Object> deleteQuoteTypeAttr(HttpSession session, @RequestParam(value="quoteTypeId") String quoteTypeId, @RequestParam(value="attrName") String attrName) {
+	public ResponseEntity<Map<String, Object>> deleteQuoteTypeAttr(HttpSession session, @RequestParam(value="quoteTypeId") String quoteTypeId, @RequestParam(value="attrName") String attrName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quoteTypeId",quoteTypeId);
@@ -1036,23 +1038,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createQuote")
-	public ResponseEntity<Object> createQuote(HttpSession session, @RequestParam(value="quoteTypeId", required=false) String quoteTypeId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="salesChannelEnumId", required=false) String salesChannelEnumId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="validFromDate", required=false) Timestamp validFromDate, @RequestParam(value="description", required=false) String description, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="issueDate", required=false) Timestamp issueDate, @RequestParam(value="validThruDate", required=false) Timestamp validThruDate, @RequestParam(value="quoteName", required=false) String quoteName) {
+	public ResponseEntity<Map<String, Object>> createQuote(HttpSession session, @RequestParam(value="quoteTypeId", required=false) String quoteTypeId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="salesChannelEnumId", required=false) String salesChannelEnumId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="validFromDate", required=false) Timestamp validFromDate, @RequestParam(value="description", required=false) String description, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="issueDate", required=false) Timestamp issueDate, @RequestParam(value="validThruDate", required=false) Timestamp validThruDate, @RequestParam(value="quoteName", required=false) String quoteName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quoteTypeId",quoteTypeId);
@@ -1075,23 +1077,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/sendQuoteReportMail")
-	public ResponseEntity<Object> sendQuoteReportMail(HttpSession session, @RequestParam(value="sendTo") String sendTo, @RequestParam(value="emailType") String emailType, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="note", required=false) String note, @RequestParam(value="sendCc", required=false) String sendCc) {
+	public ResponseEntity<Map<String, Object>> sendQuoteReportMail(HttpSession session, @RequestParam(value="sendTo") String sendTo, @RequestParam(value="emailType") String emailType, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="note", required=false) String note, @RequestParam(value="sendCc", required=false) String sendCc) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("sendTo",sendTo);
@@ -1108,23 +1110,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createQuoteRole")
-	public ResponseEntity<Object> createQuoteRole(HttpSession session, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="quoteId", required=false) String quoteId) {
+	public ResponseEntity<Map<String, Object>> createQuoteRole(HttpSession session, @RequestParam(value="roleTypeId", required=false) String roleTypeId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="quoteId", required=false) String quoteId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("roleTypeId",roleTypeId);
@@ -1139,23 +1141,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/autoUpdateQuotePrice")
-	public ResponseEntity<Object> autoUpdateQuotePrice(HttpSession session, @RequestParam(value="quoteItemSeqId") String quoteItemSeqId, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="defaultQuoteUnitPrice", required=false) BigDecimal defaultQuoteUnitPrice, @RequestParam(value="manualQuoteUnitPrice", required=false) BigDecimal manualQuoteUnitPrice, @RequestParam(value="averageCost", required=false) BigDecimal averageCost, @RequestParam(value="costToPriceMult", required=false) BigDecimal costToPriceMult) {
+	public ResponseEntity<Map<String, Object>> autoUpdateQuotePrice(HttpSession session, @RequestParam(value="quoteItemSeqId") String quoteItemSeqId, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="defaultQuoteUnitPrice", required=false) BigDecimal defaultQuoteUnitPrice, @RequestParam(value="manualQuoteUnitPrice", required=false) BigDecimal manualQuoteUnitPrice, @RequestParam(value="averageCost", required=false) BigDecimal averageCost, @RequestParam(value="costToPriceMult", required=false) BigDecimal costToPriceMult) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quoteItemSeqId",quoteItemSeqId);
@@ -1173,23 +1175,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/storeQuote")
-	public ResponseEntity<Object> storeQuote(HttpSession session, @RequestParam(value="salesChannelEnumId", required=false) String salesChannelEnumId, @RequestParam(value="quoteTerms", required=false) List quoteTerms, @RequestParam(value="quoteWorkEfforts", required=false) List quoteWorkEfforts, @RequestParam(value="description", required=false) String description, @RequestParam(value="quoteAttributes", required=false) List quoteAttributes, @RequestParam(value="validThruDate", required=false) Timestamp validThruDate, @RequestParam(value="quoteTypeId", required=false) String quoteTypeId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="quoteAdjustments", required=false) List quoteAdjustments, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="quoteCoefficients", required=false) List quoteCoefficients, @RequestParam(value="validFromDate", required=false) Timestamp validFromDate, @RequestParam(value="quoteRoles", required=false) List quoteRoles, @RequestParam(value="quoteTermAttributes", required=false) List quoteTermAttributes, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="issueDate", required=false) Timestamp issueDate, @RequestParam(value="quoteName", required=false) String quoteName, @RequestParam(value="quoteItems", required=false) List quoteItems) {
+	public ResponseEntity<Map<String, Object>> storeQuote(HttpSession session, @RequestParam(value="salesChannelEnumId", required=false) String salesChannelEnumId, @RequestParam(value="quoteTerms", required=false) List quoteTerms, @RequestParam(value="quoteWorkEfforts", required=false) List quoteWorkEfforts, @RequestParam(value="description", required=false) String description, @RequestParam(value="quoteAttributes", required=false) List quoteAttributes, @RequestParam(value="validThruDate", required=false) Timestamp validThruDate, @RequestParam(value="quoteTypeId", required=false) String quoteTypeId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="quoteAdjustments", required=false) List quoteAdjustments, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="quoteCoefficients", required=false) List quoteCoefficients, @RequestParam(value="validFromDate", required=false) Timestamp validFromDate, @RequestParam(value="quoteRoles", required=false) List quoteRoles, @RequestParam(value="quoteTermAttributes", required=false) List quoteTermAttributes, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="issueDate", required=false) Timestamp issueDate, @RequestParam(value="quoteName", required=false) String quoteName, @RequestParam(value="quoteItems", required=false) List quoteItems) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("salesChannelEnumId",salesChannelEnumId);
@@ -1220,23 +1222,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createQuoteNote")
-	public ResponseEntity<Object> createQuoteNote(HttpSession session, @RequestParam(value="noteInfo") String noteInfo, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="noteName", required=false) String noteName) {
+	public ResponseEntity<Map<String, Object>> createQuoteNote(HttpSession session, @RequestParam(value="noteInfo") String noteInfo, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="noteName", required=false) String noteName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("noteInfo",noteInfo);
@@ -1251,23 +1253,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateQuoteCoefficient")
-	public ResponseEntity<Object> updateQuoteCoefficient(HttpSession session, @RequestParam(value="coeffValue", required=false) BigDecimal coeffValue, @RequestParam(value="coeffName", required=false) String coeffName, @RequestParam(value="quoteId", required=false) String quoteId) {
+	public ResponseEntity<Map<String, Object>> updateQuoteCoefficient(HttpSession session, @RequestParam(value="coeffValue", required=false) BigDecimal coeffValue, @RequestParam(value="coeffName", required=false) String coeffName, @RequestParam(value="quoteId", required=false) String quoteId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("coeffValue",coeffValue);
@@ -1282,23 +1284,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeQuoteItem")
-	public ResponseEntity<Object> removeQuoteItem(HttpSession session, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="reservLength", required=false) BigDecimal reservLength, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="reservPersons", required=false) BigDecimal reservPersons, @RequestParam(value="deliverableTypeId", required=false) String deliverableTypeId, @RequestParam(value="quoteItemSeqId", required=false) String quoteItemSeqId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="quoteUnitPrice", required=false) BigDecimal quoteUnitPrice, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="estimatedDeliveryDate", required=false) Timestamp estimatedDeliveryDate, @RequestParam(value="isPromo", required=false) String isPromo, @RequestParam(value="quoteId", required=false) String quoteId, @RequestParam(value="custRequestItemSeqId", required=false) String custRequestItemSeqId, @RequestParam(value="skillTypeId", required=false) String skillTypeId, @RequestParam(value="reservStart", required=false) Timestamp reservStart, @RequestParam(value="configId", required=false) String configId, @RequestParam(value="custRequestId", required=false) String custRequestId, @RequestParam(value="leadTimeDays", required=false) Long leadTimeDays, @RequestParam(value="selectedAmount", required=false) BigDecimal selectedAmount) {
+	public ResponseEntity<Map<String, Object>> removeQuoteItem(HttpSession session, @RequestParam(value="workEffortId", required=false) String workEffortId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="reservLength", required=false) BigDecimal reservLength, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="productId", required=false) String productId, @RequestParam(value="reservPersons", required=false) BigDecimal reservPersons, @RequestParam(value="deliverableTypeId", required=false) String deliverableTypeId, @RequestParam(value="quoteItemSeqId", required=false) String quoteItemSeqId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="quoteUnitPrice", required=false) BigDecimal quoteUnitPrice, @RequestParam(value="uomId", required=false) String uomId, @RequestParam(value="estimatedDeliveryDate", required=false) Timestamp estimatedDeliveryDate, @RequestParam(value="isPromo", required=false) String isPromo, @RequestParam(value="quoteId", required=false) String quoteId, @RequestParam(value="custRequestItemSeqId", required=false) String custRequestItemSeqId, @RequestParam(value="skillTypeId", required=false) String skillTypeId, @RequestParam(value="reservStart", required=false) Timestamp reservStart, @RequestParam(value="configId", required=false) String configId, @RequestParam(value="custRequestId", required=false) String custRequestId, @RequestParam(value="leadTimeDays", required=false) Long leadTimeDays, @RequestParam(value="selectedAmount", required=false) BigDecimal selectedAmount) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("workEffortId",workEffortId);
@@ -1331,23 +1333,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/checkUpdateQuoteStatus")
-	public ResponseEntity<Object> checkUpdateQuoteStatus(HttpSession session, @RequestParam(value="quoteId") String quoteId) {
+	public ResponseEntity<Map<String, Object>> checkUpdateQuoteStatus(HttpSession session, @RequestParam(value="quoteId") String quoteId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quoteId",quoteId);
@@ -1360,23 +1362,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateQuoteType")
-	public ResponseEntity<Object> updateQuoteType(HttpSession session, @RequestParam(value="quoteTypeId") String quoteTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> updateQuoteType(HttpSession session, @RequestParam(value="quoteTypeId") String quoteTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quoteTypeId",quoteTypeId);
@@ -1392,23 +1394,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/removeQuoteAdjustment")
-	public ResponseEntity<Object> removeQuoteAdjustment(HttpSession session, @RequestParam(value="customerReferenceId", required=false) String customerReferenceId, @RequestParam(value="correspondingProductId", required=false) String correspondingProductId, @RequestParam(value="includeInShipping", required=false) String includeInShipping, @RequestParam(value="description", required=false) String description, @RequestParam(value="exemptAmount", required=false) BigDecimal exemptAmount, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="quoteAdjustmentId", required=false) String quoteAdjustmentId, @RequestParam(value="primaryGeoId", required=false) String primaryGeoId, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="secondaryGeoId", required=false) String secondaryGeoId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="sourceReferenceId", required=false) String sourceReferenceId, @RequestParam(value="quoteItemSeqId", required=false) String quoteItemSeqId, @RequestParam(value="productPromoRuleId", required=false) String productPromoRuleId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="overrideGlAccountId", required=false) String overrideGlAccountId, @RequestParam(value="quoteId", required=false) String quoteId, @RequestParam(value="includeInTax", required=false) String includeInTax, @RequestParam(value="quoteAdjustmentTypeId", required=false) String quoteAdjustmentTypeId, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="productPromoActionSeqId", required=false) String productPromoActionSeqId, @RequestParam(value="sourcePercentage", required=false) BigDecimal sourcePercentage) {
+	public ResponseEntity<Map<String, Object>> removeQuoteAdjustment(HttpSession session, @RequestParam(value="customerReferenceId", required=false) String customerReferenceId, @RequestParam(value="correspondingProductId", required=false) String correspondingProductId, @RequestParam(value="includeInShipping", required=false) String includeInShipping, @RequestParam(value="description", required=false) String description, @RequestParam(value="exemptAmount", required=false) BigDecimal exemptAmount, @RequestParam(value="productPromoId", required=false) String productPromoId, @RequestParam(value="taxAuthPartyId", required=false) String taxAuthPartyId, @RequestParam(value="lastModifiedByUserLogin", required=false) String lastModifiedByUserLogin, @RequestParam(value="quoteAdjustmentId", required=false) String quoteAdjustmentId, @RequestParam(value="primaryGeoId", required=false) String primaryGeoId, @RequestParam(value="taxAuthGeoId", required=false) String taxAuthGeoId, @RequestParam(value="secondaryGeoId", required=false) String secondaryGeoId, @RequestParam(value="createdByUserLogin", required=false) String createdByUserLogin, @RequestParam(value="amount", required=false) BigDecimal amount, @RequestParam(value="comments", required=false) String comments, @RequestParam(value="lastModifiedDate", required=false) Timestamp lastModifiedDate, @RequestParam(value="sourceReferenceId", required=false) String sourceReferenceId, @RequestParam(value="quoteItemSeqId", required=false) String quoteItemSeqId, @RequestParam(value="productPromoRuleId", required=false) String productPromoRuleId, @RequestParam(value="productFeatureId", required=false) String productFeatureId, @RequestParam(value="overrideGlAccountId", required=false) String overrideGlAccountId, @RequestParam(value="quoteId", required=false) String quoteId, @RequestParam(value="includeInTax", required=false) String includeInTax, @RequestParam(value="quoteAdjustmentTypeId", required=false) String quoteAdjustmentTypeId, @RequestParam(value="createdDate", required=false) Timestamp createdDate, @RequestParam(value="productPromoActionSeqId", required=false) String productPromoActionSeqId, @RequestParam(value="sourcePercentage", required=false) BigDecimal sourcePercentage) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("customerReferenceId",customerReferenceId);
@@ -1447,23 +1449,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/copyQuote")
-	public ResponseEntity<Object> copyQuote(HttpSession session, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="copyQuoteAttributes", required=false) String copyQuoteAttributes, @RequestParam(value="copyQuoteCoefficients", required=false) String copyQuoteCoefficients, @RequestParam(value="copyQuoteTerms", required=false) String copyQuoteTerms, @RequestParam(value="copyQuoteRoles", required=false) String copyQuoteRoles, @RequestParam(value="copyQuoteItems", required=false) String copyQuoteItems, @RequestParam(value="copyQuoteAdjustments", required=false) String copyQuoteAdjustments) {
+	public ResponseEntity<Map<String, Object>> copyQuote(HttpSession session, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="copyQuoteAttributes", required=false) String copyQuoteAttributes, @RequestParam(value="copyQuoteCoefficients", required=false) String copyQuoteCoefficients, @RequestParam(value="copyQuoteTerms", required=false) String copyQuoteTerms, @RequestParam(value="copyQuoteRoles", required=false) String copyQuoteRoles, @RequestParam(value="copyQuoteItems", required=false) String copyQuoteItems, @RequestParam(value="copyQuoteAdjustments", required=false) String copyQuoteAdjustments) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quoteId",quoteId);
@@ -1482,23 +1484,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createQuoteType")
-	public ResponseEntity<Object> createQuoteType(HttpSession session, @RequestParam(value="quoteTypeId", required=false) String quoteTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
+	public ResponseEntity<Map<String, Object>> createQuoteType(HttpSession session, @RequestParam(value="quoteTypeId", required=false) String quoteTypeId, @RequestParam(value="parentTypeId", required=false) String parentTypeId, @RequestParam(value="hasTable", required=false) String hasTable, @RequestParam(value="description", required=false) String description) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quoteTypeId",quoteTypeId);
@@ -1514,23 +1516,23 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updateQuote")
-	public ResponseEntity<Object> updateQuote(HttpSession session, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="quoteTypeId", required=false) String quoteTypeId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="salesChannelEnumId", required=false) String salesChannelEnumId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="validFromDate", required=false) Timestamp validFromDate, @RequestParam(value="description", required=false) String description, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="issueDate", required=false) Timestamp issueDate, @RequestParam(value="validThruDate", required=false) Timestamp validThruDate, @RequestParam(value="quoteName", required=false) String quoteName) {
+	public ResponseEntity<Map<String, Object>> updateQuote(HttpSession session, @RequestParam(value="quoteId") String quoteId, @RequestParam(value="quoteTypeId", required=false) String quoteTypeId, @RequestParam(value="currencyUomId", required=false) String currencyUomId, @RequestParam(value="salesChannelEnumId", required=false) String salesChannelEnumId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="validFromDate", required=false) Timestamp validFromDate, @RequestParam(value="description", required=false) String description, @RequestParam(value="productStoreId", required=false) String productStoreId, @RequestParam(value="partyId", required=false) String partyId, @RequestParam(value="issueDate", required=false) Timestamp issueDate, @RequestParam(value="validThruDate", required=false) Timestamp validThruDate, @RequestParam(value="quoteName", required=false) String quoteName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("quoteId",quoteId);
@@ -1554,19 +1556,19 @@ public class OrderQuoteServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

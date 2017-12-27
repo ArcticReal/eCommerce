@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.facility.query.productStor
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/facility/productStoreFacilitys")
 public class ProductStoreFacilityController {
@@ -52,7 +54,7 @@ public class ProductStoreFacilityController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductStoreFacilitysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductStoreFacility>> findProductStoreFacilitysBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductStoreFacilitysBy query = new FindProductStoreFacilitysBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductStoreFacilityController {
 		}
 
 		List<ProductStoreFacility> productStoreFacilitys =((ProductStoreFacilityFound) Scheduler.execute(query).data()).getProductStoreFacilitys();
-
-		if (productStoreFacilitys.size() == 1) {
-			return ResponseEntity.ok().body(productStoreFacilitys.get(0));
-		}
 
 		return ResponseEntity.ok().body(productStoreFacilitys);
 
@@ -78,7 +76,7 @@ public class ProductStoreFacilityController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductStoreFacility(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductStoreFacility> createProductStoreFacility(HttpServletRequest request) throws Exception {
 
 		ProductStoreFacility productStoreFacilityToBeAdded = new ProductStoreFacility();
 		try {
@@ -86,7 +84,7 @@ public class ProductStoreFacilityController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductStoreFacility(productStoreFacilityToBeAdded);
@@ -101,63 +99,15 @@ public class ProductStoreFacilityController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductStoreFacility(@RequestBody ProductStoreFacility productStoreFacilityToBeAdded) throws Exception {
+	public ResponseEntity<ProductStoreFacility> createProductStoreFacility(@RequestBody ProductStoreFacility productStoreFacilityToBeAdded) throws Exception {
 
 		AddProductStoreFacility command = new AddProductStoreFacility(productStoreFacilityToBeAdded);
 		ProductStoreFacility productStoreFacility = ((ProductStoreFacilityAdded) Scheduler.execute(command).data()).getAddedProductStoreFacility();
 		
 		if (productStoreFacility != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productStoreFacility);
+			return successful(productStoreFacility);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductStoreFacility could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductStoreFacility(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductStoreFacility productStoreFacilityToBeUpdated = new ProductStoreFacility();
-
-		try {
-			productStoreFacilityToBeUpdated = ProductStoreFacilityMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductStoreFacility(productStoreFacilityToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductStoreFacilityController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductStoreFacility(@RequestBody ProductStoreFacility productStoreFacilityToBeUpdated,
+	public ResponseEntity<String> updateProductStoreFacility(@RequestBody ProductStoreFacility productStoreFacilityToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		productStoreFacilityToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ProductStoreFacilityController {
 
 		try {
 			if(((ProductStoreFacilityUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productStoreFacilityId}")
-	public ResponseEntity<Object> findById(@PathVariable String productStoreFacilityId) throws Exception {
+	public ResponseEntity<ProductStoreFacility> findById(@PathVariable String productStoreFacilityId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productStoreFacilityId", productStoreFacilityId);
 		try {
 
-			Object foundProductStoreFacility = findProductStoreFacilitysBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductStoreFacility);
+			List<ProductStoreFacility> foundProductStoreFacility = findProductStoreFacilitysBy(requestParams).getBody();
+			if(foundProductStoreFacility.size()==1){				return successful(foundProductStoreFacility.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productStoreFacilityId}")
-	public ResponseEntity<Object> deleteProductStoreFacilityByIdUpdated(@PathVariable String productStoreFacilityId) throws Exception {
+	public ResponseEntity<String> deleteProductStoreFacilityByIdUpdated(@PathVariable String productStoreFacilityId) throws Exception {
 		DeleteProductStoreFacility command = new DeleteProductStoreFacility(productStoreFacilityId);
 
 		try {
 			if (((ProductStoreFacilityDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductStoreFacility could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.accounting.relations.partyTaxAuthInfo.query.
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/accounting/partyTaxAuthInfos")
 public class PartyTaxAuthInfoController {
@@ -52,7 +54,7 @@ public class PartyTaxAuthInfoController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findPartyTaxAuthInfosBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<PartyTaxAuthInfo>> findPartyTaxAuthInfosBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindPartyTaxAuthInfosBy query = new FindPartyTaxAuthInfosBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class PartyTaxAuthInfoController {
 		}
 
 		List<PartyTaxAuthInfo> partyTaxAuthInfos =((PartyTaxAuthInfoFound) Scheduler.execute(query).data()).getPartyTaxAuthInfos();
-
-		if (partyTaxAuthInfos.size() == 1) {
-			return ResponseEntity.ok().body(partyTaxAuthInfos.get(0));
-		}
 
 		return ResponseEntity.ok().body(partyTaxAuthInfos);
 
@@ -78,7 +76,7 @@ public class PartyTaxAuthInfoController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createPartyTaxAuthInfo(HttpServletRequest request) throws Exception {
+	public ResponseEntity<PartyTaxAuthInfo> createPartyTaxAuthInfo(HttpServletRequest request) throws Exception {
 
 		PartyTaxAuthInfo partyTaxAuthInfoToBeAdded = new PartyTaxAuthInfo();
 		try {
@@ -86,7 +84,7 @@ public class PartyTaxAuthInfoController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createPartyTaxAuthInfo(partyTaxAuthInfoToBeAdded);
@@ -101,63 +99,15 @@ public class PartyTaxAuthInfoController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createPartyTaxAuthInfo(@RequestBody PartyTaxAuthInfo partyTaxAuthInfoToBeAdded) throws Exception {
+	public ResponseEntity<PartyTaxAuthInfo> createPartyTaxAuthInfo(@RequestBody PartyTaxAuthInfo partyTaxAuthInfoToBeAdded) throws Exception {
 
 		AddPartyTaxAuthInfo command = new AddPartyTaxAuthInfo(partyTaxAuthInfoToBeAdded);
 		PartyTaxAuthInfo partyTaxAuthInfo = ((PartyTaxAuthInfoAdded) Scheduler.execute(command).data()).getAddedPartyTaxAuthInfo();
 		
 		if (partyTaxAuthInfo != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(partyTaxAuthInfo);
+			return successful(partyTaxAuthInfo);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("PartyTaxAuthInfo could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updatePartyTaxAuthInfo(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		PartyTaxAuthInfo partyTaxAuthInfoToBeUpdated = new PartyTaxAuthInfo();
-
-		try {
-			partyTaxAuthInfoToBeUpdated = PartyTaxAuthInfoMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updatePartyTaxAuthInfo(partyTaxAuthInfoToBeUpdated, partyTaxAuthInfoToBeUpdated.getTaxAuthPartyId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class PartyTaxAuthInfoController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{taxAuthPartyId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updatePartyTaxAuthInfo(@RequestBody PartyTaxAuthInfo partyTaxAuthInfoToBeUpdated,
+	public ResponseEntity<String> updatePartyTaxAuthInfo(@RequestBody PartyTaxAuthInfo partyTaxAuthInfoToBeUpdated,
 			@PathVariable String taxAuthPartyId) throws Exception {
 
 		partyTaxAuthInfoToBeUpdated.setTaxAuthPartyId(taxAuthPartyId);
@@ -178,41 +128,44 @@ public class PartyTaxAuthInfoController {
 
 		try {
 			if(((PartyTaxAuthInfoUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{partyTaxAuthInfoId}")
-	public ResponseEntity<Object> findById(@PathVariable String partyTaxAuthInfoId) throws Exception {
+	public ResponseEntity<PartyTaxAuthInfo> findById(@PathVariable String partyTaxAuthInfoId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("partyTaxAuthInfoId", partyTaxAuthInfoId);
 		try {
 
-			Object foundPartyTaxAuthInfo = findPartyTaxAuthInfosBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundPartyTaxAuthInfo);
+			List<PartyTaxAuthInfo> foundPartyTaxAuthInfo = findPartyTaxAuthInfosBy(requestParams).getBody();
+			if(foundPartyTaxAuthInfo.size()==1){				return successful(foundPartyTaxAuthInfo.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{partyTaxAuthInfoId}")
-	public ResponseEntity<Object> deletePartyTaxAuthInfoByIdUpdated(@PathVariable String partyTaxAuthInfoId) throws Exception {
+	public ResponseEntity<String> deletePartyTaxAuthInfoByIdUpdated(@PathVariable String partyTaxAuthInfoId) throws Exception {
 		DeletePartyTaxAuthInfo command = new DeletePartyTaxAuthInfo(partyTaxAuthInfoId);
 
 		try {
 			if (((PartyTaxAuthInfoDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("PartyTaxAuthInfo could not be deleted");
+		return conflict();
 
 	}
 

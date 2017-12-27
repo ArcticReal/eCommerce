@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/service/productPicklist")
 public class ProductPicklistServiceController{
 
 	@RequestMapping(method = RequestMethod.POST, value = "/cancelPicklistAndItems")
-	public ResponseEntity<Object> cancelPicklistAndItems(HttpSession session, @RequestParam(value="picklistId") String picklistId) {
+	public ResponseEntity<Map<String, Object>> cancelPicklistAndItems(HttpSession session, @RequestParam(value="picklistId") String picklistId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("picklistId",picklistId);
@@ -39,23 +41,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/editPicklistItem")
-	public ResponseEntity<Object> editPicklistItem(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="productId") String productId, @RequestParam(value="orderId") String orderId, @RequestParam(value="lotId") String lotId, @RequestParam(value="picklistBinId") String picklistBinId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="oldLotId", required=false) String oldLotId) {
+	public ResponseEntity<Map<String, Object>> editPicklistItem(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="productId") String productId, @RequestParam(value="orderId") String orderId, @RequestParam(value="lotId") String lotId, @RequestParam(value="picklistBinId") String picklistBinId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="oldLotId", required=false) String oldLotId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderItemSeqId",orderItemSeqId);
@@ -77,23 +79,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createPicklistRole")
-	public ResponseEntity<Object> createPicklistRole(HttpSession session, @RequestParam(value="picklistId") String picklistId, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> createPicklistRole(HttpSession session, @RequestParam(value="picklistId") String picklistId, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="fromDate", required=false) Timestamp fromDate, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("picklistId",picklistId);
@@ -110,23 +112,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/setPicklistItemToComplete")
-	public ResponseEntity<Object> setPicklistItemToComplete(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="orderId") String orderId, @RequestParam(value="picklistBinId") String picklistBinId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="itemStatusId") String itemStatusId) {
+	public ResponseEntity<Map<String, Object>> setPicklistItemToComplete(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="orderId") String orderId, @RequestParam(value="picklistBinId") String picklistBinId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="itemStatusId") String itemStatusId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderItemSeqId",orderItemSeqId);
@@ -145,23 +147,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deletePicklistBin")
-	public ResponseEntity<Object> deletePicklistBin(HttpSession session, @RequestParam(value="picklistBinId") String picklistBinId) {
+	public ResponseEntity<Map<String, Object>> deletePicklistBin(HttpSession session, @RequestParam(value="picklistBinId") String picklistBinId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("picklistBinId",picklistBinId);
@@ -174,23 +176,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updatePicklistRole")
-	public ResponseEntity<Object> updatePicklistRole(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="picklistId") String picklistId, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
+	public ResponseEntity<Map<String, Object>> updatePicklistRole(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="picklistId") String picklistId, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId, @RequestParam(value="thruDate", required=false) Timestamp thruDate) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -207,23 +209,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createPicklist")
-	public ResponseEntity<Object> createPicklist(HttpSession session, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="description", required=false) String description, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId) {
+	public ResponseEntity<Map<String, Object>> createPicklist(HttpSession session, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="description", required=false) String description, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("facilityId",facilityId);
@@ -239,23 +241,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/convertPickOrderIdListToHeaders")
-	public ResponseEntity<Object> convertPickOrderIdListToHeaders(HttpSession session, @RequestParam(value="orderHeaderList", required=false) List orderHeaderList, @RequestParam(value="orderIdList", required=false) List orderIdList) {
+	public ResponseEntity<Map<String, Object>> convertPickOrderIdListToHeaders(HttpSession session, @RequestParam(value="orderHeaderList", required=false) List orderHeaderList, @RequestParam(value="orderIdList", required=false) List orderIdList) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderHeaderList",orderHeaderList);
@@ -269,23 +271,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deletePicklist")
-	public ResponseEntity<Object> deletePicklist(HttpSession session, @RequestParam(value="picklistId") String picklistId) {
+	public ResponseEntity<Map<String, Object>> deletePicklist(HttpSession session, @RequestParam(value="picklistId") String picklistId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("picklistId",picklistId);
@@ -298,23 +300,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deletePicklistRole")
-	public ResponseEntity<Object> deletePicklistRole(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="picklistId") String picklistId, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId) {
+	public ResponseEntity<Map<String, Object>> deletePicklistRole(HttpSession session, @RequestParam(value="fromDate") Timestamp fromDate, @RequestParam(value="picklistId") String picklistId, @RequestParam(value="roleTypeId") String roleTypeId, @RequestParam(value="partyId") String partyId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("fromDate",fromDate);
@@ -330,23 +332,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deletePicklistItem")
-	public ResponseEntity<Object> deletePicklistItem(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="orderId") String orderId, @RequestParam(value="picklistBinId") String picklistBinId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId) {
+	public ResponseEntity<Map<String, Object>> deletePicklistItem(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="orderId") String orderId, @RequestParam(value="picklistBinId") String picklistBinId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderItemSeqId",orderItemSeqId);
@@ -363,23 +365,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getPicklistDisplayInfo")
-	public ResponseEntity<Object> getPicklistDisplayInfo(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="viewSize", required=false) Integer viewSize, @RequestParam(value="viewIndex", required=false) Integer viewIndex) {
+	public ResponseEntity<Map<String, Object>> getPicklistDisplayInfo(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="viewSize", required=false) Integer viewSize, @RequestParam(value="viewIndex", required=false) Integer viewIndex) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("facilityId",facilityId);
@@ -394,23 +396,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updatePicklistBin")
-	public ResponseEntity<Object> updatePicklistBin(HttpSession session, @RequestParam(value="picklistBinId") String picklistBinId, @RequestParam(value="picklistId", required=false) String picklistId, @RequestParam(value="primaryOrderId", required=false) String primaryOrderId, @RequestParam(value="primaryShipGroupSeqId", required=false) String primaryShipGroupSeqId, @RequestParam(value="binLocationNumber", required=false) Long binLocationNumber) {
+	public ResponseEntity<Map<String, Object>> updatePicklistBin(HttpSession session, @RequestParam(value="picklistBinId") String picklistBinId, @RequestParam(value="picklistId", required=false) String picklistId, @RequestParam(value="primaryOrderId", required=false) String primaryOrderId, @RequestParam(value="primaryShipGroupSeqId", required=false) String primaryShipGroupSeqId, @RequestParam(value="binLocationNumber", required=false) Long binLocationNumber) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("picklistBinId",picklistBinId);
@@ -427,23 +429,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createPicklistBin")
-	public ResponseEntity<Object> createPicklistBin(HttpSession session, @RequestParam(value="picklistId") String picklistId, @RequestParam(value="primaryOrderId") String primaryOrderId, @RequestParam(value="primaryShipGroupSeqId") String primaryShipGroupSeqId, @RequestParam(value="binLocationNumber") Long binLocationNumber) {
+	public ResponseEntity<Map<String, Object>> createPicklistBin(HttpSession session, @RequestParam(value="picklistId") String picklistId, @RequestParam(value="primaryOrderId") String primaryOrderId, @RequestParam(value="primaryShipGroupSeqId") String primaryShipGroupSeqId, @RequestParam(value="binLocationNumber") Long binLocationNumber) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("picklistId",picklistId);
@@ -459,23 +461,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updatePicklistItem")
-	public ResponseEntity<Object> updatePicklistItem(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="orderId") String orderId, @RequestParam(value="picklistBinId") String picklistBinId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="itemStatusId", required=false) String itemStatusId) {
+	public ResponseEntity<Map<String, Object>> updatePicklistItem(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="orderId") String orderId, @RequestParam(value="picklistBinId") String picklistBinId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="quantity", required=false) BigDecimal quantity, @RequestParam(value="itemStatusId", required=false) String itemStatusId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderItemSeqId",orderItemSeqId);
@@ -494,23 +496,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/printPickSheets")
-	public ResponseEntity<Object> printPickSheets(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="groupByNoOfOrderItems", required=false) String groupByNoOfOrderItems, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="printGroupName", required=false) String printGroupName, @RequestParam(value="groupByWarehouseArea", required=false) String groupByWarehouseArea, @RequestParam(value="groupByShippingMethod", required=false) String groupByShippingMethod, @RequestParam(value="maxNumberOfOrdersToPrint", required=false) Long maxNumberOfOrdersToPrint) {
+	public ResponseEntity<Map<String, Object>> printPickSheets(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="groupByNoOfOrderItems", required=false) String groupByNoOfOrderItems, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="printGroupName", required=false) String printGroupName, @RequestParam(value="groupByWarehouseArea", required=false) String groupByWarehouseArea, @RequestParam(value="groupByShippingMethod", required=false) String groupByShippingMethod, @RequestParam(value="maxNumberOfOrdersToPrint", required=false) Long maxNumberOfOrdersToPrint) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("facilityId",facilityId);
@@ -529,23 +531,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/getPickAndPackReportInfo")
-	public ResponseEntity<Object> getPickAndPackReportInfo(HttpSession session, @RequestParam(value="picklistId") String picklistId) {
+	public ResponseEntity<Map<String, Object>> getPickAndPackReportInfo(HttpSession session, @RequestParam(value="picklistId") String picklistId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("picklistId",picklistId);
@@ -558,23 +560,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/checkPicklistBinItemStatuses")
-	public ResponseEntity<Object> checkPicklistBinItemStatuses(HttpSession session, @RequestParam(value="picklistBinId") String picklistBinId) {
+	public ResponseEntity<Map<String, Object>> checkPicklistBinItemStatuses(HttpSession session, @RequestParam(value="picklistBinId") String picklistBinId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("picklistBinId",picklistBinId);
@@ -587,23 +589,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createPicklistFromOrders")
-	public ResponseEntity<Object> createPicklistFromOrders(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="orderHeaderList", required=false) List orderHeaderList, @RequestParam(value="orderIdList", required=false) List orderIdList, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId, @RequestParam(value="maxNumberOfOrders", required=false) Long maxNumberOfOrders, @RequestParam(value="isRushOrder", required=false) String isRushOrder) {
+	public ResponseEntity<Map<String, Object>> createPicklistFromOrders(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="orderHeaderList", required=false) List orderHeaderList, @RequestParam(value="orderIdList", required=false) List orderIdList, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId, @RequestParam(value="maxNumberOfOrders", required=false) Long maxNumberOfOrders, @RequestParam(value="isRushOrder", required=false) String isRushOrder) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("facilityId",facilityId);
@@ -621,23 +623,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/createPicklistItem")
-	public ResponseEntity<Object> createPicklistItem(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="orderId") String orderId, @RequestParam(value="picklistBinId") String picklistBinId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="itemStatusId", required=false) String itemStatusId) {
+	public ResponseEntity<Map<String, Object>> createPicklistItem(HttpSession session, @RequestParam(value="orderItemSeqId") String orderItemSeqId, @RequestParam(value="inventoryItemId") String inventoryItemId, @RequestParam(value="quantity") BigDecimal quantity, @RequestParam(value="orderId") String orderId, @RequestParam(value="picklistBinId") String picklistBinId, @RequestParam(value="shipGroupSeqId") String shipGroupSeqId, @RequestParam(value="itemStatusId", required=false) String itemStatusId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("orderItemSeqId",orderItemSeqId);
@@ -656,23 +658,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/findOrdersToPickMove")
-	public ResponseEntity<Object> findOrdersToPickMove(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="groupByNoOfOrderItems", required=false) String groupByNoOfOrderItems, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="orderHeaderList", required=false) List orderHeaderList, @RequestParam(value="groupByWarehouseArea", required=false) String groupByWarehouseArea, @RequestParam(value="groupByShippingMethod", required=false) String groupByShippingMethod, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId, @RequestParam(value="maxNumberOfOrders", required=false) Long maxNumberOfOrders, @RequestParam(value="isRushOrder", required=false) String isRushOrder) {
+	public ResponseEntity<Map<String, Object>> findOrdersToPickMove(HttpSession session, @RequestParam(value="facilityId") String facilityId, @RequestParam(value="groupByNoOfOrderItems", required=false) String groupByNoOfOrderItems, @RequestParam(value="orderId", required=false) String orderId, @RequestParam(value="orderHeaderList", required=false) List orderHeaderList, @RequestParam(value="groupByWarehouseArea", required=false) String groupByWarehouseArea, @RequestParam(value="groupByShippingMethod", required=false) String groupByShippingMethod, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId, @RequestParam(value="maxNumberOfOrders", required=false) Long maxNumberOfOrders, @RequestParam(value="isRushOrder", required=false) String isRushOrder) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("facilityId",facilityId);
@@ -693,23 +695,23 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/updatePicklist")
-	public ResponseEntity<Object> updatePicklist(HttpSession session, @RequestParam(value="picklistId") String picklistId, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="description", required=false) String description, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId) {
+	public ResponseEntity<Map<String, Object>> updatePicklist(HttpSession session, @RequestParam(value="picklistId") String picklistId, @RequestParam(value="facilityId", required=false) String facilityId, @RequestParam(value="statusId", required=false) String statusId, @RequestParam(value="description", required=false) String description, @RequestParam(value="shipmentMethodTypeId", required=false) String shipmentMethodTypeId) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("picklistId",picklistId);
@@ -726,19 +728,19 @@ public class ProductPicklistServiceController{
 		} catch (ServiceAuthException e) {
 
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+			return unauthorized();
 
 		} catch (ServiceValidationException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return serverError();
 		} catch (GenericServiceException e) {
 			e.printStackTrace();
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(e.getMessage());
+			return badRequest();
 		}
 		if(result.get("responseMessage").equals("error")) {
-			return ResponseEntity.badRequest().header("Session-ID", "JSESSIONID=" + session.getId()).body(null);
+			return badRequest();
 		}
 
-		return ResponseEntity.ok().header("Session-ID", "JSESSIONID=" + session.getId()).body(result);
+		return successful(result);
 	}
 
 

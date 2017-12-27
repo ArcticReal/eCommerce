@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.quote.query.coefficient.Find
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/quote/quoteCoefficients")
 public class QuoteCoefficientController {
@@ -52,7 +54,7 @@ public class QuoteCoefficientController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findQuoteCoefficientsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<QuoteCoefficient>> findQuoteCoefficientsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindQuoteCoefficientsBy query = new FindQuoteCoefficientsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class QuoteCoefficientController {
 		}
 
 		List<QuoteCoefficient> quoteCoefficients =((QuoteCoefficientFound) Scheduler.execute(query).data()).getQuoteCoefficients();
-
-		if (quoteCoefficients.size() == 1) {
-			return ResponseEntity.ok().body(quoteCoefficients.get(0));
-		}
 
 		return ResponseEntity.ok().body(quoteCoefficients);
 
@@ -78,7 +76,7 @@ public class QuoteCoefficientController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createQuoteCoefficient(HttpServletRequest request) throws Exception {
+	public ResponseEntity<QuoteCoefficient> createQuoteCoefficient(HttpServletRequest request) throws Exception {
 
 		QuoteCoefficient quoteCoefficientToBeAdded = new QuoteCoefficient();
 		try {
@@ -86,7 +84,7 @@ public class QuoteCoefficientController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createQuoteCoefficient(quoteCoefficientToBeAdded);
@@ -101,63 +99,15 @@ public class QuoteCoefficientController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createQuoteCoefficient(@RequestBody QuoteCoefficient quoteCoefficientToBeAdded) throws Exception {
+	public ResponseEntity<QuoteCoefficient> createQuoteCoefficient(@RequestBody QuoteCoefficient quoteCoefficientToBeAdded) throws Exception {
 
 		AddQuoteCoefficient command = new AddQuoteCoefficient(quoteCoefficientToBeAdded);
 		QuoteCoefficient quoteCoefficient = ((QuoteCoefficientAdded) Scheduler.execute(command).data()).getAddedQuoteCoefficient();
 		
 		if (quoteCoefficient != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(quoteCoefficient);
+			return successful(quoteCoefficient);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("QuoteCoefficient could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateQuoteCoefficient(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		QuoteCoefficient quoteCoefficientToBeUpdated = new QuoteCoefficient();
-
-		try {
-			quoteCoefficientToBeUpdated = QuoteCoefficientMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateQuoteCoefficient(quoteCoefficientToBeUpdated, quoteCoefficientToBeUpdated.getCoeffName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class QuoteCoefficientController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{coeffName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateQuoteCoefficient(@RequestBody QuoteCoefficient quoteCoefficientToBeUpdated,
+	public ResponseEntity<String> updateQuoteCoefficient(@RequestBody QuoteCoefficient quoteCoefficientToBeUpdated,
 			@PathVariable String coeffName) throws Exception {
 
 		quoteCoefficientToBeUpdated.setCoeffName(coeffName);
@@ -178,41 +128,44 @@ public class QuoteCoefficientController {
 
 		try {
 			if(((QuoteCoefficientUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{quoteCoefficientId}")
-	public ResponseEntity<Object> findById(@PathVariable String quoteCoefficientId) throws Exception {
+	public ResponseEntity<QuoteCoefficient> findById(@PathVariable String quoteCoefficientId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("quoteCoefficientId", quoteCoefficientId);
 		try {
 
-			Object foundQuoteCoefficient = findQuoteCoefficientsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundQuoteCoefficient);
+			List<QuoteCoefficient> foundQuoteCoefficient = findQuoteCoefficientsBy(requestParams).getBody();
+			if(foundQuoteCoefficient.size()==1){				return successful(foundQuoteCoefficient.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{quoteCoefficientId}")
-	public ResponseEntity<Object> deleteQuoteCoefficientByIdUpdated(@PathVariable String quoteCoefficientId) throws Exception {
+	public ResponseEntity<String> deleteQuoteCoefficientByIdUpdated(@PathVariable String quoteCoefficientId) throws Exception {
 		DeleteQuoteCoefficient command = new DeleteQuoteCoefficient(quoteCoefficientId);
 
 		try {
 			if (((QuoteCoefficientDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("QuoteCoefficient could not be deleted");
+		return conflict();
 
 	}
 

@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.order.relations.custRequest.query.attribute.
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/order/custRequest/custRequestAttributes")
 public class CustRequestAttributeController {
@@ -52,7 +54,7 @@ public class CustRequestAttributeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findCustRequestAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<CustRequestAttribute>> findCustRequestAttributesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindCustRequestAttributesBy query = new FindCustRequestAttributesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class CustRequestAttributeController {
 		}
 
 		List<CustRequestAttribute> custRequestAttributes =((CustRequestAttributeFound) Scheduler.execute(query).data()).getCustRequestAttributes();
-
-		if (custRequestAttributes.size() == 1) {
-			return ResponseEntity.ok().body(custRequestAttributes.get(0));
-		}
 
 		return ResponseEntity.ok().body(custRequestAttributes);
 
@@ -78,7 +76,7 @@ public class CustRequestAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createCustRequestAttribute(HttpServletRequest request) throws Exception {
+	public ResponseEntity<CustRequestAttribute> createCustRequestAttribute(HttpServletRequest request) throws Exception {
 
 		CustRequestAttribute custRequestAttributeToBeAdded = new CustRequestAttribute();
 		try {
@@ -86,7 +84,7 @@ public class CustRequestAttributeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createCustRequestAttribute(custRequestAttributeToBeAdded);
@@ -101,63 +99,15 @@ public class CustRequestAttributeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createCustRequestAttribute(@RequestBody CustRequestAttribute custRequestAttributeToBeAdded) throws Exception {
+	public ResponseEntity<CustRequestAttribute> createCustRequestAttribute(@RequestBody CustRequestAttribute custRequestAttributeToBeAdded) throws Exception {
 
 		AddCustRequestAttribute command = new AddCustRequestAttribute(custRequestAttributeToBeAdded);
 		CustRequestAttribute custRequestAttribute = ((CustRequestAttributeAdded) Scheduler.execute(command).data()).getAddedCustRequestAttribute();
 		
 		if (custRequestAttribute != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(custRequestAttribute);
+			return successful(custRequestAttribute);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("CustRequestAttribute could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateCustRequestAttribute(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		CustRequestAttribute custRequestAttributeToBeUpdated = new CustRequestAttribute();
-
-		try {
-			custRequestAttributeToBeUpdated = CustRequestAttributeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateCustRequestAttribute(custRequestAttributeToBeUpdated, custRequestAttributeToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class CustRequestAttributeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateCustRequestAttribute(@RequestBody CustRequestAttribute custRequestAttributeToBeUpdated,
+	public ResponseEntity<String> updateCustRequestAttribute(@RequestBody CustRequestAttribute custRequestAttributeToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		custRequestAttributeToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class CustRequestAttributeController {
 
 		try {
 			if(((CustRequestAttributeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{custRequestAttributeId}")
-	public ResponseEntity<Object> findById(@PathVariable String custRequestAttributeId) throws Exception {
+	public ResponseEntity<CustRequestAttribute> findById(@PathVariable String custRequestAttributeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("custRequestAttributeId", custRequestAttributeId);
 		try {
 
-			Object foundCustRequestAttribute = findCustRequestAttributesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundCustRequestAttribute);
+			List<CustRequestAttribute> foundCustRequestAttribute = findCustRequestAttributesBy(requestParams).getBody();
+			if(foundCustRequestAttribute.size()==1){				return successful(foundCustRequestAttribute.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{custRequestAttributeId}")
-	public ResponseEntity<Object> deleteCustRequestAttributeByIdUpdated(@PathVariable String custRequestAttributeId) throws Exception {
+	public ResponseEntity<String> deleteCustRequestAttributeByIdUpdated(@PathVariable String custRequestAttributeId) throws Exception {
 		DeleteCustRequestAttribute command = new DeleteCustRequestAttribute(custRequestAttributeId);
 
 		try {
 			if (((CustRequestAttributeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("CustRequestAttribute could not be deleted");
+		return conflict();
 
 	}
 

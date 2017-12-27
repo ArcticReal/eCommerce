@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.categoryCont
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productCategoryContentTypes")
 public class ProductCategoryContentTypeController {
@@ -52,7 +54,7 @@ public class ProductCategoryContentTypeController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductCategoryContentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductCategoryContentType>> findProductCategoryContentTypesBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductCategoryContentTypesBy query = new FindProductCategoryContentTypesBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductCategoryContentTypeController {
 		}
 
 		List<ProductCategoryContentType> productCategoryContentTypes =((ProductCategoryContentTypeFound) Scheduler.execute(query).data()).getProductCategoryContentTypes();
-
-		if (productCategoryContentTypes.size() == 1) {
-			return ResponseEntity.ok().body(productCategoryContentTypes.get(0));
-		}
 
 		return ResponseEntity.ok().body(productCategoryContentTypes);
 
@@ -78,7 +76,7 @@ public class ProductCategoryContentTypeController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductCategoryContentType(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductCategoryContentType> createProductCategoryContentType(HttpServletRequest request) throws Exception {
 
 		ProductCategoryContentType productCategoryContentTypeToBeAdded = new ProductCategoryContentType();
 		try {
@@ -86,7 +84,7 @@ public class ProductCategoryContentTypeController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductCategoryContentType(productCategoryContentTypeToBeAdded);
@@ -101,63 +99,15 @@ public class ProductCategoryContentTypeController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductCategoryContentType(@RequestBody ProductCategoryContentType productCategoryContentTypeToBeAdded) throws Exception {
+	public ResponseEntity<ProductCategoryContentType> createProductCategoryContentType(@RequestBody ProductCategoryContentType productCategoryContentTypeToBeAdded) throws Exception {
 
 		AddProductCategoryContentType command = new AddProductCategoryContentType(productCategoryContentTypeToBeAdded);
 		ProductCategoryContentType productCategoryContentType = ((ProductCategoryContentTypeAdded) Scheduler.execute(command).data()).getAddedProductCategoryContentType();
 		
 		if (productCategoryContentType != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productCategoryContentType);
+			return successful(productCategoryContentType);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductCategoryContentType could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductCategoryContentType(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductCategoryContentType productCategoryContentTypeToBeUpdated = new ProductCategoryContentType();
-
-		try {
-			productCategoryContentTypeToBeUpdated = ProductCategoryContentTypeMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductCategoryContentType(productCategoryContentTypeToBeUpdated, productCategoryContentTypeToBeUpdated.getProdCatContentTypeId()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductCategoryContentTypeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{prodCatContentTypeId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductCategoryContentType(@RequestBody ProductCategoryContentType productCategoryContentTypeToBeUpdated,
+	public ResponseEntity<String> updateProductCategoryContentType(@RequestBody ProductCategoryContentType productCategoryContentTypeToBeUpdated,
 			@PathVariable String prodCatContentTypeId) throws Exception {
 
 		productCategoryContentTypeToBeUpdated.setProdCatContentTypeId(prodCatContentTypeId);
@@ -178,41 +128,44 @@ public class ProductCategoryContentTypeController {
 
 		try {
 			if(((ProductCategoryContentTypeUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productCategoryContentTypeId}")
-	public ResponseEntity<Object> findById(@PathVariable String productCategoryContentTypeId) throws Exception {
+	public ResponseEntity<ProductCategoryContentType> findById(@PathVariable String productCategoryContentTypeId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productCategoryContentTypeId", productCategoryContentTypeId);
 		try {
 
-			Object foundProductCategoryContentType = findProductCategoryContentTypesBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductCategoryContentType);
+			List<ProductCategoryContentType> foundProductCategoryContentType = findProductCategoryContentTypesBy(requestParams).getBody();
+			if(foundProductCategoryContentType.size()==1){				return successful(foundProductCategoryContentType.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productCategoryContentTypeId}")
-	public ResponseEntity<Object> deleteProductCategoryContentTypeByIdUpdated(@PathVariable String productCategoryContentTypeId) throws Exception {
+	public ResponseEntity<String> deleteProductCategoryContentTypeByIdUpdated(@PathVariable String productCategoryContentTypeId) throws Exception {
 		DeleteProductCategoryContentType command = new DeleteProductCategoryContentType(productCategoryContentTypeId);
 
 		try {
 			if (((ProductCategoryContentTypeDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductCategoryContentType could not be deleted");
+		return conflict();
 
 	}
 

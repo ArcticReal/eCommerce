@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.storeFinActS
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productStoreFinActSettings")
 public class ProductStoreFinActSettingController {
@@ -52,7 +54,7 @@ public class ProductStoreFinActSettingController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductStoreFinActSettingsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductStoreFinActSetting>> findProductStoreFinActSettingsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductStoreFinActSettingsBy query = new FindProductStoreFinActSettingsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductStoreFinActSettingController {
 		}
 
 		List<ProductStoreFinActSetting> productStoreFinActSettings =((ProductStoreFinActSettingFound) Scheduler.execute(query).data()).getProductStoreFinActSettings();
-
-		if (productStoreFinActSettings.size() == 1) {
-			return ResponseEntity.ok().body(productStoreFinActSettings.get(0));
-		}
 
 		return ResponseEntity.ok().body(productStoreFinActSettings);
 
@@ -78,7 +76,7 @@ public class ProductStoreFinActSettingController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductStoreFinActSetting(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductStoreFinActSetting> createProductStoreFinActSetting(HttpServletRequest request) throws Exception {
 
 		ProductStoreFinActSetting productStoreFinActSettingToBeAdded = new ProductStoreFinActSetting();
 		try {
@@ -86,7 +84,7 @@ public class ProductStoreFinActSettingController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductStoreFinActSetting(productStoreFinActSettingToBeAdded);
@@ -101,63 +99,15 @@ public class ProductStoreFinActSettingController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductStoreFinActSetting(@RequestBody ProductStoreFinActSetting productStoreFinActSettingToBeAdded) throws Exception {
+	public ResponseEntity<ProductStoreFinActSetting> createProductStoreFinActSetting(@RequestBody ProductStoreFinActSetting productStoreFinActSettingToBeAdded) throws Exception {
 
 		AddProductStoreFinActSetting command = new AddProductStoreFinActSetting(productStoreFinActSettingToBeAdded);
 		ProductStoreFinActSetting productStoreFinActSetting = ((ProductStoreFinActSettingAdded) Scheduler.execute(command).data()).getAddedProductStoreFinActSetting();
 		
 		if (productStoreFinActSetting != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productStoreFinActSetting);
+			return successful(productStoreFinActSetting);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductStoreFinActSetting could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductStoreFinActSetting(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductStoreFinActSetting productStoreFinActSettingToBeUpdated = new ProductStoreFinActSetting();
-
-		try {
-			productStoreFinActSettingToBeUpdated = ProductStoreFinActSettingMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductStoreFinActSetting(productStoreFinActSettingToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductStoreFinActSettingController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductStoreFinActSetting(@RequestBody ProductStoreFinActSetting productStoreFinActSettingToBeUpdated,
+	public ResponseEntity<String> updateProductStoreFinActSetting(@RequestBody ProductStoreFinActSetting productStoreFinActSettingToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		productStoreFinActSettingToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ProductStoreFinActSettingController {
 
 		try {
 			if(((ProductStoreFinActSettingUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productStoreFinActSettingId}")
-	public ResponseEntity<Object> findById(@PathVariable String productStoreFinActSettingId) throws Exception {
+	public ResponseEntity<ProductStoreFinActSetting> findById(@PathVariable String productStoreFinActSettingId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productStoreFinActSettingId", productStoreFinActSettingId);
 		try {
 
-			Object foundProductStoreFinActSetting = findProductStoreFinActSettingsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductStoreFinActSetting);
+			List<ProductStoreFinActSetting> foundProductStoreFinActSetting = findProductStoreFinActSettingsBy(requestParams).getBody();
+			if(foundProductStoreFinActSetting.size()==1){				return successful(foundProductStoreFinActSetting.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productStoreFinActSettingId}")
-	public ResponseEntity<Object> deleteProductStoreFinActSettingByIdUpdated(@PathVariable String productStoreFinActSettingId) throws Exception {
+	public ResponseEntity<String> deleteProductStoreFinActSettingByIdUpdated(@PathVariable String productStoreFinActSettingId) throws Exception {
 		DeleteProductStoreFinActSetting command = new DeleteProductStoreFinActSetting(productStoreFinActSettingId);
 
 		try {
 			if (((ProductStoreFinActSettingDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductStoreFinActSetting could not be deleted");
+		return conflict();
 
 	}
 

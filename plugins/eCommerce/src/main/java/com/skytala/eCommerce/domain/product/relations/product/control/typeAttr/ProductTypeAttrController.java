@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.typeAttr.Fin
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productTypeAttrs")
 public class ProductTypeAttrController {
@@ -52,7 +54,7 @@ public class ProductTypeAttrController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductTypeAttr>> findProductTypeAttrsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductTypeAttrsBy query = new FindProductTypeAttrsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductTypeAttrController {
 		}
 
 		List<ProductTypeAttr> productTypeAttrs =((ProductTypeAttrFound) Scheduler.execute(query).data()).getProductTypeAttrs();
-
-		if (productTypeAttrs.size() == 1) {
-			return ResponseEntity.ok().body(productTypeAttrs.get(0));
-		}
 
 		return ResponseEntity.ok().body(productTypeAttrs);
 
@@ -78,7 +76,7 @@ public class ProductTypeAttrController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductTypeAttr(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductTypeAttr> createProductTypeAttr(HttpServletRequest request) throws Exception {
 
 		ProductTypeAttr productTypeAttrToBeAdded = new ProductTypeAttr();
 		try {
@@ -86,7 +84,7 @@ public class ProductTypeAttrController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductTypeAttr(productTypeAttrToBeAdded);
@@ -101,63 +99,15 @@ public class ProductTypeAttrController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductTypeAttr(@RequestBody ProductTypeAttr productTypeAttrToBeAdded) throws Exception {
+	public ResponseEntity<ProductTypeAttr> createProductTypeAttr(@RequestBody ProductTypeAttr productTypeAttrToBeAdded) throws Exception {
 
 		AddProductTypeAttr command = new AddProductTypeAttr(productTypeAttrToBeAdded);
 		ProductTypeAttr productTypeAttr = ((ProductTypeAttrAdded) Scheduler.execute(command).data()).getAddedProductTypeAttr();
 		
 		if (productTypeAttr != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productTypeAttr);
+			return successful(productTypeAttr);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductTypeAttr could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductTypeAttr(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductTypeAttr productTypeAttrToBeUpdated = new ProductTypeAttr();
-
-		try {
-			productTypeAttrToBeUpdated = ProductTypeAttrMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductTypeAttr(productTypeAttrToBeUpdated, productTypeAttrToBeUpdated.getAttrName()).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductTypeAttrController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{attrName}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductTypeAttr(@RequestBody ProductTypeAttr productTypeAttrToBeUpdated,
+	public ResponseEntity<String> updateProductTypeAttr(@RequestBody ProductTypeAttr productTypeAttrToBeUpdated,
 			@PathVariable String attrName) throws Exception {
 
 		productTypeAttrToBeUpdated.setAttrName(attrName);
@@ -178,41 +128,44 @@ public class ProductTypeAttrController {
 
 		try {
 			if(((ProductTypeAttrUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productTypeAttrId}")
-	public ResponseEntity<Object> findById(@PathVariable String productTypeAttrId) throws Exception {
+	public ResponseEntity<ProductTypeAttr> findById(@PathVariable String productTypeAttrId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productTypeAttrId", productTypeAttrId);
 		try {
 
-			Object foundProductTypeAttr = findProductTypeAttrsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductTypeAttr);
+			List<ProductTypeAttr> foundProductTypeAttr = findProductTypeAttrsBy(requestParams).getBody();
+			if(foundProductTypeAttr.size()==1){				return successful(foundProductTypeAttr.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productTypeAttrId}")
-	public ResponseEntity<Object> deleteProductTypeAttrByIdUpdated(@PathVariable String productTypeAttrId) throws Exception {
+	public ResponseEntity<String> deleteProductTypeAttrByIdUpdated(@PathVariable String productTypeAttrId) throws Exception {
 		DeleteProductTypeAttr command = new DeleteProductTypeAttr(productTypeAttrId);
 
 		try {
 			if (((ProductTypeAttrDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductTypeAttr could not be deleted");
+		return conflict();
 
 	}
 

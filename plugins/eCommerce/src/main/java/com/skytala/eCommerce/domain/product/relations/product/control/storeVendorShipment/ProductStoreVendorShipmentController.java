@@ -30,6 +30,8 @@ import com.skytala.eCommerce.domain.product.relations.product.query.storeVendorS
 import com.skytala.eCommerce.framework.exceptions.RecordNotFoundException;
 import com.skytala.eCommerce.framework.pubsub.Scheduler;
 
+import static com.skytala.eCommerce.framework.pubsub.ResponseUtil.*;
+
 @RestController
 @RequestMapping("/product/product/productStoreVendorShipments")
 public class ProductStoreVendorShipmentController {
@@ -52,7 +54,7 @@ public class ProductStoreVendorShipmentController {
 	 * @throws Exception 
 	 */
 	@GetMapping("/find")
-	public ResponseEntity<Object> findProductStoreVendorShipmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<List<ProductStoreVendorShipment>> findProductStoreVendorShipmentsBy(@RequestParam(required = false) Map<String, String> allRequestParams) throws Exception {
 
 		FindProductStoreVendorShipmentsBy query = new FindProductStoreVendorShipmentsBy(allRequestParams);
 		if (allRequestParams == null) {
@@ -60,10 +62,6 @@ public class ProductStoreVendorShipmentController {
 		}
 
 		List<ProductStoreVendorShipment> productStoreVendorShipments =((ProductStoreVendorShipmentFound) Scheduler.execute(query).data()).getProductStoreVendorShipments();
-
-		if (productStoreVendorShipments.size() == 1) {
-			return ResponseEntity.ok().body(productStoreVendorShipments.get(0));
-		}
 
 		return ResponseEntity.ok().body(productStoreVendorShipments);
 
@@ -78,7 +76,7 @@ public class ProductStoreVendorShipmentController {
 	 * @return true on success; false on fail
 	 */
 	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Object> createProductStoreVendorShipment(HttpServletRequest request) throws Exception {
+	public ResponseEntity<ProductStoreVendorShipment> createProductStoreVendorShipment(HttpServletRequest request) throws Exception {
 
 		ProductStoreVendorShipment productStoreVendorShipmentToBeAdded = new ProductStoreVendorShipment();
 		try {
@@ -86,7 +84,7 @@ public class ProductStoreVendorShipmentController {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Arguments could not be resolved.");
+			throw new IllegalArgumentException();
 		}
 
 		return this.createProductStoreVendorShipment(productStoreVendorShipmentToBeAdded);
@@ -101,63 +99,15 @@ public class ProductStoreVendorShipmentController {
 	 * @return true on success; false on fail
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "/add", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> createProductStoreVendorShipment(@RequestBody ProductStoreVendorShipment productStoreVendorShipmentToBeAdded) throws Exception {
+	public ResponseEntity<ProductStoreVendorShipment> createProductStoreVendorShipment(@RequestBody ProductStoreVendorShipment productStoreVendorShipmentToBeAdded) throws Exception {
 
 		AddProductStoreVendorShipment command = new AddProductStoreVendorShipment(productStoreVendorShipmentToBeAdded);
 		ProductStoreVendorShipment productStoreVendorShipment = ((ProductStoreVendorShipmentAdded) Scheduler.execute(command).data()).getAddedProductStoreVendorShipment();
 		
 		if (productStoreVendorShipment != null) 
-			return ResponseEntity.status(HttpStatus.CREATED)
-					             .body(productStoreVendorShipment);
+			return successful(productStoreVendorShipment);
 		else 
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					             .body("ProductStoreVendorShipment could not be created.");
-	}
-
-	/**
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @deprecated
-	 * @param request
-	 *            HttpServletRequest object
-	 * @return true on success, false on fail
-	 * @throws Exception 
-	 */
-	@PutMapping(value = "/update", consumes = "application/x-www-form-urlencoded")
-	public boolean updateProductStoreVendorShipment(HttpServletRequest request) throws Exception {
-
-		BufferedReader br;
-		String data = null;
-		Map<String, String> dataMap = null;
-
-		try {
-			br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-			if (br != null) {
-				data = java.net.URLDecoder.decode(br.readLine(), "UTF-8");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return false;
-		}
-
-		dataMap = Splitter.on('&').trimResults().withKeyValueSeparator(Splitter.on('=').limit(2).trimResults())
-				.split(data);
-
-		ProductStoreVendorShipment productStoreVendorShipmentToBeUpdated = new ProductStoreVendorShipment();
-
-		try {
-			productStoreVendorShipmentToBeUpdated = ProductStoreVendorShipmentMapper.mapstrstr(dataMap);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		if (updateProductStoreVendorShipment(productStoreVendorShipmentToBeUpdated, null).getStatusCode()
-				.equals(HttpStatus.NO_CONTENT)) {
-			return true;
-		}
-		return false;
-
+			return conflict(null);
 	}
 
 	/**
@@ -169,7 +119,7 @@ public class ProductStoreVendorShipmentController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(method = RequestMethod.PUT, value = "/{nullVal}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Object> updateProductStoreVendorShipment(@RequestBody ProductStoreVendorShipment productStoreVendorShipmentToBeUpdated,
+	public ResponseEntity<String> updateProductStoreVendorShipment(@RequestBody ProductStoreVendorShipment productStoreVendorShipmentToBeUpdated,
 			@PathVariable String nullVal) throws Exception {
 
 //		productStoreVendorShipmentToBeUpdated.setnull(null);
@@ -178,41 +128,44 @@ public class ProductStoreVendorShipmentController {
 
 		try {
 			if(((ProductStoreVendorShipmentUpdated) Scheduler.execute(command).data()).isSuccess()) 
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);	
+				return noContent();	
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+		return conflict();
 	}
 
 	@GetMapping("/{productStoreVendorShipmentId}")
-	public ResponseEntity<Object> findById(@PathVariable String productStoreVendorShipmentId) throws Exception {
+	public ResponseEntity<ProductStoreVendorShipment> findById(@PathVariable String productStoreVendorShipmentId) throws Exception {
 		HashMap<String, String> requestParams = new HashMap<String, String>();
 		requestParams.put("productStoreVendorShipmentId", productStoreVendorShipmentId);
 		try {
 
-			Object foundProductStoreVendorShipment = findProductStoreVendorShipmentsBy(requestParams).getBody();
-			return ResponseEntity.status(HttpStatus.OK).body(foundProductStoreVendorShipment);
+			List<ProductStoreVendorShipment> foundProductStoreVendorShipment = findProductStoreVendorShipmentsBy(requestParams).getBody();
+			if(foundProductStoreVendorShipment.size()==1){				return successful(foundProductStoreVendorShipment.get(0));
+			}else{
+				return notFound();
+			}
 		} catch (RecordNotFoundException e) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
 	}
 
 	@DeleteMapping("/{productStoreVendorShipmentId}")
-	public ResponseEntity<Object> deleteProductStoreVendorShipmentByIdUpdated(@PathVariable String productStoreVendorShipmentId) throws Exception {
+	public ResponseEntity<String> deleteProductStoreVendorShipmentByIdUpdated(@PathVariable String productStoreVendorShipmentId) throws Exception {
 		DeleteProductStoreVendorShipment command = new DeleteProductStoreVendorShipment(productStoreVendorShipmentId);
 
 		try {
 			if (((ProductStoreVendorShipmentDeleted) Scheduler.execute(command).data()).isSuccess())
-				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+				return noContent();
 		} catch (RecordNotFoundException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			return notFound();
 		}
 
-		return ResponseEntity.status(HttpStatus.CONFLICT).body("ProductStoreVendorShipment could not be deleted");
+		return conflict();
 
 	}
 
