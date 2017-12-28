@@ -68,30 +68,6 @@ public class WorkEffortSearchConstraintController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<WorkEffortSearchConstraint> createWorkEffortSearchConstraint(HttpServletRequest request) throws Exception {
-
-		WorkEffortSearchConstraint workEffortSearchConstraintToBeAdded = new WorkEffortSearchConstraint();
-		try {
-			workEffortSearchConstraintToBeAdded = WorkEffortSearchConstraintMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createWorkEffortSearchConstraint(workEffortSearchConstraintToBeAdded);
-
-	}
-
-	/**
 	 * creates a new WorkEffortSearchConstraint entry in the ofbiz database
 	 * 
 	 * @param workEffortSearchConstraintToBeAdded

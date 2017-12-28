@@ -68,30 +68,6 @@ public class QuoteWorkEffortController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<QuoteWorkEffort> createQuoteWorkEffort(HttpServletRequest request) throws Exception {
-
-		QuoteWorkEffort quoteWorkEffortToBeAdded = new QuoteWorkEffort();
-		try {
-			quoteWorkEffortToBeAdded = QuoteWorkEffortMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createQuoteWorkEffort(quoteWorkEffortToBeAdded);
-
-	}
-
-	/**
 	 * creates a new QuoteWorkEffort entry in the ofbiz database
 	 * 
 	 * @param quoteWorkEffortToBeAdded

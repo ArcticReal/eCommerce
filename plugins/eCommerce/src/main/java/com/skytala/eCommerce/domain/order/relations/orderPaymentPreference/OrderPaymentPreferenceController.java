@@ -68,30 +68,6 @@ public class OrderPaymentPreferenceController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<OrderPaymentPreference> createOrderPaymentPreference(HttpServletRequest request) throws Exception {
-
-		OrderPaymentPreference orderPaymentPreferenceToBeAdded = new OrderPaymentPreference();
-		try {
-			orderPaymentPreferenceToBeAdded = OrderPaymentPreferenceMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createOrderPaymentPreference(orderPaymentPreferenceToBeAdded);
-
-	}
-
-	/**
 	 * creates a new OrderPaymentPreference entry in the ofbiz database
 	 * 
 	 * @param orderPaymentPreferenceToBeAdded

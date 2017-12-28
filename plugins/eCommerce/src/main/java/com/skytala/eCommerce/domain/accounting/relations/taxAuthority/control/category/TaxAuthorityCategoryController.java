@@ -68,30 +68,6 @@ public class TaxAuthorityCategoryController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<TaxAuthorityCategory> createTaxAuthorityCategory(HttpServletRequest request) throws Exception {
-
-		TaxAuthorityCategory taxAuthorityCategoryToBeAdded = new TaxAuthorityCategory();
-		try {
-			taxAuthorityCategoryToBeAdded = TaxAuthorityCategoryMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createTaxAuthorityCategory(taxAuthorityCategoryToBeAdded);
-
-	}
-
-	/**
 	 * creates a new TaxAuthorityCategory entry in the ofbiz database
 	 * 
 	 * @param taxAuthorityCategoryToBeAdded

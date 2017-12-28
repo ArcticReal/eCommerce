@@ -68,30 +68,6 @@ public class TelecomNumberController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<TelecomNumber> createTelecomNumber(HttpServletRequest request) throws Exception {
-
-		TelecomNumber telecomNumberToBeAdded = new TelecomNumber();
-		try {
-			telecomNumberToBeAdded = TelecomNumberMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createTelecomNumber(telecomNumberToBeAdded);
-
-	}
-
-	/**
 	 * creates a new TelecomNumber entry in the ofbiz database
 	 * 
 	 * @param telecomNumberToBeAdded

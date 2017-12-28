@@ -68,30 +68,6 @@ public class TaxAuthorityGlAccountController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<TaxAuthorityGlAccount> createTaxAuthorityGlAccount(HttpServletRequest request) throws Exception {
-
-		TaxAuthorityGlAccount taxAuthorityGlAccountToBeAdded = new TaxAuthorityGlAccount();
-		try {
-			taxAuthorityGlAccountToBeAdded = TaxAuthorityGlAccountMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createTaxAuthorityGlAccount(taxAuthorityGlAccountToBeAdded);
-
-	}
-
-	/**
 	 * creates a new TaxAuthorityGlAccount entry in the ofbiz database
 	 * 
 	 * @param taxAuthorityGlAccountToBeAdded

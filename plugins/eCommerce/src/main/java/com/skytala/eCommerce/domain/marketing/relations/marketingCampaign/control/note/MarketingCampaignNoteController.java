@@ -68,30 +68,6 @@ public class MarketingCampaignNoteController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<MarketingCampaignNote> createMarketingCampaignNote(HttpServletRequest request) throws Exception {
-
-		MarketingCampaignNote marketingCampaignNoteToBeAdded = new MarketingCampaignNote();
-		try {
-			marketingCampaignNoteToBeAdded = MarketingCampaignNoteMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createMarketingCampaignNote(marketingCampaignNoteToBeAdded);
-
-	}
-
-	/**
 	 * creates a new MarketingCampaignNote entry in the ofbiz database
 	 * 
 	 * @param marketingCampaignNoteToBeAdded

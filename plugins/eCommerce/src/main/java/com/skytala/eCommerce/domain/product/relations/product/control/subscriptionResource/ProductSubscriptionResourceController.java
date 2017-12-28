@@ -68,30 +68,6 @@ public class ProductSubscriptionResourceController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductSubscriptionResource> createProductSubscriptionResource(HttpServletRequest request) throws Exception {
-
-		ProductSubscriptionResource productSubscriptionResourceToBeAdded = new ProductSubscriptionResource();
-		try {
-			productSubscriptionResourceToBeAdded = ProductSubscriptionResourceMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductSubscriptionResource(productSubscriptionResourceToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductSubscriptionResource entry in the ofbiz database
 	 * 
 	 * @param productSubscriptionResourceToBeAdded

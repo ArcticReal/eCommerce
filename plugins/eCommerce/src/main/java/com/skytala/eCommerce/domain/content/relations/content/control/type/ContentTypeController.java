@@ -68,30 +68,6 @@ public class ContentTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ContentType> createContentType(HttpServletRequest request) throws Exception {
-
-		ContentType contentTypeToBeAdded = new ContentType();
-		try {
-			contentTypeToBeAdded = ContentTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createContentType(contentTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ContentType entry in the ofbiz database
 	 * 
 	 * @param contentTypeToBeAdded

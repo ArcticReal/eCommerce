@@ -8064,6 +8064,7 @@ public class ProductsServiceController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/deleteProductAttribute")
+	@PreAuthorize(HAS_ADMIN_AUTHORITY)
 	public ResponseEntity<Object> deleteProductAttribute(HttpSession session, @RequestParam(value="productId") String productId, @RequestParam(value="attrName") String attrName) {
 		
 		Map<String, Object> paramMap = new HashMap<>();

@@ -68,30 +68,6 @@ public class TimesheetController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Timesheet> createTimesheet(HttpServletRequest request) throws Exception {
-
-		Timesheet timesheetToBeAdded = new Timesheet();
-		try {
-			timesheetToBeAdded = TimesheetMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createTimesheet(timesheetToBeAdded);
-
-	}
-
-	/**
 	 * creates a new Timesheet entry in the ofbiz database
 	 * 
 	 * @param timesheetToBeAdded

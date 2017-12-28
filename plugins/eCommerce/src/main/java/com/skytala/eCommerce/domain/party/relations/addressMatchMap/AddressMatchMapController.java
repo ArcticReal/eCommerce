@@ -68,30 +68,6 @@ public class AddressMatchMapController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<AddressMatchMap> createAddressMatchMap(HttpServletRequest request) throws Exception {
-
-		AddressMatchMap addressMatchMapToBeAdded = new AddressMatchMap();
-		try {
-			addressMatchMapToBeAdded = AddressMatchMapMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createAddressMatchMap(addressMatchMapToBeAdded);
-
-	}
-
-	/**
 	 * creates a new AddressMatchMap entry in the ofbiz database
 	 * 
 	 * @param addressMatchMapToBeAdded

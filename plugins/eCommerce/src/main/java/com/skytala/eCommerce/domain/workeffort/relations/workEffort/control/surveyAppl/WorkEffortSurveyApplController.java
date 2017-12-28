@@ -68,30 +68,6 @@ public class WorkEffortSurveyApplController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<WorkEffortSurveyAppl> createWorkEffortSurveyAppl(HttpServletRequest request) throws Exception {
-
-		WorkEffortSurveyAppl workEffortSurveyApplToBeAdded = new WorkEffortSurveyAppl();
-		try {
-			workEffortSurveyApplToBeAdded = WorkEffortSurveyApplMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createWorkEffortSurveyAppl(workEffortSurveyApplToBeAdded);
-
-	}
-
-	/**
 	 * creates a new WorkEffortSurveyAppl entry in the ofbiz database
 	 * 
 	 * @param workEffortSurveyApplToBeAdded

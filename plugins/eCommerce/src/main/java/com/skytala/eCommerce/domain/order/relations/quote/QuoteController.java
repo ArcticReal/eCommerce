@@ -68,30 +68,6 @@ public class QuoteController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Quote> createQuote(HttpServletRequest request) throws Exception {
-
-		Quote quoteToBeAdded = new Quote();
-		try {
-			quoteToBeAdded = QuoteMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createQuote(quoteToBeAdded);
-
-	}
-
-	/**
 	 * creates a new Quote entry in the ofbiz database
 	 * 
 	 * @param quoteToBeAdded

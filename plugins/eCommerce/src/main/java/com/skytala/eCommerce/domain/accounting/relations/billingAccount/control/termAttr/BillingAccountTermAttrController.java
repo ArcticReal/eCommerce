@@ -68,30 +68,6 @@ public class BillingAccountTermAttrController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<BillingAccountTermAttr> createBillingAccountTermAttr(HttpServletRequest request) throws Exception {
-
-		BillingAccountTermAttr billingAccountTermAttrToBeAdded = new BillingAccountTermAttr();
-		try {
-			billingAccountTermAttrToBeAdded = BillingAccountTermAttrMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createBillingAccountTermAttr(billingAccountTermAttrToBeAdded);
-
-	}
-
-	/**
 	 * creates a new BillingAccountTermAttr entry in the ofbiz database
 	 * 
 	 * @param billingAccountTermAttrToBeAdded

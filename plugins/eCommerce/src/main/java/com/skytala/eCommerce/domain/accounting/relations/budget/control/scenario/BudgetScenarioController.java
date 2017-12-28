@@ -68,30 +68,6 @@ public class BudgetScenarioController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<BudgetScenario> createBudgetScenario(HttpServletRequest request) throws Exception {
-
-		BudgetScenario budgetScenarioToBeAdded = new BudgetScenario();
-		try {
-			budgetScenarioToBeAdded = BudgetScenarioMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createBudgetScenario(budgetScenarioToBeAdded);
-
-	}
-
-	/**
 	 * creates a new BudgetScenario entry in the ofbiz database
 	 * 
 	 * @param budgetScenarioToBeAdded

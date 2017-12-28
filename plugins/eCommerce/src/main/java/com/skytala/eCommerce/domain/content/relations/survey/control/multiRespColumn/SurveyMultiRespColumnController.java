@@ -68,30 +68,6 @@ public class SurveyMultiRespColumnController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<SurveyMultiRespColumn> createSurveyMultiRespColumn(HttpServletRequest request) throws Exception {
-
-		SurveyMultiRespColumn surveyMultiRespColumnToBeAdded = new SurveyMultiRespColumn();
-		try {
-			surveyMultiRespColumnToBeAdded = SurveyMultiRespColumnMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createSurveyMultiRespColumn(surveyMultiRespColumnToBeAdded);
-
-	}
-
-	/**
 	 * creates a new SurveyMultiRespColumn entry in the ofbiz database
 	 * 
 	 * @param surveyMultiRespColumnToBeAdded

@@ -68,30 +68,6 @@ public class ProductStoreRoleController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductStoreRole> createProductStoreRole(HttpServletRequest request) throws Exception {
-
-		ProductStoreRole productStoreRoleToBeAdded = new ProductStoreRole();
-		try {
-			productStoreRoleToBeAdded = ProductStoreRoleMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductStoreRole(productStoreRoleToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductStoreRole entry in the ofbiz database
 	 * 
 	 * @param productStoreRoleToBeAdded

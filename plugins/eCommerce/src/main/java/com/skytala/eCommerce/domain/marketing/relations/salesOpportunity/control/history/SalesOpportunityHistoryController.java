@@ -68,30 +68,6 @@ public class SalesOpportunityHistoryController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<SalesOpportunityHistory> createSalesOpportunityHistory(HttpServletRequest request) throws Exception {
-
-		SalesOpportunityHistory salesOpportunityHistoryToBeAdded = new SalesOpportunityHistory();
-		try {
-			salesOpportunityHistoryToBeAdded = SalesOpportunityHistoryMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createSalesOpportunityHistory(salesOpportunityHistoryToBeAdded);
-
-	}
-
-	/**
 	 * creates a new SalesOpportunityHistory entry in the ofbiz database
 	 * 
 	 * @param salesOpportunityHistoryToBeAdded

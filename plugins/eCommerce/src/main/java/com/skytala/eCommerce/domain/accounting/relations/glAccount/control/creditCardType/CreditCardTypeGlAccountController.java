@@ -68,30 +68,6 @@ public class CreditCardTypeGlAccountController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<CreditCardTypeGlAccount> createCreditCardTypeGlAccount(HttpServletRequest request) throws Exception {
-
-		CreditCardTypeGlAccount creditCardTypeGlAccountToBeAdded = new CreditCardTypeGlAccount();
-		try {
-			creditCardTypeGlAccountToBeAdded = CreditCardTypeGlAccountMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createCreditCardTypeGlAccount(creditCardTypeGlAccountToBeAdded);
-
-	}
-
-	/**
 	 * creates a new CreditCardTypeGlAccount entry in the ofbiz database
 	 * 
 	 * @param creditCardTypeGlAccountToBeAdded

@@ -68,30 +68,6 @@ public class TrainingRequestController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<TrainingRequest> createTrainingRequest(HttpServletRequest request) throws Exception {
-
-		TrainingRequest trainingRequestToBeAdded = new TrainingRequest();
-		try {
-			trainingRequestToBeAdded = TrainingRequestMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createTrainingRequest(trainingRequestToBeAdded);
-
-	}
-
-	/**
 	 * creates a new TrainingRequest entry in the ofbiz database
 	 * 
 	 * @param trainingRequestToBeAdded

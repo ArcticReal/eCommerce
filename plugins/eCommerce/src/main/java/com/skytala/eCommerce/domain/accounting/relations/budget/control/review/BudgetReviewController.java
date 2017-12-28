@@ -68,30 +68,6 @@ public class BudgetReviewController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<BudgetReview> createBudgetReview(HttpServletRequest request) throws Exception {
-
-		BudgetReview budgetReviewToBeAdded = new BudgetReview();
-		try {
-			budgetReviewToBeAdded = BudgetReviewMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createBudgetReview(budgetReviewToBeAdded);
-
-	}
-
-	/**
 	 * creates a new BudgetReview entry in the ofbiz database
 	 * 
 	 * @param budgetReviewToBeAdded

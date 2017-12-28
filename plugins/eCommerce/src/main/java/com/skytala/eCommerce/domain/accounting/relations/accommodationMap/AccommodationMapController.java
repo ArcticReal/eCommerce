@@ -68,30 +68,6 @@ public class AccommodationMapController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<AccommodationMap> createAccommodationMap(HttpServletRequest request) throws Exception {
-
-		AccommodationMap accommodationMapToBeAdded = new AccommodationMap();
-		try {
-			accommodationMapToBeAdded = AccommodationMapMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createAccommodationMap(accommodationMapToBeAdded);
-
-	}
-
-	/**
 	 * creates a new AccommodationMap entry in the ofbiz database
 	 * 
 	 * @param accommodationMapToBeAdded

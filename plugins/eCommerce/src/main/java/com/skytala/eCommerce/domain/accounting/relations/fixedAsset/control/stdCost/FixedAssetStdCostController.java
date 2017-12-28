@@ -68,30 +68,6 @@ public class FixedAssetStdCostController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<FixedAssetStdCost> createFixedAssetStdCost(HttpServletRequest request) throws Exception {
-
-		FixedAssetStdCost fixedAssetStdCostToBeAdded = new FixedAssetStdCost();
-		try {
-			fixedAssetStdCostToBeAdded = FixedAssetStdCostMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createFixedAssetStdCost(fixedAssetStdCostToBeAdded);
-
-	}
-
-	/**
 	 * creates a new FixedAssetStdCost entry in the ofbiz database
 	 * 
 	 * @param fixedAssetStdCostToBeAdded

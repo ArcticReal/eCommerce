@@ -68,30 +68,6 @@ public class FacilityTypeAttrController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<FacilityTypeAttr> createFacilityTypeAttr(HttpServletRequest request) throws Exception {
-
-		FacilityTypeAttr facilityTypeAttrToBeAdded = new FacilityTypeAttr();
-		try {
-			facilityTypeAttrToBeAdded = FacilityTypeAttrMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createFacilityTypeAttr(facilityTypeAttrToBeAdded);
-
-	}
-
-	/**
 	 * creates a new FacilityTypeAttr entry in the ofbiz database
 	 * 
 	 * @param facilityTypeAttrToBeAdded

@@ -68,30 +68,6 @@ public class ContentRoleController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ContentRole> createContentRole(HttpServletRequest request) throws Exception {
-
-		ContentRole contentRoleToBeAdded = new ContentRole();
-		try {
-			contentRoleToBeAdded = ContentRoleMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createContentRole(contentRoleToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ContentRole entry in the ofbiz database
 	 * 
 	 * @param contentRoleToBeAdded

@@ -68,30 +68,6 @@ public class MetaDataPredicateController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<MetaDataPredicate> createMetaDataPredicate(HttpServletRequest request) throws Exception {
-
-		MetaDataPredicate metaDataPredicateToBeAdded = new MetaDataPredicate();
-		try {
-			metaDataPredicateToBeAdded = MetaDataPredicateMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createMetaDataPredicate(metaDataPredicateToBeAdded);
-
-	}
-
-	/**
 	 * creates a new MetaDataPredicate entry in the ofbiz database
 	 * 
 	 * @param metaDataPredicateToBeAdded

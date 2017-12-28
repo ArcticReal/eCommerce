@@ -68,30 +68,6 @@ public class ShipmentStatusController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ShipmentStatus> createShipmentStatus(HttpServletRequest request) throws Exception {
-
-		ShipmentStatus shipmentStatusToBeAdded = new ShipmentStatus();
-		try {
-			shipmentStatusToBeAdded = ShipmentStatusMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createShipmentStatus(shipmentStatusToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ShipmentStatus entry in the ofbiz database
 	 * 
 	 * @param shipmentStatusToBeAdded

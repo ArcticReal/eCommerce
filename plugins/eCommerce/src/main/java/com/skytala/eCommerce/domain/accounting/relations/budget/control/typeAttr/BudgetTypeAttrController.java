@@ -68,30 +68,6 @@ public class BudgetTypeAttrController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<BudgetTypeAttr> createBudgetTypeAttr(HttpServletRequest request) throws Exception {
-
-		BudgetTypeAttr budgetTypeAttrToBeAdded = new BudgetTypeAttr();
-		try {
-			budgetTypeAttrToBeAdded = BudgetTypeAttrMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createBudgetTypeAttr(budgetTypeAttrToBeAdded);
-
-	}
-
-	/**
 	 * creates a new BudgetTypeAttr entry in the ofbiz database
 	 * 
 	 * @param budgetTypeAttrToBeAdded

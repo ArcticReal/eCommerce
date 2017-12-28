@@ -68,30 +68,6 @@ public class WebAnalyticsTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<WebAnalyticsType> createWebAnalyticsType(HttpServletRequest request) throws Exception {
-
-		WebAnalyticsType webAnalyticsTypeToBeAdded = new WebAnalyticsType();
-		try {
-			webAnalyticsTypeToBeAdded = WebAnalyticsTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createWebAnalyticsType(webAnalyticsTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new WebAnalyticsType entry in the ofbiz database
 	 * 
 	 * @param webAnalyticsTypeToBeAdded

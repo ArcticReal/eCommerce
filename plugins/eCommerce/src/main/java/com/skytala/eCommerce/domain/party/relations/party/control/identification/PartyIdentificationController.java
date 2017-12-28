@@ -68,30 +68,6 @@ public class PartyIdentificationController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PartyIdentification> createPartyIdentification(HttpServletRequest request) throws Exception {
-
-		PartyIdentification partyIdentificationToBeAdded = new PartyIdentification();
-		try {
-			partyIdentificationToBeAdded = PartyIdentificationMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPartyIdentification(partyIdentificationToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PartyIdentification entry in the ofbiz database
 	 * 
 	 * @param partyIdentificationToBeAdded

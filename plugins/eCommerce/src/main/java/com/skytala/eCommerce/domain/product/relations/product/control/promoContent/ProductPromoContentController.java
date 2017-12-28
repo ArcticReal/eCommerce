@@ -68,30 +68,6 @@ public class ProductPromoContentController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductPromoContent> createProductPromoContent(HttpServletRequest request) throws Exception {
-
-		ProductPromoContent productPromoContentToBeAdded = new ProductPromoContent();
-		try {
-			productPromoContentToBeAdded = ProductPromoContentMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductPromoContent(productPromoContentToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductPromoContent entry in the ofbiz database
 	 * 
 	 * @param productPromoContentToBeAdded

@@ -68,30 +68,6 @@ public class ProductManufacturingRuleController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductManufacturingRule> createProductManufacturingRule(HttpServletRequest request) throws Exception {
-
-		ProductManufacturingRule productManufacturingRuleToBeAdded = new ProductManufacturingRule();
-		try {
-			productManufacturingRuleToBeAdded = ProductManufacturingRuleMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductManufacturingRule(productManufacturingRuleToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductManufacturingRule entry in the ofbiz database
 	 * 
 	 * @param productManufacturingRuleToBeAdded

@@ -68,30 +68,6 @@ public class UserLoginSessionController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<UserLoginSession> createUserLoginSession(HttpServletRequest request) throws Exception {
-
-		UserLoginSession userLoginSessionToBeAdded = new UserLoginSession();
-		try {
-			userLoginSessionToBeAdded = UserLoginSessionMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createUserLoginSession(userLoginSessionToBeAdded);
-
-	}
-
-	/**
 	 * creates a new UserLoginSession entry in the ofbiz database
 	 * 
 	 * @param userLoginSessionToBeAdded

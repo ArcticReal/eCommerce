@@ -68,30 +68,6 @@ public class FinAccountTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<FinAccountType> createFinAccountType(HttpServletRequest request) throws Exception {
-
-		FinAccountType finAccountTypeToBeAdded = new FinAccountType();
-		try {
-			finAccountTypeToBeAdded = FinAccountTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createFinAccountType(finAccountTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new FinAccountType entry in the ofbiz database
 	 * 
 	 * @param finAccountTypeToBeAdded

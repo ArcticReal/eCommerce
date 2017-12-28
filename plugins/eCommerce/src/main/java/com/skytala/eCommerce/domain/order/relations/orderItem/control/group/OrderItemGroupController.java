@@ -68,30 +68,6 @@ public class OrderItemGroupController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<OrderItemGroup> createOrderItemGroup(HttpServletRequest request) throws Exception {
-
-		OrderItemGroup orderItemGroupToBeAdded = new OrderItemGroup();
-		try {
-			orderItemGroupToBeAdded = OrderItemGroupMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createOrderItemGroup(orderItemGroupToBeAdded);
-
-	}
-
-	/**
 	 * creates a new OrderItemGroup entry in the ofbiz database
 	 * 
 	 * @param orderItemGroupToBeAdded

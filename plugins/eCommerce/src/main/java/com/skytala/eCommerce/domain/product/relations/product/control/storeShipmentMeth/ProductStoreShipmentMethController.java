@@ -68,30 +68,6 @@ public class ProductStoreShipmentMethController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductStoreShipmentMeth> createProductStoreShipmentMeth(HttpServletRequest request) throws Exception {
-
-		ProductStoreShipmentMeth productStoreShipmentMethToBeAdded = new ProductStoreShipmentMeth();
-		try {
-			productStoreShipmentMethToBeAdded = ProductStoreShipmentMethMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductStoreShipmentMeth(productStoreShipmentMethToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductStoreShipmentMeth entry in the ofbiz database
 	 * 
 	 * @param productStoreShipmentMethToBeAdded

@@ -68,30 +68,6 @@ public class SalesOpportunityTrckCodeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<SalesOpportunityTrckCode> createSalesOpportunityTrckCode(HttpServletRequest request) throws Exception {
-
-		SalesOpportunityTrckCode salesOpportunityTrckCodeToBeAdded = new SalesOpportunityTrckCode();
-		try {
-			salesOpportunityTrckCodeToBeAdded = SalesOpportunityTrckCodeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createSalesOpportunityTrckCode(salesOpportunityTrckCodeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new SalesOpportunityTrckCode entry in the ofbiz database
 	 * 
 	 * @param salesOpportunityTrckCodeToBeAdded

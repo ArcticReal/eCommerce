@@ -68,30 +68,6 @@ public class InvoiceItemTypeMapController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<InvoiceItemTypeMap> createInvoiceItemTypeMap(HttpServletRequest request) throws Exception {
-
-		InvoiceItemTypeMap invoiceItemTypeMapToBeAdded = new InvoiceItemTypeMap();
-		try {
-			invoiceItemTypeMapToBeAdded = InvoiceItemTypeMapMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createInvoiceItemTypeMap(invoiceItemTypeMapToBeAdded);
-
-	}
-
-	/**
 	 * creates a new InvoiceItemTypeMap entry in the ofbiz database
 	 * 
 	 * @param invoiceItemTypeMapToBeAdded

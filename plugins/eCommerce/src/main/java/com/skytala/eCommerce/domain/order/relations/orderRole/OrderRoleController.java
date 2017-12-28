@@ -68,30 +68,6 @@ public class OrderRoleController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<OrderRole> createOrderRole(HttpServletRequest request) throws Exception {
-
-		OrderRole orderRoleToBeAdded = new OrderRole();
-		try {
-			orderRoleToBeAdded = OrderRoleMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createOrderRole(orderRoleToBeAdded);
-
-	}
-
-	/**
 	 * creates a new OrderRole entry in the ofbiz database
 	 * 
 	 * @param orderRoleToBeAdded

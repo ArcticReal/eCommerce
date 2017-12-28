@@ -68,30 +68,6 @@ public class AgreementItemController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<AgreementItem> createAgreementItem(HttpServletRequest request) throws Exception {
-
-		AgreementItem agreementItemToBeAdded = new AgreementItem();
-		try {
-			agreementItemToBeAdded = AgreementItemMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createAgreementItem(agreementItemToBeAdded);
-
-	}
-
-	/**
 	 * creates a new AgreementItem entry in the ofbiz database
 	 * 
 	 * @param agreementItemToBeAdded

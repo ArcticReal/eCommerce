@@ -68,30 +68,6 @@ public class WorkEffortEventReminderController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<WorkEffortEventReminder> createWorkEffortEventReminder(HttpServletRequest request) throws Exception {
-
-		WorkEffortEventReminder workEffortEventReminderToBeAdded = new WorkEffortEventReminder();
-		try {
-			workEffortEventReminderToBeAdded = WorkEffortEventReminderMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createWorkEffortEventReminder(workEffortEventReminderToBeAdded);
-
-	}
-
-	/**
 	 * creates a new WorkEffortEventReminder entry in the ofbiz database
 	 * 
 	 * @param workEffortEventReminderToBeAdded

@@ -68,30 +68,6 @@ public class JobInterviewController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<JobInterview> createJobInterview(HttpServletRequest request) throws Exception {
-
-		JobInterview jobInterviewToBeAdded = new JobInterview();
-		try {
-			jobInterviewToBeAdded = JobInterviewMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createJobInterview(jobInterviewToBeAdded);
-
-	}
-
-	/**
 	 * creates a new JobInterview entry in the ofbiz database
 	 * 
 	 * @param jobInterviewToBeAdded

@@ -68,30 +68,6 @@ public class PicklistRoleController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PicklistRole> createPicklistRole(HttpServletRequest request) throws Exception {
-
-		PicklistRole picklistRoleToBeAdded = new PicklistRole();
-		try {
-			picklistRoleToBeAdded = PicklistRoleMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPicklistRole(picklistRoleToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PicklistRole entry in the ofbiz database
 	 * 
 	 * @param picklistRoleToBeAdded

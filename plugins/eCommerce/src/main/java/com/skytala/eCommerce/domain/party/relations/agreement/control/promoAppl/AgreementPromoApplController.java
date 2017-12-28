@@ -68,30 +68,6 @@ public class AgreementPromoApplController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<AgreementPromoAppl> createAgreementPromoAppl(HttpServletRequest request) throws Exception {
-
-		AgreementPromoAppl agreementPromoApplToBeAdded = new AgreementPromoAppl();
-		try {
-			agreementPromoApplToBeAdded = AgreementPromoApplMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createAgreementPromoAppl(agreementPromoApplToBeAdded);
-
-	}
-
-	/**
 	 * creates a new AgreementPromoAppl entry in the ofbiz database
 	 * 
 	 * @param agreementPromoApplToBeAdded

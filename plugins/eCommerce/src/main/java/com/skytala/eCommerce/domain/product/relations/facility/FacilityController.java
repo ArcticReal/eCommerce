@@ -68,30 +68,6 @@ public class FacilityController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Facility> createFacility(HttpServletRequest request) throws Exception {
-
-		Facility facilityToBeAdded = new Facility();
-		try {
-			facilityToBeAdded = FacilityMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createFacility(facilityToBeAdded);
-
-	}
-
-	/**
 	 * creates a new Facility entry in the ofbiz database
 	 * 
 	 * @param facilityToBeAdded

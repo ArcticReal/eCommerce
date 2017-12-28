@@ -68,30 +68,6 @@ public class CostComponentController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<CostComponent> createCostComponent(HttpServletRequest request) throws Exception {
-
-		CostComponent costComponentToBeAdded = new CostComponent();
-		try {
-			costComponentToBeAdded = CostComponentMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createCostComponent(costComponentToBeAdded);
-
-	}
-
-	/**
 	 * creates a new CostComponent entry in the ofbiz database
 	 * 
 	 * @param costComponentToBeAdded

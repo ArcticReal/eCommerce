@@ -68,30 +68,6 @@ public class ReturnItemResponseController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ReturnItemResponse> createReturnItemResponse(HttpServletRequest request) throws Exception {
-
-		ReturnItemResponse returnItemResponseToBeAdded = new ReturnItemResponse();
-		try {
-			returnItemResponseToBeAdded = ReturnItemResponseMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createReturnItemResponse(returnItemResponseToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ReturnItemResponse entry in the ofbiz database
 	 * 
 	 * @param returnItemResponseToBeAdded

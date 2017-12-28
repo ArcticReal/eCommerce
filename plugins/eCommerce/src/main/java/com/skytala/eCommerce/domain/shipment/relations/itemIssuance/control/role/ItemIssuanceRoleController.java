@@ -68,30 +68,6 @@ public class ItemIssuanceRoleController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ItemIssuanceRole> createItemIssuanceRole(HttpServletRequest request) throws Exception {
-
-		ItemIssuanceRole itemIssuanceRoleToBeAdded = new ItemIssuanceRole();
-		try {
-			itemIssuanceRoleToBeAdded = ItemIssuanceRoleMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createItemIssuanceRole(itemIssuanceRoleToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ItemIssuanceRole entry in the ofbiz database
 	 * 
 	 * @param itemIssuanceRoleToBeAdded

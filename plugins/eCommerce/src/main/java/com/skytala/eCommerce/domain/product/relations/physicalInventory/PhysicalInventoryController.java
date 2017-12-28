@@ -68,30 +68,6 @@ public class PhysicalInventoryController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PhysicalInventory> createPhysicalInventory(HttpServletRequest request) throws Exception {
-
-		PhysicalInventory physicalInventoryToBeAdded = new PhysicalInventory();
-		try {
-			physicalInventoryToBeAdded = PhysicalInventoryMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPhysicalInventory(physicalInventoryToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PhysicalInventory entry in the ofbiz database
 	 * 
 	 * @param physicalInventoryToBeAdded

@@ -68,30 +68,6 @@ public class ProductAssocController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductAssoc> createProductAssoc(HttpServletRequest request) throws Exception {
-
-		ProductAssoc productAssocToBeAdded = new ProductAssoc();
-		try {
-			productAssocToBeAdded = ProductAssocMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductAssoc(productAssocToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductAssoc entry in the ofbiz database
 	 * 
 	 * @param productAssocToBeAdded

@@ -68,30 +68,6 @@ public class ReturnHeaderController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ReturnHeader> createReturnHeader(HttpServletRequest request) throws Exception {
-
-		ReturnHeader returnHeaderToBeAdded = new ReturnHeader();
-		try {
-			returnHeaderToBeAdded = ReturnHeaderMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createReturnHeader(returnHeaderToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ReturnHeader entry in the ofbiz database
 	 * 
 	 * @param returnHeaderToBeAdded

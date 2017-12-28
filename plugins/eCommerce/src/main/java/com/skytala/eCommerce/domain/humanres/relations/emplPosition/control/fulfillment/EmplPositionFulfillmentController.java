@@ -68,30 +68,6 @@ public class EmplPositionFulfillmentController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<EmplPositionFulfillment> createEmplPositionFulfillment(HttpServletRequest request) throws Exception {
-
-		EmplPositionFulfillment emplPositionFulfillmentToBeAdded = new EmplPositionFulfillment();
-		try {
-			emplPositionFulfillmentToBeAdded = EmplPositionFulfillmentMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createEmplPositionFulfillment(emplPositionFulfillmentToBeAdded);
-
-	}
-
-	/**
 	 * creates a new EmplPositionFulfillment entry in the ofbiz database
 	 * 
 	 * @param emplPositionFulfillmentToBeAdded

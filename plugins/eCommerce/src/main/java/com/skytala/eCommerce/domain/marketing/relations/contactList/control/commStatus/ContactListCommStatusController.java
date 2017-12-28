@@ -68,30 +68,6 @@ public class ContactListCommStatusController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ContactListCommStatus> createContactListCommStatus(HttpServletRequest request) throws Exception {
-
-		ContactListCommStatus contactListCommStatusToBeAdded = new ContactListCommStatus();
-		try {
-			contactListCommStatusToBeAdded = ContactListCommStatusMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createContactListCommStatus(contactListCommStatusToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ContactListCommStatus entry in the ofbiz database
 	 * 
 	 * @param contactListCommStatusToBeAdded

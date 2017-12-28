@@ -68,30 +68,6 @@ public class ShipmentContactMechController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ShipmentContactMech> createShipmentContactMech(HttpServletRequest request) throws Exception {
-
-		ShipmentContactMech shipmentContactMechToBeAdded = new ShipmentContactMech();
-		try {
-			shipmentContactMechToBeAdded = ShipmentContactMechMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createShipmentContactMech(shipmentContactMechToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ShipmentContactMech entry in the ofbiz database
 	 * 
 	 * @param shipmentContactMechToBeAdded

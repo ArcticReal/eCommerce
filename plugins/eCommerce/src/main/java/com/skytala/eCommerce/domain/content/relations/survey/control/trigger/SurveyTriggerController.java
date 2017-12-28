@@ -68,30 +68,6 @@ public class SurveyTriggerController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<SurveyTrigger> createSurveyTrigger(HttpServletRequest request) throws Exception {
-
-		SurveyTrigger surveyTriggerToBeAdded = new SurveyTrigger();
-		try {
-			surveyTriggerToBeAdded = SurveyTriggerMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createSurveyTrigger(surveyTriggerToBeAdded);
-
-	}
-
-	/**
 	 * creates a new SurveyTrigger entry in the ofbiz database
 	 * 
 	 * @param surveyTriggerToBeAdded

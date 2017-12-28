@@ -68,30 +68,6 @@ public class AffiliateController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Affiliate> createAffiliate(HttpServletRequest request) throws Exception {
-
-		Affiliate affiliateToBeAdded = new Affiliate();
-		try {
-			affiliateToBeAdded = AffiliateMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createAffiliate(affiliateToBeAdded);
-
-	}
-
-	/**
 	 * creates a new Affiliate entry in the ofbiz database
 	 * 
 	 * @param affiliateToBeAdded

@@ -68,30 +68,6 @@ public class CommunicationEventProductController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<CommunicationEventProduct> createCommunicationEventProduct(HttpServletRequest request) throws Exception {
-
-		CommunicationEventProduct communicationEventProductToBeAdded = new CommunicationEventProduct();
-		try {
-			communicationEventProductToBeAdded = CommunicationEventProductMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createCommunicationEventProduct(communicationEventProductToBeAdded);
-
-	}
-
-	/**
 	 * creates a new CommunicationEventProduct entry in the ofbiz database
 	 * 
 	 * @param communicationEventProductToBeAdded

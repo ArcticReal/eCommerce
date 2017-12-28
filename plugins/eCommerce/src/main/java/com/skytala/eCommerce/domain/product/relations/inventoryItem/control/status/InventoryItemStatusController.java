@@ -68,30 +68,6 @@ public class InventoryItemStatusController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<InventoryItemStatus> createInventoryItemStatus(HttpServletRequest request) throws Exception {
-
-		InventoryItemStatus inventoryItemStatusToBeAdded = new InventoryItemStatus();
-		try {
-			inventoryItemStatusToBeAdded = InventoryItemStatusMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createInventoryItemStatus(inventoryItemStatusToBeAdded);
-
-	}
-
-	/**
 	 * creates a new InventoryItemStatus entry in the ofbiz database
 	 * 
 	 * @param inventoryItemStatusToBeAdded

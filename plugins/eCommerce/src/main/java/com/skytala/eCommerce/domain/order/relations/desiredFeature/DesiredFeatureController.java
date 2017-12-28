@@ -68,30 +68,6 @@ public class DesiredFeatureController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<DesiredFeature> createDesiredFeature(HttpServletRequest request) throws Exception {
-
-		DesiredFeature desiredFeatureToBeAdded = new DesiredFeature();
-		try {
-			desiredFeatureToBeAdded = DesiredFeatureMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createDesiredFeature(desiredFeatureToBeAdded);
-
-	}
-
-	/**
 	 * creates a new DesiredFeature entry in the ofbiz database
 	 * 
 	 * @param desiredFeatureToBeAdded

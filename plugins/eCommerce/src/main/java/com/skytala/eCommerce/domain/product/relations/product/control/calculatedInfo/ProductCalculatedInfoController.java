@@ -68,30 +68,6 @@ public class ProductCalculatedInfoController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductCalculatedInfo> createProductCalculatedInfo(HttpServletRequest request) throws Exception {
-
-		ProductCalculatedInfo productCalculatedInfoToBeAdded = new ProductCalculatedInfo();
-		try {
-			productCalculatedInfoToBeAdded = ProductCalculatedInfoMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductCalculatedInfo(productCalculatedInfoToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductCalculatedInfo entry in the ofbiz database
 	 * 
 	 * @param productCalculatedInfoToBeAdded

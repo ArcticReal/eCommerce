@@ -68,30 +68,6 @@ public class WebSitePublishPointController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<WebSitePublishPoint> createWebSitePublishPoint(HttpServletRequest request) throws Exception {
-
-		WebSitePublishPoint webSitePublishPointToBeAdded = new WebSitePublishPoint();
-		try {
-			webSitePublishPointToBeAdded = WebSitePublishPointMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createWebSitePublishPoint(webSitePublishPointToBeAdded);
-
-	}
-
-	/**
 	 * creates a new WebSitePublishPoint entry in the ofbiz database
 	 * 
 	 * @param webSitePublishPointToBeAdded

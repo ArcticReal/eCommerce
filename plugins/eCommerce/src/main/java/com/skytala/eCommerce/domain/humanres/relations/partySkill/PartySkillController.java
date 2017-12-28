@@ -68,30 +68,6 @@ public class PartySkillController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PartySkill> createPartySkill(HttpServletRequest request) throws Exception {
-
-		PartySkill partySkillToBeAdded = new PartySkill();
-		try {
-			partySkillToBeAdded = PartySkillMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPartySkill(partySkillToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PartySkill entry in the ofbiz database
 	 * 
 	 * @param partySkillToBeAdded

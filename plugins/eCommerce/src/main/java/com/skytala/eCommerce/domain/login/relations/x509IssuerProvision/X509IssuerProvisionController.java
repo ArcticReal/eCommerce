@@ -68,30 +68,6 @@ public class X509IssuerProvisionController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<X509IssuerProvision> createX509IssuerProvision(HttpServletRequest request) throws Exception {
-
-		X509IssuerProvision x509IssuerProvisionToBeAdded = new X509IssuerProvision();
-		try {
-			x509IssuerProvisionToBeAdded = X509IssuerProvisionMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createX509IssuerProvision(x509IssuerProvisionToBeAdded);
-
-	}
-
-	/**
 	 * creates a new X509IssuerProvision entry in the ofbiz database
 	 * 
 	 * @param x509IssuerProvisionToBeAdded

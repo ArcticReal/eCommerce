@@ -68,30 +68,6 @@ public class WebSitePathAliasController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<WebSitePathAlias> createWebSitePathAlias(HttpServletRequest request) throws Exception {
-
-		WebSitePathAlias webSitePathAliasToBeAdded = new WebSitePathAlias();
-		try {
-			webSitePathAliasToBeAdded = WebSitePathAliasMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createWebSitePathAlias(webSitePathAliasToBeAdded);
-
-	}
-
-	/**
 	 * creates a new WebSitePathAlias entry in the ofbiz database
 	 * 
 	 * @param webSitePathAliasToBeAdded

@@ -68,30 +68,6 @@ public class QuantityBreakTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<QuantityBreakType> createQuantityBreakType(HttpServletRequest request) throws Exception {
-
-		QuantityBreakType quantityBreakTypeToBeAdded = new QuantityBreakType();
-		try {
-			quantityBreakTypeToBeAdded = QuantityBreakTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createQuantityBreakType(quantityBreakTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new QuantityBreakType entry in the ofbiz database
 	 * 
 	 * @param quantityBreakTypeToBeAdded

@@ -68,30 +68,6 @@ public class WebSiteContentController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<WebSiteContent> createWebSiteContent(HttpServletRequest request) throws Exception {
-
-		WebSiteContent webSiteContentToBeAdded = new WebSiteContent();
-		try {
-			webSiteContentToBeAdded = WebSiteContentMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createWebSiteContent(webSiteContentToBeAdded);
-
-	}
-
-	/**
 	 * creates a new WebSiteContent entry in the ofbiz database
 	 * 
 	 * @param webSiteContentToBeAdded

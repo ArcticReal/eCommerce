@@ -68,30 +68,6 @@ public class GlAccountCategoryController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<GlAccountCategory> createGlAccountCategory(HttpServletRequest request) throws Exception {
-
-		GlAccountCategory glAccountCategoryToBeAdded = new GlAccountCategory();
-		try {
-			glAccountCategoryToBeAdded = GlAccountCategoryMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createGlAccountCategory(glAccountCategoryToBeAdded);
-
-	}
-
-	/**
 	 * creates a new GlAccountCategory entry in the ofbiz database
 	 * 
 	 * @param glAccountCategoryToBeAdded

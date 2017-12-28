@@ -68,30 +68,6 @@ public class ProductCategoryAttributeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductCategoryAttribute> createProductCategoryAttribute(HttpServletRequest request) throws Exception {
-
-		ProductCategoryAttribute productCategoryAttributeToBeAdded = new ProductCategoryAttribute();
-		try {
-			productCategoryAttributeToBeAdded = ProductCategoryAttributeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductCategoryAttribute(productCategoryAttributeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductCategoryAttribute entry in the ofbiz database
 	 * 
 	 * @param productCategoryAttributeToBeAdded

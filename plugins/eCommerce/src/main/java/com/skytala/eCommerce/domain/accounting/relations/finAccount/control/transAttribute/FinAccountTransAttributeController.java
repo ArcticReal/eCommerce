@@ -68,30 +68,6 @@ public class FinAccountTransAttributeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<FinAccountTransAttribute> createFinAccountTransAttribute(HttpServletRequest request) throws Exception {
-
-		FinAccountTransAttribute finAccountTransAttributeToBeAdded = new FinAccountTransAttribute();
-		try {
-			finAccountTransAttributeToBeAdded = FinAccountTransAttributeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createFinAccountTransAttribute(finAccountTransAttributeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new FinAccountTransAttribute entry in the ofbiz database
 	 * 
 	 * @param finAccountTransAttributeToBeAdded

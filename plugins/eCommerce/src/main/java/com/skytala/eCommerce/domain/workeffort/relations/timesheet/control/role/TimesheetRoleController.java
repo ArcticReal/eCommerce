@@ -68,30 +68,6 @@ public class TimesheetRoleController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<TimesheetRole> createTimesheetRole(HttpServletRequest request) throws Exception {
-
-		TimesheetRole timesheetRoleToBeAdded = new TimesheetRole();
-		try {
-			timesheetRoleToBeAdded = TimesheetRoleMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createTimesheetRole(timesheetRoleToBeAdded);
-
-	}
-
-	/**
 	 * creates a new TimesheetRole entry in the ofbiz database
 	 * 
 	 * @param timesheetRoleToBeAdded

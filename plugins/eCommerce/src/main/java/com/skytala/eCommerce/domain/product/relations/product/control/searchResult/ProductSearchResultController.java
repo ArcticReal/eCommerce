@@ -68,30 +68,6 @@ public class ProductSearchResultController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductSearchResult> createProductSearchResult(HttpServletRequest request) throws Exception {
-
-		ProductSearchResult productSearchResultToBeAdded = new ProductSearchResult();
-		try {
-			productSearchResultToBeAdded = ProductSearchResultMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductSearchResult(productSearchResultToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductSearchResult entry in the ofbiz database
 	 * 
 	 * @param productSearchResultToBeAdded

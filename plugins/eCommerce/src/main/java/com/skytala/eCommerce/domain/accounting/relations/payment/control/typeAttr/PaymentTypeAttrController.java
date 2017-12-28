@@ -68,30 +68,6 @@ public class PaymentTypeAttrController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PaymentTypeAttr> createPaymentTypeAttr(HttpServletRequest request) throws Exception {
-
-		PaymentTypeAttr paymentTypeAttrToBeAdded = new PaymentTypeAttr();
-		try {
-			paymentTypeAttrToBeAdded = PaymentTypeAttrMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPaymentTypeAttr(paymentTypeAttrToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PaymentTypeAttr entry in the ofbiz database
 	 * 
 	 * @param paymentTypeAttrToBeAdded

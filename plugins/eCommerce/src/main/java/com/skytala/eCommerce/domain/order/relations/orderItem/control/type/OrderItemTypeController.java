@@ -68,30 +68,6 @@ public class OrderItemTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<OrderItemType> createOrderItemType(HttpServletRequest request) throws Exception {
-
-		OrderItemType orderItemTypeToBeAdded = new OrderItemType();
-		try {
-			orderItemTypeToBeAdded = OrderItemTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createOrderItemType(orderItemTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new OrderItemType entry in the ofbiz database
 	 * 
 	 * @param orderItemTypeToBeAdded

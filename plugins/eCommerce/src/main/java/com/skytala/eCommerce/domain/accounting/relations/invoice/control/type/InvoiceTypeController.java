@@ -68,30 +68,6 @@ public class InvoiceTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<InvoiceType> createInvoiceType(HttpServletRequest request) throws Exception {
-
-		InvoiceType invoiceTypeToBeAdded = new InvoiceType();
-		try {
-			invoiceTypeToBeAdded = InvoiceTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createInvoiceType(invoiceTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new InvoiceType entry in the ofbiz database
 	 * 
 	 * @param invoiceTypeToBeAdded

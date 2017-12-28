@@ -68,30 +68,6 @@ public class ResponsibilityTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ResponsibilityType> createResponsibilityType(HttpServletRequest request) throws Exception {
-
-		ResponsibilityType responsibilityTypeToBeAdded = new ResponsibilityType();
-		try {
-			responsibilityTypeToBeAdded = ResponsibilityTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createResponsibilityType(responsibilityTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ResponsibilityType entry in the ofbiz database
 	 * 
 	 * @param responsibilityTypeToBeAdded

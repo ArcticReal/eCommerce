@@ -68,30 +68,6 @@ public class BudgetAttributeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<BudgetAttribute> createBudgetAttribute(HttpServletRequest request) throws Exception {
-
-		BudgetAttribute budgetAttributeToBeAdded = new BudgetAttribute();
-		try {
-			budgetAttributeToBeAdded = BudgetAttributeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createBudgetAttribute(budgetAttributeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new BudgetAttribute entry in the ofbiz database
 	 * 
 	 * @param budgetAttributeToBeAdded

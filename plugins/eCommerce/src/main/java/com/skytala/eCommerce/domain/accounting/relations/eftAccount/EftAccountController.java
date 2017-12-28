@@ -68,30 +68,6 @@ public class EftAccountController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<EftAccount> createEftAccount(HttpServletRequest request) throws Exception {
-
-		EftAccount eftAccountToBeAdded = new EftAccount();
-		try {
-			eftAccountToBeAdded = EftAccountMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createEftAccount(eftAccountToBeAdded);
-
-	}
-
-	/**
 	 * creates a new EftAccount entry in the ofbiz database
 	 * 
 	 * @param eftAccountToBeAdded

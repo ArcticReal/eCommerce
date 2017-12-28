@@ -68,30 +68,6 @@ public class WorkEffortAssocAttributeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<WorkEffortAssocAttribute> createWorkEffortAssocAttribute(HttpServletRequest request) throws Exception {
-
-		WorkEffortAssocAttribute workEffortAssocAttributeToBeAdded = new WorkEffortAssocAttribute();
-		try {
-			workEffortAssocAttributeToBeAdded = WorkEffortAssocAttributeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createWorkEffortAssocAttribute(workEffortAssocAttributeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new WorkEffortAssocAttribute entry in the ofbiz database
 	 * 
 	 * @param workEffortAssocAttributeToBeAdded

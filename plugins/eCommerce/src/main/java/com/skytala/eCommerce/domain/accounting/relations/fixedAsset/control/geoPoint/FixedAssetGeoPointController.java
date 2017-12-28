@@ -68,30 +68,6 @@ public class FixedAssetGeoPointController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<FixedAssetGeoPoint> createFixedAssetGeoPoint(HttpServletRequest request) throws Exception {
-
-		FixedAssetGeoPoint fixedAssetGeoPointToBeAdded = new FixedAssetGeoPoint();
-		try {
-			fixedAssetGeoPointToBeAdded = FixedAssetGeoPointMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createFixedAssetGeoPoint(fixedAssetGeoPointToBeAdded);
-
-	}
-
-	/**
 	 * creates a new FixedAssetGeoPoint entry in the ofbiz database
 	 * 
 	 * @param fixedAssetGeoPointToBeAdded

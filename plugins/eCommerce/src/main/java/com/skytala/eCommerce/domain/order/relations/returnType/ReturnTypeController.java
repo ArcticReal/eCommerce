@@ -68,30 +68,6 @@ public class ReturnTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ReturnType> createReturnType(HttpServletRequest request) throws Exception {
-
-		ReturnType returnTypeToBeAdded = new ReturnType();
-		try {
-			returnTypeToBeAdded = ReturnTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createReturnType(returnTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ReturnType entry in the ofbiz database
 	 * 
 	 * @param returnTypeToBeAdded

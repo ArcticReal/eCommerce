@@ -68,30 +68,6 @@ public class PartyRoleController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PartyRole> createPartyRole(HttpServletRequest request) throws Exception {
-
-		PartyRole partyRoleToBeAdded = new PartyRole();
-		try {
-			partyRoleToBeAdded = PartyRoleMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPartyRole(partyRoleToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PartyRole entry in the ofbiz database
 	 * 
 	 * @param partyRoleToBeAdded

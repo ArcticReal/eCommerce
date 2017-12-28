@@ -68,30 +68,6 @@ public class SurveyPageController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<SurveyPage> createSurveyPage(HttpServletRequest request) throws Exception {
-
-		SurveyPage surveyPageToBeAdded = new SurveyPage();
-		try {
-			surveyPageToBeAdded = SurveyPageMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createSurveyPage(surveyPageToBeAdded);
-
-	}
-
-	/**
 	 * creates a new SurveyPage entry in the ofbiz database
 	 * 
 	 * @param surveyPageToBeAdded

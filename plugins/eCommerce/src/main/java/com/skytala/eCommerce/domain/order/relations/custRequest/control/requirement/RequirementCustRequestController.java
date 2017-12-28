@@ -68,30 +68,6 @@ public class RequirementCustRequestController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<RequirementCustRequest> createRequirementCustRequest(HttpServletRequest request) throws Exception {
-
-		RequirementCustRequest requirementCustRequestToBeAdded = new RequirementCustRequest();
-		try {
-			requirementCustRequestToBeAdded = RequirementCustRequestMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createRequirementCustRequest(requirementCustRequestToBeAdded);
-
-	}
-
-	/**
 	 * creates a new RequirementCustRequest entry in the ofbiz database
 	 * 
 	 * @param requirementCustRequestToBeAdded

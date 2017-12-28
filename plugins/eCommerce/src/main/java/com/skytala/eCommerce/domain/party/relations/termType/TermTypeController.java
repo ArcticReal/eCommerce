@@ -68,30 +68,6 @@ public class TermTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<TermType> createTermType(HttpServletRequest request) throws Exception {
-
-		TermType termTypeToBeAdded = new TermType();
-		try {
-			termTypeToBeAdded = TermTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createTermType(termTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new TermType entry in the ofbiz database
 	 * 
 	 * @param termTypeToBeAdded

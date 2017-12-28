@@ -68,30 +68,6 @@ public class WorkEffortSearchResultController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<WorkEffortSearchResult> createWorkEffortSearchResult(HttpServletRequest request) throws Exception {
-
-		WorkEffortSearchResult workEffortSearchResultToBeAdded = new WorkEffortSearchResult();
-		try {
-			workEffortSearchResultToBeAdded = WorkEffortSearchResultMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createWorkEffortSearchResult(workEffortSearchResultToBeAdded);
-
-	}
-
-	/**
 	 * creates a new WorkEffortSearchResult entry in the ofbiz database
 	 * 
 	 * @param workEffortSearchResultToBeAdded

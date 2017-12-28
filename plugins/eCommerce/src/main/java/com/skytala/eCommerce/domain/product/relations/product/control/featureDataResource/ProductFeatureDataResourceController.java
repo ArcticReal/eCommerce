@@ -68,30 +68,6 @@ public class ProductFeatureDataResourceController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductFeatureDataResource> createProductFeatureDataResource(HttpServletRequest request) throws Exception {
-
-		ProductFeatureDataResource productFeatureDataResourceToBeAdded = new ProductFeatureDataResource();
-		try {
-			productFeatureDataResourceToBeAdded = ProductFeatureDataResourceMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductFeatureDataResource(productFeatureDataResourceToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductFeatureDataResource entry in the ofbiz database
 	 * 
 	 * @param productFeatureDataResourceToBeAdded

@@ -68,30 +68,6 @@ public class WorkEffortReviewController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<WorkEffortReview> createWorkEffortReview(HttpServletRequest request) throws Exception {
-
-		WorkEffortReview workEffortReviewToBeAdded = new WorkEffortReview();
-		try {
-			workEffortReviewToBeAdded = WorkEffortReviewMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createWorkEffortReview(workEffortReviewToBeAdded);
-
-	}
-
-	/**
 	 * creates a new WorkEffortReview entry in the ofbiz database
 	 * 
 	 * @param workEffortReviewToBeAdded

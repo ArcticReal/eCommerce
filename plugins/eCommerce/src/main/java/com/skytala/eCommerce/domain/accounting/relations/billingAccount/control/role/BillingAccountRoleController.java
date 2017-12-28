@@ -68,30 +68,6 @@ public class BillingAccountRoleController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<BillingAccountRole> createBillingAccountRole(HttpServletRequest request) throws Exception {
-
-		BillingAccountRole billingAccountRoleToBeAdded = new BillingAccountRole();
-		try {
-			billingAccountRoleToBeAdded = BillingAccountRoleMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createBillingAccountRole(billingAccountRoleToBeAdded);
-
-	}
-
-	/**
 	 * creates a new BillingAccountRole entry in the ofbiz database
 	 * 
 	 * @param billingAccountRoleToBeAdded

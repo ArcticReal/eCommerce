@@ -68,30 +68,6 @@ public class ShipmentReceiptRoleController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ShipmentReceiptRole> createShipmentReceiptRole(HttpServletRequest request) throws Exception {
-
-		ShipmentReceiptRole shipmentReceiptRoleToBeAdded = new ShipmentReceiptRole();
-		try {
-			shipmentReceiptRoleToBeAdded = ShipmentReceiptRoleMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createShipmentReceiptRole(shipmentReceiptRoleToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ShipmentReceiptRole entry in the ofbiz database
 	 * 
 	 * @param shipmentReceiptRoleToBeAdded

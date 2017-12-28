@@ -68,30 +68,6 @@ public class AgreementEmploymentApplController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<AgreementEmploymentAppl> createAgreementEmploymentAppl(HttpServletRequest request) throws Exception {
-
-		AgreementEmploymentAppl agreementEmploymentApplToBeAdded = new AgreementEmploymentAppl();
-		try {
-			agreementEmploymentApplToBeAdded = AgreementEmploymentApplMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createAgreementEmploymentAppl(agreementEmploymentApplToBeAdded);
-
-	}
-
-	/**
 	 * creates a new AgreementEmploymentAppl entry in the ofbiz database
 	 * 
 	 * @param agreementEmploymentApplToBeAdded

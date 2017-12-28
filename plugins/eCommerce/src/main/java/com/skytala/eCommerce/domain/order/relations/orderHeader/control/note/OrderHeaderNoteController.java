@@ -68,30 +68,6 @@ public class OrderHeaderNoteController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<OrderHeaderNote> createOrderHeaderNote(HttpServletRequest request) throws Exception {
-
-		OrderHeaderNote orderHeaderNoteToBeAdded = new OrderHeaderNote();
-		try {
-			orderHeaderNoteToBeAdded = OrderHeaderNoteMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createOrderHeaderNote(orderHeaderNoteToBeAdded);
-
-	}
-
-	/**
 	 * creates a new OrderHeaderNote entry in the ofbiz database
 	 * 
 	 * @param orderHeaderNoteToBeAdded

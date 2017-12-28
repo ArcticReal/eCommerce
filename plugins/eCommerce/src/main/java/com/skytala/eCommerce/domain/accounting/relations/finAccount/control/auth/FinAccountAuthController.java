@@ -68,30 +68,6 @@ public class FinAccountAuthController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<FinAccountAuth> createFinAccountAuth(HttpServletRequest request) throws Exception {
-
-		FinAccountAuth finAccountAuthToBeAdded = new FinAccountAuth();
-		try {
-			finAccountAuthToBeAdded = FinAccountAuthMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createFinAccountAuth(finAccountAuthToBeAdded);
-
-	}
-
-	/**
 	 * creates a new FinAccountAuth entry in the ofbiz database
 	 * 
 	 * @param finAccountAuthToBeAdded

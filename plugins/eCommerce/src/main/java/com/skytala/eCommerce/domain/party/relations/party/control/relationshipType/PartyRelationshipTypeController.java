@@ -68,30 +68,6 @@ public class PartyRelationshipTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PartyRelationshipType> createPartyRelationshipType(HttpServletRequest request) throws Exception {
-
-		PartyRelationshipType partyRelationshipTypeToBeAdded = new PartyRelationshipType();
-		try {
-			partyRelationshipTypeToBeAdded = PartyRelationshipTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPartyRelationshipType(partyRelationshipTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PartyRelationshipType entry in the ofbiz database
 	 * 
 	 * @param partyRelationshipTypeToBeAdded

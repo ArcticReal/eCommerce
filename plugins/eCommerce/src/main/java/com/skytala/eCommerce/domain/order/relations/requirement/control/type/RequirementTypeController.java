@@ -68,30 +68,6 @@ public class RequirementTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<RequirementType> createRequirementType(HttpServletRequest request) throws Exception {
-
-		RequirementType requirementTypeToBeAdded = new RequirementType();
-		try {
-			requirementTypeToBeAdded = RequirementTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createRequirementType(requirementTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new RequirementType entry in the ofbiz database
 	 * 
 	 * @param requirementTypeToBeAdded

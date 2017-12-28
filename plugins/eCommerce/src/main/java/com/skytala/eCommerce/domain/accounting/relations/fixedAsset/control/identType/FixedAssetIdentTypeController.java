@@ -68,30 +68,6 @@ public class FixedAssetIdentTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<FixedAssetIdentType> createFixedAssetIdentType(HttpServletRequest request) throws Exception {
-
-		FixedAssetIdentType fixedAssetIdentTypeToBeAdded = new FixedAssetIdentType();
-		try {
-			fixedAssetIdentTypeToBeAdded = FixedAssetIdentTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createFixedAssetIdentType(fixedAssetIdentTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new FixedAssetIdentType entry in the ofbiz database
 	 * 
 	 * @param fixedAssetIdentTypeToBeAdded

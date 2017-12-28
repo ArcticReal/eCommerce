@@ -68,30 +68,6 @@ public class PayrollPreferenceController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PayrollPreference> createPayrollPreference(HttpServletRequest request) throws Exception {
-
-		PayrollPreference payrollPreferenceToBeAdded = new PayrollPreference();
-		try {
-			payrollPreferenceToBeAdded = PayrollPreferenceMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPayrollPreference(payrollPreferenceToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PayrollPreference entry in the ofbiz database
 	 * 
 	 * @param payrollPreferenceToBeAdded

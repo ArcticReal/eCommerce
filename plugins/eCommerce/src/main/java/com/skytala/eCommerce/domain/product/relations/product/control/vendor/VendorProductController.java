@@ -68,30 +68,6 @@ public class VendorProductController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<VendorProduct> createVendorProduct(HttpServletRequest request) throws Exception {
-
-		VendorProduct vendorProductToBeAdded = new VendorProduct();
-		try {
-			vendorProductToBeAdded = VendorProductMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createVendorProduct(vendorProductToBeAdded);
-
-	}
-
-	/**
 	 * creates a new VendorProduct entry in the ofbiz database
 	 * 
 	 * @param vendorProductToBeAdded

@@ -68,30 +68,6 @@ public class PostalAddressBoundaryController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PostalAddressBoundary> createPostalAddressBoundary(HttpServletRequest request) throws Exception {
-
-		PostalAddressBoundary postalAddressBoundaryToBeAdded = new PostalAddressBoundary();
-		try {
-			postalAddressBoundaryToBeAdded = PostalAddressBoundaryMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPostalAddressBoundary(postalAddressBoundaryToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PostalAddressBoundary entry in the ofbiz database
 	 * 
 	 * @param postalAddressBoundaryToBeAdded

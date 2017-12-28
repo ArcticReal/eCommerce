@@ -68,30 +68,6 @@ public class ProductAverageCostTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductAverageCostType> createProductAverageCostType(HttpServletRequest request) throws Exception {
-
-		ProductAverageCostType productAverageCostTypeToBeAdded = new ProductAverageCostType();
-		try {
-			productAverageCostTypeToBeAdded = ProductAverageCostTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductAverageCostType(productAverageCostTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductAverageCostType entry in the ofbiz database
 	 * 
 	 * @param productAverageCostTypeToBeAdded

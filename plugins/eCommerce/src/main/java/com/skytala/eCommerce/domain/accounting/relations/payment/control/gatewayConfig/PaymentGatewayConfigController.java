@@ -68,30 +68,6 @@ public class PaymentGatewayConfigController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PaymentGatewayConfig> createPaymentGatewayConfig(HttpServletRequest request) throws Exception {
-
-		PaymentGatewayConfig paymentGatewayConfigToBeAdded = new PaymentGatewayConfig();
-		try {
-			paymentGatewayConfigToBeAdded = PaymentGatewayConfigMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPaymentGatewayConfig(paymentGatewayConfigToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PaymentGatewayConfig entry in the ofbiz database
 	 * 
 	 * @param paymentGatewayConfigToBeAdded

@@ -68,30 +68,6 @@ public class PaymentContentController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PaymentContent> createPaymentContent(HttpServletRequest request) throws Exception {
-
-		PaymentContent paymentContentToBeAdded = new PaymentContent();
-		try {
-			paymentContentToBeAdded = PaymentContentMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPaymentContent(paymentContentToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PaymentContent entry in the ofbiz database
 	 * 
 	 * @param paymentContentToBeAdded

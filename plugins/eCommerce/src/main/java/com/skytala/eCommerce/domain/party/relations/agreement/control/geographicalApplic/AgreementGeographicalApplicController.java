@@ -68,30 +68,6 @@ public class AgreementGeographicalApplicController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<AgreementGeographicalApplic> createAgreementGeographicalApplic(HttpServletRequest request) throws Exception {
-
-		AgreementGeographicalApplic agreementGeographicalApplicToBeAdded = new AgreementGeographicalApplic();
-		try {
-			agreementGeographicalApplicToBeAdded = AgreementGeographicalApplicMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createAgreementGeographicalApplic(agreementGeographicalApplicToBeAdded);
-
-	}
-
-	/**
 	 * creates a new AgreementGeographicalApplic entry in the ofbiz database
 	 * 
 	 * @param agreementGeographicalApplicToBeAdded

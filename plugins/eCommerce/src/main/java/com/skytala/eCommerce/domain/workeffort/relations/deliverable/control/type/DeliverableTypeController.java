@@ -68,30 +68,6 @@ public class DeliverableTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<DeliverableType> createDeliverableType(HttpServletRequest request) throws Exception {
-
-		DeliverableType deliverableTypeToBeAdded = new DeliverableType();
-		try {
-			deliverableTypeToBeAdded = DeliverableTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createDeliverableType(deliverableTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new DeliverableType entry in the ofbiz database
 	 * 
 	 * @param deliverableTypeToBeAdded

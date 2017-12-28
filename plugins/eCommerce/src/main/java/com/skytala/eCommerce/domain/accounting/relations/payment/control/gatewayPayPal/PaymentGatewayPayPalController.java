@@ -68,30 +68,6 @@ public class PaymentGatewayPayPalController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PaymentGatewayPayPal> createPaymentGatewayPayPal(HttpServletRequest request) throws Exception {
-
-		PaymentGatewayPayPal paymentGatewayPayPalToBeAdded = new PaymentGatewayPayPal();
-		try {
-			paymentGatewayPayPalToBeAdded = PaymentGatewayPayPalMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPaymentGatewayPayPal(paymentGatewayPayPalToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PaymentGatewayPayPal entry in the ofbiz database
 	 * 
 	 * @param paymentGatewayPayPalToBeAdded

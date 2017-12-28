@@ -68,30 +68,6 @@ public class OrderDeliveryScheduleController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<OrderDeliverySchedule> createOrderDeliverySchedule(HttpServletRequest request) throws Exception {
-
-		OrderDeliverySchedule orderDeliveryScheduleToBeAdded = new OrderDeliverySchedule();
-		try {
-			orderDeliveryScheduleToBeAdded = OrderDeliveryScheduleMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createOrderDeliverySchedule(orderDeliveryScheduleToBeAdded);
-
-	}
-
-	/**
 	 * creates a new OrderDeliverySchedule entry in the ofbiz database
 	 * 
 	 * @param orderDeliveryScheduleToBeAdded

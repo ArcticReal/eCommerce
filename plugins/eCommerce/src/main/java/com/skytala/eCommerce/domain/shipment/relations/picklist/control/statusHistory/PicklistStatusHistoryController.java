@@ -68,30 +68,6 @@ public class PicklistStatusHistoryController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PicklistStatusHistory> createPicklistStatusHistory(HttpServletRequest request) throws Exception {
-
-		PicklistStatusHistory picklistStatusHistoryToBeAdded = new PicklistStatusHistory();
-		try {
-			picklistStatusHistoryToBeAdded = PicklistStatusHistoryMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPicklistStatusHistory(picklistStatusHistoryToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PicklistStatusHistory entry in the ofbiz database
 	 * 
 	 * @param picklistStatusHistoryToBeAdded

@@ -68,30 +68,6 @@ public class SalesOpportunityRoleController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<SalesOpportunityRole> createSalesOpportunityRole(HttpServletRequest request) throws Exception {
-
-		SalesOpportunityRole salesOpportunityRoleToBeAdded = new SalesOpportunityRole();
-		try {
-			salesOpportunityRoleToBeAdded = SalesOpportunityRoleMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createSalesOpportunityRole(salesOpportunityRoleToBeAdded);
-
-	}
-
-	/**
 	 * creates a new SalesOpportunityRole entry in the ofbiz database
 	 * 
 	 * @param salesOpportunityRoleToBeAdded

@@ -68,30 +68,6 @@ public class ReorderGuidelineController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ReorderGuideline> createReorderGuideline(HttpServletRequest request) throws Exception {
-
-		ReorderGuideline reorderGuidelineToBeAdded = new ReorderGuideline();
-		try {
-			reorderGuidelineToBeAdded = ReorderGuidelineMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createReorderGuideline(reorderGuidelineToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ReorderGuideline entry in the ofbiz database
 	 * 
 	 * @param reorderGuidelineToBeAdded

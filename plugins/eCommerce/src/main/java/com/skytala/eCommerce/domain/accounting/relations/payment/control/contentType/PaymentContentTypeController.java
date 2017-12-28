@@ -68,30 +68,6 @@ public class PaymentContentTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PaymentContentType> createPaymentContentType(HttpServletRequest request) throws Exception {
-
-		PaymentContentType paymentContentTypeToBeAdded = new PaymentContentType();
-		try {
-			paymentContentTypeToBeAdded = PaymentContentTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPaymentContentType(paymentContentTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PaymentContentType entry in the ofbiz database
 	 * 
 	 * @param paymentContentTypeToBeAdded

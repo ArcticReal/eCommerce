@@ -68,30 +68,6 @@ public class CreditCardController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<CreditCard> createCreditCard(HttpServletRequest request) throws Exception {
-
-		CreditCard creditCardToBeAdded = new CreditCard();
-		try {
-			creditCardToBeAdded = CreditCardMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createCreditCard(creditCardToBeAdded);
-
-	}
-
-	/**
 	 * creates a new CreditCard entry in the ofbiz database
 	 * 
 	 * @param creditCardToBeAdded

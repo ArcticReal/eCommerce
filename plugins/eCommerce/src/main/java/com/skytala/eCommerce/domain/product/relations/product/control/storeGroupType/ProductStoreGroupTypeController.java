@@ -68,30 +68,6 @@ public class ProductStoreGroupTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductStoreGroupType> createProductStoreGroupType(HttpServletRequest request) throws Exception {
-
-		ProductStoreGroupType productStoreGroupTypeToBeAdded = new ProductStoreGroupType();
-		try {
-			productStoreGroupTypeToBeAdded = ProductStoreGroupTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductStoreGroupType(productStoreGroupTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductStoreGroupType entry in the ofbiz database
 	 * 
 	 * @param productStoreGroupTypeToBeAdded

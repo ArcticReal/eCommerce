@@ -68,30 +68,6 @@ public class WorkEffortAssocTypeAttrController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<WorkEffortAssocTypeAttr> createWorkEffortAssocTypeAttr(HttpServletRequest request) throws Exception {
-
-		WorkEffortAssocTypeAttr workEffortAssocTypeAttrToBeAdded = new WorkEffortAssocTypeAttr();
-		try {
-			workEffortAssocTypeAttrToBeAdded = WorkEffortAssocTypeAttrMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createWorkEffortAssocTypeAttr(workEffortAssocTypeAttrToBeAdded);
-
-	}
-
-	/**
 	 * creates a new WorkEffortAssocTypeAttr entry in the ofbiz database
 	 * 
 	 * @param workEffortAssocTypeAttrToBeAdded

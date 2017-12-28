@@ -68,30 +68,6 @@ public class PartyQualController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PartyQual> createPartyQual(HttpServletRequest request) throws Exception {
-
-		PartyQual partyQualToBeAdded = new PartyQual();
-		try {
-			partyQualToBeAdded = PartyQualMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPartyQual(partyQualToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PartyQual entry in the ofbiz database
 	 * 
 	 * @param partyQualToBeAdded

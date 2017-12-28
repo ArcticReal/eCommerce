@@ -68,30 +68,6 @@ public class FixedAssetProductTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<FixedAssetProductType> createFixedAssetProductType(HttpServletRequest request) throws Exception {
-
-		FixedAssetProductType fixedAssetProductTypeToBeAdded = new FixedAssetProductType();
-		try {
-			fixedAssetProductTypeToBeAdded = FixedAssetProductTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createFixedAssetProductType(fixedAssetProductTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new FixedAssetProductType entry in the ofbiz database
 	 * 
 	 * @param fixedAssetProductTypeToBeAdded

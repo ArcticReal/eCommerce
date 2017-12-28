@@ -68,30 +68,6 @@ public class SurveyQuestionOptionController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<SurveyQuestionOption> createSurveyQuestionOption(HttpServletRequest request) throws Exception {
-
-		SurveyQuestionOption surveyQuestionOptionToBeAdded = new SurveyQuestionOption();
-		try {
-			surveyQuestionOptionToBeAdded = SurveyQuestionOptionMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createSurveyQuestionOption(surveyQuestionOptionToBeAdded);
-
-	}
-
-	/**
 	 * creates a new SurveyQuestionOption entry in the ofbiz database
 	 * 
 	 * @param surveyQuestionOptionToBeAdded

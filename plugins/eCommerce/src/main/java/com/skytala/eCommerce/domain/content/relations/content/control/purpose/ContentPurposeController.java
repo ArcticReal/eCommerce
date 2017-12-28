@@ -68,30 +68,6 @@ public class ContentPurposeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ContentPurpose> createContentPurpose(HttpServletRequest request) throws Exception {
-
-		ContentPurpose contentPurposeToBeAdded = new ContentPurpose();
-		try {
-			contentPurposeToBeAdded = ContentPurposeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createContentPurpose(contentPurposeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ContentPurpose entry in the ofbiz database
 	 * 
 	 * @param contentPurposeToBeAdded

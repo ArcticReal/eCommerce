@@ -68,30 +68,6 @@ public class ContentOperationController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ContentOperation> createContentOperation(HttpServletRequest request) throws Exception {
-
-		ContentOperation contentOperationToBeAdded = new ContentOperation();
-		try {
-			contentOperationToBeAdded = ContentOperationMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createContentOperation(contentOperationToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ContentOperation entry in the ofbiz database
 	 * 
 	 * @param contentOperationToBeAdded

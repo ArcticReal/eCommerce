@@ -68,30 +68,6 @@ public class PaymentMethodController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PaymentMethod> createPaymentMethod(HttpServletRequest request) throws Exception {
-
-		PaymentMethod paymentMethodToBeAdded = new PaymentMethod();
-		try {
-			paymentMethodToBeAdded = PaymentMethodMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPaymentMethod(paymentMethodToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PaymentMethod entry in the ofbiz database
 	 * 
 	 * @param paymentMethodToBeAdded

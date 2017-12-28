@@ -68,30 +68,6 @@ public class FacilityContactMechPurposeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<FacilityContactMechPurpose> createFacilityContactMechPurpose(HttpServletRequest request) throws Exception {
-
-		FacilityContactMechPurpose facilityContactMechPurposeToBeAdded = new FacilityContactMechPurpose();
-		try {
-			facilityContactMechPurposeToBeAdded = FacilityContactMechPurposeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createFacilityContactMechPurpose(facilityContactMechPurposeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new FacilityContactMechPurpose entry in the ofbiz database
 	 * 
 	 * @param facilityContactMechPurposeToBeAdded

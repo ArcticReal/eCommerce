@@ -68,30 +68,6 @@ public class ShipmentCostEstimateController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ShipmentCostEstimate> createShipmentCostEstimate(HttpServletRequest request) throws Exception {
-
-		ShipmentCostEstimate shipmentCostEstimateToBeAdded = new ShipmentCostEstimate();
-		try {
-			shipmentCostEstimateToBeAdded = ShipmentCostEstimateMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createShipmentCostEstimate(shipmentCostEstimateToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ShipmentCostEstimate entry in the ofbiz database
 	 * 
 	 * @param shipmentCostEstimateToBeAdded

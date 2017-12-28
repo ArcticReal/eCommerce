@@ -68,30 +68,6 @@ public class ContainerController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Container> createContainer(HttpServletRequest request) throws Exception {
-
-		Container containerToBeAdded = new Container();
-		try {
-			containerToBeAdded = ContainerMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createContainer(containerToBeAdded);
-
-	}
-
-	/**
 	 * creates a new Container entry in the ofbiz database
 	 * 
 	 * @param containerToBeAdded

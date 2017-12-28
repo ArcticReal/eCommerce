@@ -68,30 +68,6 @@ public class CommunicationEventPrpTypController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<CommunicationEventPrpTyp> createCommunicationEventPrpTyp(HttpServletRequest request) throws Exception {
-
-		CommunicationEventPrpTyp communicationEventPrpTypToBeAdded = new CommunicationEventPrpTyp();
-		try {
-			communicationEventPrpTypToBeAdded = CommunicationEventPrpTypMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createCommunicationEventPrpTyp(communicationEventPrpTypToBeAdded);
-
-	}
-
-	/**
 	 * creates a new CommunicationEventPrpTyp entry in the ofbiz database
 	 * 
 	 * @param communicationEventPrpTypToBeAdded

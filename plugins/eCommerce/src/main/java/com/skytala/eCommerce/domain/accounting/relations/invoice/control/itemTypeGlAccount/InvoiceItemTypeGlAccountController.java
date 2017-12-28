@@ -68,30 +68,6 @@ public class InvoiceItemTypeGlAccountController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<InvoiceItemTypeGlAccount> createInvoiceItemTypeGlAccount(HttpServletRequest request) throws Exception {
-
-		InvoiceItemTypeGlAccount invoiceItemTypeGlAccountToBeAdded = new InvoiceItemTypeGlAccount();
-		try {
-			invoiceItemTypeGlAccountToBeAdded = InvoiceItemTypeGlAccountMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createInvoiceItemTypeGlAccount(invoiceItemTypeGlAccountToBeAdded);
-
-	}
-
-	/**
 	 * creates a new InvoiceItemTypeGlAccount entry in the ofbiz database
 	 * 
 	 * @param invoiceItemTypeGlAccountToBeAdded

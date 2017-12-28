@@ -68,30 +68,6 @@ public class PaymentAttributeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PaymentAttribute> createPaymentAttribute(HttpServletRequest request) throws Exception {
-
-		PaymentAttribute paymentAttributeToBeAdded = new PaymentAttribute();
-		try {
-			paymentAttributeToBeAdded = PaymentAttributeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPaymentAttribute(paymentAttributeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PaymentAttribute entry in the ofbiz database
 	 * 
 	 * @param paymentAttributeToBeAdded

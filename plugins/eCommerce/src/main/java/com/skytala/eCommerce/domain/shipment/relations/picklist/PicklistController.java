@@ -68,30 +68,6 @@ public class PicklistController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Picklist> createPicklist(HttpServletRequest request) throws Exception {
-
-		Picklist picklistToBeAdded = new Picklist();
-		try {
-			picklistToBeAdded = PicklistMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPicklist(picklistToBeAdded);
-
-	}
-
-	/**
 	 * creates a new Picklist entry in the ofbiz database
 	 * 
 	 * @param picklistToBeAdded

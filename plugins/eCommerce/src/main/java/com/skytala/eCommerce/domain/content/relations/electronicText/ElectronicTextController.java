@@ -68,30 +68,6 @@ public class ElectronicTextController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ElectronicText> createElectronicText(HttpServletRequest request) throws Exception {
-
-		ElectronicText electronicTextToBeAdded = new ElectronicText();
-		try {
-			electronicTextToBeAdded = ElectronicTextMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createElectronicText(electronicTextToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ElectronicText entry in the ofbiz database
 	 * 
 	 * @param electronicTextToBeAdded

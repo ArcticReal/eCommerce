@@ -68,30 +68,6 @@ public class FixedAssetMaintController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<FixedAssetMaint> createFixedAssetMaint(HttpServletRequest request) throws Exception {
-
-		FixedAssetMaint fixedAssetMaintToBeAdded = new FixedAssetMaint();
-		try {
-			fixedAssetMaintToBeAdded = FixedAssetMaintMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createFixedAssetMaint(fixedAssetMaintToBeAdded);
-
-	}
-
-	/**
 	 * creates a new FixedAssetMaint entry in the ofbiz database
 	 * 
 	 * @param fixedAssetMaintToBeAdded

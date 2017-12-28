@@ -68,30 +68,6 @@ public class TarpittedLoginViewController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<TarpittedLoginView> createTarpittedLoginView(HttpServletRequest request) throws Exception {
-
-		TarpittedLoginView tarpittedLoginViewToBeAdded = new TarpittedLoginView();
-		try {
-			tarpittedLoginViewToBeAdded = TarpittedLoginViewMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createTarpittedLoginView(tarpittedLoginViewToBeAdded);
-
-	}
-
-	/**
 	 * creates a new TarpittedLoginView entry in the ofbiz database
 	 * 
 	 * @param tarpittedLoginViewToBeAdded

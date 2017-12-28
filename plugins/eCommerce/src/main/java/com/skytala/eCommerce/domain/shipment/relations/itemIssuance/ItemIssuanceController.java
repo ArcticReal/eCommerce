@@ -68,30 +68,6 @@ public class ItemIssuanceController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ItemIssuance> createItemIssuance(HttpServletRequest request) throws Exception {
-
-		ItemIssuance itemIssuanceToBeAdded = new ItemIssuance();
-		try {
-			itemIssuanceToBeAdded = ItemIssuanceMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createItemIssuance(itemIssuanceToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ItemIssuance entry in the ofbiz database
 	 * 
 	 * @param itemIssuanceToBeAdded

@@ -68,30 +68,6 @@ public class TermTypeAttrController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<TermTypeAttr> createTermTypeAttr(HttpServletRequest request) throws Exception {
-
-		TermTypeAttr termTypeAttrToBeAdded = new TermTypeAttr();
-		try {
-			termTypeAttrToBeAdded = TermTypeAttrMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createTermTypeAttr(termTypeAttrToBeAdded);
-
-	}
-
-	/**
 	 * creates a new TermTypeAttr entry in the ofbiz database
 	 * 
 	 * @param termTypeAttrToBeAdded

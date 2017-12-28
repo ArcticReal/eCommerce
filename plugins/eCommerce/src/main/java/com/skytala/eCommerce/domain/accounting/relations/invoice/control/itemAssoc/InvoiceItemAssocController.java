@@ -68,30 +68,6 @@ public class InvoiceItemAssocController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<InvoiceItemAssoc> createInvoiceItemAssoc(HttpServletRequest request) throws Exception {
-
-		InvoiceItemAssoc invoiceItemAssocToBeAdded = new InvoiceItemAssoc();
-		try {
-			invoiceItemAssocToBeAdded = InvoiceItemAssocMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createInvoiceItemAssoc(invoiceItemAssocToBeAdded);
-
-	}
-
-	/**
 	 * creates a new InvoiceItemAssoc entry in the ofbiz database
 	 * 
 	 * @param invoiceItemAssocToBeAdded

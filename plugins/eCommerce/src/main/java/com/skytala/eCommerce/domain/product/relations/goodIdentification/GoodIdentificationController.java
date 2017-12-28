@@ -68,30 +68,6 @@ public class GoodIdentificationController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<GoodIdentification> createGoodIdentification(HttpServletRequest request) throws Exception {
-
-		GoodIdentification goodIdentificationToBeAdded = new GoodIdentification();
-		try {
-			goodIdentificationToBeAdded = GoodIdentificationMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createGoodIdentification(goodIdentificationToBeAdded);
-
-	}
-
-	/**
 	 * creates a new GoodIdentification entry in the ofbiz database
 	 * 
 	 * @param goodIdentificationToBeAdded

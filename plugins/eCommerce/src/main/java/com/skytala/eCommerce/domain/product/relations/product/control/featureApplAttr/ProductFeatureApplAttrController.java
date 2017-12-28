@@ -68,30 +68,6 @@ public class ProductFeatureApplAttrController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductFeatureApplAttr> createProductFeatureApplAttr(HttpServletRequest request) throws Exception {
-
-		ProductFeatureApplAttr productFeatureApplAttrToBeAdded = new ProductFeatureApplAttr();
-		try {
-			productFeatureApplAttrToBeAdded = ProductFeatureApplAttrMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductFeatureApplAttr(productFeatureApplAttrToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductFeatureApplAttr entry in the ofbiz database
 	 * 
 	 * @param productFeatureApplAttrToBeAdded

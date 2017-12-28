@@ -68,30 +68,6 @@ public class InventoryItemTempResController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<InventoryItemTempRes> createInventoryItemTempRes(HttpServletRequest request) throws Exception {
-
-		InventoryItemTempRes inventoryItemTempResToBeAdded = new InventoryItemTempRes();
-		try {
-			inventoryItemTempResToBeAdded = InventoryItemTempResMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createInventoryItemTempRes(inventoryItemTempResToBeAdded);
-
-	}
-
-	/**
 	 * creates a new InventoryItemTempRes entry in the ofbiz database
 	 * 
 	 * @param inventoryItemTempResToBeAdded

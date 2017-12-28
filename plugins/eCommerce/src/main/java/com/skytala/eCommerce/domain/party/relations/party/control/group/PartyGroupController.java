@@ -68,30 +68,6 @@ public class PartyGroupController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PartyGroup> createPartyGroup(HttpServletRequest request) throws Exception {
-
-		PartyGroup partyGroupToBeAdded = new PartyGroup();
-		try {
-			partyGroupToBeAdded = PartyGroupMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPartyGroup(partyGroupToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PartyGroup entry in the ofbiz database
 	 * 
 	 * @param partyGroupToBeAdded

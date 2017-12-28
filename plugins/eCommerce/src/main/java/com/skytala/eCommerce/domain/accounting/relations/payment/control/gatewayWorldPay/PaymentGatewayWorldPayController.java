@@ -68,30 +68,6 @@ public class PaymentGatewayWorldPayController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PaymentGatewayWorldPay> createPaymentGatewayWorldPay(HttpServletRequest request) throws Exception {
-
-		PaymentGatewayWorldPay paymentGatewayWorldPayToBeAdded = new PaymentGatewayWorldPay();
-		try {
-			paymentGatewayWorldPayToBeAdded = PaymentGatewayWorldPayMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPaymentGatewayWorldPay(paymentGatewayWorldPayToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PaymentGatewayWorldPay entry in the ofbiz database
 	 * 
 	 * @param paymentGatewayWorldPayToBeAdded

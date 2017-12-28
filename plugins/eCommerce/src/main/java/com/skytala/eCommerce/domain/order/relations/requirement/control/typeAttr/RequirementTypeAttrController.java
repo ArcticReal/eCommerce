@@ -68,30 +68,6 @@ public class RequirementTypeAttrController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<RequirementTypeAttr> createRequirementTypeAttr(HttpServletRequest request) throws Exception {
-
-		RequirementTypeAttr requirementTypeAttrToBeAdded = new RequirementTypeAttr();
-		try {
-			requirementTypeAttrToBeAdded = RequirementTypeAttrMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createRequirementTypeAttr(requirementTypeAttrToBeAdded);
-
-	}
-
-	/**
 	 * creates a new RequirementTypeAttr entry in the ofbiz database
 	 * 
 	 * @param requirementTypeAttrToBeAdded

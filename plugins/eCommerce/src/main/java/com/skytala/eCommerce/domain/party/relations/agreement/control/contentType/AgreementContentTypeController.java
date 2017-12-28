@@ -68,30 +68,6 @@ public class AgreementContentTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<AgreementContentType> createAgreementContentType(HttpServletRequest request) throws Exception {
-
-		AgreementContentType agreementContentTypeToBeAdded = new AgreementContentType();
-		try {
-			agreementContentTypeToBeAdded = AgreementContentTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createAgreementContentType(agreementContentTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new AgreementContentType entry in the ofbiz database
 	 * 
 	 * @param agreementContentTypeToBeAdded

@@ -68,30 +68,6 @@ public class ReturnItemBillingController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ReturnItemBilling> createReturnItemBilling(HttpServletRequest request) throws Exception {
-
-		ReturnItemBilling returnItemBillingToBeAdded = new ReturnItemBilling();
-		try {
-			returnItemBillingToBeAdded = ReturnItemBillingMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createReturnItemBilling(returnItemBillingToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ReturnItemBilling entry in the ofbiz database
 	 * 
 	 * @param returnItemBillingToBeAdded

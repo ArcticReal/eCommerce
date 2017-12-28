@@ -68,30 +68,6 @@ public class OrderTypeAttrController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<OrderTypeAttr> createOrderTypeAttr(HttpServletRequest request) throws Exception {
-
-		OrderTypeAttr orderTypeAttrToBeAdded = new OrderTypeAttr();
-		try {
-			orderTypeAttrToBeAdded = OrderTypeAttrMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createOrderTypeAttr(orderTypeAttrToBeAdded);
-
-	}
-
-	/**
 	 * creates a new OrderTypeAttr entry in the ofbiz database
 	 * 
 	 * @param orderTypeAttrToBeAdded

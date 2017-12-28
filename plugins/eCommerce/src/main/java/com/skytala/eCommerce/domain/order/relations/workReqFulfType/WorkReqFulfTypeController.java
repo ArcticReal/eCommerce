@@ -68,30 +68,6 @@ public class WorkReqFulfTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<WorkReqFulfType> createWorkReqFulfType(HttpServletRequest request) throws Exception {
-
-		WorkReqFulfType workReqFulfTypeToBeAdded = new WorkReqFulfType();
-		try {
-			workReqFulfTypeToBeAdded = WorkReqFulfTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createWorkReqFulfType(workReqFulfTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new WorkReqFulfType entry in the ofbiz database
 	 * 
 	 * @param workReqFulfTypeToBeAdded

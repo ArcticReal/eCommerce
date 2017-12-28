@@ -68,30 +68,6 @@ public class ProductFeaturePriceController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductFeaturePrice> createProductFeaturePrice(HttpServletRequest request) throws Exception {
-
-		ProductFeaturePrice productFeaturePriceToBeAdded = new ProductFeaturePrice();
-		try {
-			productFeaturePriceToBeAdded = ProductFeaturePriceMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductFeaturePrice(productFeaturePriceToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductFeaturePrice entry in the ofbiz database
 	 * 
 	 * @param productFeaturePriceToBeAdded

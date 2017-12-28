@@ -68,30 +68,6 @@ public class ProductMeterController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductMeter> createProductMeter(HttpServletRequest request) throws Exception {
-
-		ProductMeter productMeterToBeAdded = new ProductMeter();
-		try {
-			productMeterToBeAdded = ProductMeterMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductMeter(productMeterToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductMeter entry in the ofbiz database
 	 * 
 	 * @param productMeterToBeAdded

@@ -68,30 +68,6 @@ public class PartyStatusController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PartyStatus> createPartyStatus(HttpServletRequest request) throws Exception {
-
-		PartyStatus partyStatusToBeAdded = new PartyStatus();
-		try {
-			partyStatusToBeAdded = PartyStatusMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPartyStatus(partyStatusToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PartyStatus entry in the ofbiz database
 	 * 
 	 * @param partyStatusToBeAdded

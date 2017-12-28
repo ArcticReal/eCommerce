@@ -68,30 +68,6 @@ public class ShipmentTypeAttrController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ShipmentTypeAttr> createShipmentTypeAttr(HttpServletRequest request) throws Exception {
-
-		ShipmentTypeAttr shipmentTypeAttrToBeAdded = new ShipmentTypeAttr();
-		try {
-			shipmentTypeAttrToBeAdded = ShipmentTypeAttrMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createShipmentTypeAttr(shipmentTypeAttrToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ShipmentTypeAttr entry in the ofbiz database
 	 * 
 	 * @param shipmentTypeAttrToBeAdded

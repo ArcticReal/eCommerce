@@ -68,30 +68,6 @@ public class EmplLeaveController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<EmplLeave> createEmplLeave(HttpServletRequest request) throws Exception {
-
-		EmplLeave emplLeaveToBeAdded = new EmplLeave();
-		try {
-			emplLeaveToBeAdded = EmplLeaveMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createEmplLeave(emplLeaveToBeAdded);
-
-	}
-
-	/**
 	 * creates a new EmplLeave entry in the ofbiz database
 	 * 
 	 * @param emplLeaveToBeAdded

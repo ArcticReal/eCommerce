@@ -68,30 +68,6 @@ public class WorkEffortPurposeTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<WorkEffortPurposeType> createWorkEffortPurposeType(HttpServletRequest request) throws Exception {
-
-		WorkEffortPurposeType workEffortPurposeTypeToBeAdded = new WorkEffortPurposeType();
-		try {
-			workEffortPurposeTypeToBeAdded = WorkEffortPurposeTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createWorkEffortPurposeType(workEffortPurposeTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new WorkEffortPurposeType entry in the ofbiz database
 	 * 
 	 * @param workEffortPurposeTypeToBeAdded

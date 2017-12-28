@@ -68,30 +68,6 @@ public class ProductStoreVendorPaymentController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductStoreVendorPayment> createProductStoreVendorPayment(HttpServletRequest request) throws Exception {
-
-		ProductStoreVendorPayment productStoreVendorPaymentToBeAdded = new ProductStoreVendorPayment();
-		try {
-			productStoreVendorPaymentToBeAdded = ProductStoreVendorPaymentMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductStoreVendorPayment(productStoreVendorPaymentToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductStoreVendorPayment entry in the ofbiz database
 	 * 
 	 * @param productStoreVendorPaymentToBeAdded

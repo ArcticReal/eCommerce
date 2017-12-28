@@ -68,30 +68,6 @@ public class WebAnalyticsConfigController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<WebAnalyticsConfig> createWebAnalyticsConfig(HttpServletRequest request) throws Exception {
-
-		WebAnalyticsConfig webAnalyticsConfigToBeAdded = new WebAnalyticsConfig();
-		try {
-			webAnalyticsConfigToBeAdded = WebAnalyticsConfigMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createWebAnalyticsConfig(webAnalyticsConfigToBeAdded);
-
-	}
-
-	/**
 	 * creates a new WebAnalyticsConfig entry in the ofbiz database
 	 * 
 	 * @param webAnalyticsConfigToBeAdded

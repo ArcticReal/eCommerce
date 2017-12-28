@@ -68,30 +68,6 @@ public class DataResourcePurposeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<DataResourcePurpose> createDataResourcePurpose(HttpServletRequest request) throws Exception {
-
-		DataResourcePurpose dataResourcePurposeToBeAdded = new DataResourcePurpose();
-		try {
-			dataResourcePurposeToBeAdded = DataResourcePurposeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createDataResourcePurpose(dataResourcePurposeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new DataResourcePurpose entry in the ofbiz database
 	 * 
 	 * @param dataResourcePurposeToBeAdded

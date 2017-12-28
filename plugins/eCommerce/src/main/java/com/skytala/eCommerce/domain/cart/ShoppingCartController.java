@@ -80,18 +80,14 @@ public class ShoppingCartController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/add")
 	@PreAuthorize(HAS_USER_AUTHORITY)
-	public ResponseEntity<String> addToCart(HttpSession session, @RequestParam Map<String, String> allRequestParams) throws Exception {
+	public ResponseEntity<String> addToCart(HttpSession session,
+											@RequestParam("productId") String productId,
+											@RequestParam("count") BigDecimal count) throws Exception {
 
-		BigDecimal anz = new BigDecimal(1);
 
-		if(allRequestParams.get("count") == null)
-			throw new IllegalArgumentException("no count given");
-		else{
-			anz = new BigDecimal(Integer.parseInt(allRequestParams.get("count")));
+		if(count.compareTo(BigDecimal.ZERO)<0)
+			throw new IllegalArgumentException("while adding count is not supposed to be negative; please use the remove function");
 
-			if(anz.compareTo(BigDecimal.ZERO)<0)
-				throw new IllegalArgumentException("while adding count is not supposed to be negative; please use the remove function");
-		}
 		if (session.getAttribute("cart") == null) {
 			ShoppingCart sc = new ShoppingCart();
 			session.setAttribute("cart", sc);
@@ -101,8 +97,8 @@ public class ShoppingCartController {
 
 		
 		try{
-			if(allRequestParams.get("productId") != null){				
-			pro = productController.findById(allRequestParams.get("productId")).getBody();
+			if(productId != null){
+			pro = productController.findById(productId).getBody();
 			}
 			else{
 				return badRequest();
@@ -116,7 +112,7 @@ public class ShoppingCartController {
 
 
 
-		if (!pro.getProductId().equals(allRequestParams.get("productId"))) {
+		if (!pro.getProductId().equals(productId)) {
 			return badRequest();
 		}
 
@@ -125,7 +121,7 @@ public class ShoppingCartController {
 		for (int i = 0; i < sc.getPositions().size(); i++) {
 			if (pro.getProductId().equals(sc.getPositions().get(i).getProduct().getProductId())) {
 				BigDecimal ibuf = sc.getPositions().get(i).getNumberProducts();
-				sc.getPositions().get(i).setNumberProducts(ibuf.add(anz));
+				sc.getPositions().get(i).setNumberProducts(ibuf.add(count));
 				sc.setGrandTotal(calculateGrandTotal(sc));
 				session.setAttribute("cart", sc);
 				return successful();
@@ -134,7 +130,7 @@ public class ShoppingCartController {
 
 		}
 
-		Position pos = new Position(pro, anz);
+		Position pos = new Position(pro, count);
 		sc.addPosition(pos);
 		sc.setGrandTotal(calculateGrandTotal(sc));
 
@@ -145,16 +141,18 @@ public class ShoppingCartController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "/remove")
 	@PreAuthorize(HAS_USER_AUTHORITY)
-	public ResponseEntity<String> removeFromCart(HttpSession session, @RequestParam Map<String, String> allRequestParams) {
+	public ResponseEntity<String> removeFromCart(HttpSession session,
+                                                 @RequestParam("productId") String productId,
+                                                 @RequestParam("count") BigDecimal count) {
 
-		if (allRequestParams.get("productId") != null) {
-			int count = Integer.parseInt(allRequestParams.get("count"));
+		if (productId != null) {
+
 			ShoppingCart sc = (ShoppingCart) session.getAttribute("cart");
 
 			for (int i = 0; i < sc.getPositions().size(); i++) {
-				if (sc.getPositions().get(i).getProduct().getProductId().equals(allRequestParams.get("productId"))) {
+				if (sc.getPositions().get(i).getProduct().getProductId().equals(productId)) {
 					sc.getPositions().get(i).setNumberProducts(
-							sc.getPositions().get(i).getNumberProducts().subtract(new BigDecimal(count)));
+							sc.getPositions().get(i).getNumberProducts().subtract(count));
 					if (sc.getPositions().get(i).getNumberProducts().signum() <= 0) {
 						sc.removebyPosition(i);
 					}

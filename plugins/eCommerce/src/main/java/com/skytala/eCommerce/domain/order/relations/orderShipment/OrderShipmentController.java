@@ -68,30 +68,6 @@ public class OrderShipmentController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<OrderShipment> createOrderShipment(HttpServletRequest request) throws Exception {
-
-		OrderShipment orderShipmentToBeAdded = new OrderShipment();
-		try {
-			orderShipmentToBeAdded = OrderShipmentMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createOrderShipment(orderShipmentToBeAdded);
-
-	}
-
-	/**
 	 * creates a new OrderShipment entry in the ofbiz database
 	 * 
 	 * @param orderShipmentToBeAdded

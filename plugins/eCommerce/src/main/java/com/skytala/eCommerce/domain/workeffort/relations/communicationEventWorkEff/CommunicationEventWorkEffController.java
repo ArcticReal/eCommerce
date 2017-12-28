@@ -68,30 +68,6 @@ public class CommunicationEventWorkEffController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<CommunicationEventWorkEff> createCommunicationEventWorkEff(HttpServletRequest request) throws Exception {
-
-		CommunicationEventWorkEff communicationEventWorkEffToBeAdded = new CommunicationEventWorkEff();
-		try {
-			communicationEventWorkEffToBeAdded = CommunicationEventWorkEffMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createCommunicationEventWorkEff(communicationEventWorkEffToBeAdded);
-
-	}
-
-	/**
 	 * creates a new CommunicationEventWorkEff entry in the ofbiz database
 	 * 
 	 * @param communicationEventWorkEffToBeAdded

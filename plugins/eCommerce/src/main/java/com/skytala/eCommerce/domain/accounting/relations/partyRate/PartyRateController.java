@@ -68,30 +68,6 @@ public class PartyRateController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PartyRate> createPartyRate(HttpServletRequest request) throws Exception {
-
-		PartyRate partyRateToBeAdded = new PartyRate();
-		try {
-			partyRateToBeAdded = PartyRateMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPartyRate(partyRateToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PartyRate entry in the ofbiz database
 	 * 
 	 * @param partyRateToBeAdded

@@ -68,30 +68,6 @@ public class OrderAttributeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<OrderAttribute> createOrderAttribute(HttpServletRequest request) throws Exception {
-
-		OrderAttribute orderAttributeToBeAdded = new OrderAttribute();
-		try {
-			orderAttributeToBeAdded = OrderAttributeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createOrderAttribute(orderAttributeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new OrderAttribute entry in the ofbiz database
 	 * 
 	 * @param orderAttributeToBeAdded

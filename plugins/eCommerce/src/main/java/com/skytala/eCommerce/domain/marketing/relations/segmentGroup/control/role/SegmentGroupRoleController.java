@@ -68,30 +68,6 @@ public class SegmentGroupRoleController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<SegmentGroupRole> createSegmentGroupRole(HttpServletRequest request) throws Exception {
-
-		SegmentGroupRole segmentGroupRoleToBeAdded = new SegmentGroupRole();
-		try {
-			segmentGroupRoleToBeAdded = SegmentGroupRoleMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createSegmentGroupRole(segmentGroupRoleToBeAdded);
-
-	}
-
-	/**
 	 * creates a new SegmentGroupRole entry in the ofbiz database
 	 * 
 	 * @param segmentGroupRoleToBeAdded

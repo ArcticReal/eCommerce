@@ -68,30 +68,6 @@ public class ProductSearchConstraintController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductSearchConstraint> createProductSearchConstraint(HttpServletRequest request) throws Exception {
-
-		ProductSearchConstraint productSearchConstraintToBeAdded = new ProductSearchConstraint();
-		try {
-			productSearchConstraintToBeAdded = ProductSearchConstraintMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductSearchConstraint(productSearchConstraintToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductSearchConstraint entry in the ofbiz database
 	 * 
 	 * @param productSearchConstraintToBeAdded

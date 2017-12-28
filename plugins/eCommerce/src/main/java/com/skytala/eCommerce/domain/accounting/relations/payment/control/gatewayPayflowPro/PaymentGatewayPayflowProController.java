@@ -68,30 +68,6 @@ public class PaymentGatewayPayflowProController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PaymentGatewayPayflowPro> createPaymentGatewayPayflowPro(HttpServletRequest request) throws Exception {
-
-		PaymentGatewayPayflowPro paymentGatewayPayflowProToBeAdded = new PaymentGatewayPayflowPro();
-		try {
-			paymentGatewayPayflowProToBeAdded = PaymentGatewayPayflowProMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPaymentGatewayPayflowPro(paymentGatewayPayflowProToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PaymentGatewayPayflowPro entry in the ofbiz database
 	 * 
 	 * @param paymentGatewayPayflowProToBeAdded

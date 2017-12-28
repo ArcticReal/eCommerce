@@ -68,30 +68,6 @@ public class CarrierShipmentBoxTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<CarrierShipmentBoxType> createCarrierShipmentBoxType(HttpServletRequest request) throws Exception {
-
-		CarrierShipmentBoxType carrierShipmentBoxTypeToBeAdded = new CarrierShipmentBoxType();
-		try {
-			carrierShipmentBoxTypeToBeAdded = CarrierShipmentBoxTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createCarrierShipmentBoxType(carrierShipmentBoxTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new CarrierShipmentBoxType entry in the ofbiz database
 	 * 
 	 * @param carrierShipmentBoxTypeToBeAdded

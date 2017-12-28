@@ -1791,7 +1791,7 @@ public class CommonsServiceController{
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/userLogin")
-	public ResponseEntity<Map<String, Object>> userLogin(HttpSession session, @RequestParam(value="login.username") String loginusername, @RequestParam(value="login.password") String loginpassword, @RequestParam(value="visitId", required=false) String visitId, @RequestParam(value="isServiceAuth", required=false) Boolean isServiceAuth) {
+	public ResponseEntity<Map<String, Object>> userLogin(HttpSession session, @RequestParam(value="loginusername") String loginusername, @RequestParam(value="loginpassword") String loginpassword, @RequestParam(value="visitId", required=false) String visitId, @RequestParam(value="isServiceAuth", required=false) Boolean isServiceAuth) {
 		
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("login.username",loginusername);

@@ -68,30 +68,6 @@ public class ValidResponsibilityController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ValidResponsibility> createValidResponsibility(HttpServletRequest request) throws Exception {
-
-		ValidResponsibility validResponsibilityToBeAdded = new ValidResponsibility();
-		try {
-			validResponsibilityToBeAdded = ValidResponsibilityMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createValidResponsibility(validResponsibilityToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ValidResponsibility entry in the ofbiz database
 	 * 
 	 * @param validResponsibilityToBeAdded

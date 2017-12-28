@@ -68,30 +68,6 @@ public class ZipSalesRuleLookupController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ZipSalesRuleLookup> createZipSalesRuleLookup(HttpServletRequest request) throws Exception {
-
-		ZipSalesRuleLookup zipSalesRuleLookupToBeAdded = new ZipSalesRuleLookup();
-		try {
-			zipSalesRuleLookupToBeAdded = ZipSalesRuleLookupMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createZipSalesRuleLookup(zipSalesRuleLookupToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ZipSalesRuleLookup entry in the ofbiz database
 	 * 
 	 * @param zipSalesRuleLookupToBeAdded

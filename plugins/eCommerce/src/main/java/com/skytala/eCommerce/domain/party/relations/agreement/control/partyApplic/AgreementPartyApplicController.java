@@ -68,30 +68,6 @@ public class AgreementPartyApplicController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<AgreementPartyApplic> createAgreementPartyApplic(HttpServletRequest request) throws Exception {
-
-		AgreementPartyApplic agreementPartyApplicToBeAdded = new AgreementPartyApplic();
-		try {
-			agreementPartyApplicToBeAdded = AgreementPartyApplicMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createAgreementPartyApplic(agreementPartyApplicToBeAdded);
-
-	}
-
-	/**
 	 * creates a new AgreementPartyApplic entry in the ofbiz database
 	 * 
 	 * @param agreementPartyApplicToBeAdded

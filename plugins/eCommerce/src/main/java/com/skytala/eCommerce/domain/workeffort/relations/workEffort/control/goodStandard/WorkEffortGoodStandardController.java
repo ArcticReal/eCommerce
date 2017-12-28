@@ -68,30 +68,6 @@ public class WorkEffortGoodStandardController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<WorkEffortGoodStandard> createWorkEffortGoodStandard(HttpServletRequest request) throws Exception {
-
-		WorkEffortGoodStandard workEffortGoodStandardToBeAdded = new WorkEffortGoodStandard();
-		try {
-			workEffortGoodStandardToBeAdded = WorkEffortGoodStandardMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createWorkEffortGoodStandard(workEffortGoodStandardToBeAdded);
-
-	}
-
-	/**
 	 * creates a new WorkEffortGoodStandard entry in the ofbiz database
 	 * 
 	 * @param workEffortGoodStandardToBeAdded

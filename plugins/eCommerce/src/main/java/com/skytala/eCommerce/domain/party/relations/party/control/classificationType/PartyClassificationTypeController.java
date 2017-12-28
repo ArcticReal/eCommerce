@@ -68,30 +68,6 @@ public class PartyClassificationTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PartyClassificationType> createPartyClassificationType(HttpServletRequest request) throws Exception {
-
-		PartyClassificationType partyClassificationTypeToBeAdded = new PartyClassificationType();
-		try {
-			partyClassificationTypeToBeAdded = PartyClassificationTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPartyClassificationType(partyClassificationTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PartyClassificationType entry in the ofbiz database
 	 * 
 	 * @param partyClassificationTypeToBeAdded

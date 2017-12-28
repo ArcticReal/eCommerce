@@ -68,30 +68,6 @@ public class ShipmentGatewayUpsController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ShipmentGatewayUps> createShipmentGatewayUps(HttpServletRequest request) throws Exception {
-
-		ShipmentGatewayUps shipmentGatewayUpsToBeAdded = new ShipmentGatewayUps();
-		try {
-			shipmentGatewayUpsToBeAdded = ShipmentGatewayUpsMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createShipmentGatewayUps(shipmentGatewayUpsToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ShipmentGatewayUps entry in the ofbiz database
 	 * 
 	 * @param shipmentGatewayUpsToBeAdded

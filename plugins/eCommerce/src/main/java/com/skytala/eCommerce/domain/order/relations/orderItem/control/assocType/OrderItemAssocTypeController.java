@@ -68,30 +68,6 @@ public class OrderItemAssocTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<OrderItemAssocType> createOrderItemAssocType(HttpServletRequest request) throws Exception {
-
-		OrderItemAssocType orderItemAssocTypeToBeAdded = new OrderItemAssocType();
-		try {
-			orderItemAssocTypeToBeAdded = OrderItemAssocTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createOrderItemAssocType(orderItemAssocTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new OrderItemAssocType entry in the ofbiz database
 	 * 
 	 * @param orderItemAssocTypeToBeAdded

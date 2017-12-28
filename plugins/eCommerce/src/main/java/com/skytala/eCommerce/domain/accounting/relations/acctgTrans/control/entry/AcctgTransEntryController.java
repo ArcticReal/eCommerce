@@ -68,30 +68,6 @@ public class AcctgTransEntryController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<AcctgTransEntry> createAcctgTransEntry(HttpServletRequest request) throws Exception {
-
-		AcctgTransEntry acctgTransEntryToBeAdded = new AcctgTransEntry();
-		try {
-			acctgTransEntryToBeAdded = AcctgTransEntryMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createAcctgTransEntry(acctgTransEntryToBeAdded);
-
-	}
-
-	/**
 	 * creates a new AcctgTransEntry entry in the ofbiz database
 	 * 
 	 * @param acctgTransEntryToBeAdded

@@ -68,30 +68,6 @@ public class SubscriptionController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<Subscription> createSubscription(HttpServletRequest request) throws Exception {
-
-		Subscription subscriptionToBeAdded = new Subscription();
-		try {
-			subscriptionToBeAdded = SubscriptionMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createSubscription(subscriptionToBeAdded);
-
-	}
-
-	/**
 	 * creates a new Subscription entry in the ofbiz database
 	 * 
 	 * @param subscriptionToBeAdded

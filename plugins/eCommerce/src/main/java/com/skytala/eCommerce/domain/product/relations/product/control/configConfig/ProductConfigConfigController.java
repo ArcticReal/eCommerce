@@ -68,30 +68,6 @@ public class ProductConfigConfigController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductConfigConfig> createProductConfigConfig(HttpServletRequest request) throws Exception {
-
-		ProductConfigConfig productConfigConfigToBeAdded = new ProductConfigConfig();
-		try {
-			productConfigConfigToBeAdded = ProductConfigConfigMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductConfigConfig(productConfigConfigToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductConfigConfig entry in the ofbiz database
 	 * 
 	 * @param productConfigConfigToBeAdded

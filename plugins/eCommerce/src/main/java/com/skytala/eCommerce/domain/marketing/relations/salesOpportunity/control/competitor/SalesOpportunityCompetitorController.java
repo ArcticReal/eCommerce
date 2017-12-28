@@ -68,30 +68,6 @@ public class SalesOpportunityCompetitorController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<SalesOpportunityCompetitor> createSalesOpportunityCompetitor(HttpServletRequest request) throws Exception {
-
-		SalesOpportunityCompetitor salesOpportunityCompetitorToBeAdded = new SalesOpportunityCompetitor();
-		try {
-			salesOpportunityCompetitorToBeAdded = SalesOpportunityCompetitorMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createSalesOpportunityCompetitor(salesOpportunityCompetitorToBeAdded);
-
-	}
-
-	/**
 	 * creates a new SalesOpportunityCompetitor entry in the ofbiz database
 	 * 
 	 * @param salesOpportunityCompetitorToBeAdded

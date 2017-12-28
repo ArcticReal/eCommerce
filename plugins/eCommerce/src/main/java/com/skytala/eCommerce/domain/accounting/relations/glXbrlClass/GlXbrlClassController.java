@@ -68,30 +68,6 @@ public class GlXbrlClassController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<GlXbrlClass> createGlXbrlClass(HttpServletRequest request) throws Exception {
-
-		GlXbrlClass glXbrlClassToBeAdded = new GlXbrlClass();
-		try {
-			glXbrlClassToBeAdded = GlXbrlClassMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createGlXbrlClass(glXbrlClassToBeAdded);
-
-	}
-
-	/**
 	 * creates a new GlXbrlClass entry in the ofbiz database
 	 * 
 	 * @param glXbrlClassToBeAdded

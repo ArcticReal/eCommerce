@@ -68,30 +68,6 @@ public class TrackingCodeOrderController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<TrackingCodeOrder> createTrackingCodeOrder(HttpServletRequest request) throws Exception {
-
-		TrackingCodeOrder trackingCodeOrderToBeAdded = new TrackingCodeOrder();
-		try {
-			trackingCodeOrderToBeAdded = TrackingCodeOrderMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createTrackingCodeOrder(trackingCodeOrderToBeAdded);
-
-	}
-
-	/**
 	 * creates a new TrackingCodeOrder entry in the ofbiz database
 	 * 
 	 * @param trackingCodeOrderToBeAdded

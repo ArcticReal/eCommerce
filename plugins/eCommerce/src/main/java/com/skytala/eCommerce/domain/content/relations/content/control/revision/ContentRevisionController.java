@@ -68,30 +68,6 @@ public class ContentRevisionController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ContentRevision> createContentRevision(HttpServletRequest request) throws Exception {
-
-		ContentRevision contentRevisionToBeAdded = new ContentRevision();
-		try {
-			contentRevisionToBeAdded = ContentRevisionMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createContentRevision(contentRevisionToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ContentRevision entry in the ofbiz database
 	 * 
 	 * @param contentRevisionToBeAdded

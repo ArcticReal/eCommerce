@@ -68,30 +68,6 @@ public class TrackingCodeVisitController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<TrackingCodeVisit> createTrackingCodeVisit(HttpServletRequest request) throws Exception {
-
-		TrackingCodeVisit trackingCodeVisitToBeAdded = new TrackingCodeVisit();
-		try {
-			trackingCodeVisitToBeAdded = TrackingCodeVisitMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createTrackingCodeVisit(trackingCodeVisitToBeAdded);
-
-	}
-
-	/**
 	 * creates a new TrackingCodeVisit entry in the ofbiz database
 	 * 
 	 * @param trackingCodeVisitToBeAdded

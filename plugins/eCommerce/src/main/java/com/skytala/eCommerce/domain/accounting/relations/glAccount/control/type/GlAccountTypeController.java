@@ -68,30 +68,6 @@ public class GlAccountTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<GlAccountType> createGlAccountType(HttpServletRequest request) throws Exception {
-
-		GlAccountType glAccountTypeToBeAdded = new GlAccountType();
-		try {
-			glAccountTypeToBeAdded = GlAccountTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createGlAccountType(glAccountTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new GlAccountType entry in the ofbiz database
 	 * 
 	 * @param glAccountTypeToBeAdded

@@ -68,30 +68,6 @@ public class OrderItemShipGrpInvResController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<OrderItemShipGrpInvRes> createOrderItemShipGrpInvRes(HttpServletRequest request) throws Exception {
-
-		OrderItemShipGrpInvRes orderItemShipGrpInvResToBeAdded = new OrderItemShipGrpInvRes();
-		try {
-			orderItemShipGrpInvResToBeAdded = OrderItemShipGrpInvResMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createOrderItemShipGrpInvRes(orderItemShipGrpInvResToBeAdded);
-
-	}
-
-	/**
 	 * creates a new OrderItemShipGrpInvRes entry in the ofbiz database
 	 * 
 	 * @param orderItemShipGrpInvResToBeAdded

@@ -68,30 +68,6 @@ public class PartyQualTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PartyQualType> createPartyQualType(HttpServletRequest request) throws Exception {
-
-		PartyQualType partyQualTypeToBeAdded = new PartyQualType();
-		try {
-			partyQualTypeToBeAdded = PartyQualTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPartyQualType(partyQualTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PartyQualType entry in the ofbiz database
 	 * 
 	 * @param partyQualTypeToBeAdded

@@ -68,30 +68,6 @@ public class ProductPromoCodePartyController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductPromoCodeParty> createProductPromoCodeParty(HttpServletRequest request) throws Exception {
-
-		ProductPromoCodeParty productPromoCodePartyToBeAdded = new ProductPromoCodeParty();
-		try {
-			productPromoCodePartyToBeAdded = ProductPromoCodePartyMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductPromoCodeParty(productPromoCodePartyToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductPromoCodeParty entry in the ofbiz database
 	 * 
 	 * @param productPromoCodePartyToBeAdded

@@ -394,7 +394,7 @@ public class LoginServicesController {
         Map resultMap = commonsServiceController.userLogin(session,
                 "flexadmin",
                 "ofbiz",
-                "1000",
+                "10000",
                 true).getBody();
 
         if(resultMap!=null)

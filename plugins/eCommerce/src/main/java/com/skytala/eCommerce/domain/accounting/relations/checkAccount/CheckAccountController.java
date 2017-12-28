@@ -68,30 +68,6 @@ public class CheckAccountController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<CheckAccount> createCheckAccount(HttpServletRequest request) throws Exception {
-
-		CheckAccount checkAccountToBeAdded = new CheckAccount();
-		try {
-			checkAccountToBeAdded = CheckAccountMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createCheckAccount(checkAccountToBeAdded);
-
-	}
-
-	/**
 	 * creates a new CheckAccount entry in the ofbiz database
 	 * 
 	 * @param checkAccountToBeAdded

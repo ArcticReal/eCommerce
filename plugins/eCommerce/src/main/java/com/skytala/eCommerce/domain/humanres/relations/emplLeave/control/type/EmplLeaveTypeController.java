@@ -68,30 +68,6 @@ public class EmplLeaveTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<EmplLeaveType> createEmplLeaveType(HttpServletRequest request) throws Exception {
-
-		EmplLeaveType emplLeaveTypeToBeAdded = new EmplLeaveType();
-		try {
-			emplLeaveTypeToBeAdded = EmplLeaveTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createEmplLeaveType(emplLeaveTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new EmplLeaveType entry in the ofbiz database
 	 * 
 	 * @param emplLeaveTypeToBeAdded

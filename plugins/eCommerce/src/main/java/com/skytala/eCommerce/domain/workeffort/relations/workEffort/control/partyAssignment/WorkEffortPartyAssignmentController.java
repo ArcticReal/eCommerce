@@ -68,30 +68,6 @@ public class WorkEffortPartyAssignmentController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<WorkEffortPartyAssignment> createWorkEffortPartyAssignment(HttpServletRequest request) throws Exception {
-
-		WorkEffortPartyAssignment workEffortPartyAssignmentToBeAdded = new WorkEffortPartyAssignment();
-		try {
-			workEffortPartyAssignmentToBeAdded = WorkEffortPartyAssignmentMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createWorkEffortPartyAssignment(workEffortPartyAssignmentToBeAdded);
-
-	}
-
-	/**
 	 * creates a new WorkEffortPartyAssignment entry in the ofbiz database
 	 * 
 	 * @param workEffortPartyAssignmentToBeAdded

@@ -68,30 +68,6 @@ public class InventoryItemLabelController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<InventoryItemLabel> createInventoryItemLabel(HttpServletRequest request) throws Exception {
-
-		InventoryItemLabel inventoryItemLabelToBeAdded = new InventoryItemLabel();
-		try {
-			inventoryItemLabelToBeAdded = InventoryItemLabelMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createInventoryItemLabel(inventoryItemLabelToBeAdded);
-
-	}
-
-	/**
 	 * creates a new InventoryItemLabel entry in the ofbiz database
 	 * 
 	 * @param inventoryItemLabelToBeAdded

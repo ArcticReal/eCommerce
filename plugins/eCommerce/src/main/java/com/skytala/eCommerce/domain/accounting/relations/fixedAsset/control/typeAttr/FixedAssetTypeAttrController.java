@@ -68,30 +68,6 @@ public class FixedAssetTypeAttrController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<FixedAssetTypeAttr> createFixedAssetTypeAttr(HttpServletRequest request) throws Exception {
-
-		FixedAssetTypeAttr fixedAssetTypeAttrToBeAdded = new FixedAssetTypeAttr();
-		try {
-			fixedAssetTypeAttrToBeAdded = FixedAssetTypeAttrMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createFixedAssetTypeAttr(fixedAssetTypeAttrToBeAdded);
-
-	}
-
-	/**
 	 * creates a new FixedAssetTypeAttr entry in the ofbiz database
 	 * 
 	 * @param fixedAssetTypeAttrToBeAdded

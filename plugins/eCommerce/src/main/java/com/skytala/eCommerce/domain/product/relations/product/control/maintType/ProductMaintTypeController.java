@@ -68,30 +68,6 @@ public class ProductMaintTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductMaintType> createProductMaintType(HttpServletRequest request) throws Exception {
-
-		ProductMaintType productMaintTypeToBeAdded = new ProductMaintType();
-		try {
-			productMaintTypeToBeAdded = ProductMaintTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductMaintType(productMaintTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductMaintType entry in the ofbiz database
 	 * 
 	 * @param productMaintTypeToBeAdded

@@ -68,30 +68,6 @@ public class FinAccountStatusController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<FinAccountStatus> createFinAccountStatus(HttpServletRequest request) throws Exception {
-
-		FinAccountStatus finAccountStatusToBeAdded = new FinAccountStatus();
-		try {
-			finAccountStatusToBeAdded = FinAccountStatusMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createFinAccountStatus(finAccountStatusToBeAdded);
-
-	}
-
-	/**
 	 * creates a new FinAccountStatus entry in the ofbiz database
 	 * 
 	 * @param finAccountStatusToBeAdded

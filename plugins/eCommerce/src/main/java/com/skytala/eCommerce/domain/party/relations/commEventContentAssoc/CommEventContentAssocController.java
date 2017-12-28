@@ -68,30 +68,6 @@ public class CommEventContentAssocController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<CommEventContentAssoc> createCommEventContentAssoc(HttpServletRequest request) throws Exception {
-
-		CommEventContentAssoc commEventContentAssocToBeAdded = new CommEventContentAssoc();
-		try {
-			commEventContentAssocToBeAdded = CommEventContentAssocMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createCommEventContentAssoc(commEventContentAssocToBeAdded);
-
-	}
-
-	/**
 	 * creates a new CommEventContentAssoc entry in the ofbiz database
 	 * 
 	 * @param commEventContentAssocToBeAdded

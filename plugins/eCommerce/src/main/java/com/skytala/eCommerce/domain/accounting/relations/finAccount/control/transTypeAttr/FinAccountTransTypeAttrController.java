@@ -68,30 +68,6 @@ public class FinAccountTransTypeAttrController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<FinAccountTransTypeAttr> createFinAccountTransTypeAttr(HttpServletRequest request) throws Exception {
-
-		FinAccountTransTypeAttr finAccountTransTypeAttrToBeAdded = new FinAccountTransTypeAttr();
-		try {
-			finAccountTransTypeAttrToBeAdded = FinAccountTransTypeAttrMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createFinAccountTransTypeAttr(finAccountTransTypeAttrToBeAdded);
-
-	}
-
-	/**
 	 * creates a new FinAccountTransTypeAttr entry in the ofbiz database
 	 * 
 	 * @param finAccountTransTypeAttrToBeAdded

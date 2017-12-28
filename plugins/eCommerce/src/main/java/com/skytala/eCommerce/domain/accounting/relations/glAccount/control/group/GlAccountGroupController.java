@@ -68,30 +68,6 @@ public class GlAccountGroupController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<GlAccountGroup> createGlAccountGroup(HttpServletRequest request) throws Exception {
-
-		GlAccountGroup glAccountGroupToBeAdded = new GlAccountGroup();
-		try {
-			glAccountGroupToBeAdded = GlAccountGroupMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createGlAccountGroup(glAccountGroupToBeAdded);
-
-	}
-
-	/**
 	 * creates a new GlAccountGroup entry in the ofbiz database
 	 * 
 	 * @param glAccountGroupToBeAdded

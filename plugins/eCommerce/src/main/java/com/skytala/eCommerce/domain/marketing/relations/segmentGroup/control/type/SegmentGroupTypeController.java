@@ -68,30 +68,6 @@ public class SegmentGroupTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<SegmentGroupType> createSegmentGroupType(HttpServletRequest request) throws Exception {
-
-		SegmentGroupType segmentGroupTypeToBeAdded = new SegmentGroupType();
-		try {
-			segmentGroupTypeToBeAdded = SegmentGroupTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createSegmentGroupType(segmentGroupTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new SegmentGroupType entry in the ofbiz database
 	 * 
 	 * @param segmentGroupTypeToBeAdded

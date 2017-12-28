@@ -68,30 +68,6 @@ public class TerminationReasonController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<TerminationReason> createTerminationReason(HttpServletRequest request) throws Exception {
-
-		TerminationReason terminationReasonToBeAdded = new TerminationReason();
-		try {
-			terminationReasonToBeAdded = TerminationReasonMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createTerminationReason(terminationReasonToBeAdded);
-
-	}
-
-	/**
 	 * creates a new TerminationReason entry in the ofbiz database
 	 * 
 	 * @param terminationReasonToBeAdded

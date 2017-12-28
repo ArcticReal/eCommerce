@@ -68,30 +68,6 @@ public class DocumentTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<DocumentType> createDocumentType(HttpServletRequest request) throws Exception {
-
-		DocumentType documentTypeToBeAdded = new DocumentType();
-		try {
-			documentTypeToBeAdded = DocumentTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createDocumentType(documentTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new DocumentType entry in the ofbiz database
 	 * 
 	 * @param documentTypeToBeAdded

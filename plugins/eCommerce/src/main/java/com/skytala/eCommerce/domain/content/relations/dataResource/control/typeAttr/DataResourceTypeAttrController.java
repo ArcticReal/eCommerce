@@ -68,30 +68,6 @@ public class DataResourceTypeAttrController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<DataResourceTypeAttr> createDataResourceTypeAttr(HttpServletRequest request) throws Exception {
-
-		DataResourceTypeAttr dataResourceTypeAttrToBeAdded = new DataResourceTypeAttr();
-		try {
-			dataResourceTypeAttrToBeAdded = DataResourceTypeAttrMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createDataResourceTypeAttr(dataResourceTypeAttrToBeAdded);
-
-	}
-
-	/**
 	 * creates a new DataResourceTypeAttr entry in the ofbiz database
 	 * 
 	 * @param dataResourceTypeAttrToBeAdded

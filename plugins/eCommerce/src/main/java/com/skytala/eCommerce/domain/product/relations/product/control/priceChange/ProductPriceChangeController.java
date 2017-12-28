@@ -68,30 +68,6 @@ public class ProductPriceChangeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ProductPriceChange> createProductPriceChange(HttpServletRequest request) throws Exception {
-
-		ProductPriceChange productPriceChangeToBeAdded = new ProductPriceChange();
-		try {
-			productPriceChangeToBeAdded = ProductPriceChangeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createProductPriceChange(productPriceChangeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new ProductPriceChange entry in the ofbiz database
 	 * 
 	 * @param productPriceChangeToBeAdded

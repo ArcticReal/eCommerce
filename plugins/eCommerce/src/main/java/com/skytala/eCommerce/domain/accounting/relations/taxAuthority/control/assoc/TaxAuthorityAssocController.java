@@ -68,30 +68,6 @@ public class TaxAuthorityAssocController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<TaxAuthorityAssoc> createTaxAuthorityAssoc(HttpServletRequest request) throws Exception {
-
-		TaxAuthorityAssoc taxAuthorityAssocToBeAdded = new TaxAuthorityAssoc();
-		try {
-			taxAuthorityAssocToBeAdded = TaxAuthorityAssocMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createTaxAuthorityAssoc(taxAuthorityAssocToBeAdded);
-
-	}
-
-	/**
 	 * creates a new TaxAuthorityAssoc entry in the ofbiz database
 	 * 
 	 * @param taxAuthorityAssocToBeAdded

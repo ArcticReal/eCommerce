@@ -68,30 +68,6 @@ public class PerfRatingTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<PerfRatingType> createPerfRatingType(HttpServletRequest request) throws Exception {
-
-		PerfRatingType perfRatingTypeToBeAdded = new PerfRatingType();
-		try {
-			perfRatingTypeToBeAdded = PerfRatingTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createPerfRatingType(perfRatingTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new PerfRatingType entry in the ofbiz database
 	 * 
 	 * @param perfRatingTypeToBeAdded

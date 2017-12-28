@@ -68,30 +68,6 @@ public class EmplPositionTypeRateController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<EmplPositionTypeRate> createEmplPositionTypeRate(HttpServletRequest request) throws Exception {
-
-		EmplPositionTypeRate emplPositionTypeRateToBeAdded = new EmplPositionTypeRate();
-		try {
-			emplPositionTypeRateToBeAdded = EmplPositionTypeRateMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createEmplPositionTypeRate(emplPositionTypeRateToBeAdded);
-
-	}
-
-	/**
 	 * creates a new EmplPositionTypeRate entry in the ofbiz database
 	 * 
 	 * @param emplPositionTypeRateToBeAdded

@@ -68,30 +68,6 @@ public class WebPreferenceTypeController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<WebPreferenceType> createWebPreferenceType(HttpServletRequest request) throws Exception {
-
-		WebPreferenceType webPreferenceTypeToBeAdded = new WebPreferenceType();
-		try {
-			webPreferenceTypeToBeAdded = WebPreferenceTypeMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createWebPreferenceType(webPreferenceTypeToBeAdded);
-
-	}
-
-	/**
 	 * creates a new WebPreferenceType entry in the ofbiz database
 	 * 
 	 * @param webPreferenceTypeToBeAdded

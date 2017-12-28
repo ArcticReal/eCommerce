@@ -68,30 +68,6 @@ public class AcctgTransTypeAttrController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<AcctgTransTypeAttr> createAcctgTransTypeAttr(HttpServletRequest request) throws Exception {
-
-		AcctgTransTypeAttr acctgTransTypeAttrToBeAdded = new AcctgTransTypeAttr();
-		try {
-			acctgTransTypeAttrToBeAdded = AcctgTransTypeAttrMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createAcctgTransTypeAttr(acctgTransTypeAttrToBeAdded);
-
-	}
-
-	/**
 	 * creates a new AcctgTransTypeAttr entry in the ofbiz database
 	 * 
 	 * @param acctgTransTypeAttrToBeAdded

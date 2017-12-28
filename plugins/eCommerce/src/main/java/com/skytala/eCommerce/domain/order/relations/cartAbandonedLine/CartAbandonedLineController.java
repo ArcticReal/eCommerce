@@ -68,30 +68,6 @@ public class CartAbandonedLineController {
 	}
 
 	/**
-	 * 
-	 * this method will only be called by Springs DispatcherServlet
-	 * 
-	 * @param request
-	 *            HttpServletRequest
-	 * @return true on success; false on fail
-	 */
-	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<CartAbandonedLine> createCartAbandonedLine(HttpServletRequest request) throws Exception {
-
-		CartAbandonedLine cartAbandonedLineToBeAdded = new CartAbandonedLine();
-		try {
-			cartAbandonedLineToBeAdded = CartAbandonedLineMapper.map(request);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
-			throw new IllegalArgumentException();
-		}
-
-		return this.createCartAbandonedLine(cartAbandonedLineToBeAdded);
-
-	}
-
-	/**
 	 * creates a new CartAbandonedLine entry in the ofbiz database
 	 * 
 	 * @param cartAbandonedLineToBeAdded
