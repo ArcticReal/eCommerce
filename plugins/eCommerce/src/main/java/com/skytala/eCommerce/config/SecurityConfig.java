@@ -1,22 +1,14 @@
 package com.skytala.eCommerce.config;
 
-import com.skytala.eCommerce.domain.login.relations.securityGroup.model.SecurityGroup;
-import com.skytala.eCommerce.domain.login.relations.securityGroup.model.permission.SecurityGroupPermission;
-import com.skytala.eCommerce.domain.login.relations.securityPermission.model.SecurityPermission;
-import com.skytala.eCommerce.domain.login.relations.userLogin.model.UserLogin;
-import com.skytala.eCommerce.domain.login.relations.userLogin.model.securityGroup.UserLoginSecurityGroup;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AdviceMode;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -24,9 +16,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import javax.resource.spi.SecurityException;
 import javax.sql.DataSource;
-import java.sql.ResultSet;
 import java.util.Arrays;
 
 import static org.springframework.http.HttpMethod.GET;
@@ -39,7 +29,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     @Autowired
     DataSource dataSource;
 
-    public static final String ALEX_SERVER_URL = "http://192.168.49.60:3000";
+    public static final String CORS_SERVER_URL = "http://192.168.49.60:3000";
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -138,7 +128,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     CorsConfigurationSource corsConfigurationSource(){//TODO: remove on server join
 
         CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", ALEX_SERVER_URL));
+		configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", CORS_SERVER_URL));
 		configuration.setAllowedMethods(Arrays.asList("*"));
 		configuration.setAllowCredentials(true);
 		configuration.addAllowedHeader("Content-Type");

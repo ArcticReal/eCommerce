@@ -1,20 +1,13 @@
 package com.skytala.eCommerce.config;
 
-import org.apache.ofbiz.security.Security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.*;
-
-import javax.servlet.FilterRegistration;
 
 @Configuration
 @EnableWebMvc
@@ -43,7 +36,7 @@ public class WebAppConfig extends WebMvcConfigurerAdapter{
 	@Override
 	public void addCorsMappings(CorsRegistry registry){
 		registry.addMapping("/**")
-				.allowedOrigins(SecurityConfig.ALEX_SERVER_URL, "localhost:3000")
+				.allowedOrigins(SecurityConfig.CORS_SERVER_URL, "localhost:3000")
 				.allowCredentials(true)
 				.allowedMethods(HttpMethod.POST.name(),
 								HttpMethod.PUT.name(),
